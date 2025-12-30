@@ -1,0 +1,4 @@
+namespace: microservices-staging
+resources:
+  - ../../base
+  - namespace.yaml

@@ -1,4 +1,0 @@
-namespace: microservices-prod
-resources:
-  - ../../base
-  - namespace.yaml

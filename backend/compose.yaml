@@ -1,0 +1,7 @@
+﻿services:
+  elaviewbackend:
+    image: elaviewbackend
+    build:
+      context: .
+      dockerfile: Dockerfile
+

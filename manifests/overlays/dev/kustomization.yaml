@@ -1,7 +1,0 @@
-namespace: microservices-dev
-resources:
-  - ../../base
-  - namespace.yaml
-  - secret.yaml
-  - secret-store.yaml
-  - external-secret.yaml

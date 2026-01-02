@@ -1,0 +1,163 @@
+---
+description: Elaview project overview, team, and scope
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Elaview Project Overview
+
+## What is Elaview?
+
+Elaview is a **B2B advertising marketplace** that connects local advertisers with physical advertising space owners. Think Airbnb, but for storefront windows, walls, and bulletin boards.
+
+### The Problem We Solve
+
+- **For Advertisers:** Local businesses (restaurants, gyms, salons, realtors) struggle to find affordable, hyper-local advertising that reaches their exact neighborhood
+- **For Space Owners:** Storefronts have unused window/wall space that could generate passive income
+
+### How It Works
+
+```
+Advertiser discovers space → Books & pays (escrow) → Owner accepts → 
+Owner downloads creative file → Prints locally → Installs → 
+Uploads verification photos → Advertiser approves → Owner gets paid
+```
+
+---
+
+## Target Users
+
+### 1. Advertiser ("Local Larry")
+- Owns 1-3 location local business
+- $500-2k/month marketing budget
+- Wants hyper-local reach (specific neighborhoods)
+- Examples: Pizza shop, CrossFit gym, hair salon, real estate agent
+
+### 2. Space Owner ("Storefront Steve")
+- Has empty window, wall, or bulletin board space
+- Wants passive income with minimal effort
+- Prints and installs locally (FedEx, Staples)
+- Examples: Coffee shop, dry cleaner, barbershop, retail store
+
+### 3. Admin (Internal)
+- Web-only access for MVP
+- Manages disputes, refunds, user support
+- Configures space categories and types
+
+---
+
+## Phase 1 Scope (MVP)
+
+### Geographic Focus
+- Orange County, CA
+- Los Angeles, CA (select areas)
+
+### Space Category: Storefronts Only
+| Space Type | Print+Install Fee |
+|------------|-------------------|
+| Bulletin board | $10 |
+| Window poster | $20 |
+| Window vinyl | $35 |
+| Wall mount | $30 |
+| A-frame sign | $25 |
+
+### NOT in MVP (but architecture supports)
+- Billboards
+- Bus stops/benches
+- Vehicle wraps
+- Digital displays
+
+---
+
+## Extensibility Vision
+
+**CRITICAL DESIGN PRINCIPLE:** Space types are **DATABASE-DRIVEN**, not hardcoded.
+
+This means:
+- New space categories (billboards, vehicles, transit) can be added via admin panel
+- No code deployment required for new space types
+- All validation rules, fees, and requirements come from SpaceCategory config
+
+### What Requires Code Changes
+- New fee calculation algorithms (new feeCalculationType values)
+- New verification methods (e.g., video instead of photos)
+- New user roles
+
+### What Does NOT Require Code Changes
+- Adding new SpaceCategory (e.g., "Billboard", "Transit")
+- Adding new SpaceType within a category
+- Changing fees, photo requirements, GPS radius, etc.
+- Enabling/disabling professional installation requirement
+
+---
+
+## Team Structure
+
+### Mike Anderson — Mobile & Frontend Lead
+- **Owns:** Expo React Native mobile app
+- **Responsibilities:** Mobile UI/UX, React Native components, mobile-specific features
+- **Stack expertise:** Expo SDK 54, React Native, TypeScript, Apollo Client
+
+### Quang — Backend & Web Lead
+- **Owns:** .NET GraphQL backend, Next.js web app
+- **Responsibilities:** GraphQL schema, database, Stripe integration, web dashboard
+- **Stack expertise:** .NET, HotChocolate GraphQL, PostgreSQL, Next.js 15
+
+### Collaboration Points
+- Shared packages (packages/features, packages/graphql, packages/shared)
+- GraphQL schema design
+- Payment flow logic
+- Domain model definitions
+
+---
+
+## Key Business Rules
+
+### Two-Stage Payout Flow
+1. **Stage 1 (File Download):** Owner accepts booking + downloads creative file → Receives print+install fee
+2. **Stage 2 (Approval):** Advertiser approves installation (or auto-approves after 48 hours) → Owner receives remainder
+
+### Verification Requirements
+- In-app camera ONLY (no gallery uploads to prevent fraud)
+- 3 photos required: wide shot, close-up, angle shot
+- GPS validation within 100m of listing location
+- Server-verified timestamp
+
+### Creative File Requirements
+- Formats: PDF, PNG, JPG
+- Max size: 25MB (10MB for bulletin boards)
+- Min resolution: 150 DPI
+- Dimensions must match space specifications
+
+### Cancellation Policy
+- Before file download → Full refund to advertiser
+- After file download → Print+install fee kept by owner, remainder refunded
+
+---
+
+## Campaign Details
+
+- **Typical duration:** 1-4 weeks
+- **Pricing model:** Per-week rental (set by space owner)
+- **Payment timing:** Full payment at booking confirmation
+- **Payout timing:** Split across two events (download + approval)
+
+---
+
+## Code Standards (Always Follow)
+
+```typescript
+// ✅ DO: Read space types from API
+const { data: spaceTypes } = useSpaceTypesQuery();
+
+// ❌ DON'T: Hardcode space types
+const SPACE_TYPES = ['window-poster', 'bulletin-board']; // NEVER DO THIS
+```
+
+When working on Elaview code:
+1. Always use TypeScript with strict mode
+2. Never hardcode space types, categories, or their configuration
+3. Follow the bulletproof-react feature pattern
+4. Include tests with every feature
+5. Use semantic git commits: `type(scope): description`

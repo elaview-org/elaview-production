@@ -1,0 +1,1028 @@
+---
+description: Apollo Client and GraphQL patterns
+globs:
+  - "**/graphql/**"
+  - "**/*.graphql"
+  - "**/apollo*/**"
+alwaysApply: false
+---
+
+# GraphQL Patterns
+
+## Overview
+
+Elaview uses GraphQL as the sole API layer between clients (mobile, web) and backend (.NET + HotChocolate).
+
+| Component | Technology |
+|-----------|------------|
+| Client | Apollo Client 3.x |
+| Code Generation | GraphQL Codegen |
+| Backend | .NET + HotChocolate |
+| Schema Location | Backend serves schema |
+
+---
+
+## Apollo Client Setup
+
+### React Native Configuration
+
+```typescript
+// apps/mobile/src/lib/apollo.ts
+import {
+  ApolloClient,
+  InMemoryCache,
+  createHttpLink,
+  from,
+} from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
+import { onError } from '@apollo/client/link/error';
+import { RetryLink } from '@apollo/client/link/retry';
+import { authStorage } from './auth-storage';
+
+// HTTP Link
+const httpLink = createHttpLink({
+  uri: process.env.EXPO_PUBLIC_GRAPHQL_ENDPOINT,
+});
+
+// Auth Link - adds token to requests
+const authLink = setContext(async (_, { headers }) => {
+  const token = await authStorage.getAccessToken();
+  
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  };
+});
+
+// Error Link - handles GraphQL and network errors
+const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
+  if (graphQLErrors) {
+    for (const error of graphQLErrors) {
+      console.error(`[GraphQL Error]: ${error.message}`);
+      
+      // Handle authentication errors
+      if (error.extensions?.code === 'UNAUTHENTICATED') {
+        // Trigger token refresh or logout
+        handleAuthError();
+      }
+    }
+  }
+  
+  if (networkError) {
+    console.error(`[Network Error]: ${networkError.message}`);
+  }
+});
+
+// Retry Link - retries failed requests
+const retryLink = new RetryLink({
+  delay: {
+    initial: 300,
+    max: 3000,
+    jitter: true,
+  },
+  attempts: {
+    max: 3,
+    retryIf: (error) => {
+      // Retry on network errors, not on GraphQL errors
+      return !!error && !error.result;
+    },
+  },
+});
+
+// Cache Configuration
+const cache = new InMemoryCache({
+  typePolicies: {
+    Query: {
+      fields: {
+        // Paginated queries
+        myBookings: {
+          keyArgs: ['status'],
+          merge(existing, incoming, { args }) {
+            if (!args?.after) {
+              return incoming;
+            }
+            return {
+              ...incoming,
+              edges: [...(existing?.edges ?? []), ...incoming.edges],
+            };
+          },
+        },
+        spaces: {
+          keyArgs: ['filter'],
+          merge(existing, incoming, { args }) {
+            if (!args?.after) {
+              return incoming;
+            }
+            return {
+              ...incoming,
+              edges: [...(existing?.edges ?? []), ...incoming.edges],
+            };
+          },
+        },
+      },
+    },
+    // Normalized cache for entities
+    Booking: {
+      keyFields: ['id'],
+    },
+    Space: {
+      keyFields: ['id'],
+    },
+    SpaceCategory: {
+      keyFields: ['id'],
+    },
+    SpaceType: {
+      keyFields: ['id'],
+    },
+    User: {
+      keyFields: ['id'],
+    },
+  },
+});
+
+// Create client
+export const apolloClient = new ApolloClient({
+  link: from([retryLink, errorLink, authLink, httpLink]),
+  cache,
+  defaultOptions: {
+    watchQuery: {
+      fetchPolicy: 'cache-and-network',
+      errorPolicy: 'all',
+    },
+    query: {
+      fetchPolicy: 'cache-first',
+      errorPolicy: 'all',
+    },
+    mutate: {
+      errorPolicy: 'all',
+    },
+  },
+});
+
+async function handleAuthError() {
+  // Try to refresh token
+  const refreshToken = await authStorage.getRefreshToken();
+  if (!refreshToken) {
+    await authStorage.clearTokens();
+    // Navigate to login
+    return;
+  }
+  
+  // Call refresh endpoint...
+}
+```
+
+---
+
+## GraphQL Codegen
+
+### Configuration
+
+```typescript
+// packages/graphql/codegen.ts
+import type { CodegenConfig } from '@graphql-codegen/cli';
+
+const config: CodegenConfig = {
+  schema: process.env.GRAPHQL_ENDPOINT || 'http://localhost:5000/graphql',
+  documents: ['packages/graphql/operations/**/*.graphql'],
+  ignoreNoDocuments: true,
+  generates: {
+    'packages/graphql/generated/types.ts': {
+      plugins: ['typescript'],
+      config: {
+        scalars: {
+          DateTime: 'string',
+          UUID: 'string',
+          Decimal: 'number',
+        },
+        enumsAsTypes: true,
+        skipTypename: false,
+        maybeValue: 'T | null',
+      },
+    },
+    'packages/graphql/generated/operations.ts': {
+      preset: 'import-types',
+      plugins: ['typescript-operations', 'typescript-react-apollo'],
+      presetConfig: {
+        typesPath: './types',
+      },
+      config: {
+        withHooks: true,
+        withComponent: false,
+        withHOC: false,
+        dedupeFragments: true,
+      },
+    },
+    'packages/graphql/generated/introspection.json': {
+      plugins: ['introspection'],
+    },
+  },
+  hooks: {
+    afterAllFileWrite: ['prettier --write'],
+  },
+};
+
+export default config;
+```
+
+### Running Codegen
+
+```bash
+# Generate types from schema
+pnpm --filter @elaview/graphql codegen
+
+# Watch mode during development
+pnpm --filter @elaview/graphql codegen:watch
+```
+
+### Package.json Scripts
+
+```json
+// packages/graphql/package.json
+{
+  "scripts": {
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:watch": "graphql-codegen --config codegen.ts --watch"
+  }
+}
+```
+
+---
+
+## Operation Files Structure
+
+```
+packages/graphql/operations/
+├── fragments/
+│   ├── booking.graphql
+│   ├── space.graphql
+│   ├── user.graphql
+│   └── space-category.graphql
+├── queries/
+│   ├── auth.graphql
+│   ├── bookings.graphql
+│   ├── spaces.graphql
+│   └── space-categories.graphql
+└── mutations/
+    ├── auth.graphql
+    ├── bookings.graphql
+    ├── payments.graphql
+    └── verification.graphql
+```
+
+---
+
+## Fragments
+
+Define reusable fragments for consistent data fetching:
+
+```graphql
+# packages/graphql/operations/fragments/space-category.graphql
+
+# Full category with all config (for validation/business logic)
+fragment SpaceCategoryFull on SpaceCategory {
+  id
+  slug
+  name
+  description
+  isActive
+  
+  # Pricing config
+  basePrintInstallFee
+  feeCalculationType
+  
+  # Verification config
+  requiredPhotoCount
+  requiresGpsValidation
+  gpsRadiusMeters
+  
+  # Installation config
+  requiresProfessionalInstall
+  estimatedInstallDays
+  
+  # Creative requirements
+  supportedFormats
+  maxFileSizeMb
+  minResolutionDpi
+  
+  # Display
+  iconUrl
+  sortOrder
+}
+
+# Minimal category for lists
+fragment SpaceCategoryBasic on SpaceCategory {
+  id
+  slug
+  name
+  iconUrl
+}
+```
+
+```graphql
+# packages/graphql/operations/fragments/booking.graphql
+
+fragment BookingCard on Booking {
+  id
+  status
+  dateRange {
+    startDate
+    endDate
+  }
+  space {
+    id
+    title
+    photos
+    location {
+      city
+      state
+    }
+    spaceType {
+      name
+    }
+  }
+  total
+  createdAt
+}
+
+fragment BookingDetail on Booking {
+  ...BookingCard
+  advertiser {
+    id
+    firstName
+    lastName
+    avatarUrl
+  }
+  space {
+    id
+    title
+    description
+    photos
+    location {
+      address
+      city
+      state
+      latitude
+      longitude
+    }
+    spaceType {
+      id
+      name
+      category {
+        ...SpaceCategoryFull
+      }
+    }
+    owner {
+      id
+      firstName
+      lastName
+      avatarUrl
+    }
+  }
+  creativeFileUrl
+  creativeFileName
+  pricePerWeek
+  totalWeeks
+  subtotal
+  platformFee
+  printInstallFee
+  total
+  requestedAt
+  acceptedAt
+  paidAt
+  fileDownloadedAt
+  installedAt
+  verifiedAt
+  approvedAt
+  completedAt
+  cancelledAt
+  autoApprovalAt
+  verification {
+    id
+    status
+    photos {
+      id
+      url
+      type
+      isGpsValid
+    }
+    disputeReason
+  }
+}
+```
+
+---
+
+## Query Patterns
+
+### Basic Query
+
+```graphql
+# packages/graphql/operations/queries/space-categories.graphql
+
+query GetSpaceCategories {
+  spaceCategories {
+    ...SpaceCategoryFull
+  }
+}
+
+query GetSpaceCategory($slug: String!) {
+  spaceCategory(slug: $slug) {
+    ...SpaceCategoryFull
+    spaceTypes {
+      id
+      slug
+      name
+      standardWidth
+      standardHeight
+      dimensionUnit
+      printInstallFeeOverride
+      isActive
+      sortOrder
+    }
+  }
+}
+```
+
+### Using Generated Hooks
+
+```typescript
+// Using in a component
+import { useGetSpaceCategoriesQuery } from '@elaview/graphql/generated';
+
+export function SpaceCategoryPicker({ value, onChange }: Props) {
+  const { data, loading, error } = useGetSpaceCategoriesQuery({
+    // Categories rarely change - cache aggressively
+    fetchPolicy: 'cache-first',
+  });
+  
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage error={error} />;
+  
+  const categories = data?.spaceCategories ?? [];
+  
+  return (
+    <Picker
+      selectedValue={value}
+      onValueChange={onChange}
+      testID="category-picker"
+    >
+      {categories.map((category) => (
+        <Picker.Item
+          key={category.id}
+          label={category.name}
+          value={category.id}
+        />
+      ))}
+    </Picker>
+  );
+}
+```
+
+### Paginated Query
+
+```graphql
+# packages/graphql/operations/queries/bookings.graphql
+
+query GetMyBookings($status: [BookingStatus!], $first: Int, $after: String) {
+  myBookings(status: $status, first: $first, after: $after) {
+    edges {
+      cursor
+      node {
+        ...BookingCard
+      }
+    }
+    pageInfo {
+      hasNextPage
+      hasPreviousPage
+      startCursor
+      endCursor
+    }
+    totalCount
+  }
+}
+```
+
+```typescript
+// Paginated list with infinite scroll
+import { useGetMyBookingsQuery } from '@elaview/graphql/generated';
+
+export function useBookingsList(statusFilter?: BookingStatus[]) {
+  const { data, loading, error, fetchMore, refetch } = useGetMyBookingsQuery({
+    variables: {
+      status: statusFilter,
+      first: 20,
+    },
+    notifyOnNetworkStatusChange: true,
+  });
+  
+  const bookings = data?.myBookings.edges.map((e) => e.node) ?? [];
+  const pageInfo = data?.myBookings.pageInfo;
+  
+  const loadMore = () => {
+    if (!pageInfo?.hasNextPage || loading) return;
+    
+    fetchMore({
+      variables: {
+        after: pageInfo.endCursor,
+      },
+      // Cache merge happens automatically via typePolicies
+    });
+  };
+  
+  return {
+    bookings,
+    loading,
+    error,
+    hasMore: pageInfo?.hasNextPage ?? false,
+    loadMore,
+    refetch,
+  };
+}
+```
+
+---
+
+## Mutation Patterns
+
+### Basic Mutation
+
+```graphql
+# packages/graphql/operations/mutations/bookings.graphql
+
+mutation AcceptBooking($bookingId: ID!) {
+  acceptBooking(bookingId: $bookingId) {
+    id
+    status
+    acceptedAt
+  }
+}
+
+mutation CancelBooking($bookingId: ID!) {
+  cancelBooking(bookingId: $bookingId) {
+    id
+    status
+    cancelledAt
+  }
+}
+```
+
+### Mutation with Optimistic Update
+
+```typescript
+import { useAcceptBookingMutation } from '@elaview/graphql/generated';
+
+export function useAcceptBooking() {
+  const [acceptBooking, { loading, error }] = useAcceptBookingMutation();
+  
+  const accept = async (bookingId: string) => {
+    const result = await acceptBooking({
+      variables: { bookingId },
+      
+      // Optimistic update - update UI immediately
+      optimisticResponse: {
+        __typename: 'Mutation',
+        acceptBooking: {
+          __typename: 'Booking',
+          id: bookingId,
+          status: 'ACCEPTED',
+          acceptedAt: new Date().toISOString(),
+        },
+      },
+      
+      // Update cache after mutation
+      update: (cache, { data }) => {
+        if (!data?.acceptBooking) return;
+        
+        // Update the specific booking in cache
+        cache.modify({
+          id: cache.identify({ __typename: 'Booking', id: bookingId }),
+          fields: {
+            status: () => data.acceptBooking.status,
+            acceptedAt: () => data.acceptBooking.acceptedAt,
+          },
+        });
+      },
+    });
+    
+    return result;
+  };
+  
+  return { accept, loading, error };
+}
+```
+
+### Mutation with Cache Eviction
+
+```typescript
+import { useCancelBookingMutation } from '@elaview/graphql/generated';
+
+export function useCancelBooking() {
+  const [cancelBooking, { loading }] = useCancelBookingMutation();
+  
+  const cancel = async (bookingId: string) => {
+    await cancelBooking({
+      variables: { bookingId },
+      
+      // Refetch affected queries after cancellation
+      refetchQueries: [
+        { query: GET_MY_BOOKINGS },
+        { query: GET_OWNER_EARNINGS },
+      ],
+      
+      // Or use cache eviction
+      update: (cache) => {
+        // Remove from my bookings list
+        cache.modify({
+          fields: {
+            myBookings: (existingBookings, { readField }) => {
+              return {
+                ...existingBookings,
+                edges: existingBookings.edges.filter(
+                  (edge: any) => readField('id', edge.node) !== bookingId
+                ),
+              };
+            },
+          },
+        });
+      },
+    });
+  };
+  
+  return { cancel, loading };
+}
+```
+
+---
+
+## Error Handling
+
+### Error Types
+
+```typescript
+// packages/graphql/utils/errors.ts
+
+import { ApolloError } from '@apollo/client';
+
+export type GraphQLErrorCode =
+  | 'UNAUTHENTICATED'
+  | 'FORBIDDEN'
+  | 'NOT_FOUND'
+  | 'BAD_USER_INPUT'
+  | 'VALIDATION_ERROR'
+  | 'INTERNAL_SERVER_ERROR';
+
+export function getErrorCode(error: ApolloError): GraphQLErrorCode | null {
+  const graphQLError = error.graphQLErrors?.[0];
+  return (graphQLError?.extensions?.code as GraphQLErrorCode) ?? null;
+}
+
+export function getErrorMessage(error: ApolloError): string {
+  // Network error
+  if (error.networkError) {
+    return 'Unable to connect. Please check your internet connection.';
+  }
+  
+  // GraphQL error
+  const code = getErrorCode(error);
+  
+  switch (code) {
+    case 'UNAUTHENTICATED':
+      return 'Please sign in to continue.';
+    case 'FORBIDDEN':
+      return 'You don\'t have permission to do this.';
+    case 'NOT_FOUND':
+      return 'The requested item was not found.';
+    case 'BAD_USER_INPUT':
+    case 'VALIDATION_ERROR':
+      return error.graphQLErrors?.[0]?.message ?? 'Invalid input.';
+    default:
+      return 'Something went wrong. Please try again.';
+  }
+}
+
+export function isNetworkError(error: ApolloError): boolean {
+  return !!error.networkError;
+}
+
+export function isAuthError(error: ApolloError): boolean {
+  return getErrorCode(error) === 'UNAUTHENTICATED';
+}
+```
+
+### Error Handling in Components
+
+```typescript
+import { useGetBookingQuery } from '@elaview/graphql/generated';
+import { getErrorMessage, isAuthError } from '@elaview/graphql/utils/errors';
+
+export function BookingDetailScreen({ id }: { id: string }) {
+  const { data, loading, error, refetch } = useGetBookingQuery({
+    variables: { id },
+  });
+  
+  if (loading) {
+    return <LoadingScreen />;
+  }
+  
+  if (error) {
+    // Handle auth errors specially
+    if (isAuthError(error)) {
+      return <Redirect href="/login" />;
+    }
+    
+    // Show user-friendly error
+    return (
+      <ErrorScreen
+        message={getErrorMessage(error)}
+        onRetry={refetch}
+        testID="error-screen"
+      />
+    );
+  }
+  
+  if (!data?.booking) {
+    return <NotFoundScreen />;
+  }
+  
+  return <BookingDetail booking={data.booking} />;
+}
+```
+
+---
+
+## Cache Policies
+
+### Cache Configuration by Entity
+
+```typescript
+// Cache policies in Apollo Client setup
+
+const cache = new InMemoryCache({
+  typePolicies: {
+    // Space categories rarely change - cache aggressively
+    SpaceCategory: {
+      keyFields: ['id'],
+      fields: {
+        // All fields are cacheable
+      },
+    },
+    
+    // Space types also stable
+    SpaceType: {
+      keyFields: ['id'],
+    },
+    
+    // Spaces change more often
+    Space: {
+      keyFields: ['id'],
+      fields: {
+        // Photos array should be replaced, not merged
+        photos: {
+          merge: false,
+        },
+      },
+    },
+    
+    // Bookings change frequently - always refetch
+    Booking: {
+      keyFields: ['id'],
+      fields: {
+        // Status should always be fresh
+        status: {
+          read(existing) {
+            return existing;
+          },
+        },
+      },
+    },
+  },
+});
+```
+
+### Fetch Policy by Query Type
+
+| Query Type | Fetch Policy | Reason |
+|------------|--------------|--------|
+| Space categories | `cache-first` | Rarely change (1hr+ stale time OK) |
+| Space types | `cache-first` | Rarely change |
+| Space list | `cache-and-network` | May have new listings |
+| Space detail | `cache-and-network` | May have updates |
+| My bookings | `cache-and-network` | Status changes often |
+| Booking detail | `network-only` | Critical to have latest status |
+| User profile | `cache-first` | Rarely changes |
+| Notifications | `network-only` | Always need latest |
+
+### Manual Cache Updates
+
+```typescript
+// After creating a new space, add it to the list
+const [createSpace] = useCreateSpaceMutation({
+  update: (cache, { data }) => {
+    if (!data?.createSpace) return;
+    
+    cache.modify({
+      fields: {
+        mySpaces: (existingSpaces = { edges: [] }) => {
+          const newSpaceRef = cache.writeFragment({
+            data: data.createSpace,
+            fragment: SPACE_CARD_FRAGMENT,
+          });
+          
+          return {
+            ...existingSpaces,
+            edges: [
+              { __typename: 'SpaceEdge', node: newSpaceRef },
+              ...existingSpaces.edges,
+            ],
+          };
+        },
+      },
+    });
+  },
+});
+```
+
+---
+
+## Subscription Patterns (Optional)
+
+For real-time updates (booking status changes):
+
+```graphql
+# packages/graphql/operations/subscriptions/bookings.graphql
+
+subscription OnBookingStatusChanged($bookingId: ID!) {
+  bookingStatusChanged(bookingId: $bookingId) {
+    id
+    status
+    acceptedAt
+    paidAt
+    fileDownloadedAt
+    installedAt
+    verifiedAt
+    completedAt
+    cancelledAt
+  }
+}
+```
+
+```typescript
+// Subscribe to booking updates
+import { useOnBookingStatusChangedSubscription } from '@elaview/graphql/generated';
+
+export function useBookingUpdates(bookingId: string) {
+  useOnBookingStatusChangedSubscription({
+    variables: { bookingId },
+    onData: ({ data }) => {
+      // Apollo automatically updates cache
+      console.log('Booking updated:', data.data?.bookingStatusChanged);
+    },
+  });
+}
+```
+
+---
+
+## Testing GraphQL
+
+### MSW Setup for GraphQL
+
+```typescript
+// packages/shared/testing/msw/handlers.ts
+import { graphql } from 'msw';
+import { createMockBooking, createMockSpaceCategory } from '../factories';
+
+export const handlers = [
+  // Query handlers
+  graphql.query('GetSpaceCategories', (req, res, ctx) => {
+    return res(
+      ctx.data({
+        spaceCategories: [
+          createMockSpaceCategory({ slug: 'storefront' }),
+          createMockSpaceCategory({ slug: 'billboard' }),
+        ],
+      })
+    );
+  }),
+  
+  graphql.query('GetMyBookings', (req, res, ctx) => {
+    const { status, first, after } = req.variables;
+    
+    const bookings = [
+      createMockBooking({ status: 'PAID' }),
+      createMockBooking({ status: 'VERIFIED' }),
+    ];
+    
+    return res(
+      ctx.data({
+        myBookings: {
+          edges: bookings.map((b) => ({ cursor: b.id, node: b })),
+          pageInfo: {
+            hasNextPage: false,
+            hasPreviousPage: false,
+            startCursor: bookings[0]?.id,
+            endCursor: bookings[bookings.length - 1]?.id,
+          },
+          totalCount: bookings.length,
+        },
+      })
+    );
+  }),
+  
+  // Mutation handlers
+  graphql.mutation('AcceptBooking', (req, res, ctx) => {
+    const { bookingId } = req.variables;
+    
+    return res(
+      ctx.data({
+        acceptBooking: {
+          id: bookingId,
+          status: 'ACCEPTED',
+          acceptedAt: new Date().toISOString(),
+        },
+      })
+    );
+  }),
+  
+  // Error simulation
+  graphql.query('GetBooking', (req, res, ctx) => {
+    const { id } = req.variables;
+    
+    if (id === 'not-found') {
+      return res(
+        ctx.errors([
+          { message: 'Booking not found', extensions: { code: 'NOT_FOUND' } },
+        ])
+      );
+    }
+    
+    return res(
+      ctx.data({
+        booking: createMockBooking({ id }),
+      })
+    );
+  }),
+];
+```
+
+### Testing with MockedProvider
+
+```typescript
+// Component test with mocked GraphQL
+import { MockedProvider } from '@apollo/client/testing';
+import { render, waitFor } from '@testing-library/react-native';
+import { BookingDetail } from './BookingDetail';
+import { GET_BOOKING } from '@elaview/graphql/operations';
+import { createMockBooking } from '@elaview/shared/testing/factories';
+
+const mockBooking = createMockBooking({
+  id: '123',
+  status: 'PAID',
+});
+
+const mocks = [
+  {
+    request: {
+      query: GET_BOOKING,
+      variables: { id: '123' },
+    },
+    result: {
+      data: {
+        booking: mockBooking,
+      },
+    },
+  },
+];
+
+describe('BookingDetail', () => {
+  it('renders booking information', async () => {
+    const { getByText, getByTestId } = render(
+      <MockedProvider mocks={mocks} addTypename={false}>
+        <BookingDetail id="123" />
+      </MockedProvider>
+    );
+    
+    // Wait for query to resolve
+    await waitFor(() => {
+      expect(getByText(mockBooking.space.title)).toBeTruthy();
+    });
+    
+    expect(getByTestId('booking-status')).toHaveTextContent('Paid');
+  });
+});
+```
+
+---
+
+## Best Practices Summary
+
+1. **Always use generated types** - Never manually type GraphQL responses
+2. **Use fragments** - For consistent data fetching across components
+3. **Handle loading and error states** - Every query needs these
+4. **Use optimistic updates** - For instant UI feedback
+5. **Configure cache properly** - Different policies for different data
+6. **Never hardcode space types** - Always fetch from API with `useGetSpaceCategoriesQuery`
+7. **Test with MSW** - Mock at the network level for realistic tests

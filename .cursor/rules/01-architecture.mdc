@@ -1,0 +1,397 @@
+---
+description: System architecture and monorepo structure
+globs:
+  - "**/package.json"
+  - "**/turbo.json"
+  - "**/tsconfig.json"
+alwaysApply: false
+---
+
+# Elaview Architecture
+
+## Tech Stack Overview
+
+| Layer | Technology | Owner |
+|-------|------------|-------|
+| Mobile App | Expo SDK 54, React Native, Expo Router v6 | Mike |
+| Web App | Next.js 15, App Router | Quang |
+| API Client | Apollo Client (both apps) | Shared |
+| Backend | .NET 8, HotChocolate GraphQL | Quang |
+| Database | PostgreSQL | Quang |
+| Auth | .NET built-in authentication | Quang |
+| Payments | Stripe Connect | Quang |
+| File Storage | Cloudflare R2 | Quang |
+| Monorepo | Turborepo + pnpm | Shared |
+
+---
+
+## Monorepo Structure
+
+```
+elaview/
+├── apps/
+│   ├── mobile/                 # Expo React Native (Mike owns)
+│   │   ├── app/                # Expo Router file-based routing
+│   │   │   ├── (auth)/         # Auth flow screens
+│   │   │   ├── (advertiser)/   # Advertiser tab screens
+│   │   │   └── (owner)/        # Space owner tab screens
+│   │   ├── src/
+│   │   │   ├── components/     # Mobile-specific components
+│   │   │   ├── hooks/          # Mobile-specific hooks
+│   │   │   └── utils/          # Mobile utilities
+│   │   └── app.json
+│   │
+│   └── web/                    # Next.js 15 (Quang maintains)
+│       ├── app/                # Next.js App Router
+│       │   ├── (auth)/
+│       │   ├── (dashboard)/
+│       │   └── api/
+│       └── shared/             # Web-specific shared components
+│
+├── packages/
+│   ├── features/               # Shared domain logic (bulletproof-react)
+│   │   ├── auth/
+│   │   ├── spaces/
+│   │   ├── bookings/
+│   │   ├── payments/
+│   │   └── verification/
+│   │
+│   ├── graphql/                # Generated types + operations
+│   │   ├── generated/          # Codegen output
+│   │   ├── operations/         # .graphql files
+│   │   └── codegen.ts
+│   │
+│   └── shared/                 # Constants, validation, utilities
+│       ├── constants/
+│       ├── schemas/            # Zod validation schemas
+│       ├── testing/            # Test factories & utilities
+│       └── utils/
+│
+├── backend/                    # .NET GraphQL (Quang owns)
+│   ├── GraphQL/
+│   │   ├── Queries/
+│   │   ├── Mutations/
+│   │   └── Types/
+│   ├── Models/
+│   ├── Data/
+│   └── Services/
+│
+├── .cursor/rules/              # AI context files
+├── .github/                    # CI/CD workflows
+└── docs/                       # Architecture documentation
+```
+
+---
+
+## Bulletproof-React Feature Pattern
+
+Each feature package follows this structure:
+
+```
+packages/features/bookings/
+├── api/                        # GraphQL operations
+│   ├── queries.ts              # Query hooks
+│   ├── mutations.ts            # Mutation hooks
+│   └── fragments.ts            # Reusable fragments
+│
+├── hooks/                      # Business logic hooks
+│   ├── useBookingFlow.ts
+│   ├── useBookingStatus.ts
+│   └── useBookingFilters.ts
+│
+├── types/                      # Feature-specific types
+│   ├── index.ts
+│   └── booking.types.ts
+│
+├── utils/                      # Pure utility functions
+│   ├── status-helpers.ts
+│   ├── price-calculations.ts
+│   └── date-formatters.ts
+│
+├── components/                 # Shared UI components
+│   ├── BookingCard/
+│   ├── BookingStatusBadge/
+│   └── BookingTimeline/
+│
+└── index.ts                    # Public API exports
+```
+
+### Import Rules
+
+```typescript
+// ✅ Feature packages can import from:
+import { formatCurrency } from '@elaview/shared/utils';
+import { BookingStatus } from '@elaview/graphql/generated';
+
+// ❌ Feature packages should NOT import from:
+import { SomeComponent } from '@elaview/features/other-feature'; // Cross-feature
+import { MobileOnlyThing } from 'apps/mobile/src'; // App-specific
+```
+
+---
+
+## Data Flow
+
+```mermaid
+graph TB
+    subgraph "Client Apps"
+        Mobile[Mobile App<br/>Expo + Apollo Client]
+        Web[Web App<br/>Next.js + Apollo Client]
+    end
+    
+    subgraph "API Layer"
+        GraphQL[GraphQL API<br/>.NET + HotChocolate]
+    end
+    
+    subgraph "Backend Services"
+        Auth[Auth Service]
+        Booking[Booking Service]
+        Payment[Payment Service]
+        Storage[File Storage]
+    end
+    
+    subgraph "External"
+        Stripe[Stripe Connect]
+        R2[Cloudflare R2]
+        Push[Expo Push]
+    end
+    
+    subgraph "Database"
+        PG[(PostgreSQL)]
+    end
+    
+    Mobile --> GraphQL
+    Web --> GraphQL
+    GraphQL --> Auth
+    GraphQL --> Booking
+    GraphQL --> Payment
+    GraphQL --> Storage
+    
+    Payment --> Stripe
+    Storage --> R2
+    Auth --> PG
+    Booking --> PG
+    Payment --> PG
+```
+
+---
+
+## Package Dependencies
+
+```mermaid
+graph TD
+    subgraph "Apps (Consumers)"
+        Mobile[apps/mobile]
+        Web[apps/web]
+    end
+    
+    subgraph "Feature Packages"
+        Auth[features/auth]
+        Spaces[features/spaces]
+        Bookings[features/bookings]
+        Payments[features/payments]
+        Verification[features/verification]
+    end
+    
+    subgraph "Foundation Packages"
+        GraphQL[packages/graphql]
+        Shared[packages/shared]
+    end
+    
+    Mobile --> Auth
+    Mobile --> Spaces
+    Mobile --> Bookings
+    Mobile --> Payments
+    Mobile --> Verification
+    
+    Web --> Auth
+    Web --> Spaces
+    Web --> Bookings
+    Web --> Payments
+    
+    Auth --> GraphQL
+    Auth --> Shared
+    Spaces --> GraphQL
+    Spaces --> Shared
+    Bookings --> GraphQL
+    Bookings --> Shared
+    Payments --> GraphQL
+    Payments --> Shared
+    Verification --> GraphQL
+    Verification --> Shared
+    
+    GraphQL --> Shared
+```
+
+---
+
+## Turborepo Configuration
+
+```json
+// turbo.json
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env"],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "test:unit": {},
+    "test:integration": {
+      "dependsOn": ["^build"]
+    },
+    "codegen": {
+      "outputs": ["packages/graphql/generated/**"]
+    }
+  }
+}
+```
+
+---
+
+## pnpm Workspace Configuration
+
+```yaml
+# pnpm-workspace.yaml
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'packages/features/*'
+```
+
+---
+
+## TypeScript Configuration
+
+### Root tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    "baseUrl": ".",
+    "paths": {
+      "@elaview/shared/*": ["packages/shared/*"],
+      "@elaview/graphql/*": ["packages/graphql/*"],
+      "@elaview/features/*": ["packages/features/*"]
+    }
+  }
+}
+```
+
+### Package-specific extends
+
+```json
+// packages/features/bookings/tsconfig.json
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}
+```
+
+---
+
+## Environment Variables
+
+### Shared (all environments)
+
+```bash
+# .env.example
+GRAPHQL_ENDPOINT=http://localhost:5000/graphql
+STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+```
+
+### Mobile-specific
+
+```bash
+# apps/mobile/.env
+EXPO_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:5000/graphql
+EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+```
+
+### Web-specific
+
+```bash
+# apps/web/.env.local
+NEXT_PUBLIC_GRAPHQL_ENDPOINT=http://localhost:5000/graphql
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
+STRIPE_SECRET_KEY=sk_test_xxx  # Server-side only
+```
+
+---
+
+## Key Architecture Decisions
+
+### 1. Config-Driven Space Types
+All space categories and types are fetched from the API, never hardcoded. This allows adding new advertising formats without deployments.
+
+```typescript
+// ✅ Correct: Fetch from API
+const { data } = useSpaceCategoriesQuery();
+const categories = data?.spaceCategories ?? [];
+
+// ❌ Wrong: Hardcoded
+const CATEGORIES = ['storefront', 'billboard'];
+```
+
+### 2. Feature Package Isolation
+Each feature (auth, bookings, payments) is a separate package with clear boundaries. Cross-feature dependencies should go through shared packages.
+
+### 3. GraphQL as Single Source of Truth
+All client-server communication goes through GraphQL. No REST endpoints for business logic.
+
+### 4. Shared Type Generation
+GraphQL Codegen generates TypeScript types used by both mobile and web apps, ensuring type safety across the stack.
+
+---
+
+## Running the Monorepo
+
+```bash
+# Install dependencies
+pnpm install
+
+# Run all apps in development
+pnpm dev
+
+# Run specific app
+pnpm --filter @elaview/mobile dev
+pnpm --filter @elaview/web dev
+
+# Build all packages
+pnpm build
+
+# Run tests
+pnpm test
+
+# Generate GraphQL types
+pnpm codegen
+
+# Lint all packages
+pnpm lint
+
+# Type check all packages
+pnpm typecheck
+```

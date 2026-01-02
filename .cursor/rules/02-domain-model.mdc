@@ -1,0 +1,949 @@
+---
+description: Domain entities, types, and relationships
+globs:
+  - "**/types/**"
+  - "**/models/**"
+  - "**/schemas/**"
+  - "**/entities/**"
+alwaysApply: false
+---
+
+# Elaview Domain Model
+
+## Critical Design Principle
+
+**NEVER hardcode space types or their configuration.** All space categories and types are database-driven and fetched from the API. This enables adding new advertising formats (billboards, vehicles, transit) without code changes.
+
+```typescript
+// ✅ CORRECT: Dynamic from API
+const { data } = useSpaceCategoriesQuery();
+const requiredPhotos = data?.space.spaceType.category.requiredPhotoCount;
+
+// ❌ WRONG: Hardcoded values
+const REQUIRED_PHOTOS = 3;
+const SPACE_TYPES = ['window-poster', 'bulletin-board'];
+```
+
+---
+
+## Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    User ||--o{ Space : owns
+    User ||--o{ Booking : "advertiser"
+    User ||--o{ Notification : receives
+    
+    SpaceCategory ||--o{ SpaceType : contains
+    SpaceType ||--o{ Space : categorizes
+    
+    Space ||--o{ Booking : "booked for"
+    
+    Booking ||--|| Payment : has
+    Booking ||--o{ Payout : triggers
+    Booking ||--o| Verification : requires
+    
+    User {
+        string id PK
+        string email
+        UserRole role
+        string stripeAccountId
+    }
+    
+    SpaceCategory {
+        string id PK
+        string slug UK
+        string name
+        number basePrintInstallFee
+        FeeCalculationType feeCalculationType
+        number requiredPhotoCount
+        boolean requiresGpsValidation
+        number gpsRadiusMeters
+    }
+    
+    SpaceType {
+        string id PK
+        string categoryId FK
+        string slug UK
+        string name
+        number printInstallFeeOverride
+    }
+    
+    Space {
+        string id PK
+        string ownerId FK
+        string spaceTypeId FK
+        string title
+        number pricePerWeek
+        json location
+    }
+    
+    Booking {
+        string id PK
+        string advertiserId FK
+        string spaceId FK
+        BookingStatus status
+        daterange dateRange
+        string creativeFileUrl
+    }
+```
+
+---
+
+## Core Entities
+
+### User
+
+```typescript
+// packages/shared/types/user.types.ts
+
+export type UserRole = 'ADVERTISER' | 'SPACE_OWNER' | 'ADMIN';
+
+export interface User {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: UserRole;
+  phone?: string;
+  avatarUrl?: string;
+  
+  // Stripe Connect (for space owners receiving payouts)
+  stripeAccountId?: string;
+  stripeAccountStatus?: 'PENDING' | 'ACTIVE' | 'RESTRICTED';
+  
+  // Notification preferences
+  emailNotifications: boolean;
+  pushNotifications: boolean;
+  
+  // Timestamps
+  createdAt: Date;
+  updatedAt: Date;
+  lastLoginAt?: Date;
+}
+```
+
+### Zod Schema
+
+```typescript
+// packages/shared/schemas/user.schema.ts
+import { z } from 'zod';
+
+export const userRoleSchema = z.enum(['ADVERTISER', 'SPACE_OWNER', 'ADMIN']);
+
+export const userSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  firstName: z.string().min(1).max(50),
+  lastName: z.string().min(1).max(50),
+  role: userRoleSchema,
+  phone: z.string().regex(/^\+?[1-9]\d{1,14}$/).optional(),
+  avatarUrl: z.string().url().optional(),
+  stripeAccountId: z.string().optional(),
+  stripeAccountStatus: z.enum(['PENDING', 'ACTIVE', 'RESTRICTED']).optional(),
+  emailNotifications: z.boolean().default(true),
+  pushNotifications: z.boolean().default(true),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+  lastLoginAt: z.coerce.date().optional(),
+});
+
+export const createUserSchema = userSchema.pick({
+  email: true,
+  firstName: true,
+  lastName: true,
+  role: true,
+  phone: true,
+});
+
+export type CreateUserInput = z.infer<typeof createUserSchema>;
+```
+
+---
+
+### SpaceCategory (Config-Driven)
+
+This entity drives the behavior of the entire system. **All space-related logic reads from these fields.**
+
+```typescript
+// packages/shared/types/space-category.types.ts
+
+export type FeeCalculationType = 'FIXED' | 'PER_SQFT' | 'CUSTOM';
+
+export interface SpaceCategory {
+  id: string;
+  slug: string;                    // 'storefront', 'billboard', 'transit'
+  name: string;                    // Display name
+  description: string;
+  isActive: boolean;               // Can disable without deleting
+  
+  // === PRICING & FEES ===
+  basePrintInstallFee: number;     // Default fee for this category
+  feeCalculationType: FeeCalculationType;
+  // FIXED = flat fee from basePrintInstallFee or SpaceType override
+  // PER_SQFT = fee calculated based on space dimensions
+  // CUSTOM = requires custom logic (rare, needs code)
+  
+  // === VERIFICATION REQUIREMENTS ===
+  requiredPhotoCount: number;      // 3 for storefronts, 5 for billboards
+  requiresGpsValidation: boolean;  // true for fixed locations, false for vehicles
+  gpsRadiusMeters: number;         // 100m for storefronts, 500m for billboards
+  
+  // === INSTALLATION ===
+  requiresProfessionalInstall: boolean;  // false for storefronts, true for billboards
+  estimatedInstallDays: number;          // 1 for posters, 7+ for billboards
+  
+  // === CREATIVE FILE REQUIREMENTS ===
+  supportedFormats: string[];      // ['PDF', 'PNG', 'JPG']
+  maxFileSizeMb: number;           // 25 for most, 50 for billboards
+  minResolutionDpi: number;        // 150 for most, 300 for billboards
+  
+  // === DISPLAY ===
+  iconUrl: string;
+  sortOrder: number;
+  
+  // === TIMESTAMPS ===
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### How Config Fields Are Used
+
+```typescript
+// Verification flow reads config
+function VerificationFlow({ booking }: { booking: Booking }) {
+  const { category } = booking.space.spaceType;
+  
+  return (
+    <PhotoCapture
+      requiredCount={category.requiredPhotoCount}      // From config
+      validateGps={category.requiresGpsValidation}     // From config
+      gpsRadius={category.gpsRadiusMeters}             // From config
+    />
+  );
+}
+
+// Creative upload validation reads config
+function validateCreativeFile(file: File, spaceType: SpaceType) {
+  const { category } = spaceType;
+  
+  const validFormat = category.supportedFormats.includes(
+    getFileExtension(file.name).toUpperCase()
+  );
+  
+  const validSize = file.size <= category.maxFileSizeMb * 1024 * 1024;
+  
+  return { validFormat, validSize };
+}
+
+// Fee calculation reads config
+function calculatePrintInstallFee(space: Space): number {
+  const { category, printInstallFeeOverride } = space.spaceType;
+  
+  // SpaceType can override category default
+  if (printInstallFeeOverride !== null) {
+    return printInstallFeeOverride;
+  }
+  
+  switch (category.feeCalculationType) {
+    case 'FIXED':
+      return category.basePrintInstallFee;
+    case 'PER_SQFT':
+      const sqft = (space.width * space.height) / 144; // inches to sqft
+      return category.basePrintInstallFee * sqft;
+    case 'CUSTOM':
+      throw new Error('Custom fee calculation not implemented');
+  }
+}
+```
+
+### SpaceCategory Zod Schema
+
+```typescript
+// packages/shared/schemas/space-category.schema.ts
+import { z } from 'zod';
+
+export const feeCalculationTypeSchema = z.enum(['FIXED', 'PER_SQFT', 'CUSTOM']);
+
+export const spaceCategorySchema = z.object({
+  id: z.string().uuid(),
+  slug: z.string().regex(/^[a-z0-9-]+$/).min(2).max(50),
+  name: z.string().min(1).max(100),
+  description: z.string().max(500),
+  isActive: z.boolean(),
+  
+  // Pricing
+  basePrintInstallFee: z.number().min(0).max(10000),
+  feeCalculationType: feeCalculationTypeSchema,
+  
+  // Verification
+  requiredPhotoCount: z.number().int().min(1).max(10),
+  requiresGpsValidation: z.boolean(),
+  gpsRadiusMeters: z.number().int().min(10).max(10000),
+  
+  // Installation
+  requiresProfessionalInstall: z.boolean(),
+  estimatedInstallDays: z.number().int().min(1).max(30),
+  
+  // Creative requirements
+  supportedFormats: z.array(z.string()).min(1),
+  maxFileSizeMb: z.number().min(1).max(100),
+  minResolutionDpi: z.number().int().min(72).max(600),
+  
+  // Display
+  iconUrl: z.string().url(),
+  sortOrder: z.number().int(),
+  
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+```
+
+---
+
+### SpaceType
+
+Specific formats within a category. Inherits config from category but can override fees.
+
+```typescript
+// packages/shared/types/space-type.types.ts
+
+export type DimensionUnit = 'INCHES' | 'FEET' | 'CM';
+
+export interface SpaceType {
+  id: string;
+  categoryId: string;              // FK to SpaceCategory
+  category: SpaceCategory;         // Populated relation
+  slug: string;                    // 'window-poster', 'bulletin-board'
+  name: string;                    // 'Window Poster', 'Bulletin Board'
+  description: string;
+  
+  // Standard dimensions (null means custom/variable)
+  standardWidth: number | null;
+  standardHeight: number | null;
+  dimensionUnit: DimensionUnit;
+  
+  // Override category default fee if needed
+  printInstallFeeOverride: number | null;
+  
+  isActive: boolean;
+  sortOrder: number;
+  
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### MVP Space Types
+
+| Space Type | Category | Fee | Standard Size |
+|------------|----------|-----|---------------|
+| Bulletin board | Storefront | $10 | 24x36 in |
+| Window poster | Storefront | $20 | 24x36 in |
+| Window vinyl | Storefront | $35 | Custom |
+| Wall mount | Storefront | $30 | 24x36 in |
+| A-frame sign | Storefront | $25 | 24x36 in |
+
+---
+
+### Space
+
+A specific advertising location listed by a space owner.
+
+```typescript
+// packages/shared/types/space.types.ts
+
+export type SpaceStatus = 'DRAFT' | 'PENDING_REVIEW' | 'ACTIVE' | 'PAUSED' | 'ARCHIVED';
+
+export interface SpaceLocation {
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface Space {
+  id: string;
+  ownerId: string;
+  owner: User;
+  spaceTypeId: string;
+  spaceType: SpaceType;            // Includes category
+  
+  // Listing details
+  title: string;
+  description: string;
+  
+  // Dimensions (actual, may differ from standard)
+  width: number;
+  height: number;
+  dimensionUnit: DimensionUnit;
+  
+  // Pricing (set by owner)
+  pricePerWeek: number;
+  
+  // Location
+  location: SpaceLocation;
+  
+  // Media
+  photos: string[];                // URLs
+  
+  // Status
+  status: SpaceStatus;
+  
+  // Availability
+  availableFrom?: Date;
+  availableUntil?: Date;
+  
+  // Stats
+  viewCount: number;
+  bookingCount: number;
+  
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### Space Zod Schema
+
+```typescript
+// packages/shared/schemas/space.schema.ts
+import { z } from 'zod';
+
+export const spaceLocationSchema = z.object({
+  address: z.string().min(5).max(200),
+  city: z.string().min(2).max(100),
+  state: z.string().length(2),
+  zipCode: z.string().regex(/^\d{5}(-\d{4})?$/),
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+});
+
+export const spaceStatusSchema = z.enum([
+  'DRAFT', 'PENDING_REVIEW', 'ACTIVE', 'PAUSED', 'ARCHIVED'
+]);
+
+export const createSpaceSchema = z.object({
+  spaceTypeId: z.string().uuid(),
+  title: z.string().min(10).max(100),
+  description: z.string().min(50).max(2000),
+  width: z.number().positive(),
+  height: z.number().positive(),
+  dimensionUnit: z.enum(['INCHES', 'FEET', 'CM']),
+  pricePerWeek: z.number().min(10).max(10000),
+  location: spaceLocationSchema,
+  photos: z.array(z.string().url()).min(3).max(10),
+});
+```
+
+---
+
+### Booking
+
+A reservation of a space by an advertiser.
+
+```typescript
+// packages/shared/types/booking.types.ts
+
+export type BookingStatus =
+  | 'PENDING_APPROVAL'  // Waiting for owner to accept
+  | 'ACCEPTED'          // Owner accepted, waiting for payment
+  | 'PAID'              // Advertiser paid, waiting for file download
+  | 'FILE_DOWNLOADED'   // Owner downloaded file, Stage 1 payout triggered
+  | 'INSTALLED'         // Owner marked as installed
+  | 'VERIFIED'          // Owner uploaded verification photos
+  | 'DISPUTED'          // Advertiser disputed the installation
+  | 'COMPLETED'         // Advertiser approved, Stage 2 payout complete
+  | 'CANCELLED';        // Booking cancelled
+
+export interface DateRange {
+  startDate: Date;
+  endDate: Date;
+}
+
+export interface Booking {
+  id: string;
+  
+  // Parties
+  advertiserId: string;
+  advertiser: User;
+  spaceId: string;
+  space: Space;                    // Includes spaceType and category
+  
+  // Status
+  status: BookingStatus;
+  
+  // Dates
+  dateRange: DateRange;
+  
+  // Creative
+  creativeFileUrl?: string;
+  creativeFileName?: string;
+  creativeFileSize?: number;
+  creativeUploadedAt?: Date;
+  
+  // Pricing (snapshot at booking time)
+  pricePerWeek: number;
+  totalWeeks: number;
+  subtotal: number;                // pricePerWeek * totalWeeks
+  platformFee: number;             // Elaview's cut
+  printInstallFee: number;         // Paid to owner on file download
+  total: number;                   // What advertiser pays
+  
+  // Timestamps for state transitions
+  requestedAt: Date;
+  acceptedAt?: Date;
+  paidAt?: Date;
+  fileDownloadedAt?: Date;
+  installedAt?: Date;
+  verifiedAt?: Date;
+  approvedAt?: Date;
+  completedAt?: Date;
+  cancelledAt?: Date;
+  
+  // Auto-approval
+  autoApprovalAt?: Date;           // 48 hours after verification
+  
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### Booking Zod Schema
+
+```typescript
+// packages/shared/schemas/booking.schema.ts
+import { z } from 'zod';
+
+export const bookingStatusSchema = z.enum([
+  'PENDING_APPROVAL',
+  'ACCEPTED',
+  'PAID',
+  'FILE_DOWNLOADED',
+  'INSTALLED',
+  'VERIFIED',
+  'DISPUTED',
+  'COMPLETED',
+  'CANCELLED',
+]);
+
+export const dateRangeSchema = z.object({
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date(),
+}).refine(
+  (data) => data.endDate > data.startDate,
+  { message: 'End date must be after start date' }
+);
+
+export const createBookingSchema = z.object({
+  spaceId: z.string().uuid(),
+  dateRange: dateRangeSchema,
+  creativeFile: z.instanceof(File).optional(), // Can upload later
+});
+```
+
+---
+
+### Payment
+
+Tracks the advertiser's payment for a booking.
+
+```typescript
+// packages/shared/types/payment.types.ts
+
+export type PaymentStatus =
+  | 'PENDING'           // Payment intent created
+  | 'PROCESSING'        // Payment being processed
+  | 'SUCCEEDED'         // Payment successful, funds held
+  | 'FAILED'            // Payment failed
+  | 'REFUNDED'          // Full refund issued
+  | 'PARTIALLY_REFUNDED'; // Partial refund (after file download)
+
+export interface Payment {
+  id: string;
+  bookingId: string;
+  booking: Booking;
+  
+  // Stripe
+  stripePaymentIntentId: string;
+  stripeChargeId?: string;
+  
+  // Amounts (cents)
+  amount: number;                  // Total charged
+  amountRefunded: number;          // Amount refunded (if any)
+  
+  status: PaymentStatus;
+  
+  // Card details (for display)
+  cardBrand?: string;              // 'visa', 'mastercard'
+  cardLast4?: string;              // '4242'
+  
+  createdAt: Date;
+  updatedAt: Date;
+  succeededAt?: Date;
+  refundedAt?: Date;
+}
+```
+
+---
+
+### Payout
+
+Tracks payouts to space owners (two per booking).
+
+```typescript
+// packages/shared/types/payout.types.ts
+
+export type PayoutStage = 'PRINT_INSTALL' | 'REMAINDER';
+export type PayoutStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+
+export interface Payout {
+  id: string;
+  bookingId: string;
+  booking: Booking;
+  
+  // Which payout is this
+  stage: PayoutStage;
+  // PRINT_INSTALL = triggered on file download
+  // REMAINDER = triggered on approval
+  
+  // Stripe
+  stripeTransferId?: string;
+  stripeAccountId: string;         // Owner's connected account
+  
+  // Amount (cents)
+  amount: number;
+  
+  status: PayoutStatus;
+  
+  createdAt: Date;
+  completedAt?: Date;
+  failedAt?: Date;
+  failureReason?: string;
+}
+```
+
+---
+
+### Verification
+
+Tracks installation verification photos.
+
+```typescript
+// packages/shared/types/verification.types.ts
+
+export type VerificationStatus = 
+  | 'PENDING'           // Waiting for photos
+  | 'SUBMITTED'         // Photos uploaded, waiting for review
+  | 'APPROVED'          // Advertiser approved
+  | 'AUTO_APPROVED'     // Auto-approved after 48 hours
+  | 'DISPUTED';         // Advertiser disputed
+
+export interface VerificationPhoto {
+  id: string;
+  url: string;
+  thumbnailUrl: string;
+  type: 'WIDE_SHOT' | 'CLOSE_UP' | 'ANGLE_SHOT';
+  
+  // GPS data extracted from EXIF
+  latitude?: number;
+  longitude?: number;
+  gpsAccuracyMeters?: number;
+  
+  // Timestamp from EXIF
+  capturedAt?: Date;
+  
+  // Validation
+  isGpsValid: boolean;             // Within radius of space location
+  isTimestampValid: boolean;       // Within expected window
+  
+  uploadedAt: Date;
+}
+
+export interface Verification {
+  id: string;
+  bookingId: string;
+  booking: Booking;
+  
+  photos: VerificationPhoto[];
+  
+  status: VerificationStatus;
+  
+  // GPS validation
+  spaceLatitude: number;           // Expected location
+  spaceLongitude: number;
+  allowedRadiusMeters: number;     // From SpaceCategory config
+  
+  // Dispute
+  disputeReason?: string;
+  disputedAt?: Date;
+  disputeResolvedAt?: Date;
+  disputeResolution?: string;
+  
+  submittedAt?: Date;
+  approvedAt?: Date;
+  
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+---
+
+### Notification
+
+In-app and push notifications.
+
+```typescript
+// packages/shared/types/notification.types.ts
+
+export type NotificationType =
+  // Booking lifecycle
+  | 'BOOKING_REQUEST_RECEIVED'     // To owner
+  | 'BOOKING_ACCEPTED'             // To advertiser
+  | 'BOOKING_REJECTED'             // To advertiser
+  | 'PAYMENT_RECEIVED'             // To owner
+  | 'FILE_READY_FOR_DOWNLOAD'      // To owner
+  | 'FILE_DOWNLOADED'              // To advertiser
+  | 'INSTALLATION_COMPLETE'        // To advertiser
+  | 'VERIFICATION_SUBMITTED'       // To advertiser
+  | 'VERIFICATION_APPROVED'        // To owner
+  | 'PAYOUT_COMPLETED'             // To owner
+  | 'BOOKING_COMPLETED'            // To both
+  // Disputes
+  | 'DISPUTE_OPENED'               // To owner
+  | 'DISPUTE_RESOLVED'             // To both
+  // Reminders
+  | 'APPROVAL_REMINDER'            // To advertiser
+  | 'AUTO_APPROVAL_WARNING'        // To advertiser
+  | 'INSTALL_REMINDER';            // To owner
+
+export interface Notification {
+  id: string;
+  userId: string;
+  
+  type: NotificationType;
+  title: string;
+  body: string;
+  
+  // Deep link data
+  data?: {
+    bookingId?: string;
+    spaceId?: string;
+    screen?: string;
+  };
+  
+  // Status
+  read: boolean;
+  readAt?: Date;
+  
+  // Push notification tracking
+  pushSent: boolean;
+  pushSentAt?: Date;
+  pushError?: string;
+  
+  createdAt: Date;
+}
+```
+
+---
+
+### AuditLog
+
+Compliance and debugging trail.
+
+```typescript
+// packages/shared/types/audit-log.types.ts
+
+export type ActorType = 'USER' | 'SYSTEM' | 'ADMIN';
+export type AuditAction = 'CREATE' | 'UPDATE' | 'DELETE';
+
+export interface AuditLog {
+  id: string;
+  timestamp: Date;
+  
+  // What happened
+  eventType: string;               // 'BOOKING_CREATED', 'PAYMENT_SUCCEEDED', etc.
+  action: AuditAction;
+  
+  // Who did it
+  actorId: string | null;          // null for system events
+  actorType: ActorType;
+  
+  // What was affected
+  resourceType: string;            // 'Booking', 'Payment', 'User', etc.
+  resourceId: string;
+  
+  // Changes (for updates)
+  changes?: Record<string, { before: unknown; after: unknown }>;
+  
+  // Additional context
+  metadata?: Record<string, unknown>;
+  
+  // Request context
+  ipAddress?: string;
+  userAgent?: string;
+}
+```
+
+---
+
+## Type Utilities
+
+```typescript
+// packages/shared/types/utils.ts
+
+// Make specific fields optional
+export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
+
+// Make specific fields required
+export type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
+
+// Extract just the IDs from relations
+export type WithIds<T> = {
+  [K in keyof T]: T[K] extends { id: string } ? string : T[K];
+};
+
+// Common API response wrapper
+export interface ApiResponse<T> {
+  data: T;
+  errors?: Array<{ message: string; code: string }>;
+}
+
+// Pagination
+export interface PaginatedResponse<T> {
+  items: T[];
+  totalCount: number;
+  pageInfo: {
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+    startCursor?: string;
+    endCursor?: string;
+  };
+}
+```
+
+---
+
+## Validation Helper Functions
+
+```typescript
+// packages/shared/utils/validation.ts
+
+import { SpaceCategory, SpaceType } from '../types';
+
+/**
+ * Validate a creative file against space type requirements.
+ * ALWAYS reads config from SpaceCategory - never hardcode.
+ */
+export function validateCreativeFile(
+  file: File,
+  spaceType: SpaceType
+): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+  const { category } = spaceType;
+  
+  // Check format
+  const ext = file.name.split('.').pop()?.toUpperCase() ?? '';
+  if (!category.supportedFormats.includes(ext)) {
+    errors.push(
+      `Unsupported format. Allowed: ${category.supportedFormats.join(', ')}`
+    );
+  }
+  
+  // Check size
+  const maxBytes = category.maxFileSizeMb * 1024 * 1024;
+  if (file.size > maxBytes) {
+    errors.push(`File too large. Maximum: ${category.maxFileSizeMb}MB`);
+  }
+  
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Calculate print+install fee based on space type config.
+ * ALWAYS reads from SpaceCategory config.
+ */
+export function calculatePrintInstallFee(
+  spaceType: SpaceType,
+  dimensions?: { width: number; height: number }
+): number {
+  const { category, printInstallFeeOverride } = spaceType;
+  
+  // SpaceType override takes precedence
+  if (printInstallFeeOverride !== null) {
+    return printInstallFeeOverride;
+  }
+  
+  switch (category.feeCalculationType) {
+    case 'FIXED':
+      return category.basePrintInstallFee;
+      
+    case 'PER_SQFT':
+      if (!dimensions) {
+        throw new Error('Dimensions required for PER_SQFT calculation');
+      }
+      // Assuming dimensions in inches, convert to sqft
+      const sqft = (dimensions.width * dimensions.height) / 144;
+      return Math.round(category.basePrintInstallFee * sqft);
+      
+    case 'CUSTOM':
+      throw new Error(
+        'Custom fee calculation requires implementation for this category'
+      );
+      
+    default:
+      throw new Error(`Unknown fee calculation type: ${category.feeCalculationType}`);
+  }
+}
+
+/**
+ * Validate GPS coordinates against space location.
+ * Radius comes from SpaceCategory config.
+ */
+export function validateGpsLocation(
+  photoLat: number,
+  photoLng: number,
+  spaceLat: number,
+  spaceLng: number,
+  category: SpaceCategory
+): { valid: boolean; distanceMeters: number } {
+  if (!category.requiresGpsValidation) {
+    return { valid: true, distanceMeters: 0 };
+  }
+  
+  const distanceMeters = calculateDistance(
+    photoLat, photoLng,
+    spaceLat, spaceLng
+  );
+  
+  return {
+    valid: distanceMeters <= category.gpsRadiusMeters,
+    distanceMeters,
+  };
+}
+
+// Haversine formula for distance calculation
+function calculateDistance(
+  lat1: number, lon1: number,
+  lat2: number, lon2: number
+): number {
+  const R = 6371e3; // Earth's radius in meters
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
+
+  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+            Math.cos(φ1) * Math.cos(φ2) *
+            Math.sin(Δλ/2) * Math.sin(Δλ/2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+  return R * c;
+}
+```

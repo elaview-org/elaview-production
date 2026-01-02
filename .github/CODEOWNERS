@@ -1,0 +1,37 @@
+# Default owners for everything
+* @mike-anderson @quang-cap
+
+# Mobile app - Mike primary
+/apps/mobile/ @mike-anderson
+
+# Web app - Quang primary
+/apps/web/ @quang-cap
+
+# Backend - Quang owns
+/backend/ @quang-cap
+
+# Shared packages - both review
+/packages/ @mike-anderson @quang-cap
+
+# GraphQL schema/operations - both review
+/packages/graphql/ @mike-anderson @quang-cap
+
+# CI/CD and GitHub config
+/.github/ @mike-anderson @quang-cap
+
+# Documentation
+/docs/ @mike-anderson @quang-cap
+
+# AI Context files
+/.cursor/ @mike-anderson @quang-cap
+
+# CRITICAL: Payment code requires both reviewers
+**/payment* @mike-anderson @quang-cap
+**/stripe* @mike-anderson @quang-cap
+**/payout* @mike-anderson @quang-cap
+**/escrow* @mike-anderson @quang-cap
+
+# CRITICAL: Auth code requires both reviewers
+**/auth* @mike-anderson @quang-cap
+**/session* @mike-anderson @quang-cap
+**/token* @mike-anderson @quang-cap

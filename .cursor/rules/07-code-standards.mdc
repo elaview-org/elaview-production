@@ -1,0 +1,715 @@
+---
+description: TypeScript conventions and coding standards
+globs:
+  - "**/*"
+alwaysApply: true
+---
+
+# Code Standards
+
+## Critical Rules
+
+### 1. NEVER Hardcode Space Types
+
+Space types are database-driven. Always fetch from API.
+
+```typescript
+// ❌ NEVER DO THIS
+const SPACE_TYPES = ['window-poster', 'bulletin-board', 'wall-mount'];
+const PRINT_INSTALL_FEES = { 'window-poster': 20, 'bulletin-board': 10 };
+const REQUIRED_PHOTOS = 3;
+
+// ✅ ALWAYS DO THIS
+const { data } = useSpaceCategoriesQuery();
+const categories = data?.spaceCategories ?? [];
+
+// Get config from the space's category
+const { requiredPhotoCount, gpsRadiusMeters } = booking.space.spaceType.category;
+```
+
+### 2. Always Use TypeScript Strict Mode
+
+```json
+// tsconfig.json
+{
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": true
+  }
+}
+```
+
+### 3. Every Feature Must Include Tests
+
+No PR is complete without tests. See testing strategy for requirements.
+
+---
+
+## TypeScript Conventions
+
+### Type Definitions
+
+```typescript
+// ✅ Use interfaces for objects that will be extended
+interface User {
+  id: string;
+  email: string;
+  role: UserRole;
+}
+
+// ✅ Use type for unions, intersections, and primitives
+type UserRole = 'ADVERTISER' | 'SPACE_OWNER' | 'ADMIN';
+type BookingStatus = 'PENDING_APPROVAL' | 'ACCEPTED' | 'PAID' | /* ... */;
+
+// ✅ Use const assertions for literal types
+const BOOKING_STATUSES = [
+  'PENDING_APPROVAL',
+  'ACCEPTED',
+  'PAID',
+] as const;
+
+// ✅ Derive types from const arrays
+type BookingStatus = typeof BOOKING_STATUSES[number];
+
+// ❌ Avoid `any` - use `unknown` for truly unknown types
+function parseResponse(data: unknown): User {
+  // Validate and narrow the type
+  if (!isUser(data)) {
+    throw new Error('Invalid user data');
+  }
+  return data;
+}
+
+// ❌ Avoid `!` non-null assertion - handle null properly
+const user = users.find(u => u.id === id);
+if (!user) {
+  throw new NotFoundError('User not found');
+}
+// Now user is safely non-null
+```
+
+### Null Handling
+
+```typescript
+// ✅ Use nullish coalescing
+const name = user.displayName ?? user.email;
+
+// ✅ Use optional chaining
+const city = booking?.space?.location?.city;
+
+// ✅ Use type guards
+function isBooking(value: unknown): value is Booking {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'id' in value &&
+    'status' in value
+  );
+}
+```
+
+---
+
+## Naming Conventions
+
+### Files and Directories
+
+```
+# Components: PascalCase
+BookingCard.tsx
+BookingCard.test.tsx
+BookingCard.styles.ts
+
+# Hooks: camelCase with use prefix
+useBookingStatus.ts
+useLocationValidation.ts
+
+# Utilities: camelCase
+formatCurrency.ts
+calculateDistance.ts
+
+# Types: camelCase with .types suffix
+booking.types.ts
+payment.types.ts
+
+# Constants: camelCase
+constants.ts
+colors.ts
+
+# GraphQL operations: camelCase with operation type
+queries.graphql
+mutations.graphql
+fragments.graphql
+```
+
+### Variables and Functions
+
+```typescript
+// Variables: camelCase
+const bookingStatus = 'PAID';
+const userEmail = user.email;
+const isLoading = true;
+
+// Constants: SCREAMING_SNAKE_CASE for true constants
+const MAX_FILE_SIZE_MB = 25;
+const API_TIMEOUT_MS = 30000;
+
+// Functions: camelCase, verb prefix
+function getBookingById(id: string): Booking { }
+function calculateTotalPrice(booking: Booking): number { }
+function formatDateRange(start: Date, end: Date): string { }
+
+// Boolean functions: is/has/can/should prefix
+function isValidBooking(booking: Booking): boolean { }
+function hasPermission(user: User, action: string): boolean { }
+function canCancelBooking(booking: Booking): boolean { }
+
+// Event handlers: handle prefix
+function handleSubmit(event: FormEvent): void { }
+function handleBookingPress(booking: Booking): void { }
+```
+
+### Components
+
+```typescript
+// Components: PascalCase
+function BookingCard({ booking, onPress }: BookingCardProps) { }
+function SpaceSearchFilters({ filters, onChange }: Props) { }
+
+// Props interfaces: ComponentNameProps
+interface BookingCardProps {
+  booking: Booking;
+  onPress: () => void;
+  testID?: string;
+}
+
+// Hooks: useCamelCase
+function useBookingStatus(bookingId: string) { }
+function useDebounce<T>(value: T, delay: number): T { }
+```
+
+---
+
+## Import Ordering
+
+Organize imports in this order, with blank lines between groups:
+
+```typescript
+// 1. React/React Native core
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+
+// 2. Third-party libraries
+import { useQuery } from '@apollo/client';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+// 3. Internal packages (monorepo)
+import { BookingStatus } from '@elaview/graphql/generated';
+import { useBookingFlow } from '@elaview/features/bookings';
+import { formatCurrency } from '@elaview/shared/utils';
+
+// 4. Relative imports (parent directories first)
+import { SpaceImage } from '../../components/SpaceImage';
+import { useAuth } from '../contexts/AuthContext';
+
+// 5. Relative imports (same directory)
+import { BookingCardSkeleton } from './BookingCard.skeleton';
+import { styles } from './BookingCard.styles';
+
+// 6. Types (last, with type keyword)
+import type { Booking, Space } from '@elaview/graphql/generated';
+```
+
+---
+
+## Component Structure
+
+### Standard Component Pattern
+
+```typescript
+// BookingCard.tsx
+import React, { memo, useCallback } from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { Booking } from '@elaview/graphql/generated';
+import { BookingStatusBadge } from '@elaview/features/bookings';
+import { formatCurrency, formatDateRange } from '@elaview/shared/utils';
+import { SpaceImage } from '../SpaceImage';
+
+// ============================================
+// Types
+// ============================================
+interface BookingCardProps {
+  booking: Booking;
+  onPress: (booking: Booking) => void;
+  variant?: 'default' | 'compact';
+  testID?: string;
+}
+
+// ============================================
+// Component
+// ============================================
+function BookingCardComponent({
+  booking,
+  onPress,
+  variant = 'default',
+  testID,
+}: BookingCardProps) {
+  // Hooks
+  const handlePress = useCallback(() => {
+    onPress(booking);
+  }, [booking, onPress]);
+
+  // Derived state
+  const isCompact = variant === 'compact';
+
+  // Render
+  return (
+    <Pressable
+      style={[styles.container, isCompact && styles.containerCompact]}
+      onPress={handlePress}
+      testID={testID}
+      accessibilityRole="button"
+      accessibilityLabel={`View booking for ${booking.space.title}`}
+    >
+      <SpaceImage
+        uri={booking.space.photos[0]}
+        style={styles.image}
+        testID={`${testID}-image`}
+      />
+
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Text
+            style={styles.title}
+            numberOfLines={1}
+            testID={`${testID}-title`}
+          >
+            {booking.space.title}
+          </Text>
+          <BookingStatusBadge status={booking.status} />
+        </View>
+
+        {!isCompact && (
+          <Text style={styles.dates}>
+            {formatDateRange(booking.dateRange.startDate, booking.dateRange.endDate)}
+          </Text>
+        )}
+
+        <Text style={styles.price} testID={`${testID}-price`}>
+          {formatCurrency(booking.total)}
+        </Text>
+      </View>
+    </Pressable>
+  );
+}
+
+// ============================================
+// Styles
+// ============================================
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginHorizontal: 16,
+    marginVertical: 8,
+    // Shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  containerCompact: {
+    marginVertical: 4,
+  },
+  image: {
+    width: 100,
+    height: 100,
+  },
+  content: {
+    flex: 1,
+    padding: 12,
+    justifyContent: 'space-between',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1F2937',
+    flex: 1,
+    marginRight: 8,
+  },
+  dates: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 4,
+  },
+  price: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#3B82F6',
+    marginTop: 4,
+  },
+});
+
+// ============================================
+// Exports
+// ============================================
+export const BookingCard = memo(BookingCardComponent);
+export type { BookingCardProps };
+```
+
+### Hook Pattern
+
+```typescript
+// useBookingStatus.ts
+import { useState, useEffect, useCallback } from 'react';
+import { useGetBookingQuery } from '@elaview/graphql/generated';
+
+interface UseBookingStatusOptions {
+  pollInterval?: number;
+  onStatusChange?: (newStatus: BookingStatus) => void;
+}
+
+interface UseBookingStatusResult {
+  status: BookingStatus | null;
+  loading: boolean;
+  error: Error | null;
+  refetch: () => Promise<void>;
+}
+
+export function useBookingStatus(
+  bookingId: string,
+  options: UseBookingStatusOptions = {}
+): UseBookingStatusResult {
+  const { pollInterval = 0, onStatusChange } = options;
+  const [previousStatus, setPreviousStatus] = useState<BookingStatus | null>(null);
+
+  const { data, loading, error, refetch } = useGetBookingQuery({
+    variables: { id: bookingId },
+    pollInterval,
+    skip: !bookingId,
+  });
+
+  const status = data?.booking?.status ?? null;
+
+  // Notify on status change
+  useEffect(() => {
+    if (status && previousStatus && status !== previousStatus) {
+      onStatusChange?.(status);
+    }
+    setPreviousStatus(status);
+  }, [status, previousStatus, onStatusChange]);
+
+  const handleRefetch = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
+  return {
+    status,
+    loading,
+    error: error ?? null,
+    refetch: handleRefetch,
+  };
+}
+```
+
+---
+
+## Security Requirements
+
+### Input Validation
+
+```typescript
+// ✅ Always validate user input with Zod
+import { z } from 'zod';
+
+const createBookingSchema = z.object({
+  spaceId: z.string().uuid(),
+  dateRange: z.object({
+    startDate: z.coerce.date().min(new Date(), 'Start date must be in the future'),
+    endDate: z.coerce.date(),
+  }).refine(
+    (data) => data.endDate > data.startDate,
+    'End date must be after start date'
+  ),
+  message: z.string().max(1000).optional(),
+});
+
+// Use in form submission
+const handleSubmit = async (formData: unknown) => {
+  const result = createBookingSchema.safeParse(formData);
+  if (!result.success) {
+    // Handle validation errors
+    return;
+  }
+  // result.data is now typed and validated
+  await createBooking(result.data);
+};
+```
+
+### Authentication Checks
+
+```typescript
+// ✅ Always check auth before sensitive operations
+async function downloadCreativeFile(bookingId: string) {
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new UnauthorizedError('Authentication required');
+  }
+
+  const booking = await getBooking(bookingId);
+  if (!booking) {
+    throw new NotFoundError('Booking not found');
+  }
+
+  // Check ownership
+  if (booking.space.ownerId !== user.id) {
+    throw new ForbiddenError('You do not have access to this booking');
+  }
+
+  // Proceed with download
+  return generateDownloadUrl(booking.creativeFileUrl);
+}
+```
+
+### No Secrets in Code
+
+```typescript
+// ❌ NEVER hardcode secrets
+const STRIPE_SECRET = 'sk_live_abc123'; // NEVER
+const API_KEY = '1234567890'; // NEVER
+
+// ✅ Use environment variables
+const STRIPE_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+
+// ✅ Server-side secrets stay on server
+// Backend handles STRIPE_SECRET_KEY, never exposed to client
+```
+
+### Parameterized Queries
+
+```typescript
+// ❌ NEVER concatenate user input into queries
+const query = `SELECT * FROM bookings WHERE id = '${bookingId}'`; // SQL injection!
+
+// ✅ Use parameterized queries (handled by ORM/GraphQL)
+// GraphQL variables are automatically safe
+const { data } = useQuery(GET_BOOKING, {
+  variables: { id: bookingId }, // Safe - treated as parameter
+});
+```
+
+---
+
+## Accessibility
+
+### React Native Accessibility
+
+```typescript
+// ✅ Include testID for E2E testing
+<Pressable testID="booking-card-123">
+
+// ✅ Include accessibility props
+<Pressable
+  accessibilityRole="button"
+  accessibilityLabel="View booking for Coffee Shop Window"
+  accessibilityHint="Opens booking details"
+>
+
+// ✅ Images need accessibility
+<Image
+  source={{ uri: photo }}
+  accessibilityLabel="Storefront window advertising space"
+  accessibilityRole="image"
+/>
+
+// ✅ Form inputs need labels
+<TextInput
+  accessibilityLabel="Email address"
+  accessibilityHint="Enter your email to sign in"
+  testID="input-email"
+/>
+```
+
+### testID Conventions
+
+```typescript
+// Pattern: [component]-[identifier]-[element]
+testID="booking-card-123"           // Main component
+testID="booking-card-123-title"     // Child element
+testID="booking-card-123-status"    // Child element
+
+// Interactive elements
+testID="button-submit"
+testID="button-cancel"
+testID="button-pay"
+
+// Form inputs
+testID="input-email"
+testID="input-password"
+testID="picker-space-type"
+
+// Lists
+testID="list-bookings"
+testID="list-spaces"
+
+// Screens
+testID="screen-booking-detail"
+testID="screen-login"
+```
+
+---
+
+## Git Commit Format
+
+### Commit Message Structure
+
+```
+type(scope): brief description
+
+- Detail 1
+- Detail 2
+- Detail 3
+
+Closes #123
+```
+
+### Types
+
+| Type | Description |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `refactor` | Code change that neither fixes a bug nor adds a feature |
+| `style` | Formatting, missing semicolons, etc. (no code change) |
+| `test` | Adding or updating tests |
+| `docs` | Documentation only |
+| `chore` | Maintenance, dependencies, config |
+| `ci` | CI/CD changes |
+| `perf` | Performance improvement |
+
+### Scopes
+
+| Scope | Description |
+|-------|-------------|
+| `auth` | Authentication, login, signup |
+| `spaces` | Space listings, search |
+| `bookings` | Booking flow, status |
+| `payments` | Stripe, payouts, refunds |
+| `verification` | Photo verification, GPS |
+| `mobile` | Mobile app specific |
+| `web` | Web app specific |
+| `graphql` | Schema, queries, mutations |
+| `config` | Configuration, environment |
+
+### Examples
+
+```bash
+# Feature
+feat(bookings): add auto-approval after 48 hours
+
+- Created scheduled job for auto-approval
+- Added autoApprovalAt field to Booking entity
+- Send notification when auto-approved
+
+Closes #45
+
+# Bug fix
+fix(payments): prevent duplicate Stage 1 payouts
+
+- Added idempotency check before creating Stripe transfer
+- Log warning if payout already exists
+- Added test coverage for duplicate scenario
+
+Fixes #102
+
+# Refactor
+refactor(mobile): migrate to Expo Router v6 patterns
+
+- Updated navigate() calls to use replace() where needed
+- Refactored protected route logic
+- Updated deep linking handlers
+
+# Chore
+chore(deps): update Expo SDK to 54
+
+- Updated expo and related packages
+- Enabled New Architecture
+- Updated Reanimated to v4
+```
+
+---
+
+## ESLint Rules
+
+```javascript
+// eslint.config.js
+export default [
+  {
+    rules: {
+      // TypeScript
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+
+      // React
+      'react/prop-types': 'off', // We use TypeScript
+      'react-hooks/rules-of-hooks': 'error',
+      'react-hooks/exhaustive-deps': 'warn',
+
+      // Import ordering
+      'import/order': [
+        'error',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            'parent',
+            'sibling',
+            'index',
+            'type',
+          ],
+          'newlines-between': 'always',
+          alphabetize: { order: 'asc' },
+        },
+      ],
+
+      // General
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'prefer-const': 'error',
+      'no-var': 'error',
+    },
+  },
+];
+```
+
+---
+
+## Code Review Checklist
+
+Before submitting a PR, verify:
+
+- [ ] TypeScript compiles without errors (`pnpm typecheck`)
+- [ ] ESLint passes (`pnpm lint`)
+- [ ] All tests pass (`pnpm test`)
+- [ ] No `console.log` statements (use proper logging)
+- [ ] No hardcoded space types or configuration
+- [ ] No secrets or API keys in code
+- [ ] Accessibility props included (testID, accessibilityLabel)
+- [ ] Error states handled with user-friendly messages
+- [ ] Loading states included
+- [ ] New functionality has test coverage
+- [ ] Commit messages follow convention

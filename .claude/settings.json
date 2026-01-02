@@ -1,0 +1,17 @@
+{
+  "projectName": "Elaview",
+  "contextFiles": [
+    "CLAUDE.md",
+    ".cursor/rules/00-project-overview.mdc",
+    ".cursor/rules/07-code-standards.mdc",
+    ".cursor/rules/09-testing-strategy.mdc"
+  ],
+  "autoLoadContext": true,
+  "preferredModel": "claude-sonnet-4-20250514",
+  "codeStyle": {
+    "language": "typescript",
+    "formatter": "prettier",
+    "testFramework": "jest",
+    "componentLibrary": "react-native"
+  }
+}

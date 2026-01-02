@@ -1,0 +1,1035 @@
+---
+description: Stripe payments, escrow, and payouts
+globs:
+  - "**/payment*/**"
+  - "**/stripe*/**"
+  - "**/payout*/**"
+  - "**/escrow*/**"
+alwaysApply: false
+---
+
+# Payment Flow
+
+## Overview
+
+Elaview uses **Stripe Connect** with a two-stage payout model:
+
+1. **Advertiser pays** at booking confirmation → Funds held in platform escrow
+2. **Stage 1 payout** when owner downloads file → Print+install fee transferred
+3. **Stage 2 payout** when advertiser approves → Remainder transferred
+
+```mermaid
+sequenceDiagram
+    participant A as Advertiser
+    participant E as Elaview Platform
+    participant S as Stripe
+    participant O as Owner (Connected Account)
+    
+    A->>E: Book space
+    E->>S: Create PaymentIntent
+    S-->>E: Client secret
+    E-->>A: Payment form
+    A->>S: Confirm payment
+    S->>E: Webhook: payment_intent.succeeded
+    E->>E: Hold funds in escrow
+    
+    Note over E,O: Owner downloads creative file
+    E->>S: Create Transfer (print+install fee)
+    S->>O: Stage 1 payout
+    
+    Note over A,E: Advertiser approves installation
+    E->>S: Create Transfer (remainder)
+    S->>O: Stage 2 payout
+```
+
+---
+
+## Stripe Connect Setup
+
+### Platform Account Type
+
+Elaview uses **Stripe Connect with Express accounts** for space owners:
+
+- Owners onboard via Stripe-hosted flow
+- Stripe handles identity verification, tax forms
+- Owners can view payouts in Stripe Express Dashboard
+- Platform controls payout timing
+
+### Owner Onboarding
+
+```typescript
+// packages/features/payments/api/mutations.ts
+export const CREATE_CONNECT_ACCOUNT = gql`
+  mutation CreateConnectAccount {
+    createConnectAccount {
+      accountId
+      onboardingUrl
+    }
+  }
+`;
+
+// packages/features/payments/hooks/useStripeOnboarding.ts
+export function useStripeOnboarding() {
+  const [createAccount] = useCreateConnectAccountMutation();
+  
+  const startOnboarding = async () => {
+    const { data } = await createAccount();
+    
+    // Open Stripe's hosted onboarding
+    await Linking.openURL(data.createConnectAccount.onboardingUrl);
+  };
+  
+  return { startOnboarding };
+}
+```
+
+**Backend Implementation:**
+
+```csharp
+// Backend: Services/StripeService.cs
+public async Task<(string AccountId, string OnboardingUrl)> CreateConnectAccount(string userId)
+{
+    var account = await _stripeClient.Accounts.CreateAsync(new AccountCreateOptions
+    {
+        Type = "express",
+        Country = "US",
+        Email = user.Email,
+        Capabilities = new AccountCapabilitiesOptions
+        {
+            Transfers = new AccountCapabilitiesTransfersOptions { Requested = true },
+        },
+        BusinessType = "individual",
+        Metadata = new Dictionary<string, string>
+        {
+            { "elaview_user_id", userId }
+        }
+    });
+    
+    var accountLink = await _stripeClient.AccountLinks.CreateAsync(new AccountLinkCreateOptions
+    {
+        Account = account.Id,
+        RefreshUrl = $"{_config.AppUrl}/stripe/refresh",
+        ReturnUrl = $"{_config.AppUrl}/stripe/return",
+        Type = "account_onboarding"
+    });
+    
+    return (account.Id, accountLink.Url);
+}
+```
+
+### Checking Account Status
+
+```typescript
+// packages/features/payments/api/queries.ts
+export const GET_PAYOUT_ACCOUNT = gql`
+  query GetPayoutAccount {
+    payoutAccount {
+      id
+      status  # PENDING, ACTIVE, RESTRICTED
+      payoutsEnabled
+      chargesEnabled
+      requiresAction
+      dashboardUrl
+    }
+  }
+`;
+```
+
+---
+
+## Payment Intent Creation
+
+When advertiser is ready to pay:
+
+```typescript
+// packages/features/payments/api/mutations.ts
+export const CREATE_PAYMENT_INTENT = gql`
+  mutation CreatePaymentIntent($bookingId: ID!) {
+    createPaymentIntent(bookingId: $bookingId) {
+      clientSecret
+      paymentIntentId
+      amount
+      currency
+    }
+  }
+`;
+```
+
+**Backend Implementation:**
+
+```csharp
+// Backend: Services/PaymentService.cs
+public async Task<PaymentIntentResult> CreatePaymentIntent(string bookingId)
+{
+    var booking = await _db.Bookings
+        .Include(b => b.Space)
+        .ThenInclude(s => s.SpaceType)
+        .ThenInclude(st => st.Category)
+        .FirstOrDefaultAsync(b => b.Id == bookingId);
+    
+    // Calculate amounts
+    var subtotal = booking.PricePerWeek * booking.TotalWeeks;
+    var platformFee = CalculatePlatformFee(subtotal);
+    var printInstallFee = CalculatePrintInstallFee(booking.Space.SpaceType);
+    var total = subtotal + platformFee;
+    
+    // Create payment intent (funds go to platform, later transferred)
+    var paymentIntent = await _stripeClient.PaymentIntents.CreateAsync(
+        new PaymentIntentCreateOptions
+        {
+            Amount = (long)(total * 100), // Cents
+            Currency = "usd",
+            Metadata = new Dictionary<string, string>
+            {
+                { "booking_id", bookingId },
+                { "subtotal", subtotal.ToString() },
+                { "platform_fee", platformFee.ToString() },
+                { "print_install_fee", printInstallFee.ToString() },
+            },
+            // Capture immediately (we hold in escrow via our logic)
+            CaptureMethod = "automatic",
+        }
+    );
+    
+    // Store payment record
+    await _db.Payments.AddAsync(new Payment
+    {
+        BookingId = bookingId,
+        StripePaymentIntentId = paymentIntent.Id,
+        Amount = total,
+        Status = PaymentStatus.Pending,
+    });
+    
+    return new PaymentIntentResult
+    {
+        ClientSecret = paymentIntent.ClientSecret,
+        PaymentIntentId = paymentIntent.Id,
+        Amount = total,
+        Currency = "usd",
+    };
+}
+```
+
+---
+
+## Fee Calculation
+
+Fees are calculated based on `SpaceCategory.feeCalculationType`:
+
+```typescript
+// packages/features/payments/utils/fee-calculator.ts
+
+import { Space, SpaceType, SpaceCategory } from '@elaview/graphql/generated';
+
+/**
+ * Calculate print+install fee based on space type configuration.
+ * ALWAYS reads from config - never hardcode fees.
+ */
+export function calculatePrintInstallFee(
+  spaceType: SpaceType,
+  space?: Space
+): number {
+  const { category, printInstallFeeOverride } = spaceType;
+  
+  // SpaceType can override category default
+  if (printInstallFeeOverride !== null && printInstallFeeOverride !== undefined) {
+    return printInstallFeeOverride;
+  }
+  
+  switch (category.feeCalculationType) {
+    case 'FIXED':
+      // Simple flat fee
+      return category.basePrintInstallFee;
+      
+    case 'PER_SQFT':
+      // Fee based on actual space dimensions
+      if (!space) {
+        throw new Error('Space dimensions required for PER_SQFT calculation');
+      }
+      const sqft = calculateSquareFeet(space.width, space.height, space.dimensionUnit);
+      return Math.round(category.basePrintInstallFee * sqft * 100) / 100;
+      
+    case 'CUSTOM':
+      // Requires specific implementation per category
+      throw new Error(`Custom fee calculation not implemented for ${category.slug}`);
+      
+    default:
+      throw new Error(`Unknown fee calculation type: ${category.feeCalculationType}`);
+  }
+}
+
+function calculateSquareFeet(
+  width: number,
+  height: number,
+  unit: 'INCHES' | 'FEET' | 'CM'
+): number {
+  switch (unit) {
+    case 'INCHES':
+      return (width * height) / 144; // 144 sq inches = 1 sq ft
+    case 'FEET':
+      return width * height;
+    case 'CM':
+      return (width * height) / 929.03; // 929.03 sq cm = 1 sq ft
+  }
+}
+
+/**
+ * Calculate platform fee (Elaview's commission).
+ */
+export function calculatePlatformFee(subtotal: number): number {
+  // 15% platform fee
+  const PLATFORM_FEE_RATE = 0.15;
+  return Math.round(subtotal * PLATFORM_FEE_RATE * 100) / 100;
+}
+
+/**
+ * Calculate all booking amounts.
+ */
+export function calculateBookingPricing(
+  pricePerWeek: number,
+  totalWeeks: number,
+  spaceType: SpaceType,
+  space?: Space
+): BookingPricing {
+  const subtotal = pricePerWeek * totalWeeks;
+  const platformFee = calculatePlatformFee(subtotal);
+  const printInstallFee = calculatePrintInstallFee(spaceType, space);
+  const total = subtotal + platformFee;
+  
+  // What owner receives (in two stages)
+  const ownerEarnings = subtotal - platformFee;
+  const stage1Payout = printInstallFee; // On file download
+  const stage2Payout = ownerEarnings - printInstallFee; // On approval
+  
+  return {
+    pricePerWeek,
+    totalWeeks,
+    subtotal,
+    platformFee,
+    printInstallFee,
+    total,
+    ownerEarnings,
+    stage1Payout,
+    stage2Payout,
+  };
+}
+
+interface BookingPricing {
+  pricePerWeek: number;
+  totalWeeks: number;
+  subtotal: number;
+  platformFee: number;
+  printInstallFee: number;
+  total: number;         // What advertiser pays
+  ownerEarnings: number; // Total owner receives
+  stage1Payout: number;  // Print+install fee
+  stage2Payout: number;  // Remainder
+}
+```
+
+### MVP Space Type Fees
+
+| Space Type | Category | Fee Type | Fee |
+|------------|----------|----------|-----|
+| Bulletin board | Storefront | FIXED | $10 |
+| Window poster | Storefront | FIXED | $20 |
+| Window vinyl | Storefront | FIXED | $35 |
+| Wall mount | Storefront | FIXED | $30 |
+| A-frame sign | Storefront | FIXED | $25 |
+
+### Future Category Example (Billboard)
+
+```typescript
+// Example: Billboard category with PER_SQFT fee
+const billboardCategory: SpaceCategory = {
+  slug: 'billboard',
+  name: 'Billboard',
+  feeCalculationType: 'PER_SQFT',
+  basePrintInstallFee: 2.50, // $2.50 per square foot
+  requiresProfessionalInstall: true,
+  estimatedInstallDays: 7,
+  // ... other config
+};
+
+// 14' x 48' billboard = 672 sqft
+// Print+install fee = 672 * $2.50 = $1,680
+```
+
+---
+
+## Two-Stage Payout
+
+### Stage 1: File Download Payout
+
+Triggered when owner downloads the creative file:
+
+```csharp
+// Backend: Services/PayoutService.cs
+public async Task ProcessStage1Payout(string bookingId)
+{
+    var booking = await GetBookingWithPayment(bookingId);
+    var owner = await GetSpaceOwner(booking.SpaceId);
+    
+    // Idempotency check - don't pay twice
+    var existingPayout = await _db.Payouts.FirstOrDefaultAsync(
+        p => p.BookingId == bookingId && p.Stage == PayoutStage.PrintInstall
+    );
+    if (existingPayout != null)
+    {
+        _logger.LogWarning("Stage 1 payout already processed for booking {BookingId}", bookingId);
+        return;
+    }
+    
+    // Calculate print+install fee
+    var printInstallFee = CalculatePrintInstallFee(booking.Space.SpaceType);
+    
+    // Create Stripe Transfer
+    var transfer = await _stripeClient.Transfers.CreateAsync(new TransferCreateOptions
+    {
+        Amount = (long)(printInstallFee * 100),
+        Currency = "usd",
+        Destination = owner.StripeAccountId,
+        TransferGroup = $"booking_{bookingId}",
+        Metadata = new Dictionary<string, string>
+        {
+            { "booking_id", bookingId },
+            { "payout_stage", "print_install" },
+        }
+    });
+    
+    // Record payout
+    await _db.Payouts.AddAsync(new Payout
+    {
+        BookingId = bookingId,
+        Stage = PayoutStage.PrintInstall,
+        Amount = printInstallFee,
+        StripeTransferId = transfer.Id,
+        StripeAccountId = owner.StripeAccountId,
+        Status = PayoutStatus.Completed,
+        CompletedAt = DateTime.UtcNow,
+    });
+    
+    // Create audit log
+    await _auditService.Log(new AuditEvent
+    {
+        EventType = "PAYOUT_STAGE1_COMPLETED",
+        ResourceType = "Booking",
+        ResourceId = bookingId,
+        ActorType = ActorType.System,
+        Metadata = new { TransferId = transfer.Id, Amount = printInstallFee }
+    });
+    
+    // Notify owner
+    await _notificationService.Send(owner.Id, new Notification
+    {
+        Type = NotificationType.PayoutCompleted,
+        Title = "Print & Install Fee Received",
+        Body = $"${printInstallFee:F2} has been transferred to your account.",
+        Data = new { BookingId = bookingId }
+    });
+}
+```
+
+### Stage 2: Approval Payout
+
+Triggered when advertiser approves (or auto-approval):
+
+```csharp
+// Backend: Services/PayoutService.cs
+public async Task ProcessStage2Payout(string bookingId)
+{
+    var booking = await GetBookingWithPayment(bookingId);
+    var owner = await GetSpaceOwner(booking.SpaceId);
+    
+    // Idempotency check
+    var existingPayout = await _db.Payouts.FirstOrDefaultAsync(
+        p => p.BookingId == bookingId && p.Stage == PayoutStage.Remainder
+    );
+    if (existingPayout != null)
+    {
+        _logger.LogWarning("Stage 2 payout already processed for booking {BookingId}", bookingId);
+        return;
+    }
+    
+    // Calculate remainder (total owner earnings minus print+install fee)
+    var pricing = CalculateBookingPricing(booking);
+    var remainderAmount = pricing.Stage2Payout;
+    
+    // Create Stripe Transfer
+    var transfer = await _stripeClient.Transfers.CreateAsync(new TransferCreateOptions
+    {
+        Amount = (long)(remainderAmount * 100),
+        Currency = "usd",
+        Destination = owner.StripeAccountId,
+        TransferGroup = $"booking_{bookingId}",
+        Metadata = new Dictionary<string, string>
+        {
+            { "booking_id", bookingId },
+            { "payout_stage", "remainder" },
+        }
+    });
+    
+    // Record payout
+    await _db.Payouts.AddAsync(new Payout
+    {
+        BookingId = bookingId,
+        Stage = PayoutStage.Remainder,
+        Amount = remainderAmount,
+        StripeTransferId = transfer.Id,
+        StripeAccountId = owner.StripeAccountId,
+        Status = PayoutStatus.Completed,
+        CompletedAt = DateTime.UtcNow,
+    });
+    
+    // Create audit log
+    await _auditService.Log(new AuditEvent
+    {
+        EventType = "PAYOUT_STAGE2_COMPLETED",
+        ResourceType = "Booking",
+        ResourceId = bookingId,
+        ActorType = ActorType.System,
+        Metadata = new { TransferId = transfer.Id, Amount = remainderAmount }
+    });
+    
+    // Notify owner
+    await _notificationService.Send(owner.Id, new Notification
+    {
+        Type = NotificationType.PayoutCompleted,
+        Title = "Final Payment Received",
+        Body = $"${remainderAmount:F2} has been transferred to your account.",
+        Data = new { BookingId = bookingId }
+    });
+}
+```
+
+---
+
+## Cancellation & Refunds
+
+### Refund Matrix
+
+| Booking Status | Advertiser Refund | Owner Keeps | Notes |
+|----------------|-------------------|-------------|-------|
+| PENDING_APPROVAL | N/A | N/A | No payment yet |
+| ACCEPTED | N/A | N/A | No payment yet |
+| PAID | 100% | $0 | Full refund before file download |
+| FILE_DOWNLOADED | Total - PrintInstallFee | PrintInstallFee | Owner already received Stage 1 |
+| INSTALLED | Total - PrintInstallFee | PrintInstallFee | Owner already received Stage 1 |
+| VERIFIED | Total - PrintInstallFee | PrintInstallFee | Owner already received Stage 1 |
+| DISPUTED (advertiser wins) | Total - PrintInstallFee | PrintInstallFee | Admin resolved in favor |
+
+### Refund Implementation
+
+```csharp
+// Backend: Services/RefundService.cs
+public async Task<RefundResult> ProcessCancellationRefund(string bookingId, string cancelledBy)
+{
+    var booking = await GetBookingWithPayment(bookingId);
+    var payment = booking.Payment;
+    
+    if (payment == null || payment.Status != PaymentStatus.Succeeded)
+    {
+        // No payment to refund
+        return new RefundResult { RefundAmount = 0, Success = true };
+    }
+    
+    // Determine refund amount based on status
+    var refundAmount = CalculateRefundAmount(booking);
+    
+    if (refundAmount <= 0)
+    {
+        return new RefundResult { RefundAmount = 0, Success = true };
+    }
+    
+    // Create Stripe refund
+    var refund = await _stripeClient.Refunds.CreateAsync(new RefundCreateOptions
+    {
+        PaymentIntent = payment.StripePaymentIntentId,
+        Amount = (long)(refundAmount * 100),
+        Reason = RefundReasons.RequestedByCustomer,
+        Metadata = new Dictionary<string, string>
+        {
+            { "booking_id", bookingId },
+            { "cancelled_by", cancelledBy },
+        }
+    });
+    
+    // Update payment record
+    payment.AmountRefunded = refundAmount;
+    payment.Status = refundAmount >= payment.Amount 
+        ? PaymentStatus.Refunded 
+        : PaymentStatus.PartiallyRefunded;
+    payment.RefundedAt = DateTime.UtcNow;
+    
+    // Create audit log
+    await _auditService.Log(new AuditEvent
+    {
+        EventType = "REFUND_PROCESSED",
+        ResourceType = "Payment",
+        ResourceId = payment.Id,
+        ActorType = ActorType.System,
+        Metadata = new { 
+            RefundId = refund.Id, 
+            Amount = refundAmount,
+            CancelledBy = cancelledBy 
+        }
+    });
+    
+    return new RefundResult
+    {
+        RefundAmount = refundAmount,
+        StripeRefundId = refund.Id,
+        Success = true,
+    };
+}
+
+private decimal CalculateRefundAmount(Booking booking)
+{
+    // Before file download: full refund
+    if (booking.FileDownloadedAt == null)
+    {
+        return booking.Total;
+    }
+    
+    // After file download: refund total minus print+install fee
+    // (Owner keeps print+install fee which was already transferred)
+    return booking.Total - booking.PrintInstallFee;
+}
+```
+
+---
+
+## Webhook Handling
+
+### Webhook Endpoint
+
+```csharp
+// Backend: Controllers/WebhooksController.cs
+[ApiController]
+[Route("api/webhooks")]
+public class WebhooksController : ControllerBase
+{
+    [HttpPost("stripe")]
+    public async Task<IActionResult> HandleStripeWebhook()
+    {
+        var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+        
+        try
+        {
+            var stripeEvent = EventUtility.ConstructEvent(
+                json,
+                Request.Headers["Stripe-Signature"],
+                _config.StripeWebhookSecret
+            );
+            
+            // Handle event based on type
+            switch (stripeEvent.Type)
+            {
+                case Events.PaymentIntentSucceeded:
+                    await HandlePaymentSucceeded(stripeEvent);
+                    break;
+                    
+                case Events.PaymentIntentPaymentFailed:
+                    await HandlePaymentFailed(stripeEvent);
+                    break;
+                    
+                case Events.TransferCreated:
+                    await HandleTransferCreated(stripeEvent);
+                    break;
+                    
+                case Events.TransferFailed:
+                    await HandleTransferFailed(stripeEvent);
+                    break;
+                    
+                case Events.AccountUpdated:
+                    await HandleAccountUpdated(stripeEvent);
+                    break;
+                    
+                default:
+                    _logger.LogInformation("Unhandled Stripe event type: {Type}", stripeEvent.Type);
+                    break;
+            }
+            
+            return Ok();
+        }
+        catch (StripeException e)
+        {
+            _logger.LogError(e, "Stripe webhook error");
+            return BadRequest();
+        }
+    }
+}
+```
+
+### Payment Success Handler
+
+```csharp
+private async Task HandlePaymentSucceeded(Event stripeEvent)
+{
+    var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+    var bookingId = paymentIntent.Metadata["booking_id"];
+    
+    // Idempotency: Check if already processed
+    var payment = await _db.Payments.FirstOrDefaultAsync(
+        p => p.StripePaymentIntentId == paymentIntent.Id
+    );
+    
+    if (payment?.Status == PaymentStatus.Succeeded)
+    {
+        _logger.LogInformation("Payment already processed: {PaymentIntentId}", paymentIntent.Id);
+        return;
+    }
+    
+    // Update payment status
+    payment.Status = PaymentStatus.Succeeded;
+    payment.StripeChargeId = paymentIntent.LatestChargeId;
+    payment.SucceededAt = DateTime.UtcNow;
+    
+    // Update booking status
+    var booking = await _db.Bookings.FindAsync(bookingId);
+    booking.Status = BookingStatus.Paid;
+    booking.PaidAt = DateTime.UtcNow;
+    
+    await _db.SaveChangesAsync();
+    
+    // Create audit log
+    await _auditService.Log(new AuditEvent
+    {
+        EventType = "PAYMENT_SUCCEEDED",
+        ResourceType = "Payment",
+        ResourceId = payment.Id,
+        ActorType = ActorType.System,
+        Metadata = new { PaymentIntentId = paymentIntent.Id }
+    });
+    
+    // Notify owner
+    var owner = await GetSpaceOwner(booking.SpaceId);
+    await _notificationService.Send(owner.Id, new Notification
+    {
+        Type = NotificationType.PaymentReceived,
+        Title = "Payment Received!",
+        Body = "Download the creative file to start the installation.",
+        Data = new { BookingId = bookingId }
+    });
+}
+```
+
+---
+
+## Idempotency Patterns
+
+All payment operations must be idempotent to handle retries:
+
+```csharp
+// Example: Idempotent payout processing
+public async Task ProcessPayout(string bookingId, PayoutStage stage)
+{
+    // 1. Check for existing payout
+    var existingPayout = await _db.Payouts.FirstOrDefaultAsync(
+        p => p.BookingId == bookingId && p.Stage == stage
+    );
+    
+    if (existingPayout != null)
+    {
+        switch (existingPayout.Status)
+        {
+            case PayoutStatus.Completed:
+                // Already done, return success
+                return;
+                
+            case PayoutStatus.Processing:
+                // In progress, check status with Stripe
+                await RefreshPayoutStatus(existingPayout);
+                return;
+                
+            case PayoutStatus.Failed:
+                // Retry the transfer
+                await RetryPayout(existingPayout);
+                return;
+        }
+    }
+    
+    // 2. Create payout record BEFORE calling Stripe
+    var payout = new Payout
+    {
+        BookingId = bookingId,
+        Stage = stage,
+        Status = PayoutStatus.Processing,
+        CreatedAt = DateTime.UtcNow,
+    };
+    await _db.Payouts.AddAsync(payout);
+    await _db.SaveChangesAsync();
+    
+    try
+    {
+        // 3. Create Stripe transfer with idempotency key
+        var transfer = await _stripeClient.Transfers.CreateAsync(
+            new TransferCreateOptions { /* ... */ },
+            new RequestOptions 
+            { 
+                IdempotencyKey = $"payout_{bookingId}_{stage}" 
+            }
+        );
+        
+        // 4. Update payout record
+        payout.StripeTransferId = transfer.Id;
+        payout.Status = PayoutStatus.Completed;
+        payout.CompletedAt = DateTime.UtcNow;
+    }
+    catch (StripeException e)
+    {
+        payout.Status = PayoutStatus.Failed;
+        payout.FailureReason = e.Message;
+        payout.FailedAt = DateTime.UtcNow;
+        throw;
+    }
+    finally
+    {
+        await _db.SaveChangesAsync();
+    }
+}
+```
+
+---
+
+## Frontend Payment Flow
+
+```typescript
+// packages/features/payments/hooks/usePayment.ts
+
+import { useStripe } from '@stripe/stripe-react-native';
+import { useCreatePaymentIntentMutation } from '@elaview/graphql/generated';
+
+export function usePayment(bookingId: string) {
+  const { confirmPayment } = useStripe();
+  const [createIntent, { loading: creatingIntent }] = useCreatePaymentIntentMutation();
+  const [processing, setProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const processPayment = async () => {
+    setProcessing(true);
+    setError(null);
+    
+    try {
+      // 1. Create payment intent on backend
+      const { data } = await createIntent({
+        variables: { bookingId },
+      });
+      
+      const { clientSecret } = data.createPaymentIntent;
+      
+      // 2. Confirm payment with Stripe SDK
+      const { error: stripeError, paymentIntent } = await confirmPayment(
+        clientSecret,
+        {
+          paymentMethodType: 'Card',
+        }
+      );
+      
+      if (stripeError) {
+        throw new Error(stripeError.message);
+      }
+      
+      if (paymentIntent.status !== 'Succeeded') {
+        throw new Error('Payment was not successful');
+      }
+      
+      // 3. Backend webhook will update booking status
+      // Poll or subscribe for status change
+      return { success: true, paymentIntentId: paymentIntent.id };
+      
+    } catch (e) {
+      const message = e instanceof Error ? e.message : 'Payment failed';
+      setError(message);
+      return { success: false, error: message };
+    } finally {
+      setProcessing(false);
+    }
+  };
+  
+  return {
+    processPayment,
+    loading: creatingIntent || processing,
+    error,
+  };
+}
+```
+
+### Payment Screen Component
+
+```typescript
+// apps/mobile/app/(advertiser)/bookings/[id]/pay.tsx
+
+import { usePayment } from '@elaview/features/payments';
+import { useBooking } from '@elaview/features/bookings';
+
+export default function PaymentScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const { data: booking } = useBooking(id);
+  const { processPayment, loading, error } = usePayment(id);
+  const router = useRouter();
+  
+  const handlePay = async () => {
+    const result = await processPayment();
+    
+    if (result.success) {
+      router.replace(`/(advertiser)/bookings/${id}`);
+    }
+  };
+  
+  return (
+    <View style={styles.container}>
+      <BookingPricingSummary booking={booking} />
+      
+      <CardField
+        postalCodeEnabled={true}
+        style={styles.cardField}
+        testID="card-field"
+      />
+      
+      {error && (
+        <Text style={styles.error}>{error}</Text>
+      )}
+      
+      <Button
+        title={`Pay $${booking.total.toFixed(2)}`}
+        onPress={handlePay}
+        loading={loading}
+        disabled={loading}
+        testID="pay-button"
+      />
+      
+      <Text style={styles.disclaimer}>
+        Your payment will be held securely until the installation is complete.
+      </Text>
+    </View>
+  );
+}
+```
+
+---
+
+## Payout Status Queries
+
+```typescript
+// packages/features/payments/api/queries.ts
+
+export const GET_BOOKING_PAYOUTS = gql`
+  query GetBookingPayouts($bookingId: ID!) {
+    bookingPayouts(bookingId: $bookingId) {
+      id
+      stage
+      amount
+      status
+      createdAt
+      completedAt
+    }
+  }
+`;
+
+export const GET_OWNER_EARNINGS = gql`
+  query GetOwnerEarnings($period: EarningsPeriod!) {
+    ownerEarnings(period: $period) {
+      totalEarnings
+      pendingPayouts
+      completedPayouts
+      payouts {
+        id
+        booking {
+          id
+          space {
+            title
+          }
+        }
+        stage
+        amount
+        status
+        completedAt
+      }
+    }
+  }
+`;
+```
+
+---
+
+## Error Handling
+
+### Payment Failures
+
+```typescript
+// packages/features/payments/utils/error-messages.ts
+
+export function getPaymentErrorMessage(error: string): string {
+  const errorMap: Record<string, string> = {
+    'card_declined': 'Your card was declined. Please try a different card.',
+    'insufficient_funds': 'Insufficient funds. Please try a different card.',
+    'expired_card': 'Your card has expired. Please use a different card.',
+    'incorrect_cvc': 'The CVC code is incorrect. Please check and try again.',
+    'processing_error': 'An error occurred while processing. Please try again.',
+    'rate_limit': 'Too many attempts. Please wait a moment and try again.',
+  };
+  
+  return errorMap[error] || 'Payment failed. Please try again or contact support.';
+}
+```
+
+### Payout Failures
+
+```csharp
+// Backend: Services/PayoutService.cs
+public async Task HandlePayoutFailure(string payoutId, string reason)
+{
+    var payout = await _db.Payouts.FindAsync(payoutId);
+    
+    payout.Status = PayoutStatus.Failed;
+    payout.FailureReason = reason;
+    payout.FailedAt = DateTime.UtcNow;
+    
+    await _db.SaveChangesAsync();
+    
+    // Alert admin
+    await _alertService.SendAdminAlert(new Alert
+    {
+        Type = AlertType.PayoutFailed,
+        Message = $"Payout {payoutId} failed: {reason}",
+        Severity = AlertSeverity.High,
+    });
+    
+    // Notify owner
+    var booking = await _db.Bookings.FindAsync(payout.BookingId);
+    var owner = await GetSpaceOwner(booking.SpaceId);
+    
+    await _notificationService.Send(owner.Id, new Notification
+    {
+        Type = NotificationType.PayoutFailed,
+        Title = "Payout Issue",
+        Body = "There was an issue with your payout. Our team is looking into it.",
+        Data = new { BookingId = payout.BookingId }
+    });
+}
+```
+
+---
+
+## Testing Payments
+
+### Test Card Numbers
+
+| Card | Number | Behavior |
+|------|--------|----------|
+| Success | 4242424242424242 | Always succeeds |
+| Decline | 4000000000000002 | Always declines |
+| Insufficient | 4000000000009995 | Insufficient funds |
+| 3D Secure | 4000002500003155 | Requires authentication |
+
+### Test Webhooks
+
+```bash
+# Forward Stripe webhooks to local development
+stripe listen --forward-to localhost:5000/api/webhooks/stripe
+
+# Trigger test events
+stripe trigger payment_intent.succeeded
+stripe trigger transfer.created
+```

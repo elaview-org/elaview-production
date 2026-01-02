@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ElaviewBackend.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260102144727_Initial")]
+    [Migration("20260102170411_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -27,7 +27,7 @@ namespace ElaviewBackend.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("ElaviewBackend.Data.AdvertiserProfile", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.AdvertiserProfile", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -76,7 +76,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("advertiser_profiles", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Booking", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Booking", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -422,7 +422,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("bookings", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.BugReport", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.BugReport", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -502,7 +502,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("bug_reports", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Campaign", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Campaign", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -574,7 +574,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("campaigns", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.CronJobLog", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.CronJobLog", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -620,7 +620,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("cron_job_logs", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.DemoRequest", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DemoRequest", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -696,7 +696,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("demo_requests", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Lead", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Lead", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -832,7 +832,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("leads", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.MarketResearch", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.MarketResearch", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -899,7 +899,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("market_research", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Message", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Message", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -993,7 +993,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("messages", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Notification", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Notification", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -1051,7 +1051,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("notifications", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.OutreachLog", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.OutreachLog", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -1117,7 +1117,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("outreach_logs", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.PlatformAnalytics", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.PlatformAnalytics", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -1161,7 +1161,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("platform_analytics", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.ReferralPartner", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.ReferralPartner", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -1232,7 +1232,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("referral_partners", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Review", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Review", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -1280,7 +1280,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("reviews", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Space", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Space", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -1433,7 +1433,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("spaces", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.SpaceOwnerProfile", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.SpaceOwnerProfile", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -1501,7 +1501,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("space_owner_profiles", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.StripeWebhookEvent", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.StripeWebhookEvent", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -1533,7 +1533,7 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("stripe_webhook_events", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.User", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.User", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
@@ -1561,6 +1561,11 @@ namespace ElaviewBackend.Migrations
                     b.Property<string>("Name")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
 
                     b.Property<string>("Phone")
                         .HasMaxLength(50)
@@ -1591,26 +1596,89 @@ namespace ElaviewBackend.Migrations
                     b.ToTable("users", (string)null);
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.AdvertiserProfile", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.UserSession", b =>
                 {
-                    b.HasOne("ElaviewBackend.Data.User", "User")
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("character varying(45)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("LastActivityAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("RevokedReason")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("SessionToken")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExpiresAt");
+
+                    b.HasIndex("IsActive");
+
+                    b.HasIndex("SessionToken")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "IsActive");
+
+                    b.ToTable("user_sessions", (string)null);
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.AdvertiserProfile", b =>
+                {
+                    b.HasOne("ElaviewBackend.Data.Entities.User", "User")
                         .WithOne("AdvertiserProfile")
-                        .HasForeignKey("ElaviewBackend.Data.AdvertiserProfile", "UserId")
+                        .HasForeignKey("ElaviewBackend.Data.Entities.AdvertiserProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Booking", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Booking", b =>
                 {
-                    b.HasOne("ElaviewBackend.Data.Campaign", "Campaign")
+                    b.HasOne("ElaviewBackend.Data.Entities.Campaign", "Campaign")
                         .WithMany("Bookings")
                         .HasForeignKey("CampaignId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ElaviewBackend.Data.Space", "Space")
+                    b.HasOne("ElaviewBackend.Data.Entities.Space", "Space")
                         .WithMany("Bookings")
                         .HasForeignKey("SpaceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1621,9 +1689,9 @@ namespace ElaviewBackend.Migrations
                     b.Navigation("Space");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.BugReport", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.BugReport", b =>
                 {
-                    b.HasOne("ElaviewBackend.Data.User", "User")
+                    b.HasOne("ElaviewBackend.Data.Entities.User", "User")
                         .WithMany("BugReports")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.SetNull);
@@ -1631,9 +1699,9 @@ namespace ElaviewBackend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Campaign", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Campaign", b =>
                 {
-                    b.HasOne("ElaviewBackend.Data.User", "Advertiser")
+                    b.HasOne("ElaviewBackend.Data.Entities.User", "Advertiser")
                         .WithMany("Campaigns")
                         .HasForeignKey("AdvertiserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1642,20 +1710,20 @@ namespace ElaviewBackend.Migrations
                     b.Navigation("Advertiser");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Message", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Message", b =>
                 {
-                    b.HasOne("ElaviewBackend.Data.Booking", "Booking")
+                    b.HasOne("ElaviewBackend.Data.Entities.Booking", "Booking")
                         .WithMany("Messages")
                         .HasForeignKey("BookingId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("ElaviewBackend.Data.Campaign", "Campaign")
+                    b.HasOne("ElaviewBackend.Data.Entities.Campaign", "Campaign")
                         .WithMany("Messages")
                         .HasForeignKey("CampaignId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ElaviewBackend.Data.User", "Sender")
+                    b.HasOne("ElaviewBackend.Data.Entities.User", "Sender")
                         .WithMany("SentMessages")
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1668,9 +1736,9 @@ namespace ElaviewBackend.Migrations
                     b.Navigation("Sender");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Notification", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Notification", b =>
                 {
-                    b.HasOne("ElaviewBackend.Data.User", "User")
+                    b.HasOne("ElaviewBackend.Data.Entities.User", "User")
                         .WithMany("Notifications")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1679,9 +1747,9 @@ namespace ElaviewBackend.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.OutreachLog", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.OutreachLog", b =>
                 {
-                    b.HasOne("ElaviewBackend.Data.Lead", "Lead")
+                    b.HasOne("ElaviewBackend.Data.Entities.Lead", "Lead")
                         .WithMany("Outreach")
                         .HasForeignKey("LeadId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1690,15 +1758,15 @@ namespace ElaviewBackend.Migrations
                     b.Navigation("Lead");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Review", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Review", b =>
                 {
-                    b.HasOne("ElaviewBackend.Data.Booking", "Booking")
+                    b.HasOne("ElaviewBackend.Data.Entities.Booking", "Booking")
                         .WithOne("Review")
-                        .HasForeignKey("ElaviewBackend.Data.Review", "BookingId")
+                        .HasForeignKey("ElaviewBackend.Data.Entities.Review", "BookingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ElaviewBackend.Data.Space", "Space")
+                    b.HasOne("ElaviewBackend.Data.Entities.Space", "Space")
                         .WithMany("Reviews")
                         .HasForeignKey("SpaceId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1709,9 +1777,9 @@ namespace ElaviewBackend.Migrations
                     b.Navigation("Space");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Space", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Space", b =>
                 {
-                    b.HasOne("ElaviewBackend.Data.User", "Owner")
+                    b.HasOne("ElaviewBackend.Data.Entities.User", "Owner")
                         .WithMany("OwnedSpaces")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1720,44 +1788,55 @@ namespace ElaviewBackend.Migrations
                     b.Navigation("Owner");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.SpaceOwnerProfile", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.SpaceOwnerProfile", b =>
                 {
-                    b.HasOne("ElaviewBackend.Data.User", "User")
+                    b.HasOne("ElaviewBackend.Data.Entities.User", "User")
                         .WithOne("SpaceOwnerProfile")
-                        .HasForeignKey("ElaviewBackend.Data.SpaceOwnerProfile", "UserId")
+                        .HasForeignKey("ElaviewBackend.Data.Entities.SpaceOwnerProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Booking", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.UserSession", b =>
+                {
+                    b.HasOne("ElaviewBackend.Data.Entities.User", "User")
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Booking", b =>
                 {
                     b.Navigation("Messages");
 
                     b.Navigation("Review");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Campaign", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Campaign", b =>
                 {
                     b.Navigation("Bookings");
 
                     b.Navigation("Messages");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Lead", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Lead", b =>
                 {
                     b.Navigation("Outreach");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.Space", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Space", b =>
                 {
                     b.Navigation("Bookings");
 
                     b.Navigation("Reviews");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Data.User", b =>
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.User", b =>
                 {
                     b.Navigation("AdvertiserProfile");
 
@@ -1770,6 +1849,8 @@ namespace ElaviewBackend.Migrations
                     b.Navigation("OwnedSpaces");
 
                     b.Navigation("SentMessages");
+
+                    b.Navigation("Sessions");
 
                     b.Navigation("SpaceOwnerProfile");
                 });

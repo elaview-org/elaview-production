@@ -185,6 +185,7 @@ namespace ElaviewBackend.Migrations
                 {
                     Id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValueSql: "gen_random_uuid()"),
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Password = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Phone = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     Avatar = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
@@ -410,6 +411,33 @@ namespace ElaviewBackend.Migrations
                     table.ForeignKey(
                         name: "FK_spaces_users_OwnerId",
                         column: x => x.OwnerId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "user_sessions",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    UserId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    SessionToken = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    UserAgent = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    IpAddress = table.Column<string>(type: "character varying(45)", maxLength: 45, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    ExpiresAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    LastActivityAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    RevokedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    RevokedReason = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_user_sessions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_user_sessions_users_UserId",
+                        column: x => x.UserId,
                         principalTable: "users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -1059,6 +1087,32 @@ namespace ElaviewBackend.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_user_sessions_ExpiresAt",
+                table: "user_sessions",
+                column: "ExpiresAt");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_sessions_IsActive",
+                table: "user_sessions",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_sessions_SessionToken",
+                table: "user_sessions",
+                column: "SessionToken",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_sessions_UserId",
+                table: "user_sessions",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_user_sessions_UserId_IsActive",
+                table: "user_sessions",
+                columns: new[] { "UserId", "IsActive" });
+
+            migrationBuilder.CreateIndex(
                 name: "IX_users_CreatedAt",
                 table: "users",
                 column: "CreatedAt");
@@ -1121,6 +1175,9 @@ namespace ElaviewBackend.Migrations
 
             migrationBuilder.DropTable(
                 name: "stripe_webhook_events");
+
+            migrationBuilder.DropTable(
+                name: "user_sessions");
 
             migrationBuilder.DropTable(
                 name: "leads");

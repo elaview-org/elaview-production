@@ -9,6 +9,8 @@
   </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
         <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.11" />
         <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="15.1.11" />

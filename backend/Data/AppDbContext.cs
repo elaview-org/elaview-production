@@ -2,11 +2,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.Data;
 
-public sealed class ElaviewDbContext : DbContext
-{
-    public ElaviewDbContext(DbContextOptions<ElaviewDbContext> options) : base(options)
-    {
-    }
+public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
+    : DbContext(options) {
     public DbSet<User> Users { get; set; }
     public DbSet<AdvertiserProfile> AdvertiserProfiles { get; set; }
     public DbSet<SpaceOwnerProfile> SpaceOwnerProfiles { get; set; }
@@ -26,13 +23,11 @@ public sealed class ElaviewDbContext : DbContext
     public DbSet<ReferralPartner> ReferralPartners { get; set; }
     public DbSet<MarketResearch> MarketResearches { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
 
         // User configuration
-        modelBuilder.Entity<User>(entity =>
-        {
+        modelBuilder.Entity<User>(entity => {
             entity.ToTable("users");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Email).IsUnique();
@@ -40,21 +35,24 @@ public sealed class ElaviewDbContext : DbContext
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
         // AdvertiserProfile configuration
-        modelBuilder.Entity<AdvertiserProfile>(entity =>
-        {
+        modelBuilder.Entity<AdvertiserProfile>(entity => {
             entity.ToTable("advertiser_profiles");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.StripeCustomerId);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.User)
                 .WithOne(u => u.AdvertiserProfile)
@@ -63,17 +61,18 @@ public sealed class ElaviewDbContext : DbContext
         });
 
         // SpaceOwnerProfile configuration
-        modelBuilder.Entity<SpaceOwnerProfile>(entity =>
-        {
+        modelBuilder.Entity<SpaceOwnerProfile>(entity => {
             entity.ToTable("space_owner_profiles");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.StripeAccountId);
             entity.HasIndex(e => e.StripeAccountStatus);
             entity.HasIndex(e => e.AccountDisconnectedAt);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.User)
                 .WithOne(u => u.SpaceOwnerProfile)
@@ -82,8 +81,7 @@ public sealed class ElaviewDbContext : DbContext
         });
 
         // Space configuration
-        modelBuilder.Entity<Space>(entity =>
-        {
+        modelBuilder.Entity<Space>(entity => {
             entity.ToTable("spaces");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.OwnerId);
@@ -98,13 +96,15 @@ public sealed class ElaviewDbContext : DbContext
             entity.HasIndex(e => new { e.QuadtreeNodeId, e.QuadtreeDepth });
             entity.HasIndex(e => e.QuadtreeNodeId);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.PricePerDay).HasPrecision(10, 2);
             entity.Property(e => e.InstallationFee).HasPrecision(10, 2);
             entity.Property(e => e.TotalRevenue).HasPrecision(10, 2);
             entity.Property(e => e.QuadtreeNodeId).HasMaxLength(20);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.Owner)
                 .WithMany(u => u.OwnedSpaces)
@@ -112,8 +112,7 @@ public sealed class ElaviewDbContext : DbContext
         });
 
         // Campaign configuration
-        modelBuilder.Entity<Campaign>(entity =>
-        {
+        modelBuilder.Entity<Campaign>(entity => {
             entity.ToTable("campaigns");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.AdvertiserId);
@@ -123,10 +122,12 @@ public sealed class ElaviewDbContext : DbContext
             entity.HasIndex(e => e.StartDate);
             entity.HasIndex(e => e.EndDate);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.TotalBudget).HasPrecision(10, 2);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.Advertiser)
                 .WithMany(u => u.Campaigns)
@@ -134,8 +135,7 @@ public sealed class ElaviewDbContext : DbContext
         });
 
         // Booking configuration
-        modelBuilder.Entity<Booking>(entity =>
-        {
+        modelBuilder.Entity<Booking>(entity => {
             entity.ToTable("bookings");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.CampaignId);
@@ -158,7 +158,7 @@ public sealed class ElaviewDbContext : DbContext
             entity.HasIndex(e => e.IsTestData);
             entity.HasIndex(e => new { e.Status, e.IsTestData });
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.PricePerDay).HasPrecision(10, 2);
             entity.Property(e => e.TotalAmount).HasPrecision(10, 2);
             entity.Property(e => e.PlatformFee).HasPrecision(10, 2);
@@ -171,8 +171,10 @@ public sealed class ElaviewDbContext : DbContext
             entity.Property(e => e.RefundAmount).HasPrecision(10, 2);
             entity.Property(e => e.SpaceOwnerAmount).HasPrecision(10, 2);
             entity.Property(e => e.TransferAmount).HasPrecision(10, 2);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.Campaign)
                 .WithMany(c => c.Bookings)
@@ -184,8 +186,7 @@ public sealed class ElaviewDbContext : DbContext
         });
 
         // Review configuration
-        modelBuilder.Entity<Review>(entity =>
-        {
+        modelBuilder.Entity<Review>(entity => {
             entity.ToTable("reviews");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.BookingId).IsUnique();
@@ -194,8 +195,9 @@ public sealed class ElaviewDbContext : DbContext
             entity.HasIndex(e => e.CreatedAt);
             entity.HasIndex(e => new { e.SpaceId, e.Rating });
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.Booking)
                 .WithOne(b => b.Review)
@@ -209,8 +211,7 @@ public sealed class ElaviewDbContext : DbContext
         });
 
         // Message configuration
-        modelBuilder.Entity<Message>(entity =>
-        {
+        modelBuilder.Entity<Message>(entity => {
             entity.ToTable("messages");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.CampaignId);
@@ -222,8 +223,9 @@ public sealed class ElaviewDbContext : DbContext
             entity.HasIndex(e => new { e.BookingId, e.MessageType });
             entity.HasIndex(e => e.CreatedAt);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.Booking)
                 .WithMany(b => b.Messages)
@@ -242,8 +244,7 @@ public sealed class ElaviewDbContext : DbContext
         });
 
         // Notification configuration
-        modelBuilder.Entity<Notification>(entity =>
-        {
+        modelBuilder.Entity<Notification>(entity => {
             entity.ToTable("notifications");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.UserId);
@@ -253,8 +254,9 @@ public sealed class ElaviewDbContext : DbContext
             entity.HasIndex(e => e.CampaignId);
             entity.HasIndex(e => e.CreatedAt);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.User)
                 .WithMany(u => u.Notifications)
@@ -263,59 +265,59 @@ public sealed class ElaviewDbContext : DbContext
         });
 
         // PlatformAnalytics configuration
-        modelBuilder.Entity<PlatformAnalytics>(entity =>
-        {
+        modelBuilder.Entity<PlatformAnalytics>(entity => {
             entity.ToTable("platform_analytics");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Date).IsUnique();
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.TotalRevenue).HasPrecision(10, 2);
             entity.Property(e => e.PlatformFees).HasPrecision(10, 2);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
         // StripeWebhookEvent configuration
-        modelBuilder.Entity<StripeWebhookEvent>(entity =>
-        {
+        modelBuilder.Entity<StripeWebhookEvent>(entity => {
             entity.ToTable("stripe_webhook_events");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.StripeEventId).IsUnique();
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
         // CronJobLog configuration
-        modelBuilder.Entity<CronJobLog>(entity =>
-        {
+        modelBuilder.Entity<CronJobLog>(entity => {
             entity.ToTable("cron_job_logs");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.JobName);
             entity.HasIndex(e => e.ExecutedAt);
             entity.HasIndex(e => e.Status);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.ExecutedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.ExecutedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
         // DemoRequest configuration
-        modelBuilder.Entity<DemoRequest>(entity =>
-        {
+        modelBuilder.Entity<DemoRequest>(entity => {
             entity.ToTable("demo_requests");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.CreatedAt);
             entity.HasIndex(e => e.Email);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
         // BugReport configuration
-        modelBuilder.Entity<BugReport>(entity =>
-        {
+        modelBuilder.Entity<BugReport>(entity => {
             entity.ToTable("bug_reports");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Status);
@@ -324,12 +326,14 @@ public sealed class ElaviewDbContext : DbContext
             entity.HasIndex(e => e.CreatedAt);
             entity.HasIndex(e => e.UserId);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.Title).HasMaxLength(200);
             entity.Property(e => e.PageUrl).HasMaxLength(500);
             entity.Property(e => e.LinkedBugId).HasMaxLength(50);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.User)
                 .WithMany(u => u.BugReports)
@@ -338,28 +342,29 @@ public sealed class ElaviewDbContext : DbContext
         });
 
         // Lead configuration
-        modelBuilder.Entity<Lead>(entity =>
-        {
+        modelBuilder.Entity<Lead>(entity => {
             entity.ToTable("leads");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.Phase1Qualified);
             entity.HasIndex(e => e.PriorityScore);
-            entity.HasIndex(e => new { e.HasInventory, e.HasInstallCapability });
+            entity.HasIndex(e => new
+                { e.HasInventory, e.HasInstallCapability });
             entity.HasIndex(e => e.NextFollowUpDate);
             entity.HasIndex(e => e.Source);
             entity.HasIndex(e => e.ConvertedAt);
             entity.HasIndex(e => e.ConvertedUserId);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.TotalRevenue).HasPrecision(10, 2);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
         // OutreachLog configuration
-        modelBuilder.Entity<OutreachLog>(entity =>
-        {
+        modelBuilder.Entity<OutreachLog>(entity => {
             entity.ToTable("outreach_logs");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.LeadId);
@@ -367,9 +372,11 @@ public sealed class ElaviewDbContext : DbContext
             entity.HasIndex(e => e.Channel);
             entity.HasIndex(e => e.Responded);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.SentAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.SentAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(e => e.Lead)
                 .WithMany(l => l.Outreach)
@@ -378,32 +385,35 @@ public sealed class ElaviewDbContext : DbContext
         });
 
         // ReferralPartner configuration
-        modelBuilder.Entity<ReferralPartner>(entity =>
-        {
+        modelBuilder.Entity<ReferralPartner>(entity => {
             entity.ToTable("referral_partners");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.PartnerType);
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.TotalRevenue).HasPrecision(10, 2);
             entity.Property(e => e.CommissionRate).HasPrecision(5, 2);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
         // MarketResearch configuration
-        modelBuilder.Entity<MarketResearch>(entity =>
-        {
+        modelBuilder.Entity<MarketResearch>(entity => {
             entity.ToTable("market_research");
             entity.HasKey(e => e.Id);
             entity.HasIndex(e => e.BusinessType);
             entity.HasIndex(e => e.RevisitDate);
-            entity.HasIndex(e => new { e.HasInventory, e.HasInstallCapability });
+            entity.HasIndex(e => new
+                { e.HasInventory, e.HasInstallCapability });
 
-            entity.Property(e => e.Id).HasDefaultValueSql("extensions.cuid()");
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
     }
 }

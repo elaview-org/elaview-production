@@ -1,15 +1,26 @@
+using ElaviewBackend.Data;
+using ElaviewBackend.Settings;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services
+    .Configure<GlobalSettings>(builder.Configuration)
+    .AddDbContext<AppDbContext>((serviceProvider, options) => {
+            options.LogTo(Console.WriteLine);
+            options.UseNpgsql(serviceProvider
+                .GetRequiredService<IOptions<GlobalSettings>>().Value.Database
+                .GetConnectionString());
+        }
+    )
     .AddOpenApi()
     .AddGraphQLServer()
     .AddTypes();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
 }

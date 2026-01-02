@@ -1,7 +1,26 @@
-﻿services:
-  elaviewbackend:
-    image: elaviewbackend
-    build:
-      context: .
-      dockerfile: Dockerfile
+﻿name: elaview-backend
+
+services:
+  elaview-backend-postgres:
+    container_name: elaview-backend-postgres
+    image: postgres:latest
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${Database__User}
+      POSTGRES_PASSWORD: ${Database__Password}
+      POSTGRES_DB: ${Database__User}
+    networks: [ elaview-backend ]
+    ports: [ "5432:5432" ]
+    volumes:
+      - type: volume
+        source: elaview-postgres-data
+        target: /var/lib/postgresql
+
+networks:
+  elaview-backend:
+    name: ${Database__User}
+
+volumes:
+  elaview-postgres-data:
 

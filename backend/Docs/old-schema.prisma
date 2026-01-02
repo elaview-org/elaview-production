@@ -1,0 +1,829 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String             @id @default(cuid())
+  email             String             @unique
+  name              String?
+  phone             String?
+  avatar            String?
+  role              UserRole           @default(ADVERTISER)
+  status            UserStatus         @default(ACTIVE)
+  clerkId           String             @unique
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  lastLoginAt       DateTime?
+  advertiserProfile AdvertiserProfile?
+  campaigns         Campaign[]
+  sentMessages      Message[]          @relation("MessageSender")
+  notifications     Notification[]
+  spaceOwnerProfile SpaceOwnerProfile?
+  ownedSpaces       Space[]
+  bugReports        BugReport[]
+
+  @@index([email])
+  @@index([role])
+  @@index([status])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model AdvertiserProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  companyName      String?
+  industry         String?
+  website          String?
+  stripeCustomerId String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeCustomerId])
+  @@map("advertiser_profiles")
+}
+
+model SpaceOwnerProfile {
+  id                            String         @id @default(cuid())
+  userId                        String         @unique
+  businessName                  String?
+  businessType                  String?
+  stripeAccountId               String?
+  payoutSchedule                PayoutSchedule @default(WEEKLY)
+  onboardingComplete            Boolean        @default(false)
+  stripeAccountStatus           String?        @default("PENDING")
+  lastAccountHealthCheck        DateTime?
+  accountDisconnectedAt         DateTime?
+  accountDisconnectedNotifiedAt DateTime?
+  createdAt                     DateTime       @default(now())
+  updatedAt                     DateTime       @updatedAt
+  user                          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([stripeAccountId])
+  @@index([stripeAccountStatus])
+  @@index([accountDisconnectedAt])
+  @@map("space_owner_profiles")
+}
+
+model Space {
+  id              String      @id @default(cuid())
+  ownerId         String
+  title           String
+  description     String?
+  type            SpaceType
+  status          SpaceStatus @default(ACTIVE)
+  address         String
+  city            String
+  state           String
+  zipCode         String?
+  latitude        Float
+  longitude       Float
+  width           Float?
+  height          Float?
+  dimensions      String?
+  pricePerDay     Decimal     @db.Decimal(10, 2)
+  installationFee Decimal?    @db.Decimal(10, 2)
+  minDuration     Int         @default(1)
+  maxDuration     Int?
+  images          String[]
+  availableFrom   DateTime?
+  availableTo     DateTime?
+  totalBookings   Int         @default(0)
+  totalRevenue    Decimal     @default(0) @db.Decimal(10, 2)
+  averageRating   Float?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  dimensionsText  String?
+  rejectionReason String?
+  traffic         String?
+
+  // Phase 1: Quadtree spatial indexing metadata
+  // Hierarchical node ID (e.g., "0", "01", "0123") - max 20 chars for depth 20
+  quadtreeNodeId String? @db.VarChar(20)
+  // Tree depth: 0 (root) to 15 (max precision ~1 meter)
+  quadtreeDepth  Int?
+
+  bookings Booking[]
+  reviews  Review[]
+  owner    User      @relation(fields: [ownerId], references: [id])
+
+  @@index([ownerId])
+  @@index([status])
+  @@index([type])
+  @@index([latitude, longitude])
+  @@index([city, state])
+  @@index([type, status])
+  @@index([status, createdAt])
+  @@index([pricePerDay])
+  @@index([averageRating])
+  // Phase 1: Quadtree indexes for efficient spatial queries
+  @@index([quadtreeNodeId, quadtreeDepth])
+  @@index([quadtreeNodeId])
+  @@map("spaces")
+}
+
+model Campaign {
+  id             String         @id @default(cuid())
+  advertiserId   String
+  name           String
+  description    String?
+  imageUrl       String
+  targetAudience String?
+  goals          String?
+  totalBudget    Decimal?       @db.Decimal(10, 2)
+  status         CampaignStatus @default(DRAFT)
+  startDate      DateTime?
+  endDate        DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  bookings       Booking[]
+  advertiser     User           @relation(fields: [advertiserId], references: [id])
+  messages       Message[]
+
+  @@index([advertiserId])
+  @@index([status])
+  @@index([advertiserId, status])
+  @@index([createdAt])
+  @@index([startDate])
+  @@index([endDate])
+  @@map("campaigns")
+}
+
+model Booking {
+  id                           String        @id @default(cuid())
+  campaignId                   String
+  spaceId                      String
+  startDate                    DateTime
+  endDate                      DateTime
+  totalDays                    Int
+  pricePerDay                  Decimal       @db.Decimal(10, 2)
+  totalAmount                  Decimal       @db.Decimal(10, 2)
+  platformFee                  Decimal       @db.Decimal(10, 2)
+  stripeFee                    Decimal?      @db.Decimal(10, 2)
+  totalWithFees                Decimal?      @db.Decimal(10, 2)
+  status                       BookingStatus @default(PENDING_APPROVAL)
+  stripePaymentIntentId        String?
+  paidAt                       DateTime?
+  proofPhotos                  String[]      @default([])
+  proofUploadedAt              DateTime?
+  proofApprovedAt              DateTime?
+  proofApprovedBy              String?
+  firstPayoutProcessed         Boolean       @default(false)
+  firstPayoutDate              DateTime?
+  firstPayoutAmount            Decimal?      @db.Decimal(10, 2)
+  finalPayoutProcessed         Boolean       @default(false)
+  finalPayoutDate              DateTime?
+  finalPayoutAmount            Decimal?      @db.Decimal(10, 2)
+  verificationSchedule         Json?
+  verificationPhotos           Json?
+  nextVerificationDue          DateTime?
+  missedVerifications          Int           @default(0)
+  reservedUntil                DateTime?
+  advertiserNotes              String?
+  ownerNotes                   String?
+  adminNotes                   String?
+  createdAt                    DateTime      @default(now())
+  updatedAt                    DateTime      @updatedAt
+  balanceAmount                Decimal?      @db.Decimal(10, 2)
+  balanceChargeId              String?
+  balanceDueDate               DateTime?
+  balancePaidAt                DateTime?
+  cancellationReason           String?
+  cancelledAt                  DateTime?
+  cancelledBy                  String?
+  depositAmount                Decimal?      @db.Decimal(10, 2)
+  depositChargeId              String?
+  depositPaidAt                DateTime?
+
+  // Actual Stripe charge IDs (ch_xxx) for source_transaction - FUND ISOLATION
+  stripeChargeId        String? // Main charge ID for immediate payments
+  depositStripeChargeId String? // Deposit payment charge ID (ch_xxx)
+  balanceStripeChargeId String? // Balance payment charge ID (ch_xxx)
+
+  paymentType                  PaymentType       @default(IMMEDIATE)
+  proofMessageId               String?
+  proofStatus                  ProofStatus?
+  qualityGuaranteePeriod       DateTime?
+  refundAmount                 Decimal?          @db.Decimal(10, 2)
+  refundProcessedAt            DateTime?
+  spaceOwnerAmount             Decimal           @db.Decimal(10, 2)
+  stripeTransferId             String?
+  transferAmount               Decimal?          @db.Decimal(10, 2)
+  transferredAt                DateTime?
+  disputeReason                String?
+  disputedAt                   DateTime?
+  payoutError                  String?
+  payoutProcessedAt            DateTime?
+  refundedAt                   DateTime?
+  stripeRefundId               String?
+  balanceChargeAttempts        Int               @default(0)
+  balanceChargeError           String?
+  checkpointTransferIds        String[]          @default([])
+  finalTransferId              String?
+  finalTransferredAt           DateTime?
+  firstRentalTransferId        String?
+  firstRentalTransferredAt     DateTime?
+  installationFeeTransferId    String?
+  installationFeeTransferredAt DateTime?
+  lastBalanceChargeAttempt     DateTime?
+  lastPayoutAttempt            DateTime?
+  payoutAttempts               Int               @default(0)
+  payoutStatus                 PayoutStatus?
+  refundHistory                Json?
+  pendingPayoutReason          String?
+  isTestData                   Boolean           @default(false)
+  campaign                     Campaign          @relation(fields: [campaignId], references: [id])
+  space                        Space             @relation(fields: [spaceId], references: [id])
+  messages                     Message[]         @relation("BookingMessages")
+  review                       Review?
+  disputedBy                   String? // User ID who filed the dispute
+  disputePhotos                String[]          @default([]) // Photos showing the issue
+  disputeType                  DisputeIssueType? // Issue type enum
+  resolvedBy                   String? // Admin ID who resolved
+  resolvedAt                   DateTime?
+  resolutionNotes              String? // Admin's notes on resolution
+  resolutionAction             String? // 'APPROVED' | 'REFUNDED' | 'PENDING'
+
+  @@index([campaignId])
+  @@index([spaceId])
+  @@index([status])
+  @@index([proofStatus])
+  @@index([paymentType])
+  @@index([startDate, endDate])
+  @@index([spaceId, startDate, endDate])
+  @@index([campaignId, status])
+  @@index([status, proofStatus])
+  @@index([reservedUntil])
+  @@index([nextVerificationDue])
+  @@index([balanceDueDate])
+  @@index([qualityGuaranteePeriod])
+  @@index([paidAt])
+  @@index([payoutProcessedAt])
+  @@index([refundedAt])
+  @@index([createdAt])
+  @@index([isTestData])
+  @@index([status, isTestData])
+  @@map("bookings")
+}
+
+model Review {
+  id           String       @id @default(cuid())
+  bookingId    String       @unique
+  spaceId      String
+  rating       Int
+  comment      String?
+  reviewerType ReviewerType
+  createdAt    DateTime     @default(now())
+  booking      Booking      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  space        Space        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+
+  @@index([spaceId])
+  @@index([rating])
+  @@index([createdAt])
+  @@index([spaceId, rating])
+  @@map("reviews")
+}
+
+model Message {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  senderId            String
+  content             String
+  isRead              Boolean           @default(false)
+  attachments         String[]
+  createdAt           DateTime          @default(now())
+  bookingId           String?
+  disputeReason       String?
+  messageType         MessageType       @default(TEXT)
+  proofApprovedAt     DateTime?
+  autoApprovedAt      DateTime?
+  proofApprovedBy     String?
+  proofDisputedAt     DateTime?
+  proofStatus         ProofStatus?
+  attemptedResolution String?
+  correctionDetails   String?
+  issueType           DisputeIssueType?
+  booking             Booking?          @relation("BookingMessages", fields: [bookingId], references: [id], onDelete: Cascade)
+  campaign            Campaign          @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  sender              User              @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@index([senderId])
+  @@index([bookingId])
+  @@index([messageType])
+  @@index([proofStatus])
+  @@index([campaignId, createdAt])
+  @@index([bookingId, messageType])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+model Notification {
+  id         String           @id @default(cuid())
+  userId     String
+  type       NotificationType
+  title      String
+  content    String
+  isRead     Boolean          @default(false)
+  campaignId String?
+  bookingId  String?
+  createdAt  DateTime         @default(now())
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, isRead])
+  @@index([type])
+  @@index([bookingId])
+  @@index([campaignId])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+model PlatformAnalytics {
+  id           String   @id @default(cuid())
+  date         DateTime @unique @default(now()) @db.Date
+  newUsers     Int      @default(0)
+  newSpaces    Int      @default(0)
+  newCampaigns Int      @default(0)
+  newBookings  Int      @default(0)
+  totalRevenue Decimal  @default(0) @db.Decimal(10, 2)
+  platformFees Decimal  @default(0) @db.Decimal(10, 2)
+  createdAt    DateTime @default(now())
+
+  @@index([date])
+  @@map("platform_analytics")
+}
+
+model StripeWebhookEvent {
+  id            String    @id @default(cuid())
+  stripeEventId String    @unique
+  processed     Boolean   @default(false)
+  processedAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([stripeEventId])
+  @@map("stripe_webhook_events")
+}
+
+model CronJobLog {
+  id             String   @id @default(cuid())
+  jobName        String
+  executedAt     DateTime @default(now())
+  status         String // SUCCESS, FAILED, PARTIAL
+  duration       Int? // milliseconds
+  itemsProcessed Int?
+  errorMessage   String?
+  metadata       Json? // Additional job-specific data
+
+  @@index([jobName])
+  @@index([executedAt])
+  @@index([status])
+  @@map("cron_job_logs")
+}
+
+enum UserRole {
+  ADVERTISER
+  SPACE_OWNER
+  ADMIN
+  MARKETING
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum SpaceType {
+  BILLBOARD
+  STOREFRONT
+  TRANSIT
+  DIGITAL_DISPLAY
+  WINDOW_DISPLAY
+  VEHICLE_WRAP
+  OTHER
+}
+
+enum SpaceStatus {
+  ACTIVE
+  INACTIVE
+  PENDING_APPROVAL
+  SUSPENDED
+  REJECTED
+}
+
+enum CampaignStatus {
+  DRAFT
+  SUBMITTED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  PENDING_APPROVAL
+  APPROVED
+  CONFIRMED
+  ACTIVE
+  AWAITING_PROOF
+  COMPLETED
+  CANCELLED
+  REJECTED
+  PENDING_BALANCE
+  DISPUTED
+}
+
+enum PaymentType {
+  IMMEDIATE
+  DEPOSIT
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PARTIALLY_PAID
+  COMPLETED
+  FAILED
+}
+
+enum ProofStatus {
+  PENDING
+  APPROVED
+  DISPUTED
+  REJECTED
+  UNDER_REVIEW
+  CORRECTION_REQUESTED
+}
+
+enum MessageType {
+  TEXT
+  PROOF_SUBMISSION
+  PROOF_APPROVED
+  PROOF_DISPUTED
+  SYSTEM
+  PROOF_REJECTED
+  CORRECTION_REQUEST
+  QUALITY_CONCERN
+}
+
+enum PayoutSchedule {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+}
+
+enum NotificationType {
+  BOOKING_REQUEST
+  BOOKING_APPROVED
+  BOOKING_REJECTED
+  PAYMENT_RECEIVED
+  PROOF_UPLOADED
+  MESSAGE_RECEIVED
+  SYSTEM_UPDATE
+  PAYOUT_PROCESSED
+  SPACE_APPROVED
+  SPACE_REJECTED
+  SPACE_SUSPENDED
+  SPACE_REACTIVATED
+  SESSION_EXPIRED
+  PAYMENT_FAILED
+  PROOF_APPROVED
+  PROOF_DISPUTED
+  PROOF_REJECTED
+  REFUND_PROCESSED
+  BOOKING_CANCELLED
+  PAYMENT_REMINDER
+  DISPUTE_FILED
+}
+
+enum ReviewerType {
+  ADVERTISER
+  SPACE_OWNER
+}
+
+enum DisputeIssueType {
+  WRONG_LOCATION
+  POOR_QUALITY
+  DAMAGE_TO_CREATIVE
+  NOT_VISIBLE
+  SAFETY_ISSUE
+  MISLEADING_LISTING
+}
+
+enum BugCategory {
+  UI_UX // Visual bugs, layout issues, styling
+  PAYMENT // Stripe, checkout, billing
+  MESSAGING // Campaign messages, proof system
+  AUTHENTICATION // Login, signup, session issues
+  BOOKING // Booking flow, cart, reservations
+  SPACE_MANAGEMENT // Space CRUD, space owner features
+  CAMPAIGN // Campaign creation, management
+  NOTIFICATIONS // Notification delivery/display
+  PERFORMANCE // Slow loading, crashes, timeouts
+  DATA_INTEGRITY // Wrong data, missing data
+  OTHER // Uncategorized
+
+  @@map("bug_category")
+}
+
+enum BugSeverity {
+  CRITICAL // P0 - Platform down, payment broken, data loss
+  HIGH // P1 - Major feature broken, significant user impact
+  MEDIUM // P2 - Feature partially broken, workaround exists
+  LOW // P3 - Minor annoyance, cosmetic issue
+
+  @@map("bug_severity")
+}
+
+enum BugStatus {
+  NEW // Just submitted, needs review
+  CONFIRMED // Admin verified it's a real bug
+  IN_PROGRESS // Currently being fixed
+  FIXED // Fix deployed to production
+  WONT_FIX // Not a bug or decided not to fix
+  DUPLICATE // Duplicate of another report
+
+  @@map("bug_status")
+}
+
+model DemoRequest {
+  id          String    @id @default(cuid())
+  name        String
+  email       String
+  company     String
+  phone       String?
+  companySize String?
+  message     String?   @db.Text
+  status      String    @default("NEW")
+  priority    String    @default("MEDIUM")
+  source      String    @default("WEBSITE")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  contactedAt DateTime?
+  notes       String?   @db.Text
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([email])
+  @@map("demo_requests")
+}
+
+model BugReport {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Reporter (optional - allow anonymous reports)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Bug details
+  title       String @db.VarChar(200)
+  description String @db.Text
+
+  // Auto-captured context
+  pageUrl     String?  @db.VarChar(500)
+  userAgent   String?  @db.Text
+  screenshots String[] @default([])
+
+  // Categorization
+  category BugCategory @default(OTHER)
+  severity BugSeverity @default(MEDIUM)
+  status   BugStatus   @default(NEW)
+
+  // Admin workflow
+  adminNotes  String?   @db.Text
+  linkedBugId String?   @db.VarChar(50) // Link to BUG-PROD-XXX in docs
+  processedAt DateTime?
+  processedBy String?
+
+  @@index([status])
+  @@index([severity])
+  @@index([category])
+  @@index([createdAt])
+  @@index([userId])
+  @@map("bug_reports")
+}
+
+// ===== OUTBOUND CRM MODELS =====
+
+model Lead {
+  id           String       @id @default(cuid())
+  name         String
+  email        String?
+  company      String?
+  phone        String?
+  website      String?
+  source       LeadSource   @default(GOOGLE_MAPS)
+  businessType BusinessType @default(OTHER)
+  location     String?
+
+  // Phase 1 Qualification (CRITICAL)
+  hasInventory         TriState   @default(UNKNOWN)
+  inventoryType        SpaceType?
+  estimatedSpaces      Int?
+  hasInstallCapability TriState   @default(UNKNOWN)
+  phase1Qualified      Boolean    @default(false)
+
+  // Scoring & Status
+  priorityScore Int        @default(1) // 1-5
+  status        LeadStatus @default(NEW)
+
+  // Activity Tracking
+  lastContactDate  DateTime?
+  nextAction       String?
+  nextFollowUpDate DateTime?
+
+  // Conversion
+  convertedAt     DateTime?
+  convertedUserId String? // Links to User if they sign up
+
+  // Post-conversion metrics
+  spacesListed     Int       @default(0)
+  firstBookingDate DateTime?
+  totalRevenue     Decimal   @default(0) @db.Decimal(10, 2)
+
+  // Referral potential
+  conversionSource String? // Which channel/outreach converted them
+  testimonialGiven Boolean @default(false)
+  willingToRefer   Boolean @default(false)
+  referralNotes    String? @db.Text
+
+  // Notes
+  notes String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  outreach OutreachLog[]
+
+  @@index([status])
+  @@index([phase1Qualified])
+  @@index([priorityScore])
+  @@index([hasInventory, hasInstallCapability])
+  @@index([nextFollowUpDate])
+  @@index([source])
+  @@index([convertedAt])
+  @@index([convertedUserId])
+  @@map("leads")
+}
+
+model OutreachLog {
+  id     String @id @default(cuid())
+  leadId String
+  lead   Lead   @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  channel        OutreachChannel
+  messageType    OutreachMessageType @default(INITIAL)
+  templateUsed   String?
+  subject        String? // Email subject or call purpose
+  messageContent String?             @db.Text
+
+  responded       Boolean   @default(false)
+  responseDate    DateTime?
+  responseSummary String?   @db.Text
+
+  sentAt    DateTime @default(now())
+  sentBy    String? // Admin user ID who sent
+  createdAt DateTime @default(now())
+
+  @@index([leadId])
+  @@index([sentAt])
+  @@index([channel])
+  @@index([responded])
+  @@map("outreach_logs")
+}
+
+model ReferralPartner {
+  id          String        @id @default(cuid())
+  name        String
+  company     String?
+  email       String?
+  phone       String?
+  partnerType String? // Agency, Consultant, Installer, Broker, Other
+  status      PartnerStatus @default(PROSPECT)
+
+  // Performance tracking
+  leadsReferred  Int     @default(0)
+  leadsConverted Int     @default(0)
+  totalRevenue   Decimal @default(0) @db.Decimal(10, 2)
+
+  // Commission (future use)
+  commissionRate Decimal? @db.Decimal(5, 2) // Percentage
+
+  notes           String?   @db.Text
+  lastContactDate DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([partnerType])
+  @@map("referral_partners")
+}
+
+model MarketResearch {
+  id           String       @id @default(cuid())
+  companyName  String
+  businessType BusinessType @default(OTHER)
+  website      String?
+  location     String?
+
+  // Qualification signals
+  hasInventory         TriState @default(UNKNOWN)
+  hasInstallCapability TriState @default(UNKNOWN)
+  estimatedScale       Scale    @default(UNKNOWN_SCALE)
+
+  // Why not pursuing now
+  reasonNotPursuing String?   @db.Text // "Too big", "Wrong market", "No contact info"
+  revisitDate       DateTime?
+
+  // Research notes
+  notes     String? @db.Text
+  sourceUrl String? // Where you found them
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([businessType])
+  @@index([revisitDate])
+  @@index([hasInventory, hasInstallCapability])
+  @@map("market_research")
+}
+
+// ===== OUTBOUND CRM ENUMS =====
+
+enum TriState {
+  YES
+  NO
+  UNKNOWN
+}
+
+enum LeadSource {
+  GOOGLE_MAPS
+  LINKEDIN
+  REFERRAL
+  COLD_OUTREACH
+  TRADE_SHOW
+  WEBSITE
+  OTHER
+}
+
+enum BusinessType {
+  SIGN_COMPANY
+  BILLBOARD_OPERATOR
+  WRAP_INSTALLER
+  PROPERTY_MANAGER
+  PRINT_SHOP
+  AGENCY
+  OTHER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  RESPONDED
+  DEMO_SCHEDULED
+  SIGNED_UP
+  FOLLOW_UP
+  NOT_INTERESTED
+}
+
+enum OutreachChannel {
+  EMAIL
+  LINKEDIN
+  PHONE
+  WHATSAPP
+  IN_PERSON
+  OTHER
+}
+
+enum OutreachMessageType {
+  INITIAL
+  FOLLOW_UP_1
+  FOLLOW_UP_2
+  FOLLOW_UP_3
+  DEMO_INVITE
+  CHECK_IN
+}
+
+enum Scale {
+  SMALL // < 10 spaces
+  MEDIUM // 10-50 spaces
+  LARGE // 50+ spaces
+  ENTERPRISE // 100+ spaces
+  UNKNOWN_SCALE
+}
+
+enum PartnerStatus {
+  PROSPECT
+  ACTIVE
+  INACTIVE
+  CHURNED
+}

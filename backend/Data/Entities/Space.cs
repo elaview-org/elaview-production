@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ElaviewBackend.Data;
+namespace ElaviewBackend.Data.Entities;
 
 public sealed class Space {
     [MaxLength(50)] public string Id { get; init; } = null!;
@@ -8,7 +8,7 @@ public sealed class Space {
     [MaxLength(500)] public string Title { get; init; } = null!;
     [MaxLength(500)] public string? Description { get; init; }
     public SpaceType Type { get; init; }
-    public SpaceStatus Status { get; init; } = SpaceStatus.ACTIVE;
+    public SpaceStatus Status { get; init; } = SpaceStatus.Active;
     [MaxLength(500)] public string Address { get; init; } = null!;
     [MaxLength(100)] public string City { get; init; } = null!;
     [MaxLength(100)] public string State { get; init; } = null!;

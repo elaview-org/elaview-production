@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ElaviewBackend.Data;
+namespace ElaviewBackend.Data.Entities;
 
 public sealed class ReferralPartner
 {
@@ -16,7 +16,7 @@ public sealed class ReferralPartner
     public string? Phone { get; init; }
     [MaxLength(100)]
     public string? PartnerType { get; init; }
-    public PartnerStatus Status { get; set; } = PartnerStatus.PROSPECT;
+    public PartnerStatus Status { get; set; } = PartnerStatus.Prospect;
     public int LeadsReferred { get; set; } = 0;
     public int LeadsConverted { get; set; } = 0;
     public decimal TotalRevenue { get; set; } = 0;

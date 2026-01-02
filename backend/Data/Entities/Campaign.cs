@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ElaviewBackend.Data;
+namespace ElaviewBackend.Data.Entities;
 
 public sealed class Campaign
 {
@@ -16,7 +16,7 @@ public sealed class Campaign
     public string? TargetAudience { get; init; }
     public string? Goals { get; init; }
     public decimal? TotalBudget { get; init; }
-    public CampaignStatus Status { get; set; } = CampaignStatus.DRAFT;
+    public CampaignStatus Status { get; set; } = CampaignStatus.Draft;
     public DateTime? StartDate { get; init; }
     public DateTime? EndDate { get; init; }
     public DateTime CreatedAt { get; init; }

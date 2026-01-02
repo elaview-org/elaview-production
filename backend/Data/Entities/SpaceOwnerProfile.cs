@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ElaviewBackend.Data;
+namespace ElaviewBackend.Data.Entities;
 
 public sealed class SpaceOwnerProfile
 {
@@ -14,7 +14,7 @@ public sealed class SpaceOwnerProfile
     public string? BusinessType { get; init; }
     [MaxLength(255)]
     public string? StripeAccountId { get; init; }
-    public PayoutSchedule PayoutSchedule { get; init; } = PayoutSchedule.WEEKLY;
+    public PayoutSchedule PayoutSchedule { get; init; } = PayoutSchedule.Weekly;
     public bool OnboardingComplete { get; set; } = false;
     [MaxLength(50)]
     public string? StripeAccountStatus { get; init; } = "PENDING";

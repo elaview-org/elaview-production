@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ElaviewBackend.Data;
+namespace ElaviewBackend.Data.Entities;
 
 public sealed class Lead {
     [MaxLength(50)] public string Id { get; init; } = null!;
@@ -9,16 +9,16 @@ public sealed class Lead {
     [MaxLength(255)] public string? Company { get; init; }
     [MaxLength(50)] public string? Phone { get; init; }
     [MaxLength(500)] public string? Website { get; init; }
-    public LeadSource Source { get; init; } = LeadSource.GOOGLE_MAPS;
-    public BusinessType BusinessType { get; init; } = BusinessType.OTHER;
+    public LeadSource Source { get; init; } = LeadSource.GoogleMaps;
+    public BusinessType BusinessType { get; init; } = BusinessType.Other;
     [MaxLength(255)] public string? Location { get; init; }
-    public TriState HasInventory { get; set; } = TriState.UNKNOWN;
+    public TriState HasInventory { get; set; } = TriState.Unknown;
     public SpaceType? InventoryType { get; set; }
     public int? EstimatedSpaces { get; set; }
-    public TriState HasInstallCapability { get; set; } = TriState.UNKNOWN;
+    public TriState HasInstallCapability { get; set; } = TriState.Unknown;
     public bool Phase1Qualified { get; set; } = false;
     public int PriorityScore { get; set; } = 1;
-    public LeadStatus Status { get; set; } = LeadStatus.NEW;
+    public LeadStatus Status { get; set; } = LeadStatus.New;
     public DateTime? LastContactDate { get; set; }
     [MaxLength(500)] public string? NextAction { get; set; }
     public DateTime? NextFollowUpDate { get; set; }

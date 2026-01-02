@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ElaviewBackend.Data;
+namespace ElaviewBackend.Data.Entities;
 
 public sealed class Message {
     [MaxLength(50)] public string Id { get; init; } = null!;
@@ -18,7 +18,7 @@ public sealed class Message {
     [MaxLength(50)] public string? BookingId { get; init; }
 
     [MaxLength(50)] public string? DisputeReason { get; init; }
-    public MessageType MessageType { get; init; } = MessageType.TEXT;
+    public MessageType MessageType { get; init; } = MessageType.Text;
 
     public DateTime? ProofApprovedAt { get; init; }
 

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ElaviewBackend.Data;
+namespace ElaviewBackend.Data.Entities;
 
 public sealed class BugReport
 {
@@ -18,9 +18,9 @@ public sealed class BugReport
     public string? PageUrl { get; init; }
     public string? UserAgent { get; init; }
     public List<string> Screenshots { get; init; } = new();
-    public BugCategory Category { get; init; } = BugCategory.OTHER;
-    public BugSeverity Severity { get; init; } = BugSeverity.MEDIUM;
-    public BugStatus Status { get; set; } = BugStatus.NEW;
+    public BugCategory Category { get; init; } = BugCategory.Other;
+    public BugSeverity Severity { get; init; } = BugSeverity.Medium;
+    public BugStatus Status { get; set; } = BugStatus.New;
     public string? AdminNotes { get; init; }
     [MaxLength(50)]
     public string? LinkedBugId { get; init; }

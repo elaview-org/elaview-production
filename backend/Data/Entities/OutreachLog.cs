@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ElaviewBackend.Data;
+namespace ElaviewBackend.Data.Entities;
 
 public sealed class OutreachLog
 {
@@ -9,7 +9,7 @@ public sealed class OutreachLog
     [MaxLength(50)]
     public string LeadId { get; init; } = null!;
     public OutreachChannel Channel { get; init; }
-    public OutreachMessageType MessageType { get; init; } = OutreachMessageType.INITIAL;
+    public OutreachMessageType MessageType { get; init; } = OutreachMessageType.Initial;
     [MaxLength(255)]
     public string? TemplateUsed { get; init; }
     [MaxLength(500)]

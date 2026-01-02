@@ -1,3 +1,4 @@
+using ElaviewBackend.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.Data;

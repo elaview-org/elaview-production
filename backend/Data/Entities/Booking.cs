@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
-namespace ElaviewBackend.Data;
+namespace ElaviewBackend.Data.Entities;
 
 public sealed class Booking
 {
@@ -19,7 +19,7 @@ public sealed class Booking
     public decimal PlatformFee { get; init; }
     public decimal? StripeFee { get; init; }
     public decimal? TotalWithFees { get; init; }
-    public BookingStatus Status { get; set; } = BookingStatus.PENDING_APPROVAL;
+    public BookingStatus Status { get; set; } = BookingStatus.PendingApproval;
     [MaxLength(255)]
     public string? StripePaymentIntentId { get; init; }
     public DateTime? PaidAt { get; set; }
@@ -63,7 +63,7 @@ public sealed class Booking
     public string? DepositStripeChargeId { get; init; }
     [MaxLength(255)]
     public string? BalanceStripeChargeId { get; init; }
-    public PaymentType PaymentType { get; init; } = PaymentType.IMMEDIATE;
+    public PaymentType PaymentType { get; init; } = PaymentType.Immediate;
     [MaxLength(50)]
     public string? ProofMessageId { get; init; }
     public ProofStatus? ProofStatus { get; set; }

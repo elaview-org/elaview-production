@@ -15,9 +15,9 @@ builder.Services
                 .GetConnectionString());
         }
     )
-    .AddOpenApi()
-    .AddGraphQLServer()
-    .AddTypes();
+    .AddOpenApi();
+
+builder.AddGraphQL().AddTypes();
 
 var app = builder.Build();
 
@@ -28,4 +28,4 @@ if (app.Environment.IsDevelopment()) {
 app.MapGet("/", () => "Hello World!");
 app.UseHttpsRedirection();
 app.MapGraphQL();
-app.Run();
+app.RunWithGraphQLCommands(args);

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.13.7/.schema/devbox.schema.json",
+  "packages": [
+    "dotnet-sdk@latest",
+    "postgresql@latest",
+    "docker@latest",
+    "docker-compose@latest"
+  ],
+  "shell": {
+    "init_hook": [
+      "echo 'Devbox environment ready!'",
+      "echo 'Installed versions:'",
+      "echo '  dotnet:' $(dotnet --version)",
+      "echo '  PostgreSQL:' $(postgres --version | head -1)",
+      "echo '  Docker:' $(docker --version)",
+      "echo '  Docker Compose:' $(docker-compose --version)",
+      "echo ''",
+      "echo 'Available scripts:'",
+      "echo '  devbox run setup        - Initialize local PostgreSQL'",
+      "echo '  devbox run start        - Start with local PostgreSQL'",
+      "echo '  devbox run test         - Run all tests'",
+      "echo '  devbox run docker-up    - Start with Docker Compose'",
+      "echo '  devbox run docker-down  - Stop Docker Compose'",
+      "echo '  devbox run clean        - Clean local PostgreSQL and build artifacts'",
+      "echo ''",
+      "echo 'Manual commands:'",
+      "echo '  dotnet restore          - Restore dependencies'",
+      "echo '  dotnet build            - Build the project'",
+      "echo '  dotnet run              - Run the application'",
+      "echo '  dotnet test             - Run tests'",
+      "echo '  dotnet ef migrations add <name>  - Create migration'",
+      "echo '  dotnet ef database update        - Apply migrations'",
+      "echo ''",
+      "if [ ! -d .devbox/postgres ] && [ ! -f .env ]; then",
+      "  echo 'First time setup:'",
+      "  echo '  Option 1 (Docker): devbox run docker-up'",
+      "  echo '  Option 2 (Local):  devbox run setup'",
+      "fi"
+    ],
+    "scripts": {
+      "setup": [
+        "echo 'Setting up local PostgreSQL...'",
+        "mkdir -p .devbox/postgres",
+        "initdb -D .devbox/postgres",
+        "pg_ctl -D .devbox/postgres -l .devbox/postgres/logfile start",
+        "sleep 2",
+        "createdb elaview-backend || echo 'Database already exists'",
+        "dotnet restore",
+        "echo ''",
+        "echo 'Setup complete! Next steps:'",
+        "echo '  1. Copy secrets.json.example to secrets.json (if needed)'",
+        "echo '  2. Run: dotnet ef database update'",
+        "echo '  3. Run: devbox run start'"
+      ],
+      "start": [
+        "pg_ctl -D .devbox/postgres -l .devbox/postgres/logfile start || echo 'PostgreSQL already running'",
+        "dotnet run"
+      ],
+      "test": [
+        "dotnet test ElaviewBackend.csproj"
+      ],
+      "docker-up": [
+        "echo 'Starting services with Docker Compose...'",
+        "docker-compose -f compose.yaml up -d",
+        "echo 'Waiting for PostgreSQL to be ready...'",
+        "sleep 3",
+        "echo 'PostgreSQL is ready!'",
+        "echo ''",
+        "echo 'Next steps:'",
+        "echo '  1. Run: dotnet ef database update'",
+        "echo '  2. Run: dotnet run'",
+        "echo ''",
+        "echo 'To stop: devbox run docker-down'"
+      ],
+      "docker-down": [
+        "docker-compose -f compose.yaml down"
+      ],
+      "docker-clean": [
+        "docker-compose -f compose.yaml down -v",
+        "echo 'Docker volumes removed. Database data deleted.'"
+      ],
+      "clean": [
+        "pg_ctl -D .devbox/postgres stop || echo 'PostgreSQL not running'",
+        "rm -rf .devbox/postgres",
+        "dotnet clean",
+        "echo 'Cleaned local PostgreSQL and build artifacts'"
+      ]
+    }
+  },
+  "env": {
+    "PGDATA": ".devbox/postgres",
+    "PGHOST": "localhost",
+    "PGPORT": "5432",
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1",
+    "DOTNET_SKIP_FIRST_TIME_EXPERIENCE": "1"
+  }
+}

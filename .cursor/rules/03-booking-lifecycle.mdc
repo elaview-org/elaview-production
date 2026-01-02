@@ -1,0 +1,818 @@
+---
+description: Booking state machine and lifecycle
+globs:
+  - "**/booking*/**"
+  - "**/features/bookings/**"
+alwaysApply: false
+---
+
+# Booking Lifecycle
+
+## State Machine Overview
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING_APPROVAL: Advertiser submits request
+    
+    PENDING_APPROVAL --> ACCEPTED: Owner accepts
+    PENDING_APPROVAL --> CANCELLED: Owner rejects / Advertiser cancels
+    
+    ACCEPTED --> PAID: Advertiser completes payment
+    ACCEPTED --> CANCELLED: Payment timeout (24hr) / Either party cancels
+    
+    PAID --> FILE_DOWNLOADED: Owner downloads creative file
+    PAID --> CANCELLED: Advertiser cancels (full refund)
+    
+    FILE_DOWNLOADED --> INSTALLED: Owner marks installed
+    FILE_DOWNLOADED --> CANCELLED: Either cancels (partial refund)
+    
+    INSTALLED --> VERIFIED: Owner uploads verification photos
+    INSTALLED --> CANCELLED: Either cancels (partial refund)
+    
+    VERIFIED --> COMPLETED: Advertiser approves
+    VERIFIED --> COMPLETED: Auto-approval (48hr timeout)
+    VERIFIED --> DISPUTED: Advertiser disputes
+    
+    DISPUTED --> COMPLETED: Admin resolves in owner's favor
+    DISPUTED --> CANCELLED: Admin resolves in advertiser's favor
+    
+    CANCELLED --> [*]
+    COMPLETED --> [*]
+```
+
+---
+
+## Status Definitions
+
+| Status | Description | Who Can Transition | Next Valid States |
+|--------|-------------|-------------------|-------------------|
+| `PENDING_APPROVAL` | Waiting for owner to accept request | Owner | ACCEPTED, CANCELLED |
+| `ACCEPTED` | Owner accepted, waiting for payment | Advertiser | PAID, CANCELLED |
+| `PAID` | Payment received, file ready for download | Owner | FILE_DOWNLOADED, CANCELLED |
+| `FILE_DOWNLOADED` | Owner downloaded file, Stage 1 payout triggered | Owner | INSTALLED, CANCELLED |
+| `INSTALLED` | Owner marked as physically installed | Owner | VERIFIED, CANCELLED |
+| `VERIFIED` | Verification photos submitted | Advertiser, System | COMPLETED, DISPUTED |
+| `DISPUTED` | Advertiser disputes installation quality | Admin | COMPLETED, CANCELLED |
+| `COMPLETED` | Booking fully completed, Stage 2 payout done | - | - |
+| `CANCELLED` | Booking cancelled at any stage | - | - |
+
+---
+
+## Status Transitions
+
+### PENDING_APPROVAL → ACCEPTED
+
+**Trigger:** Owner taps "Accept" button
+
+```typescript
+// packages/features/bookings/api/mutations.ts
+export const ACCEPT_BOOKING = gql`
+  mutation AcceptBooking($bookingId: ID!) {
+    acceptBooking(bookingId: $bookingId) {
+      id
+      status
+      acceptedAt
+    }
+  }
+`;
+
+// Usage in owner's booking detail screen
+const [acceptBooking] = useAcceptBookingMutation();
+
+const handleAccept = async () => {
+  await acceptBooking({
+    variables: { bookingId },
+    optimisticResponse: {
+      acceptBooking: {
+        __typename: 'Booking',
+        id: bookingId,
+        status: 'ACCEPTED',
+        acceptedAt: new Date().toISOString(),
+      },
+    },
+  });
+};
+```
+
+**Backend Logic:**
+1. Validate owner owns the space
+2. Validate booking is in PENDING_APPROVAL status
+3. Update status to ACCEPTED
+4. Set `acceptedAt` timestamp
+5. Create notification for advertiser
+6. Set payment deadline (24 hours)
+
+---
+
+### ACCEPTED → PAID
+
+**Trigger:** Stripe payment intent succeeds (webhook)
+
+```typescript
+// This happens on backend via Stripe webhook
+// Frontend just redirects after successful payment
+
+// packages/features/bookings/hooks/useBookingPayment.ts
+export function useBookingPayment(bookingId: string) {
+  const [createPaymentIntent] = useCreatePaymentIntentMutation();
+  const { confirmPayment } = useStripe();
+  
+  const initiatePayment = async () => {
+    // 1. Create payment intent on backend
+    const { data } = await createPaymentIntent({
+      variables: { bookingId },
+    });
+    
+    const clientSecret = data.createPaymentIntent.clientSecret;
+    
+    // 2. Confirm with Stripe SDK
+    const { error, paymentIntent } = await confirmPayment(clientSecret, {
+      paymentMethodType: 'Card',
+    });
+    
+    if (error) {
+      throw new Error(error.message);
+    }
+    
+    // 3. Backend webhook updates booking to PAID
+    // Frontend polls or subscribes for status change
+    return paymentIntent;
+  };
+  
+  return { initiatePayment };
+}
+```
+
+**Backend Logic (Webhook):**
+1. Verify webhook signature
+2. Find booking by payment intent ID
+3. Update status to PAID
+4. Set `paidAt` timestamp
+5. Create notification for owner: "Payment received! Download the creative file to continue."
+6. File is now available for download
+
+---
+
+### PAID → FILE_DOWNLOADED
+
+**Trigger:** Owner downloads creative file
+
+```typescript
+// packages/features/bookings/api/mutations.ts
+export const DOWNLOAD_CREATIVE_FILE = gql`
+  mutation DownloadCreativeFile($bookingId: ID!) {
+    downloadCreativeFile(bookingId: $bookingId) {
+      downloadUrl
+      booking {
+        id
+        status
+        fileDownloadedAt
+      }
+    }
+  }
+`;
+
+// Usage in owner's booking screen
+const [downloadFile] = useDownloadCreativeFileMutation();
+
+const handleDownload = async () => {
+  const { data } = await downloadFile({
+    variables: { bookingId },
+  });
+  
+  // Open download URL
+  await Linking.openURL(data.downloadCreativeFile.downloadUrl);
+  
+  // Status is now FILE_DOWNLOADED
+  // Stage 1 payout (print+install fee) is triggered automatically
+};
+```
+
+**Backend Logic:**
+1. Validate owner owns the booking's space
+2. Validate booking is in PAID status
+3. Generate signed download URL (expires in 24 hours)
+4. Update status to FILE_DOWNLOADED
+5. Set `fileDownloadedAt` timestamp
+6. **TRIGGER STAGE 1 PAYOUT** (print+install fee to owner)
+7. Create notification for advertiser: "File downloaded! Installation in progress."
+
+**CRITICAL:** This is a point of no return. After this:
+- Advertiser can only get partial refund (minus print+install fee)
+- Owner keeps print+install fee even if cancelled
+
+---
+
+### FILE_DOWNLOADED → INSTALLED
+
+**Trigger:** Owner marks installation complete
+
+```typescript
+// packages/features/bookings/api/mutations.ts
+export const MARK_INSTALLED = gql`
+  mutation MarkInstalled($bookingId: ID!) {
+    markInstalled(bookingId: $bookingId) {
+      id
+      status
+      installedAt
+    }
+  }
+`;
+```
+
+**Backend Logic:**
+1. Validate ownership
+2. Update status to INSTALLED
+3. Set `installedAt` timestamp
+4. Create notification for owner: "Now upload verification photos"
+
+---
+
+### INSTALLED → VERIFIED
+
+**Trigger:** Owner submits verification photos
+
+```typescript
+// packages/features/verification/api/mutations.ts
+export const SUBMIT_VERIFICATION = gql`
+  mutation SubmitVerification($input: SubmitVerificationInput!) {
+    submitVerification(input: $input) {
+      verification {
+        id
+        status
+        photos {
+          id
+          url
+          type
+          isGpsValid
+        }
+      }
+      booking {
+        id
+        status
+        verifiedAt
+        autoApprovalAt
+      }
+    }
+  }
+`;
+
+// Input includes photo URLs (uploaded separately) and GPS data
+interface SubmitVerificationInput {
+  bookingId: string;
+  photos: Array<{
+    url: string;
+    type: 'WIDE_SHOT' | 'CLOSE_UP' | 'ANGLE_SHOT';
+    latitude: number;
+    longitude: number;
+    capturedAt: string;
+  }>;
+}
+```
+
+**Backend Logic:**
+1. Validate required photo count (from `SpaceCategory.requiredPhotoCount`)
+2. Validate photo types (must have all required types)
+3. If `SpaceCategory.requiresGpsValidation`:
+   - Validate each photo's GPS within `SpaceCategory.gpsRadiusMeters` of space location
+4. Validate timestamps are recent (within last 24 hours)
+5. Update booking status to VERIFIED
+6. Set `verifiedAt` timestamp
+7. Set `autoApprovalAt` = now + 48 hours
+8. Create notification for advertiser: "Verification submitted! Review and approve."
+9. Schedule auto-approval job for 48 hours
+
+**Verification Requirements Come From Config:**
+
+```typescript
+// packages/features/verification/hooks/useVerificationRequirements.ts
+export function useVerificationRequirements(booking: Booking) {
+  const { category } = booking.space.spaceType;
+  
+  return {
+    requiredPhotoCount: category.requiredPhotoCount,    // e.g., 3
+    requiresGps: category.requiresGpsValidation,        // e.g., true
+    gpsRadiusMeters: category.gpsRadiusMeters,         // e.g., 100
+    photoTypes: ['WIDE_SHOT', 'CLOSE_UP', 'ANGLE_SHOT'] as const,
+  };
+}
+```
+
+---
+
+### VERIFIED → COMPLETED (Manual Approval)
+
+**Trigger:** Advertiser taps "Approve"
+
+```typescript
+// packages/features/bookings/api/mutations.ts
+export const APPROVE_BOOKING = gql`
+  mutation ApproveBooking($bookingId: ID!) {
+    approveBooking(bookingId: $bookingId) {
+      id
+      status
+      approvedAt
+      completedAt
+    }
+  }
+`;
+```
+
+**Backend Logic:**
+1. Validate advertiser owns the booking
+2. Validate booking is in VERIFIED status
+3. Update status to COMPLETED
+4. Set `approvedAt` and `completedAt` timestamps
+5. **TRIGGER STAGE 2 PAYOUT** (remainder to owner)
+6. Cancel auto-approval scheduled job
+7. Create notifications for both parties: "Booking completed!"
+
+---
+
+### VERIFIED → COMPLETED (Auto-Approval)
+
+**Trigger:** 48-hour timeout expires without action
+
+```typescript
+// Backend scheduled job (runs every minute)
+// NOT a cron job - event-driven via message queue
+
+async function processAutoApprovals() {
+  const bookings = await db.bookings.findMany({
+    where: {
+      status: 'VERIFIED',
+      autoApprovalAt: { lte: new Date() },
+    },
+  });
+  
+  for (const booking of bookings) {
+    await autoApproveBooking(booking.id);
+  }
+}
+
+async function autoApproveBooking(bookingId: string) {
+  // Same as manual approval, but:
+  // - Set approvalType = 'AUTO'
+  // - Different notification: "Auto-approved after 48 hours"
+}
+```
+
+**Backend Logic:**
+1. Update status to COMPLETED
+2. Set `approvedAt` = `autoApprovalAt`
+3. Set `completedAt` = now
+4. **TRIGGER STAGE 2 PAYOUT**
+5. Create notification for advertiser: "Booking auto-approved after 48 hours"
+6. Create notification for owner: "Booking completed (auto-approved)"
+
+---
+
+### VERIFIED → DISPUTED
+
+**Trigger:** Advertiser taps "Dispute"
+
+```typescript
+// packages/features/bookings/api/mutations.ts
+export const DISPUTE_BOOKING = gql`
+  mutation DisputeBooking($input: DisputeBookingInput!) {
+    disputeBooking(input: $input) {
+      id
+      status
+      verification {
+        disputeReason
+        disputedAt
+      }
+    }
+  }
+`;
+
+interface DisputeBookingInput {
+  bookingId: string;
+  reason: string;  // Required explanation
+}
+```
+
+**Backend Logic:**
+1. Validate advertiser owns the booking
+2. Validate booking is in VERIFIED status
+3. Update status to DISPUTED
+4. Store dispute reason
+5. Set `disputedAt` timestamp
+6. Cancel auto-approval scheduled job
+7. Create notification for owner: "Advertiser disputed the installation"
+8. Create notification for admin: "New dispute requires review"
+9. Stage 2 payout is HELD until resolution
+
+---
+
+### DISPUTED → Resolution
+
+**Admin resolves dispute:**
+
+```typescript
+// Admin-only mutation
+export const RESOLVE_DISPUTE = gql`
+  mutation ResolveDispute($input: ResolveDisputeInput!) {
+    resolveDispute(input: $input) {
+      id
+      status
+      verification {
+        disputeResolution
+        disputeResolvedAt
+      }
+    }
+  }
+`;
+
+interface ResolveDisputeInput {
+  bookingId: string;
+  resolution: 'APPROVE' | 'CANCEL';
+  notes: string;
+}
+```
+
+**If APPROVE (owner wins):**
+1. Update status to COMPLETED
+2. Trigger Stage 2 payout
+3. Notify both parties
+
+**If CANCEL (advertiser wins):**
+1. Update status to CANCELLED
+2. Refund remainder to advertiser (print+install fee already paid to owner)
+3. Notify both parties
+
+---
+
+## Cancellation Flows
+
+### Cancellation Refund Matrix
+
+| Status When Cancelled | Advertiser Refund | Owner Keeps |
+|----------------------|-------------------|-------------|
+| PENDING_APPROVAL | N/A (no payment yet) | N/A |
+| ACCEPTED | N/A (no payment yet) | N/A |
+| PAID | 100% | $0 |
+| FILE_DOWNLOADED | Total - Print+Install Fee | Print+Install Fee |
+| INSTALLED | Total - Print+Install Fee | Print+Install Fee |
+| VERIFIED | Total - Print+Install Fee | Print+Install Fee |
+
+```typescript
+// packages/features/bookings/utils/refund-calculator.ts
+
+export function calculateRefund(booking: Booking): {
+  advertiserRefund: number;
+  ownerKeeps: number;
+} {
+  const { status, total, printInstallFee } = booking;
+  
+  // Before file download: full refund
+  if (['PENDING_APPROVAL', 'ACCEPTED', 'PAID'].includes(status)) {
+    return {
+      advertiserRefund: total,
+      ownerKeeps: 0,
+    };
+  }
+  
+  // After file download: owner keeps print+install fee
+  return {
+    advertiserRefund: total - printInstallFee,
+    ownerKeeps: printInstallFee,
+  };
+}
+```
+
+---
+
+## What Each User Sees
+
+### Advertiser View by Status
+
+| Status | Screen Title | Primary Action | Secondary Action |
+|--------|--------------|----------------|------------------|
+| PENDING_APPROVAL | "Waiting for Owner" | - | Cancel Request |
+| ACCEPTED | "Ready to Pay" | Pay Now | Cancel |
+| PAID | "Awaiting Installation" | - | Cancel (Full Refund) |
+| FILE_DOWNLOADED | "Installation in Progress" | - | Cancel (Partial Refund) |
+| INSTALLED | "Verification Pending" | - | - |
+| VERIFIED | "Review Installation" | Approve | Dispute |
+| DISPUTED | "Under Review" | - | - |
+| COMPLETED | "Completed" | Leave Review | - |
+| CANCELLED | "Cancelled" | - | - |
+
+### Owner View by Status
+
+| Status | Screen Title | Primary Action | Secondary Action |
+|--------|--------------|----------------|------------------|
+| PENDING_APPROVAL | "New Request" | Accept | Decline |
+| ACCEPTED | "Awaiting Payment" | - | Cancel |
+| PAID | "Download File" | Download | - |
+| FILE_DOWNLOADED | "Ready to Install" | Mark Installed | - |
+| INSTALLED | "Upload Verification" | Take Photos | - |
+| VERIFIED | "Awaiting Approval" | - | - |
+| DISPUTED | "Under Review" | - | - |
+| COMPLETED | "Completed" | View Earnings | - |
+| CANCELLED | "Cancelled" | - | - |
+
+---
+
+## Status Badge Component
+
+```typescript
+// packages/features/bookings/components/BookingStatusBadge.tsx
+
+import { BookingStatus } from '@elaview/graphql/generated';
+
+const STATUS_CONFIG: Record<BookingStatus, {
+  label: string;
+  color: string;
+  bgColor: string;
+}> = {
+  PENDING_APPROVAL: {
+    label: 'Pending',
+    color: '#92400E',
+    bgColor: '#FEF3C7',
+  },
+  ACCEPTED: {
+    label: 'Accepted',
+    color: '#1E40AF',
+    bgColor: '#DBEAFE',
+  },
+  PAID: {
+    label: 'Paid',
+    color: '#065F46',
+    bgColor: '#D1FAE5',
+  },
+  FILE_DOWNLOADED: {
+    label: 'In Progress',
+    color: '#7C3AED',
+    bgColor: '#EDE9FE',
+  },
+  INSTALLED: {
+    label: 'Installed',
+    color: '#7C3AED',
+    bgColor: '#EDE9FE',
+  },
+  VERIFIED: {
+    label: 'Awaiting Approval',
+    color: '#0891B2',
+    bgColor: '#CFFAFE',
+  },
+  DISPUTED: {
+    label: 'Disputed',
+    color: '#DC2626',
+    bgColor: '#FEE2E2',
+  },
+  COMPLETED: {
+    label: 'Completed',
+    color: '#047857',
+    bgColor: '#D1FAE5',
+  },
+  CANCELLED: {
+    label: 'Cancelled',
+    color: '#6B7280',
+    bgColor: '#F3F4F6',
+  },
+};
+
+interface Props {
+  status: BookingStatus;
+}
+
+export function BookingStatusBadge({ status }: Props) {
+  const config = STATUS_CONFIG[status];
+  
+  return (
+    <View style={[styles.badge, { backgroundColor: config.bgColor }]}>
+      <Text style={[styles.text, { color: config.color }]}>
+        {config.label}
+      </Text>
+    </View>
+  );
+}
+```
+
+---
+
+## Timeline Component
+
+```typescript
+// packages/features/bookings/components/BookingTimeline.tsx
+
+interface TimelineStep {
+  status: BookingStatus;
+  label: string;
+  timestamp?: Date;
+  isCompleted: boolean;
+  isCurrent: boolean;
+}
+
+export function useBookingTimeline(booking: Booking): TimelineStep[] {
+  const steps: TimelineStep[] = [
+    {
+      status: 'PENDING_APPROVAL',
+      label: 'Requested',
+      timestamp: booking.requestedAt,
+      isCompleted: true,
+      isCurrent: booking.status === 'PENDING_APPROVAL',
+    },
+    {
+      status: 'ACCEPTED',
+      label: 'Accepted',
+      timestamp: booking.acceptedAt,
+      isCompleted: !!booking.acceptedAt,
+      isCurrent: booking.status === 'ACCEPTED',
+    },
+    {
+      status: 'PAID',
+      label: 'Paid',
+      timestamp: booking.paidAt,
+      isCompleted: !!booking.paidAt,
+      isCurrent: booking.status === 'PAID',
+    },
+    {
+      status: 'FILE_DOWNLOADED',
+      label: 'File Downloaded',
+      timestamp: booking.fileDownloadedAt,
+      isCompleted: !!booking.fileDownloadedAt,
+      isCurrent: booking.status === 'FILE_DOWNLOADED',
+    },
+    {
+      status: 'INSTALLED',
+      label: 'Installed',
+      timestamp: booking.installedAt,
+      isCompleted: !!booking.installedAt,
+      isCurrent: booking.status === 'INSTALLED',
+    },
+    {
+      status: 'VERIFIED',
+      label: 'Verified',
+      timestamp: booking.verifiedAt,
+      isCompleted: !!booking.verifiedAt,
+      isCurrent: booking.status === 'VERIFIED',
+    },
+    {
+      status: 'COMPLETED',
+      label: 'Completed',
+      timestamp: booking.completedAt,
+      isCompleted: !!booking.completedAt,
+      isCurrent: booking.status === 'COMPLETED',
+    },
+  ];
+  
+  return steps;
+}
+```
+
+---
+
+## Edge Cases
+
+### Payment Timeout
+- If advertiser doesn't pay within 24 hours of acceptance
+- Backend job cancels booking automatically
+- Notification sent to both parties
+
+### Owner Doesn't Download File
+- No automatic timeout (advertiser can cancel for full refund)
+- Consider reminder notification after 48 hours
+
+### Owner Doesn't Install/Verify
+- Advertiser can cancel for partial refund
+- Consider reminder notifications
+
+### Advertiser Unresponsive After Verification
+- Auto-approval kicks in after 48 hours
+- Protects owner from ghosting advertisers
+
+### GPS Unavailable
+- If device can't get GPS, allow manual confirmation with warning
+- Flag for admin review if disputed
+
+```typescript
+// packages/features/verification/components/GpsUnavailableModal.tsx
+export function GpsUnavailableModal({ onConfirm, onCancel }) {
+  return (
+    <Modal>
+      <Text>Unable to verify your location.</Text>
+      <Text>
+        You can continue, but the advertiser may request additional proof 
+        of installation location.
+      </Text>
+      <Button onPress={onConfirm}>Continue Anyway</Button>
+      <Button onPress={onCancel}>Try Again</Button>
+    </Modal>
+  );
+}
+```
+
+---
+
+## Booking Queries
+
+```typescript
+// packages/features/bookings/api/queries.ts
+
+// Get all bookings for current user (role-aware)
+export const GET_MY_BOOKINGS = gql`
+  query GetMyBookings($status: [BookingStatus!], $first: Int, $after: String) {
+    myBookings(status: $status, first: $first, after: $after) {
+      edges {
+        node {
+          id
+          status
+          dateRange {
+            startDate
+            endDate
+          }
+          space {
+            id
+            title
+            photos
+            spaceType {
+              name
+              category {
+                name
+                requiredPhotoCount
+              }
+            }
+          }
+          total
+          createdAt
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+// Get single booking with all details
+export const GET_BOOKING = gql`
+  query GetBooking($id: ID!) {
+    booking(id: $id) {
+      id
+      status
+      dateRange {
+        startDate
+        endDate
+      }
+      advertiser {
+        id
+        firstName
+        lastName
+        avatarUrl
+      }
+      space {
+        id
+        title
+        photos
+        location {
+          address
+          city
+          latitude
+          longitude
+        }
+        spaceType {
+          id
+          name
+          category {
+            requiredPhotoCount
+            requiresGpsValidation
+            gpsRadiusMeters
+          }
+        }
+      }
+      creativeFileUrl
+      pricePerWeek
+      totalWeeks
+      subtotal
+      platformFee
+      printInstallFee
+      total
+      requestedAt
+      acceptedAt
+      paidAt
+      fileDownloadedAt
+      installedAt
+      verifiedAt
+      approvedAt
+      completedAt
+      cancelledAt
+      autoApprovalAt
+      verification {
+        id
+        status
+        photos {
+          id
+          url
+          type
+          isGpsValid
+        }
+        disputeReason
+      }
+    }
+  }
+`;
+```

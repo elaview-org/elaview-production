@@ -1,0 +1,1086 @@
+---
+description: Testing patterns and requirements
+globs:
+  - "**/*.test.*"
+  - "**/*.spec.*"
+  - "**/__tests__/**"
+  - "**/e2e/**"
+alwaysApply: true
+---
+
+# Testing Strategy
+
+## Core Rule
+
+**Every feature PR must include tests. No exceptions.**
+
+A feature is not complete until:
+1. Unit tests cover new utility functions
+2. Component tests verify UI behavior
+3. Integration tests validate feature flows
+4. E2E tests cover critical user paths (if applicable)
+
+---
+
+## Test Types
+
+| Type | Tool | Scope | When to Use |
+|------|------|-------|-------------|
+| Unit | Jest | Pure functions, hooks | Utils, calculations, formatters |
+| Component | RNTL | Single component | UI rendering, interactions |
+| Integration | MSW + Apollo MockedProvider | Feature flows | Multi-component flows with mocked API |
+| E2E | Maestro (mobile), Playwright (web) | Full app | Critical user journeys |
+
+---
+
+## File Structure
+
+Tests are co-located with their source files:
+
+```
+packages/features/bookings/
+├── components/
+│   ├── BookingCard/
+│   │   ├── BookingCard.tsx
+│   │   ├── BookingCard.test.tsx      # Component test
+│   │   └── index.ts
+│   └── BookingTimeline/
+│       ├── BookingTimeline.tsx
+│       └── BookingTimeline.test.tsx
+├── hooks/
+│   ├── useBookingFlow.ts
+│   └── useBookingFlow.test.ts        # Hook test
+├── utils/
+│   ├── price-calculations.ts
+│   └── price-calculations.test.ts    # Unit test
+└── __tests__/
+    └── booking-flow.integration.test.tsx  # Integration test
+
+apps/mobile/
+├── e2e/
+│   ├── flows/
+│   │   ├── advertiser-booking.yaml   # Maestro E2E
+│   │   ├── owner-verification.yaml
+│   │   └── auth.yaml
+│   └── maestro.config.yaml
+```
+
+---
+
+## Test Factories
+
+Create realistic test data with factories:
+
+```typescript
+// packages/shared/testing/factories/index.ts
+
+import { faker } from '@faker-js/faker';
+import {
+  User,
+  Booking,
+  Space,
+  SpaceCategory,
+  SpaceType,
+  BookingStatus,
+  UserRole,
+} from '@elaview/graphql/generated';
+
+// ============================================
+// User Factory
+// ============================================
+export function createMockUser(overrides: Partial<User> = {}): User {
+  return {
+    __typename: 'User',
+    id: faker.string.uuid(),
+    email: faker.internet.email(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
+    role: 'ADVERTISER' as UserRole,
+    phone: faker.phone.number(),
+    avatarUrl: faker.image.avatar(),
+    stripeAccountId: null,
+    stripeAccountStatus: null,
+    emailNotifications: true,
+    pushNotifications: true,
+    createdAt: faker.date.past().toISOString(),
+    updatedAt: faker.date.recent().toISOString(),
+    lastLoginAt: faker.date.recent().toISOString(),
+    ...overrides,
+  };
+}
+
+// ============================================
+// Space Category Factory
+// ============================================
+export function createMockSpaceCategory(
+  overrides: Partial<SpaceCategory> = {}
+): SpaceCategory {
+  return {
+    __typename: 'SpaceCategory',
+    id: faker.string.uuid(),
+    slug: 'storefront',
+    name: 'Storefront',
+    description: 'Storefronts, windows, and walls',
+    isActive: true,
+    basePrintInstallFee: 20,
+    feeCalculationType: 'FIXED',
+    requiredPhotoCount: 3,
+    requiresGpsValidation: true,
+    gpsRadiusMeters: 100,
+    requiresProfessionalInstall: false,
+    estimatedInstallDays: 1,
+    supportedFormats: ['PDF', 'PNG', 'JPG'],
+    maxFileSizeMb: 25,
+    minResolutionDpi: 150,
+    iconUrl: 'https://example.com/storefront-icon.png',
+    sortOrder: 1,
+    createdAt: faker.date.past().toISOString(),
+    updatedAt: faker.date.recent().toISOString(),
+    ...overrides,
+  };
+}
+
+// ============================================
+// Space Type Factory
+// ============================================
+export function createMockSpaceType(
+  overrides: Partial<SpaceType> = {}
+): SpaceType {
+  const category = createMockSpaceCategory(overrides.category);
+  
+  return {
+    __typename: 'SpaceType',
+    id: faker.string.uuid(),
+    categoryId: category.id,
+    category,
+    slug: 'window-poster',
+    name: 'Window Poster',
+    description: 'Standard window poster display',
+    standardWidth: 24,
+    standardHeight: 36,
+    dimensionUnit: 'INCHES',
+    printInstallFeeOverride: null,
+    isActive: true,
+    sortOrder: 1,
+    createdAt: faker.date.past().toISOString(),
+    updatedAt: faker.date.recent().toISOString(),
+    ...overrides,
+  };
+}
+
+// ============================================
+// Space Factory
+// ============================================
+export function createMockSpace(overrides: Partial<Space> = {}): Space {
+  const spaceType = createMockSpaceType(overrides.spaceType);
+  const owner = createMockUser({ role: 'SPACE_OWNER' });
+
+  return {
+    __typename: 'Space',
+    id: faker.string.uuid(),
+    ownerId: owner.id,
+    owner,
+    spaceTypeId: spaceType.id,
+    spaceType,
+    title: `${faker.company.name()} Window Display`,
+    description: faker.lorem.paragraphs(2),
+    width: 24,
+    height: 36,
+    dimensionUnit: 'INCHES',
+    pricePerWeek: faker.number.int({ min: 50, max: 200 }),
+    location: {
+      address: faker.location.streetAddress(),
+      city: faker.location.city(),
+      state: 'CA',
+      zipCode: faker.location.zipCode(),
+      latitude: faker.location.latitude(),
+      longitude: faker.location.longitude(),
+    },
+    photos: [
+      faker.image.url(),
+      faker.image.url(),
+      faker.image.url(),
+    ],
+    status: 'ACTIVE',
+    viewCount: faker.number.int({ min: 0, max: 500 }),
+    bookingCount: faker.number.int({ min: 0, max: 20 }),
+    createdAt: faker.date.past().toISOString(),
+    updatedAt: faker.date.recent().toISOString(),
+    ...overrides,
+  };
+}
+
+// ============================================
+// Booking Factory
+// ============================================
+export function createMockBooking(
+  overrides: Partial<Booking> = {}
+): Booking {
+  const advertiser = createMockUser({ role: 'ADVERTISER' });
+  const space = createMockSpace();
+  const status = overrides.status ?? 'PAID';
+  
+  const pricePerWeek = space.pricePerWeek;
+  const totalWeeks = 2;
+  const subtotal = pricePerWeek * totalWeeks;
+  const platformFee = subtotal * 0.15;
+  const printInstallFee = space.spaceType.category.basePrintInstallFee;
+  const total = subtotal + platformFee;
+
+  const startDate = faker.date.soon({ days: 7 });
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + totalWeeks * 7);
+
+  return {
+    __typename: 'Booking',
+    id: faker.string.uuid(),
+    advertiserId: advertiser.id,
+    advertiser,
+    spaceId: space.id,
+    space,
+    status: status as BookingStatus,
+    dateRange: {
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+    },
+    creativeFileUrl: status !== 'PENDING_APPROVAL' ? faker.internet.url() : null,
+    creativeFileName: status !== 'PENDING_APPROVAL' ? 'creative.pdf' : null,
+    creativeFileSize: status !== 'PENDING_APPROVAL' ? 5242880 : null,
+    pricePerWeek,
+    totalWeeks,
+    subtotal,
+    platformFee,
+    printInstallFee,
+    total,
+    requestedAt: faker.date.past().toISOString(),
+    acceptedAt: ['ACCEPTED', 'PAID', 'FILE_DOWNLOADED', 'INSTALLED', 'VERIFIED', 'COMPLETED'].includes(status)
+      ? faker.date.past().toISOString()
+      : null,
+    paidAt: ['PAID', 'FILE_DOWNLOADED', 'INSTALLED', 'VERIFIED', 'COMPLETED'].includes(status)
+      ? faker.date.past().toISOString()
+      : null,
+    fileDownloadedAt: ['FILE_DOWNLOADED', 'INSTALLED', 'VERIFIED', 'COMPLETED'].includes(status)
+      ? faker.date.past().toISOString()
+      : null,
+    installedAt: ['INSTALLED', 'VERIFIED', 'COMPLETED'].includes(status)
+      ? faker.date.past().toISOString()
+      : null,
+    verifiedAt: ['VERIFIED', 'COMPLETED'].includes(status)
+      ? faker.date.past().toISOString()
+      : null,
+    completedAt: status === 'COMPLETED' ? faker.date.recent().toISOString() : null,
+    cancelledAt: status === 'CANCELLED' ? faker.date.recent().toISOString() : null,
+    autoApprovalAt: status === 'VERIFIED'
+      ? new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString()
+      : null,
+    createdAt: faker.date.past().toISOString(),
+    updatedAt: faker.date.recent().toISOString(),
+    verification: null,
+    ...overrides,
+  };
+}
+
+// ============================================
+// Payment Factory
+// ============================================
+export function createMockPayment(overrides: Partial<Payment> = {}): Payment {
+  return {
+    __typename: 'Payment',
+    id: faker.string.uuid(),
+    bookingId: faker.string.uuid(),
+    stripePaymentIntentId: `pi_${faker.string.alphanumeric(24)}`,
+    stripeChargeId: `ch_${faker.string.alphanumeric(24)}`,
+    amount: faker.number.int({ min: 100, max: 500 }),
+    amountRefunded: 0,
+    status: 'SUCCEEDED',
+    cardBrand: 'visa',
+    cardLast4: '4242',
+    createdAt: faker.date.past().toISOString(),
+    updatedAt: faker.date.recent().toISOString(),
+    succeededAt: faker.date.recent().toISOString(),
+    ...overrides,
+  };
+}
+```
+
+---
+
+## Unit Tests
+
+Test pure functions and utilities:
+
+```typescript
+// packages/features/payments/utils/fee-calculator.test.ts
+
+import { calculatePrintInstallFee, calculateBookingPricing } from './fee-calculator';
+import { createMockSpaceType, createMockSpaceCategory } from '@elaview/shared/testing/factories';
+
+describe('calculatePrintInstallFee', () => {
+  it('returns category base fee for FIXED calculation type', () => {
+    const spaceType = createMockSpaceType({
+      category: createMockSpaceCategory({
+        feeCalculationType: 'FIXED',
+        basePrintInstallFee: 25,
+      }),
+      printInstallFeeOverride: null,
+    });
+
+    const fee = calculatePrintInstallFee(spaceType);
+    
+    expect(fee).toBe(25);
+  });
+
+  it('uses spaceType override when provided', () => {
+    const spaceType = createMockSpaceType({
+      category: createMockSpaceCategory({
+        feeCalculationType: 'FIXED',
+        basePrintInstallFee: 25,
+      }),
+      printInstallFeeOverride: 35,
+    });
+
+    const fee = calculatePrintInstallFee(spaceType);
+    
+    expect(fee).toBe(35);
+  });
+
+  it('calculates PER_SQFT fee with dimensions', () => {
+    const spaceType = createMockSpaceType({
+      category: createMockSpaceCategory({
+        feeCalculationType: 'PER_SQFT',
+        basePrintInstallFee: 2.5, // $2.50 per sqft
+      }),
+    });
+    
+    // 24x36 inches = 6 sqft
+    const fee = calculatePrintInstallFee(spaceType, { width: 24, height: 36 });
+    
+    expect(fee).toBe(15); // 6 * 2.5
+  });
+
+  it('throws error for PER_SQFT without dimensions', () => {
+    const spaceType = createMockSpaceType({
+      category: createMockSpaceCategory({
+        feeCalculationType: 'PER_SQFT',
+      }),
+    });
+
+    expect(() => calculatePrintInstallFee(spaceType)).toThrow(
+      'Dimensions required for PER_SQFT calculation'
+    );
+  });
+});
+
+describe('calculateBookingPricing', () => {
+  it('calculates all pricing components correctly', () => {
+    const spaceType = createMockSpaceType({
+      category: createMockSpaceCategory({
+        basePrintInstallFee: 20,
+      }),
+    });
+
+    const pricing = calculateBookingPricing(100, 2, spaceType);
+
+    expect(pricing).toEqual({
+      pricePerWeek: 100,
+      totalWeeks: 2,
+      subtotal: 200,
+      platformFee: 30, // 15%
+      printInstallFee: 20,
+      total: 230,
+      ownerEarnings: 170, // 200 - 30
+      stage1Payout: 20,
+      stage2Payout: 150, // 170 - 20
+    });
+  });
+});
+```
+
+---
+
+## Component Tests
+
+Test UI rendering and interactions:
+
+```typescript
+// packages/features/bookings/components/BookingCard/BookingCard.test.tsx
+
+import React from 'react';
+import { render, fireEvent, screen } from '@testing-library/react-native';
+import { BookingCard } from './BookingCard';
+import { createMockBooking } from '@elaview/shared/testing/factories';
+
+describe('BookingCard', () => {
+  const mockBooking = createMockBooking({
+    status: 'PAID',
+    total: 230,
+    space: {
+      title: 'Coffee Shop Window',
+      photos: ['https://example.com/photo.jpg'],
+    },
+  });
+
+  it('renders booking information correctly', () => {
+    render(
+      <BookingCard
+        booking={mockBooking}
+        onPress={jest.fn()}
+        testID="booking-card"
+      />
+    );
+
+    expect(screen.getByText('Coffee Shop Window')).toBeTruthy();
+    expect(screen.getByText('$230.00')).toBeTruthy();
+    expect(screen.getByTestId('booking-card')).toBeTruthy();
+  });
+
+  it('displays correct status badge', () => {
+    render(
+      <BookingCard
+        booking={mockBooking}
+        onPress={jest.fn()}
+        testID="booking-card"
+      />
+    );
+
+    expect(screen.getByText('Paid')).toBeTruthy();
+  });
+
+  it('calls onPress with booking when tapped', () => {
+    const onPress = jest.fn();
+    
+    render(
+      <BookingCard
+        booking={mockBooking}
+        onPress={onPress}
+        testID="booking-card"
+      />
+    );
+
+    fireEvent.press(screen.getByTestId('booking-card'));
+    
+    expect(onPress).toHaveBeenCalledTimes(1);
+    expect(onPress).toHaveBeenCalledWith(mockBooking);
+  });
+
+  it('renders in compact mode when variant is compact', () => {
+    render(
+      <BookingCard
+        booking={mockBooking}
+        onPress={jest.fn()}
+        variant="compact"
+        testID="booking-card"
+      />
+    );
+
+    // Date range should not be visible in compact mode
+    expect(screen.queryByTestId('booking-card-dates')).toBeNull();
+  });
+
+  it('shows different statuses correctly', () => {
+    const statuses = ['PENDING_APPROVAL', 'ACCEPTED', 'VERIFIED', 'COMPLETED', 'CANCELLED'];
+    const expectedLabels = ['Pending', 'Accepted', 'Awaiting Approval', 'Completed', 'Cancelled'];
+
+    statuses.forEach((status, index) => {
+      const booking = createMockBooking({ status: status as any });
+      
+      const { unmount } = render(
+        <BookingCard booking={booking} onPress={jest.fn()} />
+      );
+
+      expect(screen.getByText(expectedLabels[index])).toBeTruthy();
+      unmount();
+    });
+  });
+});
+```
+
+### Hook Tests
+
+```typescript
+// packages/features/bookings/hooks/useBookingStatus.test.ts
+
+import { renderHook, waitFor } from '@testing-library/react-native';
+import { MockedProvider } from '@apollo/client/testing';
+import { useBookingStatus } from './useBookingStatus';
+import { GET_BOOKING } from '../api/queries';
+import { createMockBooking } from '@elaview/shared/testing/factories';
+
+const mockBooking = createMockBooking({ id: '123', status: 'PAID' });
+
+const mocks = [
+  {
+    request: {
+      query: GET_BOOKING,
+      variables: { id: '123' },
+    },
+    result: {
+      data: {
+        booking: mockBooking,
+      },
+    },
+  },
+];
+
+const wrapper = ({ children }: { children: React.ReactNode }) => (
+  <MockedProvider mocks={mocks} addTypename={false}>
+    {children}
+  </MockedProvider>
+);
+
+describe('useBookingStatus', () => {
+  it('returns booking status', async () => {
+    const { result } = renderHook(
+      () => useBookingStatus('123'),
+      { wrapper }
+    );
+
+    expect(result.current.loading).toBe(true);
+    expect(result.current.status).toBeNull();
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.status).toBe('PAID');
+  });
+
+  it('calls onStatusChange when status changes', async () => {
+    const onStatusChange = jest.fn();
+    
+    const { result, rerender } = renderHook(
+      () => useBookingStatus('123', { onStatusChange }),
+      { wrapper }
+    );
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    // Simulate status change (would normally come from refetch/poll)
+    // This would be tested with updated mocks
+  });
+});
+```
+
+---
+
+## Integration Tests
+
+Test feature flows with mocked API:
+
+```typescript
+// packages/features/bookings/__tests__/booking-flow.integration.test.tsx
+
+import React from 'react';
+import { render, fireEvent, waitFor, screen } from '@testing-library/react-native';
+import { MockedProvider } from '@apollo/client/testing';
+import { NavigationContainer } from '@react-navigation/native';
+import { BookingFlow } from '../components/BookingFlow';
+import { GET_SPACE, CREATE_BOOKING, CREATE_PAYMENT_INTENT } from '../api';
+import { createMockSpace } from '@elaview/shared/testing/factories';
+
+const mockSpace = createMockSpace({ id: 'space-123', pricePerWeek: 100 });
+
+const mocks = [
+  {
+    request: {
+      query: GET_SPACE,
+      variables: { id: 'space-123' },
+    },
+    result: {
+      data: { space: mockSpace },
+    },
+  },
+  {
+    request: {
+      query: CREATE_BOOKING,
+      variables: {
+        input: {
+          spaceId: 'space-123',
+          dateRange: {
+            startDate: expect.any(String),
+            endDate: expect.any(String),
+          },
+        },
+      },
+    },
+    result: {
+      data: {
+        createBooking: {
+          id: 'booking-123',
+          status: 'PENDING_APPROVAL',
+        },
+      },
+    },
+  },
+];
+
+const renderWithProviders = (component: React.ReactNode) => {
+  return render(
+    <MockedProvider mocks={mocks} addTypename={false}>
+      <NavigationContainer>
+        {component}
+      </NavigationContainer>
+    </MockedProvider>
+  );
+};
+
+describe('Booking Flow Integration', () => {
+  it('completes booking request flow', async () => {
+    renderWithProviders(<BookingFlow spaceId="space-123" />);
+
+    // Wait for space to load
+    await waitFor(() => {
+      expect(screen.getByText(mockSpace.title)).toBeTruthy();
+    });
+
+    // Select dates
+    fireEvent.press(screen.getByTestId('date-picker-start'));
+    fireEvent.press(screen.getByText('15')); // Select 15th
+    fireEvent.press(screen.getByTestId('date-picker-end'));
+    fireEvent.press(screen.getByText('29')); // Select 29th
+
+    // Submit booking request
+    fireEvent.press(screen.getByTestId('btn-request-booking'));
+
+    // Verify success
+    await waitFor(() => {
+      expect(screen.getByText('Booking Requested!')).toBeTruthy();
+    });
+  });
+
+  it('shows error when booking fails', async () => {
+    const errorMocks = [
+      mocks[0], // Space query succeeds
+      {
+        request: {
+          query: CREATE_BOOKING,
+          variables: expect.any(Object),
+        },
+        error: new Error('Space is no longer available'),
+      },
+    ];
+
+    render(
+      <MockedProvider mocks={errorMocks} addTypename={false}>
+        <NavigationContainer>
+          <BookingFlow spaceId="space-123" />
+        </NavigationContainer>
+      </MockedProvider>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(mockSpace.title)).toBeTruthy();
+    });
+
+    // Try to book
+    fireEvent.press(screen.getByTestId('btn-request-booking'));
+
+    // Verify error message
+    await waitFor(() => {
+      expect(screen.getByText('Space is no longer available')).toBeTruthy();
+    });
+  });
+});
+```
+
+---
+
+## MSW Setup
+
+Mock GraphQL at the network level:
+
+```typescript
+// packages/shared/testing/msw/server.ts
+import { setupServer } from 'msw/node';
+import { handlers } from './handlers';
+
+export const server = setupServer(...handlers);
+
+// packages/shared/testing/msw/handlers.ts
+import { graphql, HttpResponse } from 'msw';
+import {
+  createMockUser,
+  createMockBooking,
+  createMockSpace,
+  createMockSpaceCategory,
+} from '../factories';
+
+export const handlers = [
+  // Auth
+  graphql.query('GetMe', () => {
+    return HttpResponse.json({
+      data: {
+        me: createMockUser(),
+      },
+    });
+  }),
+
+  // Space Categories (frequently used, stable data)
+  graphql.query('GetSpaceCategories', () => {
+    return HttpResponse.json({
+      data: {
+        spaceCategories: [
+          createMockSpaceCategory({ slug: 'storefront', name: 'Storefront' }),
+        ],
+      },
+    });
+  }),
+
+  // Bookings
+  graphql.query('GetMyBookings', ({ variables }) => {
+    const { status, first = 10 } = variables;
+    
+    const bookings = Array.from({ length: first }, () =>
+      createMockBooking({ status: status?.[0] ?? 'PAID' })
+    );
+
+    return HttpResponse.json({
+      data: {
+        myBookings: {
+          edges: bookings.map((b) => ({ cursor: b.id, node: b })),
+          pageInfo: {
+            hasNextPage: false,
+            hasPreviousPage: false,
+            startCursor: bookings[0]?.id,
+            endCursor: bookings[bookings.length - 1]?.id,
+          },
+          totalCount: bookings.length,
+        },
+      },
+    });
+  }),
+
+  graphql.query('GetBooking', ({ variables }) => {
+    const { id } = variables;
+    
+    if (id === 'not-found') {
+      return HttpResponse.json({
+        errors: [
+          {
+            message: 'Booking not found',
+            extensions: { code: 'NOT_FOUND' },
+          },
+        ],
+      });
+    }
+
+    return HttpResponse.json({
+      data: {
+        booking: createMockBooking({ id }),
+      },
+    });
+  }),
+
+  // Mutations
+  graphql.mutation('AcceptBooking', ({ variables }) => {
+    const { bookingId } = variables;
+    
+    return HttpResponse.json({
+      data: {
+        acceptBooking: {
+          id: bookingId,
+          status: 'ACCEPTED',
+          acceptedAt: new Date().toISOString(),
+        },
+      },
+    });
+  }),
+
+  graphql.mutation('CreatePaymentIntent', ({ variables }) => {
+    return HttpResponse.json({
+      data: {
+        createPaymentIntent: {
+          clientSecret: 'pi_test_secret',
+          paymentIntentId: 'pi_test123',
+          amount: 230,
+          currency: 'usd',
+        },
+      },
+    });
+  }),
+];
+
+// Jest setup file
+// packages/shared/testing/setup.ts
+import { server } from './msw/server';
+
+beforeAll(() => server.listen({ onUnhandledRequest: 'warn' }));
+afterEach(() => server.resetHandlers());
+afterAll(() => server.close());
+```
+
+---
+
+## E2E Tests (Maestro)
+
+### Critical User Journeys
+
+```yaml
+# apps/mobile/e2e/flows/advertiser-booking.yaml
+appId: com.elaview.mobile
+---
+- launchApp:
+    clearState: true
+
+# Login as advertiser
+- tapOn:
+    id: "input-email"
+- inputText: "advertiser@test.com"
+- tapOn:
+    id: "input-password"
+- inputText: "TestPassword123!"
+- tapOn:
+    id: "btn-login"
+
+# Wait for home screen
+- assertVisible:
+    id: "tab-home"
+
+# Navigate to search
+- tapOn:
+    id: "tab-search"
+
+# Search for spaces
+- tapOn:
+    id: "input-search"
+- inputText: "coffee shop"
+- tapOn:
+    id: "btn-search"
+
+# Select first result
+- tapOn:
+    id: "space-card-0"
+
+# View space details
+- assertVisible: "Book Now"
+- tapOn: "Book Now"
+
+# Select dates
+- tapOn:
+    id: "date-picker-start"
+- tapOn: "15"
+- tapOn:
+    id: "date-picker-end"
+- tapOn: "29"
+
+# Proceed to booking
+- tapOn:
+    id: "btn-continue"
+
+# Submit booking request
+- tapOn:
+    id: "btn-request-booking"
+
+# Verify success
+- assertVisible: "Booking Requested"
+- assertVisible: "Waiting for owner approval"
+```
+
+```yaml
+# apps/mobile/e2e/flows/owner-verification.yaml
+appId: com.elaview.mobile
+---
+- launchApp:
+    clearState: true
+
+# Login as space owner
+- tapOn:
+    id: "input-email"
+- inputText: "owner@test.com"
+- tapOn:
+    id: "input-password"
+- inputText: "TestPassword123!"
+- tapOn:
+    id: "btn-login"
+
+# Navigate to bookings
+- tapOn:
+    id: "tab-bookings"
+
+# Find a paid booking
+- assertVisible:
+    id: "booking-card-0"
+- tapOn:
+    id: "booking-card-0"
+
+# Download creative file
+- tapOn:
+    id: "btn-download-file"
+- assertVisible: "File Downloaded"
+
+# Mark as installed
+- tapOn:
+    id: "btn-mark-installed"
+
+# Upload verification photos
+- tapOn:
+    id: "btn-upload-verification"
+
+# Take photos (mocked in test environment)
+- tapOn:
+    id: "capture-button"
+- assertVisible: "1 of 3"
+- tapOn:
+    id: "capture-button"
+- assertVisible: "2 of 3"
+- tapOn:
+    id: "capture-button"
+- assertVisible: "3 of 3"
+
+# Submit verification
+- tapOn:
+    id: "btn-submit-verification"
+
+# Verify success
+- assertVisible: "Verification Submitted"
+- assertVisible: "Awaiting Approval"
+```
+
+```yaml
+# apps/mobile/e2e/flows/auth.yaml
+appId: com.elaview.mobile
+---
+- launchApp:
+    clearState: true
+
+# Sign Up Flow
+- tapOn: "Create Account"
+- tapOn:
+    id: "input-first-name"
+- inputText: "Test"
+- tapOn:
+    id: "input-last-name"
+- inputText: "User"
+- tapOn:
+    id: "input-email"
+- inputText: "newuser@test.com"
+- tapOn:
+    id: "input-password"
+- inputText: "SecurePass123!"
+- tapOn:
+    id: "picker-role"
+- tapOn: "Advertiser"
+- tapOn:
+    id: "btn-signup"
+
+# Verify account created
+- assertVisible: "Welcome to Elaview"
+
+# Logout
+- tapOn:
+    id: "tab-profile"
+- tapOn:
+    id: "btn-logout"
+
+# Sign In Flow
+- tapOn:
+    id: "input-email"
+- inputText: "newuser@test.com"
+- tapOn:
+    id: "input-password"
+- inputText: "SecurePass123!"
+- tapOn:
+    id: "btn-login"
+
+# Verify logged in
+- assertVisible:
+    id: "tab-home"
+```
+
+---
+
+## Coverage Requirements
+
+| Code Type | Minimum Coverage |
+|-----------|-----------------|
+| Utils/Helpers | 100% |
+| Hooks | 90% |
+| Components | 80% |
+| Integration (feature flows) | Core paths covered |
+| E2E | All critical user journeys |
+
+### Critical Paths Requiring E2E
+
+1. **Advertiser Journey:**
+   - Sign up → Browse → View space → Book → Pay → Review verification → Approve
+
+2. **Owner Journey:**
+   - Sign up → Create listing → Accept booking → Download file → Mark installed → Upload verification → Receive payout
+
+3. **Auth Flows:**
+   - Sign up, Sign in, Forgot password, Session expiry/refresh
+
+4. **Payment Flows:**
+   - Success, Failure + Retry, Refund
+
+5. **Edge Cases:**
+   - Offline sync, Auto-approval timeout, Dispute flow
+
+---
+
+## CI Integration
+
+### On Pull Request
+
+```yaml
+# .github/workflows/pr-checks.yml
+jobs:
+  test-unit:
+    name: Unit & Component Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:unit --coverage
+      - uses: codecov/codecov-action@v3
+```
+
+### On Merge to Develop
+
+```yaml
+# .github/workflows/staging.yml
+jobs:
+  e2e-staging:
+    name: E2E Tests
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mobile-dev-inc/action-maestro-cloud@v1
+        with:
+          api-key: ${{ secrets.MAESTRO_CLOUD_API_KEY }}
+          app-file: path/to/app.apk
+```
+
+---
+
+## Running Tests
+
+```bash
+# All unit + component tests
+pnpm test
+
+# Watch mode
+pnpm test:watch
+
+# With coverage
+pnpm test:coverage
+
+# Specific package
+pnpm --filter @elaview/features-bookings test
+
+# Integration tests
+pnpm test:integration
+
+# E2E (local)
+cd apps/mobile && maestro test e2e/flows/
+
+# E2E (cloud)
+maestro cloud --apiKey $MAESTRO_API_KEY apps/mobile/e2e/
+```

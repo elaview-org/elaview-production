@@ -1,0 +1,537 @@
+---
+description: Git branching and PR conventions
+globs:
+  - ".github/**"
+  - "**/.git*"
+alwaysApply: false
+---
+
+# Git Workflow
+
+## Branch Strategy
+
+```
+main (production)
+  ↑
+staging (pre-production)
+  ↑
+develop (integration)
+  ↑
+feature/* | fix/* | chore/* | docs/* | refactor/*
+```
+
+### Branch Purposes
+
+| Branch | Purpose | Deploys To | Protected |
+|--------|---------|------------|-----------|
+| `main` | Production code | Production | Yes (2 approvals) |
+| `staging` | Pre-production testing | Staging environment | Yes (1 approval) |
+| `develop` | Integration branch | Development environment | Yes (CI must pass) |
+| `feature/*` | New features | Preview (Vercel/EAS) | No |
+| `fix/*` | Bug fixes | Preview | No |
+| `chore/*` | Maintenance, deps | Preview | No |
+| `docs/*` | Documentation | Preview | No |
+| `refactor/*` | Code refactoring | Preview | No |
+
+---
+
+## Branch Naming
+
+```
+type/short-description
+
+# Examples:
+feature/advertiser-booking-flow
+feature/owner-verification-photos
+fix/payment-intent-duplicate
+fix/gps-validation-accuracy
+chore/update-expo-sdk-54
+chore/add-eslint-rules
+docs/api-contracts
+refactor/booking-state-machine
+```
+
+### Naming Rules
+
+1. Use lowercase with hyphens
+2. Keep it short but descriptive (3-5 words)
+3. Include ticket number if applicable: `feature/ELA-123-booking-flow`
+4. No special characters except hyphens
+
+---
+
+## Commit Message Format
+
+```
+type(scope): brief description
+
+- Detail 1
+- Detail 2
+- Detail 3
+
+Closes #123
+```
+
+### Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| `feat` | New feature | `feat(bookings): add auto-approval after 48 hours` |
+| `fix` | Bug fix | `fix(payments): prevent duplicate Stage 1 payouts` |
+| `refactor` | Code restructure (no behavior change) | `refactor(mobile): migrate to Expo Router v6` |
+| `style` | Formatting, whitespace | `style(components): fix indentation in BookingCard` |
+| `test` | Add or update tests | `test(bookings): add unit tests for fee calculator` |
+| `docs` | Documentation | `docs(api): document booking lifecycle states` |
+| `chore` | Maintenance, deps, config | `chore(deps): update Apollo Client to 3.9` |
+| `ci` | CI/CD changes | `ci(github): add E2E tests to staging workflow` |
+| `perf` | Performance improvement | `perf(images): lazy load space gallery photos` |
+
+### Scopes
+
+| Scope | Description |
+|-------|-------------|
+| `auth` | Authentication, login, signup, tokens |
+| `spaces` | Space listings, search, space types |
+| `bookings` | Booking flow, status, lifecycle |
+| `payments` | Stripe, payouts, refunds, escrow |
+| `verification` | Photo verification, GPS validation |
+| `mobile` | Mobile app specific |
+| `web` | Web app specific |
+| `graphql` | Schema, queries, mutations |
+| `config` | Configuration, environment |
+| `deps` | Dependencies |
+| `ci` | CI/CD workflows |
+
+### Examples
+
+```bash
+# Feature with details
+feat(bookings): add auto-approval after 48 hours
+
+- Created scheduled job for auto-approval check
+- Added autoApprovalAt field to Booking entity
+- Send notification to both parties on auto-approval
+- Added tests for auto-approval logic
+
+Closes #45
+
+# Bug fix
+fix(payments): prevent duplicate Stage 1 payouts
+
+- Added idempotency check before creating Stripe transfer
+- Log warning if payout already exists for booking+stage
+- Added integration test for duplicate scenario
+
+Fixes #102
+
+# Chore
+chore(deps): update Expo SDK to 54
+
+- Updated expo and all related packages
+- Enabled New Architecture (newArchEnabled: true)
+- Updated Reanimated to v4
+- Fixed deprecation warnings
+
+# Refactor
+refactor(mobile): migrate to Expo Router v6 patterns
+
+- Updated navigate() calls to use replace() where needed
+- Refactored protected route logic in _layout files
+- Updated deep linking handlers
+- All existing tests still pass
+
+# Documentation
+docs(api): document booking lifecycle states
+
+- Added state machine diagram
+- Documented all status transitions
+- Added what each user sees at each stage
+```
+
+---
+
+## Pull Request Process
+
+### Creating a PR
+
+1. **Create feature branch from `develop`:**
+   ```bash
+   git checkout develop
+   git pull origin develop
+   git checkout -b feature/my-feature
+   ```
+
+2. **Make commits following convention:**
+   ```bash
+   git commit -m "feat(bookings): add booking request mutation"
+   ```
+
+3. **Push and create PR:**
+   ```bash
+   git push -u origin feature/my-feature
+   # Create PR via GitHub or CLI
+   gh pr create --base develop --title "feat(bookings): add booking request flow"
+   ```
+
+### PR Requirements
+
+Every PR must include:
+
+- [ ] **Clear title** following commit format: `type(scope): description`
+- [ ] **Description** explaining what, why, and how
+- [ ] **Tests** for new functionality
+- [ ] **Screenshots** for UI changes (mobile: iOS + Android)
+- [ ] **Linked issue** if applicable
+- [ ] **No console.log** or debug code
+- [ ] **Passing CI** (lint, typecheck, tests)
+
+### PR Template
+
+```markdown
+## What
+<!-- Brief description of changes -->
+
+## Why
+<!-- Link to issue: Closes #123 -->
+<!-- Or explanation of motivation -->
+
+## How
+<!-- Technical approach taken -->
+
+## Type of Change
+- [ ] 🚀 Feature (new functionality)
+- [ ] 🐛 Bug fix (non-breaking fix)
+- [ ] 🔧 Refactor (no functional changes)
+- [ ] 📚 Documentation
+- [ ] 🧪 Tests
+- [ ] 🔨 Chore (dependencies, config)
+
+## Testing
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] E2E tests added/updated (if critical path affected)
+- [ ] Manual testing completed
+
+## Screenshots
+<!-- For UI changes, add before/after screenshots -->
+<!-- Mobile: iOS + Android if applicable -->
+<!-- Web: Desktop + Mobile viewport -->
+
+| Before | After |
+|--------|-------|
+| screenshot | screenshot |
+
+## Checklist
+- [ ] My code follows the project's code standards
+- [ ] I have performed a self-review
+- [ ] TypeScript compiles without errors (`pnpm typecheck`)
+- [ ] All tests pass (`pnpm test`)
+- [ ] No console.log or debug code
+- [ ] I have updated documentation if needed
+
+## Breaking Changes
+<!-- List any breaking changes, or write "None" -->
+
+## Deployment Notes
+<!-- Any special deployment considerations? -->
+<!-- Database migrations? Environment variables? -->
+```
+
+---
+
+## Code Review
+
+### Review Requirements
+
+| Code Area | Approvals Required | Reviewers |
+|-----------|-------------------|-----------|
+| Normal code | 1 | Any team member |
+| Payments/Stripe | 2 | Mike + Quang |
+| Authentication | 2 | Mike + Quang |
+| Database migrations | 2 | Mike + Quang |
+| Security-sensitive | 2 | Mike + Quang |
+
+### Review Checklist
+
+As a reviewer, verify:
+
+- [ ] Code follows project conventions
+- [ ] Logic is correct and handles edge cases
+- [ ] Tests cover new functionality
+- [ ] No security vulnerabilities
+- [ ] No hardcoded secrets or space types
+- [ ] Error handling is appropriate
+- [ ] Performance is acceptable
+- [ ] Accessibility is maintained
+
+### Review Comments
+
+Use conventional comment prefixes:
+
+```
+# Blocking - must be fixed
+🚨 BLOCKER: This will cause duplicate payouts
+
+# Should be fixed
+⚠️ CONCERN: Consider adding error handling here
+
+# Suggestion - take it or leave it
+💡 SUGGESTION: Could simplify with optional chaining
+
+# Question - need clarification
+❓ QUESTION: Why did you choose this approach?
+
+# Praise
+✨ NICE: Great test coverage!
+
+# Nitpick - very minor
+🔍 NIT: Typo in comment
+```
+
+---
+
+## Merge Strategy
+
+### Feature → Develop
+
+1. Squash and merge (clean history)
+2. Delete feature branch after merge
+3. CI runs tests automatically
+
+### Develop → Staging
+
+1. Create PR from `develop` to `staging`
+2. Require 1 approval
+3. Merge commit (preserve history)
+4. Deploys to staging environment
+5. E2E tests run against staging
+
+### Staging → Main
+
+1. Create PR from `staging` to `main`
+2. Require 2 approvals
+3. Add release notes to PR description
+4. Merge commit
+5. Deploys to production
+6. Tag release: `v1.2.3`
+
+---
+
+## Protected Branch Rules
+
+### main
+
+```yaml
+# Required settings
+require_pull_request_reviews: true
+required_approving_review_count: 2
+dismiss_stale_reviews: true
+require_code_owner_reviews: true
+require_status_checks: true
+required_status_checks:
+  - "test-unit"
+  - "test-integration"
+  - "build"
+strict: true  # Branch must be up to date
+restrict_pushes: true
+allow_force_pushes: false
+allow_deletions: false
+```
+
+### staging
+
+```yaml
+require_pull_request_reviews: true
+required_approving_review_count: 1
+require_status_checks: true
+required_status_checks:
+  - "test-unit"
+  - "build"
+allow_force_pushes: false
+```
+
+### develop
+
+```yaml
+require_status_checks: true
+required_status_checks:
+  - "lint"
+  - "typecheck"
+  - "test-unit"
+allow_force_pushes: false
+```
+
+---
+
+## Release Process
+
+### Versioning
+
+Follow semantic versioning: `MAJOR.MINOR.PATCH`
+
+- **MAJOR:** Breaking changes
+- **MINOR:** New features (backward compatible)
+- **PATCH:** Bug fixes
+
+### Creating a Release
+
+1. **Update version numbers:**
+   ```bash
+   # Mobile
+   cd apps/mobile
+   # Update version in app.json
+   
+   # Web
+   cd apps/web
+   # Update version in package.json
+   ```
+
+2. **Create release PR:**
+   ```bash
+   git checkout staging
+   git pull
+   git checkout -b release/v1.2.0
+   # Update CHANGELOG.md
+   git commit -m "chore: prepare release v1.2.0"
+   git push -u origin release/v1.2.0
+   # Create PR to main
+   ```
+
+3. **After merge to main:**
+   ```bash
+   git checkout main
+   git pull
+   git tag -a v1.2.0 -m "Release v1.2.0"
+   git push origin v1.2.0
+   ```
+
+4. **Create GitHub Release:**
+   - Use tag `v1.2.0`
+   - Copy changelog entries
+   - Attach any release artifacts
+
+### Changelog Format
+
+```markdown
+# Changelog
+
+## [1.2.0] - 2026-01-15
+
+### Added
+- Auto-approval for bookings after 48 hours (#45)
+- GPS validation for verification photos (#67)
+
+### Changed
+- Improved booking status badge colors (#78)
+- Updated to Expo SDK 54 (#82)
+
+### Fixed
+- Duplicate Stage 1 payouts (#102)
+- Payment retry not working on Android (#98)
+
+### Security
+- Added rate limiting to auth endpoints (#110)
+```
+
+---
+
+## Hotfix Process
+
+For critical production bugs:
+
+1. **Create hotfix branch from main:**
+   ```bash
+   git checkout main
+   git pull
+   git checkout -b hotfix/critical-payment-bug
+   ```
+
+2. **Make minimal fix with tests**
+
+3. **Create PR directly to main:**
+   - Requires 2 approvals
+   - Must include tests
+   - Skip staging for true emergencies
+
+4. **After merge, backport to develop:**
+   ```bash
+   git checkout develop
+   git pull
+   git merge main
+   git push
+   ```
+
+---
+
+## CODEOWNERS
+
+```
+# .github/CODEOWNERS
+
+# Global owners (review all PRs)
+* @mike-anderson @quang-cap
+
+# Mobile app - Mike owns
+/apps/mobile/ @mike-anderson
+
+# Web app - Quang owns  
+/apps/web/ @quang-cap
+
+# Backend - Quang owns
+/backend/ @quang-cap
+
+# Shared packages - Both review
+/packages/ @mike-anderson @quang-cap
+
+# CI/CD - Both review
+/.github/ @mike-anderson @quang-cap
+
+# High-risk: Payments (both required)
+**/payment* @mike-anderson @quang-cap
+**/stripe* @mike-anderson @quang-cap
+**/payout* @mike-anderson @quang-cap
+
+# High-risk: Auth (both required)
+**/auth* @mike-anderson @quang-cap
+**/session* @mike-anderson @quang-cap
+**/token* @mike-anderson @quang-cap
+```
+
+---
+
+## Common Git Commands
+
+```bash
+# Start new feature
+git checkout develop && git pull
+git checkout -b feature/my-feature
+
+# Update feature branch with latest develop
+git checkout develop && git pull
+git checkout feature/my-feature
+git rebase develop
+# Or: git merge develop
+
+# Interactive rebase to clean up commits before PR
+git rebase -i develop
+
+# Amend last commit
+git commit --amend
+
+# Undo last commit (keep changes)
+git reset --soft HEAD~1
+
+# Stash changes
+git stash
+git stash pop
+
+# Cherry-pick a commit
+git cherry-pick <commit-hash>
+
+# View branch graph
+git log --oneline --graph --all
+
+# Clean up local branches
+git fetch --prune
+git branch -d feature/merged-feature
+```

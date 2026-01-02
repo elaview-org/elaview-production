@@ -1,0 +1,1055 @@
+---
+description: Error handling and recovery patterns
+globs:
+  - "**/error*/**"
+  - "**/*Error*"
+  - "**/catch*/**"
+alwaysApply: false
+---
+
+# Error Handling
+
+## Principles
+
+1. **User-first:** Show friendly, actionable error messages
+2. **Graceful degradation:** App should remain usable when possible
+3. **Automatic recovery:** Retry failed operations transparently
+4. **Visibility:** Log errors for debugging without exposing to users
+5. **Consistency:** Handle errors the same way across the app
+
+---
+
+## Error Types
+
+### Network Errors
+
+Connection failures, timeouts, server unreachable.
+
+```typescript
+// packages/shared/utils/errors.ts
+
+export class NetworkError extends Error {
+  constructor(message: string, public readonly originalError?: Error) {
+    super(message);
+    this.name = 'NetworkError';
+  }
+}
+
+export function isNetworkError(error: unknown): error is NetworkError {
+  if (error instanceof NetworkError) return true;
+  
+  // Apollo network errors
+  if (error && typeof error === 'object' && 'networkError' in error) {
+    return true;
+  }
+  
+  // Fetch errors
+  if (error instanceof TypeError && error.message.includes('fetch')) {
+    return true;
+  }
+  
+  return false;
+}
+```
+
+### GraphQL Errors
+
+Validation errors, business logic errors from backend.
+
+```typescript
+export type GraphQLErrorCode =
+  | 'UNAUTHENTICATED'
+  | 'FORBIDDEN'
+  | 'NOT_FOUND'
+  | 'BAD_USER_INPUT'
+  | 'VALIDATION_ERROR'
+  | 'CONFLICT'
+  | 'INTERNAL_SERVER_ERROR';
+
+export function getGraphQLErrorCode(error: ApolloError): GraphQLErrorCode | null {
+  return (error.graphQLErrors?.[0]?.extensions?.code as GraphQLErrorCode) ?? null;
+}
+```
+
+### Validation Errors
+
+Client-side input validation failures.
+
+```typescript
+import { ZodError } from 'zod';
+
+export function formatZodError(error: ZodError): string[] {
+  return error.errors.map((e) => {
+    const path = e.path.join('.');
+    return path ? `${path}: ${e.message}` : e.message;
+  });
+}
+```
+
+---
+
+## User-Friendly Error Messages
+
+Never show raw error messages to users.
+
+```typescript
+// packages/shared/utils/error-messages.ts
+
+const ERROR_MESSAGES: Record<string, string> = {
+  // Network
+  NETWORK_ERROR: 'Unable to connect. Please check your internet connection.',
+  TIMEOUT: 'Request timed out. Please try again.',
+  
+  // Auth
+  UNAUTHENTICATED: 'Please sign in to continue.',
+  FORBIDDEN: "You don't have permission to do this.",
+  SESSION_EXPIRED: 'Your session has expired. Please sign in again.',
+  
+  // Not found
+  NOT_FOUND: 'The requested item was not found.',
+  BOOKING_NOT_FOUND: 'This booking no longer exists.',
+  SPACE_NOT_FOUND: 'This space is no longer available.',
+  
+  // Validation
+  VALIDATION_ERROR: 'Please check your input and try again.',
+  
+  // Payment
+  PAYMENT_FAILED: 'Payment failed. Please try a different payment method.',
+  CARD_DECLINED: 'Your card was declined. Please try a different card.',
+  INSUFFICIENT_FUNDS: 'Insufficient funds. Please try a different card.',
+  
+  // Business logic
+  BOOKING_ALREADY_CANCELLED: 'This booking has already been cancelled.',
+  SPACE_UNAVAILABLE: 'This space is no longer available for the selected dates.',
+  
+  // Generic
+  UNKNOWN: 'Something went wrong. Please try again.',
+};
+
+export function getUserFriendlyMessage(
+  error: Error | ApolloError | unknown
+): string {
+  // Network error
+  if (isNetworkError(error)) {
+    return ERROR_MESSAGES.NETWORK_ERROR;
+  }
+  
+  // Apollo GraphQL error
+  if (error instanceof ApolloError) {
+    const code = getGraphQLErrorCode(error);
+    if (code && ERROR_MESSAGES[code]) {
+      return ERROR_MESSAGES[code];
+    }
+    // Use backend message if it's user-friendly
+    const message = error.graphQLErrors?.[0]?.message;
+    if (message && !message.includes('Exception') && message.length < 200) {
+      return message;
+    }
+  }
+  
+  // Zod validation error
+  if (error instanceof ZodError) {
+    const messages = formatZodError(error);
+    return messages[0] ?? ERROR_MESSAGES.VALIDATION_ERROR;
+  }
+  
+  // Known error with message
+  if (error instanceof Error && ERROR_MESSAGES[error.message]) {
+    return ERROR_MESSAGES[error.message];
+  }
+  
+  return ERROR_MESSAGES.UNKNOWN;
+}
+```
+
+---
+
+## Retry with Exponential Backoff
+
+```typescript
+// packages/shared/utils/retry.ts
+
+interface RetryOptions {
+  maxAttempts?: number;
+  initialDelayMs?: number;
+  maxDelayMs?: number;
+  backoffMultiplier?: number;
+  shouldRetry?: (error: unknown, attempt: number) => boolean;
+  onRetry?: (error: unknown, attempt: number, delayMs: number) => void;
+}
+
+const DEFAULT_OPTIONS: Required<RetryOptions> = {
+  maxAttempts: 3,
+  initialDelayMs: 300,
+  maxDelayMs: 5000,
+  backoffMultiplier: 2,
+  shouldRetry: (error) => isNetworkError(error),
+  onRetry: () => {},
+};
+
+export async function withRetry<T>(
+  fn: () => Promise<T>,
+  options: RetryOptions = {}
+): Promise<T> {
+  const opts = { ...DEFAULT_OPTIONS, ...options };
+  let lastError: unknown;
+  let delay = opts.initialDelayMs;
+
+  for (let attempt = 1; attempt <= opts.maxAttempts; attempt++) {
+    try {
+      return await fn();
+    } catch (error) {
+      lastError = error;
+
+      if (attempt === opts.maxAttempts || !opts.shouldRetry(error, attempt)) {
+        throw error;
+      }
+
+      opts.onRetry(error, attempt, delay);
+      
+      // Wait with jitter
+      const jitter = Math.random() * 0.3 * delay;
+      await sleep(delay + jitter);
+      
+      // Increase delay for next attempt
+      delay = Math.min(delay * opts.backoffMultiplier, opts.maxDelayMs);
+    }
+  }
+
+  throw lastError;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Usage
+const booking = await withRetry(
+  () => fetchBooking(bookingId),
+  {
+    maxAttempts: 3,
+    onRetry: (error, attempt) => {
+      console.log(`Retry attempt ${attempt} after error:`, error);
+    },
+  }
+);
+```
+
+---
+
+## React Error Boundaries
+
+```typescript
+// apps/mobile/src/components/ErrorBoundary.tsx
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import { View, Text, Button, StyleSheet } from 'react-native';
+import * as Sentry from '@sentry/react-native';
+
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+  onError?: (error: Error, errorInfo: ErrorInfo) => void;
+}
+
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
+
+export class ErrorBoundary extends Component<Props, State> {
+  state: State = {
+    hasError: false,
+    error: null,
+  };
+
+  static getDerivedStateFromError(error: Error): State {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    // Log to Sentry
+    Sentry.captureException(error, {
+      extra: {
+        componentStack: errorInfo.componentStack,
+      },
+    });
+
+    // Custom error handler
+    this.props.onError?.(error, errorInfo);
+  }
+
+  handleRetry = () => {
+    this.setState({ hasError: false, error: null });
+  };
+
+  render() {
+    if (this.state.hasError) {
+      if (this.props.fallback) {
+        return this.props.fallback;
+      }
+
+      return (
+        <View style={styles.container} testID="error-boundary">
+          <Text style={styles.title}>Something went wrong</Text>
+          <Text style={styles.message}>
+            We're sorry, but something unexpected happened.
+          </Text>
+          <Button title="Try Again" onPress={this.handleRetry} />
+        </View>
+      );
+    }
+
+    return this.props.children;
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+    backgroundColor: '#F9FAFB',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 8,
+  },
+  message: {
+    fontSize: 16,
+    color: '#6B7280',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+});
+```
+
+### Screen-Level Error Boundary
+
+```typescript
+// apps/mobile/src/components/ScreenErrorBoundary.tsx
+import { useRouter } from 'expo-router';
+
+export function ScreenErrorBoundary({ children }: { children: ReactNode }) {
+  const router = useRouter();
+
+  const handleGoHome = () => {
+    router.replace('/');
+  };
+
+  return (
+    <ErrorBoundary
+      fallback={
+        <View style={styles.container}>
+          <Text style={styles.title}>Oops!</Text>
+          <Text style={styles.message}>
+            This screen encountered an error.
+          </Text>
+          <Button title="Go Home" onPress={handleGoHome} />
+        </View>
+      }
+    >
+      {children}
+    </ErrorBoundary>
+  );
+}
+```
+
+---
+
+## Optimistic UI + Rollback
+
+```typescript
+// packages/features/bookings/hooks/useAcceptBooking.ts
+import { useAcceptBookingMutation, BookingStatus } from '@elaview/graphql/generated';
+import { useToast } from '@/src/hooks/useToast';
+
+export function useAcceptBooking() {
+  const [acceptBooking, { loading }] = useAcceptBookingMutation();
+  const { showToast } = useToast();
+
+  const accept = async (bookingId: string) => {
+    try {
+      await acceptBooking({
+        variables: { bookingId },
+        
+        // Optimistic update - update UI immediately
+        optimisticResponse: {
+          __typename: 'Mutation',
+          acceptBooking: {
+            __typename: 'Booking',
+            id: bookingId,
+            status: 'ACCEPTED' as BookingStatus,
+            acceptedAt: new Date().toISOString(),
+          },
+        },
+
+        // If mutation fails, Apollo automatically rolls back
+        onError: (error) => {
+          // Show error toast after rollback
+          showToast({
+            type: 'error',
+            message: getUserFriendlyMessage(error),
+          });
+        },
+      });
+
+      showToast({
+        type: 'success',
+        message: 'Booking accepted!',
+      });
+    } catch (error) {
+      // Error already handled by onError
+      console.error('Failed to accept booking:', error);
+    }
+  };
+
+  return { accept, loading };
+}
+```
+
+### Manual Rollback Pattern
+
+```typescript
+// For complex operations that need manual rollback
+export function useCreateBooking() {
+  const [createBooking] = useCreateBookingMutation();
+  const [createPaymentIntent] = useCreatePaymentIntentMutation();
+  const [cancelBooking] = useCancelBookingMutation();
+  const { showToast } = useToast();
+
+  const book = async (input: CreateBookingInput) => {
+    let bookingId: string | null = null;
+
+    try {
+      // Step 1: Create booking
+      const { data } = await createBooking({ variables: { input } });
+      bookingId = data?.createBooking.id ?? null;
+
+      if (!bookingId) {
+        throw new Error('Failed to create booking');
+      }
+
+      // Step 2: Create payment intent
+      const paymentResult = await createPaymentIntent({
+        variables: { bookingId },
+      });
+
+      return {
+        bookingId,
+        clientSecret: paymentResult.data?.createPaymentIntent.clientSecret,
+      };
+    } catch (error) {
+      // Rollback: Cancel the booking if payment intent creation failed
+      if (bookingId) {
+        try {
+          await cancelBooking({ variables: { bookingId } });
+        } catch (rollbackError) {
+          // Log rollback failure for manual cleanup
+          Sentry.captureException(rollbackError, {
+            extra: { bookingId, originalError: error },
+          });
+        }
+      }
+
+      showToast({
+        type: 'error',
+        message: getUserFriendlyMessage(error),
+      });
+
+      throw error;
+    }
+  };
+
+  return { book };
+}
+```
+
+---
+
+## GraphQL Error Handling
+
+```typescript
+// packages/features/bookings/components/BookingDetail.tsx
+import { ApolloError } from '@apollo/client';
+import { useGetBookingQuery } from '@elaview/graphql/generated';
+import { getUserFriendlyMessage, getGraphQLErrorCode } from '@elaview/shared/utils';
+
+export function BookingDetail({ id }: { id: string }) {
+  const { data, loading, error, refetch } = useGetBookingQuery({
+    variables: { id },
+    errorPolicy: 'all', // Get partial data even with errors
+  });
+
+  // Loading state
+  if (loading && !data) {
+    return <BookingDetailSkeleton />;
+  }
+
+  // Error handling
+  if (error) {
+    const code = getGraphQLErrorCode(error);
+
+    // Handle specific errors
+    switch (code) {
+      case 'NOT_FOUND':
+        return (
+          <EmptyState
+            title="Booking Not Found"
+            message="This booking may have been deleted."
+            action={{ label: 'Go Back', onPress: () => router.back() }}
+            testID="booking-not-found"
+          />
+        );
+
+      case 'UNAUTHENTICATED':
+        return <Redirect href="/login" />;
+
+      case 'FORBIDDEN':
+        return (
+          <EmptyState
+            title="Access Denied"
+            message="You don't have permission to view this booking."
+            action={{ label: 'Go Home', onPress: () => router.replace('/') }}
+          />
+        );
+
+      default:
+        // Generic error with retry
+        return (
+          <ErrorState
+            message={getUserFriendlyMessage(error)}
+            onRetry={refetch}
+            testID="booking-error"
+          />
+        );
+    }
+  }
+
+  // Data not available
+  if (!data?.booking) {
+    return <BookingDetailSkeleton />;
+  }
+
+  return <BookingDetailContent booking={data.booking} />;
+}
+```
+
+---
+
+## Toast/Alert Patterns
+
+```typescript
+// apps/mobile/src/contexts/ToastContext.tsx
+import React, { createContext, useContext, useState, useCallback } from 'react';
+import Animated, { 
+  useAnimatedStyle, 
+  withSpring, 
+  withDelay,
+  runOnJS,
+} from 'react-native-reanimated';
+
+interface Toast {
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  message: string;
+  duration?: number;
+}
+
+interface ToastContextValue {
+  showToast: (toast: Omit<Toast, 'id'>) => void;
+  hideToast: (id: string) => void;
+}
+
+const ToastContext = createContext<ToastContextValue | null>(null);
+
+export function ToastProvider({ children }: { children: ReactNode }) {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+
+  const showToast = useCallback((toast: Omit<Toast, 'id'>) => {
+    const id = Date.now().toString();
+    const duration = toast.duration ?? 4000;
+
+    setToasts((prev) => [...prev, { ...toast, id }]);
+
+    // Auto-dismiss
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, duration);
+  }, []);
+
+  const hideToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  return (
+    <ToastContext.Provider value={{ showToast, hideToast }}>
+      {children}
+      <ToastContainer toasts={toasts} onDismiss={hideToast} />
+    </ToastContext.Provider>
+  );
+}
+
+export function useToast() {
+  const context = useContext(ToastContext);
+  if (!context) {
+    throw new Error('useToast must be used within ToastProvider');
+  }
+  return context;
+}
+
+// Toast component
+function ToastItem({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }) {
+  const colors = {
+    success: { bg: '#D1FAE5', text: '#065F46', icon: 'checkmark-circle' },
+    error: { bg: '#FEE2E2', text: '#991B1B', icon: 'close-circle' },
+    warning: { bg: '#FEF3C7', text: '#92400E', icon: 'warning' },
+    info: { bg: '#DBEAFE', text: '#1E40AF', icon: 'information-circle' },
+  };
+
+  const { bg, text, icon } = colors[toast.type];
+
+  return (
+    <Pressable
+      style={[styles.toast, { backgroundColor: bg }]}
+      onPress={onDismiss}
+      testID={`toast-${toast.type}`}
+    >
+      <Ionicons name={icon} size={20} color={text} />
+      <Text style={[styles.toastText, { color: text }]}>{toast.message}</Text>
+    </Pressable>
+  );
+}
+```
+
+---
+
+## Edge Case Handling
+
+### Payment Fails After Booking Created
+
+```typescript
+// Handled in useCreateBooking with rollback (see above)
+// Backend also has webhook handler for failed payments
+
+// Backend: WebhooksController.cs
+async Task HandlePaymentFailed(Event stripeEvent)
+{
+    var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+    var bookingId = paymentIntent.Metadata["booking_id"];
+
+    // Update booking status
+    var booking = await _db.Bookings.FindAsync(bookingId);
+    if (booking.Status == BookingStatus.Accepted)
+    {
+        // Payment never completed - allow retry or cancel
+        await _notificationService.Send(booking.AdvertiserId, new Notification
+        {
+            Type = NotificationType.PaymentFailed,
+            Title = "Payment Failed",
+            Body = "Your payment could not be processed. Please try again.",
+            Data = new { BookingId = bookingId }
+        });
+    }
+}
+```
+
+### Photo Upload Fails
+
+```typescript
+// packages/features/verification/hooks/usePhotoUpload.ts
+
+interface PendingPhoto {
+  localUri: string;
+  status: 'pending' | 'uploading' | 'failed' | 'uploaded';
+  attempts: number;
+  error?: string;
+  uploadedUrl?: string;
+}
+
+export function usePhotoUpload() {
+  const [photos, setPhotos] = useState<PendingPhoto[]>([]);
+  const { showToast } = useToast();
+
+  const uploadPhoto = async (localUri: string): Promise<string> => {
+    const photo: PendingPhoto = {
+      localUri,
+      status: 'pending',
+      attempts: 0,
+    };
+
+    setPhotos((prev) => [...prev, photo]);
+
+    const upload = async (): Promise<string> => {
+      setPhotos((prev) =>
+        prev.map((p) =>
+          p.localUri === localUri
+            ? { ...p, status: 'uploading', attempts: p.attempts + 1 }
+            : p
+        )
+      );
+
+      try {
+        const result = await uploadToStorage(localUri);
+        
+        setPhotos((prev) =>
+          prev.map((p) =>
+            p.localUri === localUri
+              ? { ...p, status: 'uploaded', uploadedUrl: result.url }
+              : p
+          )
+        );
+
+        return result.url;
+      } catch (error) {
+        setPhotos((prev) =>
+          prev.map((p) =>
+            p.localUri === localUri
+              ? { ...p, status: 'failed', error: error.message }
+              : p
+          )
+        );
+        throw error;
+      }
+    };
+
+    // Retry with backoff
+    return withRetry(upload, {
+      maxAttempts: 3,
+      shouldRetry: (error, attempt) => {
+        return isNetworkError(error) && attempt < 3;
+      },
+      onRetry: (error, attempt) => {
+        showToast({
+          type: 'warning',
+          message: `Retrying upload (attempt ${attempt + 1})...`,
+          duration: 2000,
+        });
+      },
+    });
+  };
+
+  const retryFailed = async () => {
+    const failed = photos.filter((p) => p.status === 'failed');
+    for (const photo of failed) {
+      await uploadPhoto(photo.localUri);
+    }
+  };
+
+  return { photos, uploadPhoto, retryFailed };
+}
+```
+
+### GPS Unavailable
+
+```typescript
+// packages/features/verification/components/LocationValidator.tsx
+
+interface Props {
+  targetLocation: { latitude: number; longitude: number };
+  radiusMeters: number;
+  onValidated: (isValid: boolean, location?: { lat: number; lng: number }) => void;
+}
+
+export function LocationValidator({ targetLocation, radiusMeters, onValidated }: Props) {
+  const [status, setStatus] = useState<'checking' | 'valid' | 'invalid' | 'unavailable'>('checking');
+  const { validateLocation, permissionStatus } = useLocationValidation();
+
+  useEffect(() => {
+    checkLocation();
+  }, []);
+
+  const checkLocation = async () => {
+    setStatus('checking');
+
+    const result = await validateLocation(
+      targetLocation.latitude,
+      targetLocation.longitude,
+      radiusMeters
+    );
+
+    if (result.error) {
+      setStatus('unavailable');
+      return;
+    }
+
+    if (result.isValid) {
+      setStatus('valid');
+      onValidated(true, result.currentLocation);
+    } else {
+      setStatus('invalid');
+      onValidated(false, result.currentLocation);
+    }
+  };
+
+  // GPS unavailable - allow manual confirmation with warning
+  if (status === 'unavailable') {
+    return (
+      <View style={styles.container} testID="gps-unavailable">
+        <Ionicons name="location-outline" size={48} color="#F59E0B" />
+        <Text style={styles.title}>Location Unavailable</Text>
+        <Text style={styles.message}>
+          We couldn't verify your location. You can continue, but the 
+          advertiser may request additional proof.
+        </Text>
+        
+        <View style={styles.actions}>
+          <Button
+            title="Continue Anyway"
+            onPress={() => onValidated(true)}
+            variant="warning"
+            testID="btn-continue-without-gps"
+          />
+          <Button
+            title="Try Again"
+            onPress={checkLocation}
+            variant="secondary"
+            testID="btn-retry-gps"
+          />
+        </View>
+        
+        <Text style={styles.hint}>
+          Tip: Make sure Location Services are enabled in Settings
+        </Text>
+      </View>
+    );
+  }
+
+  // Other states...
+}
+```
+
+### Offline Action Queuing
+
+```typescript
+// packages/shared/utils/offline-queue.ts
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NetInfo from '@react-native-community/netinfo';
+
+interface QueuedAction {
+  id: string;
+  type: string;
+  payload: unknown;
+  createdAt: string;
+  retries: number;
+}
+
+const QUEUE_KEY = 'elaview_offline_queue';
+
+export class OfflineQueue {
+  private processing = false;
+
+  async enqueue(type: string, payload: unknown): Promise<void> {
+    const action: QueuedAction = {
+      id: Date.now().toString(),
+      type,
+      payload,
+      createdAt: new Date().toISOString(),
+      retries: 0,
+    };
+
+    const queue = await this.getQueue();
+    queue.push(action);
+    await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(queue));
+  }
+
+  async processQueue(handlers: Record<string, (payload: unknown) => Promise<void>>): Promise<void> {
+    if (this.processing) return;
+    this.processing = true;
+
+    try {
+      const netInfo = await NetInfo.fetch();
+      if (!netInfo.isConnected) {
+        return;
+      }
+
+      const queue = await this.getQueue();
+      const remaining: QueuedAction[] = [];
+
+      for (const action of queue) {
+        const handler = handlers[action.type];
+        if (!handler) {
+          console.warn(`No handler for action type: ${action.type}`);
+          continue;
+        }
+
+        try {
+          await handler(action.payload);
+        } catch (error) {
+          action.retries += 1;
+          if (action.retries < 3) {
+            remaining.push(action);
+          } else {
+            console.error(`Action ${action.type} failed after 3 retries`);
+          }
+        }
+      }
+
+      await AsyncStorage.setItem(QUEUE_KEY, JSON.stringify(remaining));
+    } finally {
+      this.processing = false;
+    }
+  }
+
+  private async getQueue(): Promise<QueuedAction[]> {
+    const data = await AsyncStorage.getItem(QUEUE_KEY);
+    return data ? JSON.parse(data) : [];
+  }
+}
+
+// Usage in app
+const offlineQueue = new OfflineQueue();
+
+// When offline, queue the action
+if (!isConnected) {
+  await offlineQueue.enqueue('MARK_INSTALLED', { bookingId });
+  showToast({ type: 'info', message: 'Saved offline. Will sync when connected.' });
+}
+
+// On reconnect, process queue
+NetInfo.addEventListener((state) => {
+  if (state.isConnected) {
+    offlineQueue.processQueue({
+      MARK_INSTALLED: async (payload) => {
+        await markInstalled(payload.bookingId);
+      },
+    });
+  }
+});
+```
+
+### Token Expired - Transparent Refresh
+
+```typescript
+// apps/mobile/src/lib/apollo.ts
+import { setContext } from '@apollo/client/link/context';
+import { onError } from '@apollo/client/link/error';
+import { fromPromise } from '@apollo/client';
+
+let isRefreshing = false;
+let pendingRequests: (() => void)[] = [];
+
+const errorLink = onError(({ graphQLErrors, operation, forward }) => {
+  if (graphQLErrors) {
+    for (const error of graphQLErrors) {
+      if (error.extensions?.code === 'UNAUTHENTICATED') {
+        // Token expired - refresh transparently
+        
+        if (!isRefreshing) {
+          isRefreshing = true;
+
+          return fromPromise(
+            refreshAccessToken()
+              .then((newToken) => {
+                // Update auth header with new token
+                const oldHeaders = operation.getContext().headers;
+                operation.setContext({
+                  headers: {
+                    ...oldHeaders,
+                    authorization: `Bearer ${newToken}`,
+                  },
+                });
+
+                // Retry all pending requests
+                pendingRequests.forEach((callback) => callback());
+                pendingRequests = [];
+                
+                return true;
+              })
+              .catch((refreshError) => {
+                // Refresh failed - logout user
+                pendingRequests = [];
+                logout();
+                throw refreshError;
+              })
+              .finally(() => {
+                isRefreshing = false;
+              })
+          ).flatMap(() => forward(operation));
+        }
+
+        // Queue this request while refresh is in progress
+        return fromPromise(
+          new Promise<void>((resolve) => {
+            pendingRequests.push(() => resolve());
+          })
+        ).flatMap(() => forward(operation));
+      }
+    }
+  }
+});
+
+async function refreshAccessToken(): Promise<string> {
+  const refreshToken = await authStorage.getRefreshToken();
+  if (!refreshToken) {
+    throw new Error('No refresh token');
+  }
+
+  const response = await fetch(`${API_URL}/auth/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Token refresh failed');
+  }
+
+  const { accessToken, refreshToken: newRefreshToken } = await response.json();
+  await authStorage.setTokens(accessToken, newRefreshToken);
+
+  return accessToken;
+}
+```
+
+---
+
+## Sentry Integration
+
+```typescript
+// apps/mobile/src/lib/sentry.ts
+import * as Sentry from '@sentry/react-native';
+
+export function initSentry() {
+  Sentry.init({
+    dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
+    environment: __DEV__ ? 'development' : 'production',
+    enableAutoSessionTracking: true,
+    tracesSampleRate: 0.2,
+    
+    // Don't send PII
+    beforeSend(event) {
+      // Remove sensitive data
+      if (event.request?.headers) {
+        delete event.request.headers.authorization;
+      }
+      return event;
+    },
+  });
+}
+
+// Capture error with context
+export function captureError(
+  error: Error,
+  context?: Record<string, unknown>
+) {
+  Sentry.captureException(error, {
+    extra: context,
+  });
+}
+
+// Set user context on login
+export function setUserContext(user: User) {
+  Sentry.setUser({
+    id: user.id,
+    email: user.email,
+  });
+}
+
+// Clear user context on logout
+export function clearUserContext() {
+  Sentry.setUser(null);
+}
+```

@@ -10,7 +10,7 @@ namespace ElaviewBackend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(AuthService authService) : ControllerBase {
+public class AuthController(IAuthService authService) : ControllerBase {
     [HttpPost("signup")]
     public async Task<IActionResult> Signup([FromBody] SignupRequest request) {
         if (!ModelState.IsValid) {

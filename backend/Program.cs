@@ -20,16 +20,15 @@ builder.Services
                 .GetConnectionString());
         }
     )
-    .AddOpenApi();
+    .AddOpenApi()
+    .AddHttpContextAccessor();
 
-builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<DatabaseSeeder>();
 
-// Add controllers
 builder.Services.AddControllers();
 
-// Configure authentication with cookies
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => {
@@ -73,5 +72,5 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapGet("/", () => "Hello World!");
 app.MapControllers();
-app.MapGraphQL();
+app.MapGraphQL("/api/graphql");
 app.RunWithGraphQLCommands(args);

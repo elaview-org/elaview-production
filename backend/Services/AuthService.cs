@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.Services;
 
-public class AuthService(AppDbContext dbContext) : IAuthService {
+public class AuthService(AppDbContext dbContext) {
     public async Task<User?> CreateUserAsync(string email, string password,
         string? name = null) {
         var existingUser = await dbContext.Users

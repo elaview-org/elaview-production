@@ -3,7 +3,11 @@ using ElaviewBackend.Data;
 
 namespace ElaviewBackend.Services;
 
-public class UserService(AppDbContext dbContext, ClaimsPrincipal principal) {
+public class UserService(
+    AppDbContext dbContext,
+    IHttpContextAccessor httpContextAccessor) {
     public string PrincipalId() =>
-        principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
+        httpContextAccessor.HttpContext?.User.FindFirstValue(
+            ClaimTypes.NameIdentifier
+        )!;
 }

@@ -1,28 +1,35 @@
-using System.Security.Claims;
 using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
 using ElaviewBackend.Models;
+using ElaviewBackend.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.GraphQL.Queries;
 
 [QueryType]
 public static partial class UserQueries {
-    static string PrincipalId(ClaimsPrincipal principal) =>
-        principal.FindFirstValue(ClaimTypes.NameIdentifier)!;
+    // todo: test
+    [Authorize]
+    public static async Task<User?> GetCurrentUser(
+        AppDbContext dbContext, CancellationToken ct, UserService userService
+    ) => await dbContext.Users.FirstOrDefaultAsync(
+        t => t.Id == userService.PrincipalId(), ct
+    );
+
+    // todo: test
+    [Authorize(Roles = "Admin")]
+    public static async Task<User?> GetUserById(
+        String id, AppDbContext dbContext, CancellationToken ct
+    ) => await dbContext.Users.FirstOrDefaultAsync(t => t.Id == id, ct);
 
     [Authorize]
-    public static async Task<User> GetCurrentUserAsync(
-        AppDbContext dbContext, ClaimsPrincipal principal
-    ) => await dbContext.Users.FindAsync(
-        PrincipalId(principal)
-    ) ?? throw new Exception("Not authenticated");
+    public static NotificationSettings GetNotificationSettings(
+        UserService userService
+    ) => new NotificationSettings();
 
     [Authorize]
-    public static NotificationSettings GetNotificationSettings()
-        => new NotificationSettings();
-
-    [Authorize]
-    public static SecuritySettings GetSecuritySettings()
-        => new SecuritySettings();
+    public static SecuritySettings GetSecuritySettings(
+        UserService userService
+    ) => new SecuritySettings();
 }

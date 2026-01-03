@@ -1,9 +1,9 @@
 // src/components/layout/Navigation.tsx
-import React from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Building, MapPin } from "lucide-react";
 import { UserButton, useUser } from "@clerk/nextjs";
+import Button from "../atoms/Button/Button";
 
 interface NavigationProps {
   spacesCount?: number;
@@ -36,7 +36,10 @@ export function Navigation({
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center">
           <div className="flex items-center gap-8">
-            <button onClick={() => router.push("/")} className="flex items-center space-x-2">
+            <button
+              onClick={() => router.push("/")}
+              className="flex items-center space-x-2"
+            >
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-blue-500 to-cyan-500">
                 <Building className="h-5 w-5 text-white" />
               </div>
@@ -103,18 +106,12 @@ export function Navigation({
               >
                 Request Demo
               </Link>
-              <button
-                onClick={onSignInClick}
-                className="rounded-lg px-4 py-2 text-gray-300 transition-colors hover:text-white"
-              >
+              <Button size="md" onClick={onSignInClick}>
                 Sign In
-              </button>
-              <button
-                onClick={onSignUpClick}
-                className="rounded-lg bg-linear-to-r from-blue-500 to-cyan-500 px-6 py-2 font-medium text-white shadow-lg transition-all duration-200 hover:from-blue-600 hover:to-cyan-600 hover:shadow-blue-500/25"
-              >
+              </Button>
+              <Button onClick={onSignUpClick} variant="grandient" size="lg">
                 Get Started
-              </button>
+              </Button>
             </div>
           )}
         </div>

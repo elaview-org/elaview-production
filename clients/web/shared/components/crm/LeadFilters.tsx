@@ -10,6 +10,7 @@ interface LeadFiltersProps {
   setHasInstallFilter: (value: string | undefined) => void;
 }
 
+
 export function LeadFilters({
   statusFilter,
   setStatusFilter,

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from 'react';
-import { api } from '../../../../elaview-mvp/src/trpc/react';
+// import { api } from '../../../../elaview-mvp/src/trpc/react';
 import { 
   Download, 
   Trash2, 
@@ -13,20 +13,13 @@ import {
   FileText,
   AlertTriangle
 } from 'lucide-react';
+import useExportData from '@/shared/hooks/api/actions/useExportData/useExportData';
+import useDeleteAccount from '@/shared/hooks/api/actions/useDeleteAccount/useDeleteAccount';
 
 export function DataPrivacyTab() {
-  const exportData = api.user.exportData.useQuery(undefined, {
-    enabled: false,
-  });
-  
-  const deleteAccount = api.user.deleteAccount.useMutation({
-    onSuccess: () => {
-      window.location.href = '/';
-    },
-    onError: (error) => {
-      setError(error.message);
-    },
-  });
+  const {refetch:exportDataRefetch, isFetching:exportDataFetching} = useExportData()
+  const {userAccountDeletion, isPending:deleteAccountPending} = useDeleteAccount()
+
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +28,7 @@ export function DataPrivacyTab() {
   const handleExportData = async () => {
     try {
       setError(null);
-      const data = await exportData.refetch();
+      const data = await exportDataRefetch();
       
       if (data.data) {
         const blob = new Blob([JSON.stringify(data.data, null, 2)], { type: 'application/json' });
@@ -56,8 +49,8 @@ export function DataPrivacyTab() {
     }
   };
 
-  const handleDeleteAccount = () => {
-    deleteAccount.mutate();
+  const handleDeleteAccount = async() => {
+    await userAccountDeletion();
   };
 
   return (
@@ -107,10 +100,10 @@ export function DataPrivacyTab() {
 
         <button
           onClick={handleExportData}
-          disabled={exportData.isFetching}
+          disabled={exportDataFetching}
           className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {exportData.isFetching ? (
+          {exportDataFetching ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin mr-2" />
               Exporting...
@@ -193,10 +186,10 @@ export function DataPrivacyTab() {
             <div className="flex space-x-3">
               <button
                 onClick={handleDeleteAccount}
-                disabled={deleteAccount.isPending}
+                disabled={deleteAccountPending}
                 className="inline-flex items-center px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {deleteAccount.isPending ? (
+                {deleteAccountPending ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin mr-2" />
                     Deleting...
@@ -208,7 +201,7 @@ export function DataPrivacyTab() {
               
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                disabled={deleteAccount.isPending}
+                disabled={deleteAccountPending}
                 className="px-4 py-2 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-all duration-200"
               >
                 Cancel

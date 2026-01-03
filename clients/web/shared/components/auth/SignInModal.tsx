@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from 'react';
-import { useSignIn, useClerk } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import { Modal } from './Modal';
-import { Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { useState } from "react";
+import { useSignIn, useClerk } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { Modal } from "./Modal";
+import { Mail, Lock, Loader2, AlertCircle } from "lucide-react";
+import TextField from "../atoms/TextField";
 
 interface SignInModalProps {
   isOpen: boolean;
@@ -12,22 +13,26 @@ interface SignInModalProps {
   onSwitchToSignUp: () => void;
 }
 
-export function SignInModal({ isOpen, onClose, onSwitchToSignUp }: SignInModalProps) {
+export function SignInModal({
+  isOpen,
+  onClose,
+  onSwitchToSignUp,
+}: SignInModalProps) {
   const { isLoaded, signIn, setActive } = useSignIn();
   const { signOut } = useClerk();
   const router = useRouter();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleEmailSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoaded) return;
 
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       // CRITICAL FIX: Clear any stale sessions before email sign-in
@@ -35,7 +40,7 @@ export function SignInModal({ isOpen, onClose, onSwitchToSignUp }: SignInModalPr
         await signOut();
       } catch (signOutError) {
         // Ignore errors if no session exists
-        console.log('No existing session to clear (expected)');
+        console.log("No existing session to clear (expected)");
       }
 
       const result = await signIn.create({
@@ -43,14 +48,14 @@ export function SignInModal({ isOpen, onClose, onSwitchToSignUp }: SignInModalPr
         password,
       });
 
-      if (result.status === 'complete') {
+      if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
         onClose();
-        router.push('/campaigns');
+        router.push("/campaigns");
       }
     } catch (err: any) {
-      console.error('Sign in error:', err);
-      setError(err.errors?.[0]?.message || 'Invalid email or password');
+      console.error("Sign in error:", err);
+      setError(err.errors?.[0]?.message || "Invalid email or password");
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +65,7 @@ export function SignInModal({ isOpen, onClose, onSwitchToSignUp }: SignInModalPr
     if (!isLoaded) return;
 
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       // CRITICAL FIX: Clear any stale sessions before Google OAuth
@@ -69,18 +74,18 @@ export function SignInModal({ isOpen, onClose, onSwitchToSignUp }: SignInModalPr
         await signOut();
       } catch (signOutError) {
         // Ignore errors if no session exists - this is fine
-        console.log('No existing session to clear (expected)');
+        console.log("No existing session to clear (expected)");
       }
 
       // Use absolute URL for OAuth redirect
       await signIn.authenticateWithRedirect({
-        strategy: 'oauth_google',
+        strategy: "oauth_google",
         redirectUrl: `${window.location.origin}/sso-callback`,
         redirectUrlComplete: `${window.location.origin}/campaigns`,
       });
     } catch (err: any) {
-      console.error('Google sign in error:', err);
-      setError(err.errors?.[0]?.message || 'Failed to sign in with Google');
+      console.error("Google sign in error:", err);
+      setError(err.errors?.[0]?.message || "Failed to sign in with Google");
       setIsLoading(false);
     }
   };
@@ -139,48 +144,28 @@ export function SignInModal({ isOpen, onClose, onSwitchToSignUp }: SignInModalPr
           </div>
         </div>
 
-        {/* Email Input */}
-        <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-            Email address
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5 text-gray-500" />
-            </div>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              placeholder="Enter your email"
-            />
-          </div>
-        </div>
-
-        {/* Password Input */}
-        <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-            Password
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-gray-500" />
-            </div>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              placeholder="Enter your password"
-            />
-          </div>
-        </div>
-
+        <TextField
+          label="Email address"
+          htmlFor="email"
+          icon={Mail}
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          placeholder="Enter your email"
+        />
+        <TextField
+          label="Password"
+          htmlFor="password"
+          icon={Lock}
+          id="password"
+          type="password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          placeholder="Enter your password"
+        />
         {/* Submit Button */}
         <button
           type="submit"
@@ -199,7 +184,7 @@ export function SignInModal({ isOpen, onClose, onSwitchToSignUp }: SignInModalPr
 
         {/* Sign Up Link */}
         <div className="text-center text-sm text-gray-400">
-          Don't have an account?{' '}
+          Don't have an account?{" "}
           <button
             type="button"
             onClick={onSwitchToSignUp}

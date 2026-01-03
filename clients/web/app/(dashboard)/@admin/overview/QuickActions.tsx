@@ -12,7 +12,9 @@ export default function QuickActions() {
         >
           <div>
             <p className="font-medium text-white">💳 Payment Flow Tracking</p>
-            <p className="mt-1 text-xs text-slate-400">Real-time payment monitoring</p>
+            <p className="mt-1 text-xs text-slate-400">
+              Real-time payment monitoring
+            </p>
           </div>
           <ArrowRight className="h-5 w-5 text-blue-400 transition-colors group-hover:text-white" />
         </Link>
@@ -23,7 +25,9 @@ export default function QuickActions() {
         >
           <div>
             <p className="font-medium text-white">Financial Dashboard</p>
-            <p className="mt-1 text-xs text-slate-400">Manage disputes & payouts</p>
+            <p className="mt-1 text-xs text-slate-400">
+              Manage disputes & payouts
+            </p>
           </div>
           <ArrowRight className="h-5 w-5 text-slate-400 transition-colors group-hover:text-white" />
         </Link>
@@ -67,7 +71,9 @@ export default function QuickActions() {
         >
           <div>
             <p className="font-medium text-white">Space Management</p>
-            <p className="mt-1 text-xs text-slate-400">Approve & manage spaces</p>
+            <p className="mt-1 text-xs text-slate-400">
+              Approve & manage spaces
+            </p>
           </div>
           <ArrowRight className="h-5 w-5 text-slate-400 transition-colors group-hover:text-white" />
         </Link>
@@ -78,7 +84,9 @@ export default function QuickActions() {
         >
           <div>
             <p className="font-medium text-white">System Health</p>
-            <p className="mt-1 text-xs text-slate-400">Monitor platform status</p>
+            <p className="mt-1 text-xs text-slate-400">
+              Monitor platform status
+            </p>
           </div>
           <ArrowRight className="h-5 w-5 text-slate-400 transition-colors group-hover:text-white" />
         </Link>

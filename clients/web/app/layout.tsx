@@ -1,5 +1,6 @@
-// src/app/layout.tsx
-import "../../elaview-mvp/src/styles/globals.css";
+import "@/shared/styles/globals.css";
+
+import React from "react";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
@@ -7,12 +8,10 @@ import { Geist } from "next/font/google";
 import { type Metadata } from "next";
 import Script from "next/script";
 
-import { TRPCReactProvider } from "../../elaview-mvp/src/trpc/react";
-import { ErrorBoundary } from "../../elaview-mvp/src/components/ErrorBoundary";
+import { ErrorBoundary } from "@/shared/components/ErrorBoundary";
 import { Toaster } from "sonner";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
-import React from "react";
+// import { Analytics } from "@vercel/analytics/next";
+// import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: "Elaview - Advertising Marketplace",
@@ -25,7 +24,11 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <ClerkProvider
       appearance={{
@@ -56,17 +59,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           formFieldErrorText: "!text-red-400 !text-sm",
           otpCodeFieldInput:
             "!bg-slate-800/50 !border !border-slate-700 !text-white !text-2xl !rounded-xl focus:!border-blue-500 focus:!ring-2 focus:!ring-blue-500/20",
-          footerActionLink: "!text-blue-400 hover:!text-blue-300 !transition-colors",
+          footerActionLink:
+            "!text-blue-400 hover:!text-blue-300 !transition-colors",
           footerActionText: "!text-slate-400 !text-sm",
           formResendCodeLink: "!text-blue-400 hover:!text-blue-300",
           identityPreviewText: "!text-white !font-medium",
-          identityPreviewEditButton: "!text-blue-400 hover:!text-blue-300 !transition-colors",
+          identityPreviewEditButton:
+            "!text-blue-400 hover:!text-blue-300 !transition-colors",
           identityPreviewEditButtonIcon: "!text-blue-400",
           alert: "!bg-red-500/10 !border-red-500/20 !text-red-400",
           alertText: "!text-red-400",
           badge:
             "!bg-blue-500/10 !text-blue-400 !border !border-blue-500/20 !rounded-full !px-3 !py-1 !text-xs !font-medium",
-          avatarBox: "!bg-gradient-to-br !from-blue-500 !to-cyan-500 !shadow-lg",
+          avatarBox:
+            "!bg-gradient-to-br !from-blue-500 !to-cyan-500 !shadow-lg",
           userButtonBox: "!bg-transparent !rounded-full",
           userButtonTrigger:
             "!bg-transparent hover:!bg-transparent focus:!bg-transparent active:!bg-transparent !shadow-none",
@@ -78,7 +84,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           userButtonPopoverMain: "!bg-slate-900 !p-4",
           userPreviewMainIdentifier: "!text-white !font-semibold !text-base",
           userPreviewSecondaryIdentifier: "!text-slate-400 !text-sm",
-          userButtonPopoverActions: "!bg-slate-900 !border-t !border-slate-800 !pt-2 !pb-2",
+          userButtonPopoverActions:
+            "!bg-slate-900 !border-t !border-slate-800 !pt-2 !pb-2",
           userButtonPopoverActionButton:
             "!text-slate-300 hover:!text-white hover:!bg-slate-800/60 !transition-all !duration-200 !rounded-lg !mx-2 !my-0.5",
           userButtonPopoverActionButtonIcon: "!text-slate-400 !w-4 !h-4",
@@ -88,7 +95,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           navbarButton:
             "!text-slate-400 hover:!text-white hover:!bg-slate-800/50 !transition-all !rounded-lg",
           navbarButtonIcon: "!text-slate-500",
-          profileSection: "!bg-slate-800/30 !border !border-slate-700/50 !rounded-xl !p-6",
+          profileSection:
+            "!bg-slate-800/30 !border !border-slate-700/50 !rounded-xl !p-6",
           profileSectionTitle: "!text-white !font-semibold !text-base",
           profileSectionTitleText: "!text-white",
           profileSectionContent:
@@ -99,7 +107,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             "!text-slate-300 hover:!text-white hover:!bg-slate-800/50 !rounded-lg !transition-all",
           accordionContent: "!bg-slate-800/30 !border-t !border-slate-700/50",
           modalBackdrop: "!bg-black/80 !backdrop-blur-sm",
-          modalContent: "!bg-slate-900 !border !border-slate-800 !shadow-2xl !rounded-xl",
+          modalContent:
+            "!bg-slate-900 !border !border-slate-800 !shadow-2xl !rounded-xl",
           modalCloseButton:
             "!text-slate-400 hover:!text-white hover:!bg-slate-800/50 !rounded-lg !transition-all",
           footer: "!hidden",
@@ -125,9 +134,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             enableSystem
             disableTransitionOnChange
           >
-            <ErrorBoundary>
-              <TRPCReactProvider>{children}</TRPCReactProvider>
-            </ErrorBoundary>
+            <ErrorBoundary>{children}</ErrorBoundary>
 
             {/* Toast notifications for immediate action feedback */}
             <Toaster
@@ -142,15 +149,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   maxWidth: "calc(100vw - 32px)",
                 },
                 classNames: {
-                  toast: "text-base sm:text-sm rounded-2xl sm:rounded-xl shadow-2xl",
+                  toast:
+                    "text-base sm:text-sm rounded-2xl sm:rounded-xl shadow-2xl",
                 },
               }}
             />
           </ThemeProvider>
 
           {/* Vercel */}
-          <Analytics />
-          <SpeedInsights />
+          {/* <Analytics /> */}
+          {/* <SpeedInsights /> */}
         </body>
       </html>
     </ClerkProvider>

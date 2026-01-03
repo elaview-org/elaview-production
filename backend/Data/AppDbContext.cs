@@ -27,7 +27,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
 
-        // User configuration
         modelBuilder.Entity<User>(entity => {
             entity.ToTable("users");
             entity.HasKey(e => e.Id);
@@ -43,7 +42,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
-        // AdvertiserProfile configuration
         modelBuilder.Entity<AdvertiserProfile>(entity => {
             entity.ToTable("advertiser_profiles");
             entity.HasKey(e => e.Id);
@@ -61,7 +59,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // SpaceOwnerProfile configuration
         modelBuilder.Entity<SpaceOwnerProfile>(entity => {
             entity.ToTable("space_owner_profiles");
             entity.HasKey(e => e.Id);
@@ -81,7 +78,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Space configuration
         modelBuilder.Entity<Space>(entity => {
             entity.ToTable("spaces");
             entity.HasKey(e => e.Id);
@@ -112,7 +108,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasForeignKey(e => e.OwnerId);
         });
 
-        // Campaign configuration
         modelBuilder.Entity<Campaign>(entity => {
             entity.ToTable("campaigns");
             entity.HasKey(e => e.Id);
@@ -135,7 +130,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasForeignKey(e => e.AdvertiserId);
         });
 
-        // Booking configuration
         modelBuilder.Entity<Booking>(entity => {
             entity.ToTable("bookings");
             entity.HasKey(e => e.Id);
@@ -186,7 +180,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasForeignKey(e => e.SpaceId);
         });
 
-        // Review configuration
         modelBuilder.Entity<Review>(entity => {
             entity.ToTable("reviews");
             entity.HasKey(e => e.Id);
@@ -211,7 +204,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Message configuration
         modelBuilder.Entity<Message>(entity => {
             entity.ToTable("messages");
             entity.HasKey(e => e.Id);
@@ -244,7 +236,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Notification configuration
         modelBuilder.Entity<Notification>(entity => {
             entity.ToTable("notifications");
             entity.HasKey(e => e.Id);
@@ -265,7 +256,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // PlatformAnalytics configuration
         modelBuilder.Entity<PlatformAnalytics>(entity => {
             entity.ToTable("platform_analytics");
             entity.HasKey(e => e.Id);
@@ -278,7 +268,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
-        // StripeWebhookEvent configuration
         modelBuilder.Entity<StripeWebhookEvent>(entity => {
             entity.ToTable("stripe_webhook_events");
             entity.HasKey(e => e.Id);
@@ -289,7 +278,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
-        // CronJobLog configuration
         modelBuilder.Entity<CronJobLog>(entity => {
             entity.ToTable("cron_job_logs");
             entity.HasKey(e => e.Id);
@@ -302,7 +290,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
-        // DemoRequest configuration
         modelBuilder.Entity<DemoRequest>(entity => {
             entity.ToTable("demo_requests");
             entity.HasKey(e => e.Id);
@@ -317,7 +304,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
-        // BugReport configuration
         modelBuilder.Entity<BugReport>(entity => {
             entity.ToTable("bug_reports");
             entity.HasKey(e => e.Id);
@@ -342,7 +328,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .OnDelete(DeleteBehavior.SetNull);
         });
 
-        // Lead configuration
         modelBuilder.Entity<Lead>(entity => {
             entity.ToTable("leads");
             entity.HasKey(e => e.Id);
@@ -364,7 +349,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
-        // OutreachLog configuration
         modelBuilder.Entity<OutreachLog>(entity => {
             entity.ToTable("outreach_logs");
             entity.HasKey(e => e.Id);
@@ -385,7 +369,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // ReferralPartner configuration
         modelBuilder.Entity<ReferralPartner>(entity => {
             entity.ToTable("referral_partners");
             entity.HasKey(e => e.Id);
@@ -401,7 +384,6 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
-        // MarketResearch configuration
         modelBuilder.Entity<MarketResearch>(entity => {
             entity.ToTable("market_research");
             entity.HasKey(e => e.Id);

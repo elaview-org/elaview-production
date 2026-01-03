@@ -4,12 +4,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { X, Megaphone, Building, Settings, HelpCircle, Bug, LogOut } from "lucide-react";
+import {
+  X,
+  Megaphone,
+  Building,
+  Settings,
+  HelpCircle,
+  Bug,
+  LogOut,
+} from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
 import { toast } from "sonner";
-import { NotificationBadge } from "../../../../elaview-mvp/src/components/notifications/NotificationBadge";
-import { BugReportModal } from "../../../../elaview-mvp/src/components/feedback/BugReportButton";
+import { NotificationBadge } from "@/shared/components/notifications/NotificationBadge";
+import { BugReportModal } from "@/shared/components/feedback/BugReportButton";
+import useUnreadNotifications from "@/shared/hooks/api/getters/useUnreadNotifications/useUnreadNotifications";
+import useUserSwitchRole from "@/shared/hooks/api/actions/useUserSwitchRole/useUserSwitchRole";
 
 interface SpaceOwnerHamburgerDrawerProps {
   /** Whether drawer is open */
@@ -29,33 +38,40 @@ interface SpaceOwnerHamburgerDrawerProps {
  * - Bug report
  * - Sign out
  */
-export function SpaceOwnerHamburgerDrawer({ isOpen, onClose }: SpaceOwnerHamburgerDrawerProps) {
+export function SpaceOwnerHamburgerDrawer({
+  isOpen,
+  onClose,
+}: SpaceOwnerHamburgerDrawerProps) {
   const router = useRouter();
   const { signOut } = useClerk();
-  const utils = api.useUtils();
   const [bugReportOpen, setBugReportOpen] = useState(false);
 
-  const { data: notificationData } = api.notifications.getUnread.useQuery(undefined, {
+  // const { data: notificationData } = api.notifications.getUnread.useQuery(undefined, {
+  //   staleTime: 30000,
+  //   refetchOnWindowFocus: true,
+  // });
+  const { notificationData } = useUnreadNotifications(undefined, {
     staleTime: 30000,
     refetchOnWindowFocus: true,
   });
-
-  const switchRoleMutation = api.user.switchRole.useMutation({
-    onSuccess: async () => {
-      await utils.notifications.getUnread.invalidate();
-      await utils.user.getCurrentUser.invalidate();
-      toast.success("Switched to Advertiser mode!");
-      onClose();
-      router.push("/browse");
-    },
-    onError: () => {
-      toast.error("Failed to switch role. Please try again.");
-    },
-  });
+  const {switchRole, isPending:switchRolePending} = useUserSwitchRole();
+  // const switchRoleMutation = api.user.switchRole.useMutation({
+  //   onSuccess: async () => {
+  //     await utils.notifications.getUnread.invalidate();
+  //     await utils.user.getCurrentUser.invalidate();
+  //     toast.success("Switched to Advertiser mode!");
+  //     onClose();
+  //     router.push("/browse");
+  //   },
+  //   onError: () => {
+  //     toast.error("Failed to switch role. Please try again.");
+  //   },
+  // });
 
   const handleRoleSwitch = async () => {
     try {
-      await switchRoleMutation.mutateAsync({ role: "ADVERTISER" });
+      // await switchRoleMutation.mutateAsync({ role: "ADVERTISER" });
+      await switchRole();
     } catch (error) {
       console.error("Role switch error:", error);
     }
@@ -91,7 +107,9 @@ export function SpaceOwnerHamburgerDrawer({ isOpen, onClose }: SpaceOwnerHamburg
               </div>
               <div>
                 <span className="text-lg font-bold text-white">Elaview</span>
-                <p className="text-xs font-medium text-slate-400">Space Owner</p>
+                <p className="text-xs font-medium text-slate-400">
+                  Space Owner
+                </p>
               </div>
             </div>
 
@@ -146,18 +164,22 @@ export function SpaceOwnerHamburgerDrawer({ isOpen, onClose }: SpaceOwnerHamburg
             {/* Role Switch Button */}
             <button
               onClick={handleRoleSwitch}
-              disabled={switchRoleMutation.isPending}
+              disabled={switchRolePending}
               className={`relative flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-semibold shadow-lg transition-all ${
-                switchRoleMutation.isPending
+                switchRolePending
                   ? "cursor-not-allowed bg-slate-800 text-slate-500 shadow-none"
                   : "bg-blue-600 text-white shadow-blue-600/20 hover:bg-blue-700"
               }`}
             >
               <Megaphone className="h-5 w-5" />
-              {switchRoleMutation.isPending ? "Switching..." : "Browse Spaces"}
+              {switchRolePending ? "Switching..." : "Browse Spaces"}
               {otherRoleCount > 0 && (
                 <div className="absolute -top-1 -right-1">
-                  <NotificationBadge count={otherRoleCount} size="sm" variant="warning" />
+                  <NotificationBadge
+                    count={otherRoleCount}
+                    size="sm"
+                    variant="warning"
+                  />
                 </div>
               )}
             </button>
@@ -165,7 +187,9 @@ export function SpaceOwnerHamburgerDrawer({ isOpen, onClose }: SpaceOwnerHamburg
             {/* Mode Indicator */}
             <div className="flex items-center justify-center gap-2 rounded-lg bg-slate-800/50 px-3 py-2">
               <div className="h-2 w-2 animate-pulse rounded-full bg-green-500"></div>
-              <p className="text-xs font-medium text-slate-300">Space Owner Mode</p>
+              <p className="text-xs font-medium text-slate-300">
+                Space Owner Mode
+              </p>
             </div>
 
             {/* Sign Out */}
@@ -181,7 +205,10 @@ export function SpaceOwnerHamburgerDrawer({ isOpen, onClose }: SpaceOwnerHamburg
       </div>
 
       {/* Bug Report Modal */}
-      <BugReportModal isOpen={bugReportOpen} onClose={() => setBugReportOpen(false)} />
+      <BugReportModal
+        isOpen={bugReportOpen}
+        onClose={() => setBugReportOpen(false)}
+      />
     </>
   );
 }

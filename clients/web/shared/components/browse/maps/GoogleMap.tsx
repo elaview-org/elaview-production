@@ -1,13 +1,19 @@
 // src/components/browse/maps/GoogleMap.tsx - FULLY OPTIMIZED WITH CIRCLE MARKERS
 "use client";
 
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
 import {
   APIProvider,
   Map,
   AdvancedMarker,
   useMap,
-} from '@vis.gl/react-google-maps';
+} from "@vis.gl/react-google-maps";
 import {
   MapPin,
   Building,
@@ -17,9 +23,9 @@ import {
   Store,
   Camera,
   Locate,
-} from 'lucide-react';
-import useSupercluster from 'use-supercluster';
-import type { BBox } from 'geojson';
+} from "lucide-react";
+import useSupercluster from "use-supercluster";
+import type { BBox } from "geojson";
 
 // ============================================================================
 // TYPES
@@ -84,11 +90,11 @@ interface ClusterProperties {
 }
 
 interface ClusterFeature {
-  type: 'Feature';
+  type: "Feature";
   id?: string | number;
   properties: ClusterProperties;
   geometry: {
-    type: 'Point';
+    type: "Point";
     coordinates: [number, number];
   };
 }
@@ -104,20 +110,20 @@ const SPACE_TYPE_ICONS: Record<string, React.ComponentType<any>> = {
   DIGITAL_DISPLAY: Monitor,
   WINDOW_DISPLAY: Store,
   VEHICLE_WRAP: Car,
-  OTHER: Camera
+  OTHER: Camera,
 };
 
 const SPACE_TYPE_COLORS: Record<string, string> = {
-  BILLBOARD: '#3B82F6',
-  STOREFRONT: '#10B981',
-  TRANSIT: '#F59E0B',
-  DIGITAL_DISPLAY: '#8B5CF6',
-  WINDOW_DISPLAY: '#EF4444',
-  VEHICLE_WRAP: '#F97316',
-  OTHER: '#6B7280'
+  BILLBOARD: "#3B82F6",
+  STOREFRONT: "#10B981",
+  TRANSIT: "#F59E0B",
+  DIGITAL_DISPLAY: "#8B5CF6",
+  WINDOW_DISPLAY: "#EF4444",
+  VEHICLE_WRAP: "#F97316",
+  OTHER: "#6B7280",
 };
 
-const DEBUG = process.env.NODE_ENV === 'development';
+const DEBUG = process.env.NODE_ENV === "development";
 
 // Default world view
 const DEFAULT_CENTER = { lat: 0, lng: 0 };
@@ -140,10 +146,10 @@ const hasBoundsChangedSignificantly = (
   const changed = latDiff > threshold || lngDiff > threshold;
 
   if (DEBUG && !changed) {
-    console.log('🚫 Bounds movement too small, skipping update', {
+    console.log("🚫 Bounds movement too small, skipping update", {
       latDiff: latDiff.toFixed(4),
       lngDiff: lngDiff.toFixed(4),
-      threshold
+      threshold,
     });
   }
 
@@ -159,47 +165,56 @@ const SpaceMarker: React.FC<{
   isSelected: boolean;
   isInCart: boolean;
   onClick: () => void;
-}> = React.memo(({ space, isSelected, isInCart, onClick }) => {
-  const color = SPACE_TYPE_COLORS[space.type] || '#6B7280';
-  
-  // Circle marker styling
-  const size = isSelected ? 40 : isInCart ? 36 : 32;
-  const borderWidth = isSelected ? 3 : 2;
+}> = React.memo(
+  ({ space, isSelected, isInCart, onClick }) => {
+    const color = SPACE_TYPE_COLORS[space.type] || "#6B7280";
 
-  return (
-    <AdvancedMarker
-      position={{ lat: space.latitude, lng: space.longitude }}
-      onClick={onClick}
-      zIndex={isSelected ? 1000 : isInCart ? 500 : 100}
-    >
-      <div
-        className="flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
-        style={{
-          width: `${size}px`,
-          height: `${size}px`,
-          borderRadius: '50%',
-          backgroundColor: isSelected ? '#EF4444' : isInCart ? '#10B981' : `${color}CC`, // CC = 80% opacity
-          border: `${borderWidth}px solid ${isSelected ? '#DC2626' : isInCart ? '#059669' : color}`,
-          boxShadow: isSelected 
-            ? '0 4px 12px rgba(0, 0, 0, 0.3)' 
-            : '0 2px 8px rgba(0, 0, 0, 0.2)',
-        }}
+    // Circle marker styling
+    const size = isSelected ? 40 : isInCart ? 36 : 32;
+    const borderWidth = isSelected ? 3 : 2;
+
+    return (
+      <AdvancedMarker
+        position={{ lat: space.latitude, lng: space.longitude }}
+        onClick={onClick}
+        zIndex={isSelected ? 1000 : isInCart ? 500 : 100}
       >
-        <span className="text-white font-semibold text-xs">
-          ${Math.floor(space.pricePerDay)}
-        </span>
-      </div>
-    </AdvancedMarker>
-  );
-}, (prevProps, nextProps) => {
-  return (
-    prevProps.space.id === nextProps.space.id &&
-    prevProps.isSelected === nextProps.isSelected &&
-    prevProps.isInCart === nextProps.isInCart
-  );
-});
+        <div
+          className="flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110"
+          style={{
+            width: `${size}px`,
+            height: `${size}px`,
+            borderRadius: "50%",
+            backgroundColor: isSelected
+              ? "#EF4444"
+              : isInCart
+              ? "#10B981"
+              : `${color}CC`, // CC = 80% opacity
+            border: `${borderWidth}px solid ${
+              isSelected ? "#DC2626" : isInCart ? "#059669" : color
+            }`,
+            boxShadow: isSelected
+              ? "0 4px 12px rgba(0, 0, 0, 0.3)"
+              : "0 2px 8px rgba(0, 0, 0, 0.2)",
+          }}
+        >
+          <span className="text-white font-semibold text-xs">
+            ${Math.floor(space.pricePerDay)}
+          </span>
+        </div>
+      </AdvancedMarker>
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.space.id === nextProps.space.id &&
+      prevProps.isSelected === nextProps.isSelected &&
+      prevProps.isInCart === nextProps.isInCart
+    );
+  }
+);
 
-SpaceMarker.displayName = 'SpaceMarker';
+SpaceMarker.displayName = "SpaceMarker";
 
 const ClusterMarker: React.FC<{
   cluster: ClusterFeature;
@@ -209,7 +224,7 @@ const ClusterMarker: React.FC<{
   const pointCount = cluster.properties.point_count || 0;
 
   // Scale cluster size based on point count
-  const size = Math.min(40 + (pointCount / 10), 60);
+  const size = Math.min(40 + pointCount / 10, 60);
 
   return (
     <AdvancedMarker
@@ -222,10 +237,10 @@ const ClusterMarker: React.FC<{
         style={{
           width: `${size}px`,
           height: `${size}px`,
-          borderRadius: '50%',
-          backgroundColor: '#2563EBCC', // Semi-transparent blue
-          border: '3px solid #1D4ED8',
-          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
+          borderRadius: "50%",
+          backgroundColor: "#2563EBCC", // Semi-transparent blue
+          border: "3px solid #1D4ED8",
+          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
         }}
       >
         <span className="text-white font-bold text-sm">{pointCount}</span>
@@ -234,7 +249,7 @@ const ClusterMarker: React.FC<{
   );
 });
 
-ClusterMarker.displayName = 'ClusterMarker';
+ClusterMarker.displayName = "ClusterMarker";
 
 // ============================================================================
 // MY LOCATION BUTTON
@@ -251,8 +266,8 @@ const MyLocationButton: React.FC<{
       className="absolute top-4 right-4 z-10 bg-white hover:bg-gray-50 disabled:bg-gray-100 rounded-lg shadow-lg p-3 transition-all duration-200 hover:shadow-xl disabled:cursor-not-allowed"
       title="Go to my location"
     >
-      <Locate 
-        className={`h-5 w-5 text-gray-700 ${isLocating ? 'animate-pulse' : ''}`} 
+      <Locate
+        className={`h-5 w-5 text-gray-700 ${isLocating ? "animate-pulse" : ""}`}
       />
     </button>
   );
@@ -274,7 +289,7 @@ const MapInitializer: React.FC<{
   useEffect(() => {
     if (!map || hasInitialized.current) return;
 
-    const listener = map.addListener('tilesloaded', () => {
+    const listener = map.addListener("tilesloaded", () => {
       const bounds = map.getBounds();
       const zoom = map.getZoom();
 
@@ -286,14 +301,14 @@ const MapInitializer: React.FC<{
           north: ne.lat(),
           south: sw.lat(),
           east: ne.lng(),
-          west: sw.lng()
+          west: sw.lng(),
         };
 
         const boundsArray: BBox = [sw.lng(), sw.lat(), ne.lng(), ne.lat()];
         onBoundsReady(boundsArray);
 
         if (DEBUG) {
-          console.log('🗺️ Map initialized with bounds:', mapBounds);
+          console.log("🗺️ Map initialized with bounds:", mapBounds);
         }
 
         onBoundsChange(mapBounds, zoom);
@@ -331,13 +346,16 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   className = "",
   clusterRadius = 75,
   maxClusterZoom = 20,
-  onTilesLoaded
+  onTilesLoaded,
 }) => {
   const [mapReady, setMapReady] = useState(false);
   const [mapsApiLoaded, setMapsApiLoaded] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  
+  const [userLocation, setUserLocation] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+
   const mapRef = useRef<google.maps.Map | null>(null);
   const idleTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const lastBoundsRef = useRef<MapBounds | null>(null);
@@ -349,7 +367,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   // Check if Google Maps API is loaded
   useEffect(() => {
     const checkGoogleMaps = () => {
-      if (typeof window !== 'undefined' && window.google?.maps) {
+      if (typeof window !== "undefined" && window.google?.maps) {
         setMapsApiLoaded(true);
       } else {
         const timeout = setTimeout(checkGoogleMaps, 100);
@@ -364,16 +382,16 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
     if (!mapReady || hasAutoLocated.current) return;
 
     const requestLocation = () => {
-      if ('geolocation' in navigator) {
+      if ("geolocation" in navigator) {
         setIsLocating(true);
-        
+
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const location = {
               lat: position.coords.latitude,
-              lng: position.coords.longitude
+              lng: position.coords.longitude,
             };
-            
+
             setUserLocation(location);
             hasAutoLocated.current = true;
             setIsLocating(false);
@@ -381,21 +399,21 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
             if (mapRef.current) {
               mapRef.current.panTo(location);
               mapRef.current.setZoom(12); // Zoom in to show local spaces
-              
+
               if (DEBUG) {
-                console.log('📍 User location detected:', location);
+                console.log("📍 User location detected:", location);
               }
             }
           },
           (error) => {
-            console.warn('Geolocation denied or failed:', error.message);
+            console.warn("Geolocation denied or failed:", error.message);
             setIsLocating(false);
             hasAutoLocated.current = true; // Don't keep trying
           },
           {
             enableHighAccuracy: false,
             timeout: 5000,
-            maximumAge: 0
+            maximumAge: 0,
           }
         );
       }
@@ -408,71 +426,137 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
 
   // Handle "My Location" button click
   const handleMyLocationClick = useCallback(() => {
-    if ('geolocation' in navigator) {
+    if ("geolocation" in navigator) {
       setIsLocating(true);
-      
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const location = {
             lat: position.coords.latitude,
-            lng: position.coords.longitude
+            lng: position.coords.longitude,
           };
-          
+
           setUserLocation(location);
           setIsLocating(false);
 
           if (mapRef.current) {
             mapRef.current.panTo(location);
             mapRef.current.setZoom(12);
-            
+
             if (DEBUG) {
-              console.log('📍 Relocating to user position:', location);
+              console.log("📍 Relocating to user position:", location);
             }
           }
         },
         (error) => {
-          console.error('Geolocation error:', error.message);
+          console.error("Geolocation error:", error.message);
           setIsLocating(false);
-          alert('Unable to get your location. Please check your browser permissions.');
+          alert(
+            "Unable to get your location. Please check your browser permissions."
+          );
         },
         {
           enableHighAccuracy: true,
           timeout: 10000,
-          maximumAge: 0
+          maximumAge: 0,
         }
       );
     } else {
-      alert('Geolocation is not supported by your browser');
+      alert("Geolocation is not supported by your browser");
     }
   }, []);
 
   // Convert spaces to GeoJSON points
   const points = useMemo(() => {
-    return spaces.map(space => ({
-      type: 'Feature' as const,
+    return spaces.map((space) => ({
+      type: "Feature" as const,
       properties: {
         cluster: false,
         spaceId: space.id,
-        space: space
+        space: space,
       },
       geometry: {
-        type: 'Point' as const,
-        coordinates: [space.longitude, space.latitude]
-      }
+        type: "Point" as const,
+        coordinates: [space.longitude, space.latitude],
+      },
     }));
   }, [spaces]);
 
+  const point = [
+    {
+      type: "Feature",
+      properties: {
+        cluster: false,
+        id: 1,
+        city: "Los Angeles",
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [-118.2437, 34.0522],
+      },
+    },
+    {
+      type: "Feature",
+      properties: {
+        cluster: false,
+        id: 2,
+        city: "San Francisco",
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [-117.4194, 37.7749],
+      },
+    },
+    {
+      type: "Feature",
+      properties: {
+        cluster: false,
+        id: 3,
+        city: "San Diego",
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [-117.1611, 32.7157],
+      },
+    },
+    {
+      type: "Feature",
+      properties: {
+        cluster: false,
+        id: 4,
+        city: "San Jose",
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [-121.8863, 37.3382],
+      },
+    },
+    {
+      type: "Feature",
+      properties: {
+        cluster: false,
+        id: 5,
+        city: "Sacramento",
+      },
+      geometry: {
+        type: "Point",
+        coordinates: [-121.4944, 38.5816],
+      },
+    },
+  ];
+
   // Generate clusters
   const { clusters, supercluster } = useSupercluster({
-    points: points,
+    points: point,
     bounds: bounds,
     zoom: zoom,
     options: {
       radius: clusterRadius,
-      maxZoom: maxClusterZoom
-    }
+      maxZoom: maxClusterZoom,
+    },
   });
 
+  console.log("cluster", clusters);
   // Handle map idle with debounce and threshold
   const handleIdle = useCallback(() => {
     if (!mapRef.current || !mapReady) return;
@@ -488,7 +572,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
       const newZoom = gMap.getZoom();
       if (newZoom === undefined) {
         if (DEBUG) {
-          console.log('Map zoom is undefined, skipping idle update');
+          console.log("Map zoom is undefined, skipping idle update");
         }
         return;
       }
@@ -503,25 +587,27 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
           north: ne.lat(),
           south: sw.lat(),
           east: ne.lng(),
-          west: sw.lng()
+          west: sw.lng(),
         };
 
         const boundsArray: BBox = [sw.lng(), sw.lat(), ne.lng(), ne.lat()];
         setBounds(boundsArray);
         setZoom(newZoom);
 
-        if (hasBoundsChangedSignificantly(lastBoundsRef.current, mapBounds, 0.005)) {
+        if (
+          hasBoundsChangedSignificantly(lastBoundsRef.current, mapBounds, 0.005)
+        ) {
           lastBoundsRef.current = mapBounds;
 
           if (DEBUG) {
-            console.log('✅ Bounds changed significantly, updating...', {
+            console.log("✅ Bounds changed significantly, updating...", {
               bounds: {
                 north: mapBounds.north.toFixed(4),
                 south: mapBounds.south.toFixed(4),
                 east: mapBounds.east.toFixed(4),
-                west: mapBounds.west.toFixed(4)
+                west: mapBounds.west.toFixed(4),
               },
-              zoom: newZoom
+              zoom: newZoom,
             });
           }
 
@@ -556,9 +642,9 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
     if (!mapReady || clusters.length === 0) return [];
 
     if (DEBUG) {
-      console.log('🔄 Rendering markers/clusters:', {
+      console.log("🔄 Rendering markers/clusters:", {
         count: clusters.length,
-        selectedId: selectedSpace?.id || 'none'
+        selectedId: selectedSpace?.id || "none",
       });
     }
 
@@ -572,17 +658,20 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
             key={`cluster-${cluster.id}`}
             cluster={cluster as ClusterFeature}
             onClick={() => {
-              if (!supercluster || typeof cluster.id !== 'number') return;
+              if (!supercluster || typeof cluster.id !== "number") return;
 
-              const clusterLeaves = supercluster.getLeaves(cluster.id, Infinity);
+              const clusterLeaves = supercluster.getLeaves(
+                cluster.id,
+                Infinity
+              );
               const clusterSpaces = clusterLeaves
-                .map(leaf => (leaf.properties as any).space)
+                .map((leaf) => (leaf.properties as any).space)
                 .filter((space): space is Space => space !== undefined);
 
               if (DEBUG) {
-                console.log('🎯 Cluster clicked:', {
+                console.log("🎯 Cluster clicked:", {
                   clusterId: cluster.id,
-                  spacesInCluster: clusterSpaces.length
+                  spacesInCluster: clusterSpaces.length,
                 });
               }
 
@@ -592,8 +681,10 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
                 if (!mapRef.current) return;
                 const [lng, lat] = cluster.geometry.coordinates;
 
-                if (typeof lat === 'number' && typeof lng === 'number') {
-                  const expansionZoom = supercluster.getClusterExpansionZoom(cluster.id);
+                if (typeof lat === "number" && typeof lng === "number") {
+                  const expansionZoom = supercluster.getClusterExpansionZoom(
+                    cluster.id
+                  );
                   mapRef.current.panTo({ lat, lng });
                   mapRef.current.setZoom(expansionZoom);
                 }
@@ -615,42 +706,57 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
         />
       );
     });
-  }, [clusters, selectedSpace?.id, mapReady, isInCart, onSpaceClick, onClusterClick, supercluster]);
+  }, [
+    clusters,
+    selectedSpace?.id,
+    mapReady,
+    isInCart,
+    onSpaceClick,
+    onClusterClick,
+    supercluster,
+  ]);
 
   // Legend - Desktop only
-  const legend = useMemo(() => (
-    <div className="hidden md:block absolute bottom-8 left-8 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-xl shadow-2xl p-4 max-w-xs z-10">
-      <h4 className="text-sm font-semibold text-white mb-3">Space Types</h4>
-      <div className="grid grid-cols-2 gap-2 text-xs">
-        {Object.entries(SPACE_TYPE_COLORS).map(([type, color]) => {
-          const IconComponent = SPACE_TYPE_ICONS[type];
-          return (
-            <div key={type} className="flex items-center space-x-2">
-              <div
-                className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
-                style={{ backgroundColor: `${color}CC` }}
-              >
-                {IconComponent && <IconComponent size={10} color="white" />}
+  const legend = useMemo(
+    () => (
+      <div className="hidden md:block absolute bottom-8 left-8 bg-slate-900/95 backdrop-blur-xl border border-slate-800 rounded-xl shadow-2xl p-4 max-w-xs z-10">
+        <h4 className="text-sm font-semibold text-white mb-3">Space Types</h4>
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          {Object.entries(SPACE_TYPE_COLORS).map(([type, color]) => {
+            const IconComponent = SPACE_TYPE_ICONS[type];
+            return (
+              <div key={type} className="flex items-center space-x-2">
+                <div
+                  className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
+                  style={{ backgroundColor: `${color}CC` }}
+                >
+                  {IconComponent && <IconComponent size={10} color="white" />}
+                </div>
+                <span className="text-slate-300 leading-tight">
+                  {type.replace("_", " ").toLowerCase()}
+                </span>
               </div>
-              <span className="text-slate-300 leading-tight">
-                {type.replace('_', ' ').toLowerCase()}
-              </span>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
-  ), []);
+    ),
+    []
+  );
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!;
 
   if (!apiKey) {
     return (
-      <div className={`flex items-center justify-center bg-slate-900 ${className}`}>
+      <div
+        className={`flex items-center justify-center bg-slate-900 ${className}`}
+      >
         <div className="text-center p-8">
           <MapPin className="h-12 w-12 text-slate-600 mx-auto mb-4" />
           <p className="text-slate-400">Google Maps API key not configured</p>
-          <p className="text-sm text-slate-500 mt-2">Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env.local</p>
+          <p className="text-sm text-slate-500 mt-2">
+            Add NEXT_PUBLIC_GOOGLE_MAPS_API_KEY to your .env.local
+          </p>
         </div>
       </div>
     );
@@ -658,7 +764,9 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
 
   if (!mapsApiLoaded) {
     return (
-      <div className={`flex items-center justify-center bg-slate-900 ${className}`}>
+      <div
+        className={`flex items-center justify-center bg-slate-900 ${className}`}
+      >
         <div className="text-center p-8">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-slate-700 border-t-blue-500 mx-auto mb-4" />
           <p className="text-slate-400">Loading map...</p>
@@ -680,8 +788,8 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
               onMapClick();
             }
           }}
-          mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || 'DEMO_MAP_ID'}
-          style={{ width: '100%', height: '100%' }}
+          mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID"}
+          style={{ width: "100%", height: "100%" }}
           gestureHandling="greedy"
           disableDefaultUI={false}
           zoomControl={true}
@@ -704,12 +812,15 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
         </Map>
       </APIProvider>
 
-      <MyLocationButton onClick={handleMyLocationClick} isLocating={isLocating} />
+      <MyLocationButton
+        onClick={handleMyLocationClick}
+        isLocating={isLocating}
+      />
       {legend}
     </div>
   );
 };
 
-GoogleMap.displayName = 'GoogleMap';
+GoogleMap.displayName = "GoogleMap";
 
 export default GoogleMap;

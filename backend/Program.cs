@@ -2,6 +2,7 @@ using ElaviewBackend.Data;
 using ElaviewBackend.Services;
 using ElaviewBackend.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -10,27 +11,41 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("secrets.json", optional: false,
     reloadOnChange: true);
 
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.WebHost.UseQuic(options => {
+#pragma warning disable CA2252
+    options.MaxBidirectionalStreamCount = 200;
+#pragma warning restore CA2252
+});
+builder.WebHost.ConfigureKestrel((_, serverOptions) => {
+    serverOptions.ListenAnyIP(7106, listenOptions => {
+        listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+        listenOptions.UseHttps("TLS/chopsticksuser.dev.pfx", "chopsticksuser");
+    });
+});
+
 builder.Services
     .Configure<GlobalSettings>(builder.Configuration)
-    .AddDbContext<AppDbContext>((serviceProvider, options) => {
-            options.LogTo(Console.WriteLine);
-            options.UseNpgsql(serviceProvider
-                .GetRequiredService<IOptions<GlobalSettings>>().Value.Database
-                .GetConnectionString());
-        }
-    )
-    .AddOpenApi();
+    .AddHttpContextAccessor()
+    .AddDbContext<AppDbContext>((sp, options) => {
+        options.LogTo(Console.WriteLine);
+        var connectionString = sp.GetRequiredService<IOptions<GlobalSettings>>()
+            .Value.Database.GetConnectionString();
+        options.UseNpgsql(connectionString);
+    })
+    .AddOpenApi()
+    .AddScoped<AuthService>()
+    .AddScoped<UserService>()
+    .AddScoped<DatabaseSeeder>()
+    .AddControllers();
 
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<DatabaseSeeder>();
-
-// Add controllers
-builder.Services.AddControllers();
-
-// Configure authentication with cookies
 builder.Services
+    .AddCors(options =>
+        options.AddDefaultPolicy(policy =>
+            policy.WithOrigins("http://localhost:3000", "http://localhost:8081")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()))
+    .AddAuthorization()
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => {
         options.Cookie.Name = "ElaviewAuth";
@@ -47,31 +62,31 @@ builder.Services
         };
     });
 
-builder.Services.AddAuthorization();
-builder.Services.AddCors(options => {
-    options.AddDefaultPolicy(policy => {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:8081")
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials();
-    });
-});
-builder.AddGraphQL().AddTypes();
+builder
+    .AddGraphQL()
+    .AddTypes()
+    .AddQueryContext()
+    .AddProjections()
+    .AddFiltering()
+    .AddSorting()
+    .AddMutationConventions();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
-    using var scope = app.Services.CreateScope();
-    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.SeedDevelopmentAccountsAsync();
+    await app.Services.CreateScope().ServiceProvider
+        .GetRequiredService<DatabaseSeeder>()
+        .SeedDevelopmentAccountsAsync();
 }
 
-app.UseHttpsRedirection();
-app.UseCors();
-app.UseAuthentication();
-app.UseAuthorization();
+app
+    .UseHttpsRedirection()
+    .UseCors()
+    .UseAuthentication()
+    .UseAuthorization();
+
 app.MapGet("/", () => "Hello World!");
 app.MapControllers();
-app.MapGraphQL();
+app.MapGraphQL("/api/graphql");
 app.RunWithGraphQLCommands(args);

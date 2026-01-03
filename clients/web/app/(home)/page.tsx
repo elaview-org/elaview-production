@@ -1,5 +1,4 @@
-// src/app/page.tsx
-import LandingPage from "../../../elaview-mvp/src/components/landing/LandingPage";
+import LandingPage from "@/shared/components/landing/LandingPage";
 
 export default function HomePage() {
   return <LandingPage />;

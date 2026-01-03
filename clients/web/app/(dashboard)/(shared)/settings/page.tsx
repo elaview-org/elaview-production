@@ -16,18 +16,25 @@ import {
   Shield,
   User,
 } from "lucide-react";
-import { api } from "../../../../../elaview-mvp/src/trpc/react";
 import { toast } from "sonner";
 
 // Import existing advertiser components
-import { BusinessProfileTab } from "../../../../../elaview-mvp/src/components/settings/BusinessProfileTab";
-import { NotificationsTab } from "../../../../../elaview-mvp/src/components/settings/NotificationsTab";
-import { SecurityTab } from "../../../../../elaview-mvp/src/components/settings/SecurityTab";
-import { DataPrivacyTab } from "../../../../../elaview-mvp/src/components/settings/DataPrivacyTab";
-import { EmbeddedStripeOnboarding } from "../../../../../elaview-mvp/src/components/settings/EmbeddedStripeOnboarding";
+import { BusinessProfileTab } from "@/shared/components/settings/BusinessProfileTab";
+import { NotificationsTab } from "@/shared/components/settings/NotificationsTab";
+import { SecurityTab } from "@/shared/components/settings/SecurityTab";
+import { DataPrivacyTab } from "@/shared/components/settings/DataPrivacyTab";
+import { EmbeddedStripeOnboarding } from "@/shared/components/settings/EmbeddedStripeOnboarding";
+import useCurrentUser from "@/shared/hooks/api/getters/useCurrentUser/useCurrentUser";
+import useConnectAccountStatus from "@/shared/hooks/api/getters/useConnectAccountStatus/useConnectAccountStatus";
+import useGenerateExpressDashboardLink from "@/shared/hooks/api/actions/useGenerateExperssDashboardLink/useGenerateExpressDashboardLink";
 
 // Tab types
-type AdvertiserTabId = "profile" | "business" | "notifications" | "security" | "privacy";
+type AdvertiserTabId =
+  | "profile"
+  | "business"
+  | "notifications"
+  | "security"
+  | "privacy";
 type SpaceOwnerTabId = "profile" | "payouts";
 type TabId = AdvertiserTabId | SpaceOwnerTabId;
 
@@ -37,9 +44,10 @@ interface Tab {
   icon: React.ComponentType<{ className?: string }>;
 }
 
+type TRole = "ADVERTISER" | "SPACE_OWNER" | "ADMIN" | "MARKETING";
 export default function UnifiedSettingsPage() {
   const { user: clerkUser } = useUser();
-  const { data: user, isLoading: userLoading } = api.user.getCurrentUser.useQuery();
+  const { user, userLoading } = useCurrentUser();
 
   // Default tab based on role
   const getDefaultTab = useCallback((): TabId => {
@@ -128,8 +136,10 @@ export default function UnifiedSettingsPage() {
                   style={
                     isActive
                       ? {
-                          borderColor: user.role === "ADVERTISER" ? "#3b82f6" : "#22c55e",
-                          color: user.role === "ADVERTISER" ? "#60a5fa" : "#4ade80",
+                          borderColor:
+                            user.role === "ADVERTISER" ? "#3b82f6" : "#22c55e",
+                          color:
+                            user.role === "ADVERTISER" ? "#60a5fa" : "#4ade80",
                         }
                       : {}
                   }
@@ -144,7 +154,9 @@ export default function UnifiedSettingsPage() {
 
         {/* Content Area - Scrollable */}
         <div className="flex-1 overflow-y-auto p-6">
-          {activeTab === "profile" && <ProfileTab userRole={user.role} clerkUser={clerkUser} />}
+          {activeTab === "profile" && (
+            <ProfileTab userRole={user.role as TRole} clerkUser={clerkUser} />
+          )}
 
           {/* Advertiser-only tabs */}
           {user.role === "ADVERTISER" && (
@@ -157,7 +169,9 @@ export default function UnifiedSettingsPage() {
           )}
 
           {/* Space Owner-only tabs */}
-          {user.role === "SPACE_OWNER" && activeTab === "payouts" && <PayoutsTab />}
+          {user.role === "SPACE_OWNER" && activeTab === "payouts" && (
+            <PayoutsTab />
+          )}
         </div>
       </div>
     </div>
@@ -176,49 +190,51 @@ function ProfileTab({
     userRole === "ADVERTISER"
       ? "from-blue-500"
       : userRole === "ADMIN"
-        ? "from-purple-500"
-        : userRole === "MARKETING"
-          ? "from-purple-500"
-          : "from-green-500";
+      ? "from-purple-500"
+      : userRole === "MARKETING"
+      ? "from-purple-500"
+      : "from-green-500";
   const gradientTo =
     userRole === "ADVERTISER"
       ? "to-cyan-500"
       : userRole === "ADMIN"
-        ? "to-pink-500"
-        : userRole === "MARKETING"
-          ? "to-pink-500"
-          : "to-emerald-500";
+      ? "to-pink-500"
+      : userRole === "MARKETING"
+      ? "to-pink-500"
+      : "to-emerald-500";
   const badgeBg =
     userRole === "ADVERTISER"
       ? "bg-blue-500/10"
       : userRole === "ADMIN"
-        ? "bg-purple-500/10"
-        : userRole === "MARKETING"
-          ? "bg-purple-500/10"
-          : "bg-green-500/10";
+      ? "bg-purple-500/10"
+      : userRole === "MARKETING"
+      ? "bg-purple-500/10"
+      : "bg-green-500/10";
   const badgeText =
     userRole === "ADVERTISER"
       ? "text-blue-400"
       : userRole === "ADMIN"
-        ? "text-purple-400"
-        : "text-green-400";
+      ? "text-purple-400"
+      : "text-green-400";
   const badgeBorder =
     userRole === "ADVERTISER"
       ? "border-blue-500/20"
       : userRole === "ADMIN"
-        ? "border-purple-500/20"
-        : "border-green-500/20";
+      ? "border-purple-500/20"
+      : "border-green-500/20";
   const linkColor =
     userRole === "ADVERTISER"
       ? "text-blue-400 hover:text-blue-300"
       : userRole === "ADMIN"
-        ? "text-purple-400 hover:text-purple-300"
-        : "text-green-400 hover:text-green-300";
+      ? "text-purple-400 hover:text-purple-300"
+      : "text-green-400 hover:text-green-300";
 
   return (
     <div className="space-y-6">
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-6 transition-colors hover:border-slate-600">
-        <h2 className="mb-6 text-xl font-bold text-white">Profile Information</h2>
+        <h2 className="mb-6 text-xl font-bold text-white">
+          Profile Information
+        </h2>
 
         <div className="mb-8 flex items-center space-x-4 border-b border-slate-700 pb-6">
           <div
@@ -228,15 +244,20 @@ function ProfileTab({
             {clerkUser?.lastName?.[0]}
           </div>
           <div>
-            <h3 className="text-xl font-semibold text-white">{clerkUser?.fullName}</h3>
-            <p className="text-slate-400">{clerkUser?.primaryEmailAddress?.emailAddress}</p>
+            <h3 className="text-xl font-semibold text-white">
+              {clerkUser?.fullName}
+            </h3>
+            <p className="text-slate-400">
+              {clerkUser?.primaryEmailAddress?.emailAddress}
+            </p>
             <div className="mt-2 flex items-center gap-2">
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${badgeBg} ${badgeText} border ${badgeBorder}`}
               >
                 {userRole.replace("_", " ")}
               </span>
-              {clerkUser?.primaryEmailAddress?.verification?.status === "verified" && (
+              {clerkUser?.primaryEmailAddress?.verification?.status ===
+                "verified" && (
                 <span className="flex items-center gap-1 text-xs text-green-400">
                   <CheckCircle className="h-3 w-3" />
                   Verified
@@ -248,12 +269,18 @@ function ProfileTab({
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-medium text-slate-400">Email Address</label>
-            <p className="mt-1 text-white">{clerkUser?.primaryEmailAddress?.emailAddress}</p>
+            <label className="text-sm font-medium text-slate-400">
+              Email Address
+            </label>
+            <p className="mt-1 text-white">
+              {clerkUser?.primaryEmailAddress?.emailAddress}
+            </p>
           </div>
 
           <div>
-            <label className="text-sm font-medium text-slate-400">Account Type</label>
+            <label className="text-sm font-medium text-slate-400">
+              Account Type
+            </label>
             <p className="mt-1 text-white">{userRole.replace("_", " ")}</p>
           </div>
 
@@ -269,16 +296,22 @@ function ProfileTab({
       </div>
 
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-6 transition-colors hover:border-slate-600">
-        <h3 className="mb-4 text-lg font-semibold text-white">Account Details</h3>
+        <h3 className="mb-4 text-lg font-semibold text-white">
+          Account Details
+        </h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-slate-400">User ID</p>
-            <p className="mt-1 font-mono text-xs break-all text-slate-300">{clerkUser?.id}</p>
+            <p className="mt-1 font-mono text-xs break-all text-slate-300">
+              {clerkUser?.id}
+            </p>
           </div>
           <div>
             <p className="text-slate-400">Account Created</p>
             <p className="mt-1 text-slate-300">
-              {clerkUser?.createdAt ? new Date(clerkUser.createdAt).toLocaleDateString() : "N/A"}
+              {clerkUser?.createdAt
+                ? new Date(clerkUser.createdAt).toLocaleDateString()
+                : "N/A"}
             </p>
           </div>
         </div>
@@ -289,20 +322,23 @@ function ProfileTab({
 
 // Payouts Tab - Space Owner Only
 function PayoutsTab() {
-  const utils = api.useUtils();
+  const {
+    accountStatus,
+    accountStatusLoading: statusLoading,
+    validate,
+  } = useConnectAccountStatus();
+  const { openDashboard, isPending, openDashboardHandler } =
+    useGenerateExpressDashboardLink();
 
-  const { data: accountStatus, isLoading: statusLoading } =
-    api.billing.getConnectAccountStatus.useQuery();
-
-  const openDashboard = api.billing.generateExpressDashboardLink.useMutation({
-    onSuccess: (data) => {
-      window.open(data.url, "_blank");
-      toast.success("Opening Stripe Dashboard...");
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to open dashboard");
-    },
-  });
+  // const openDashboard = api.billing.generateExpressDashboardLink.useMutation({
+  //   onSuccess: (data) => {
+  //     window.open(data.url, "_blank");
+  //     toast.success("Opening Stripe Dashboard...");
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error.message || "Failed to open dashboard");
+  //   },
+  // });
 
   if (statusLoading) {
     return (
@@ -313,7 +349,8 @@ function PayoutsTab() {
   }
 
   const isAccountActive = accountStatus?.hasAccount && accountStatus?.isActive;
-  const needsSetup = !accountStatus?.hasAccount || accountStatus?.requiresAction;
+  const needsSetup =
+    !accountStatus?.hasAccount || accountStatus?.requiresAction;
 
   return (
     <div className="max-w-3xl space-y-6">
@@ -332,7 +369,11 @@ function PayoutsTab() {
             <AlertCircle className="h-5 w-5 shrink-0 text-amber-400" />
           )}
           <div className="flex-1">
-            <p className={`font-medium ${isAccountActive ? "text-green-400" : "text-amber-400"}`}>
+            <p
+              className={`font-medium ${
+                isAccountActive ? "text-green-400" : "text-amber-400"
+              }`}
+            >
               {isAccountActive ? "Payout Account Active" : "Setup Required"}
             </p>
             <p className="mt-0.5 text-sm text-slate-400">
@@ -344,11 +385,11 @@ function PayoutsTab() {
 
           {isAccountActive && (
             <button
-              onClick={() => openDashboard.mutate()}
-              disabled={openDashboard.isPending}
+              onClick={openDashboardHandler}
+              disabled={isPending}
               className="inline-flex items-center rounded-lg bg-green-600 px-4 py-2 font-medium text-white transition-all hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {openDashboard.isPending ? (
+              {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Opening...
@@ -379,7 +420,8 @@ function PayoutsTab() {
                 <div className="flex-1">
                   <p className="font-medium text-white">Enter your email</p>
                   <p className="mt-0.5 text-xs text-slate-400">
-                    Any email works - you will use this to access your Stripe dashboard later
+                    Any email works - you will use this to access your Stripe
+                    dashboard later
                   </p>
                 </div>
               </div>
@@ -389,7 +431,9 @@ function PayoutsTab() {
                   2
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-white">Provide business details</p>
+                  <p className="font-medium text-white">
+                    Provide business details
+                  </p>
                   <p className="mt-0.5 text-xs text-slate-400">
                     Business name, address, and tax ID (individual or business)
                   </p>
@@ -401,7 +445,9 @@ function PayoutsTab() {
                   3
                 </div>
                 <div className="flex-1">
-                  <p className="font-medium text-white">Connect your bank account</p>
+                  <p className="font-medium text-white">
+                    Connect your bank account
+                  </p>
                   <p className="mt-0.5 text-xs text-slate-400">
                     Where you will receive payouts from advertisers
                   </p>
@@ -423,8 +469,10 @@ function PayoutsTab() {
           </div>
 
           <EmbeddedStripeOnboarding
-            onComplete={() => utils.billing.getConnectAccountStatus.invalidate()}
-            onExit={() => toast.info("You can complete setup anytime from settings")}
+            onComplete={validate}
+            onExit={() =>
+              toast.info("You can complete setup anytime from settings")
+            }
           />
         </>
       )}
@@ -437,7 +485,9 @@ function PayoutsTab() {
               1
             </span>
             <div>
-              <p className="font-medium text-white">Upload installation proof within 7 days</p>
+              <p className="font-medium text-white">
+                Upload installation proof within 7 days
+              </p>
             </div>
           </div>
 
@@ -446,7 +496,9 @@ function PayoutsTab() {
               2
             </span>
             <div>
-              <p className="font-medium text-white">Advertiser reviews (48hr auto-approve)</p>
+              <p className="font-medium text-white">
+                Advertiser reviews (48hr auto-approve)
+              </p>
             </div>
           </div>
 
@@ -455,8 +507,12 @@ function PayoutsTab() {
               3
             </span>
             <div>
-              <p className="font-medium text-white">Payment sent instantly to your bank</p>
-              <p className="mt-0.5 text-xs text-slate-400">10% platform fee • 2-7 day arrival</p>
+              <p className="font-medium text-white">
+                Payment sent instantly to your bank
+              </p>
+              <p className="mt-0.5 text-xs text-slate-400">
+                10% platform fee • 2-7 day arrival
+              </p>
             </div>
           </div>
         </div>

@@ -1,22 +1,31 @@
-// src/app/(admin)/admin/marketing/page.tsx
-"use client";
-
 import Link from "next/link";
-import {
-  Mail,
-  UserCircle,
-  BarChart3,
-  Zap,
-  PlusCircle,
-  TrendingUp,
-  Loader2,
-  Users,
-  Target,
-} from "lucide-react";
-import { api } from "../../../../../elaview-mvp/src/trpc/react";
+import { Mail, UserCircle, BarChart3, Users, Target } from "lucide-react";
+import EmptyState from "@/shared/components/atoms/EmptyState";
+import useMarketingMetrics from "@/shared/hooks/api/getters/useMarketingMetrics/useMarketingMetrics";
+
+function MarketingMetricCardSkeleton() {
+  return (
+    <div className="animate-pulse rounded-lg border border-slate-700 bg-slate-800 p-6 shadow-sm">
+      <div className="mb-4 h-12 rounded bg-slate-900/50"></div>
+      <div className="mb-2 h-8 rounded bg-slate-900/50"></div>
+      <div className="h-4 w-1/2 rounded bg-slate-900/50"></div>
+    </div>
+  );
+}
+
+function UserBreakdownCardSkeleton() {
+  return (
+    <div className="space-y-3">
+      <div className="h-6 animate-pulse rounded bg-slate-900/50"></div>
+      <div className="h-6 animate-pulse rounded bg-slate-900/50"></div>
+      <div className="h-6 animate-pulse rounded bg-slate-900/50"></div>
+    </div>
+  );
+}
 
 export default function MarketingDashboard() {
-  const { data: metrics, isLoading } = api.admin.marketing.getMarketingMetrics.useQuery();
+
+  const {metrics, isLoading} = useMarketingMetrics();
 
   const stats = [
     {
@@ -30,7 +39,8 @@ export default function MarketingDashboard() {
       name: "Demo Requests",
       value: metrics?.totalDemoRequests.toLocaleString() || "0",
       change: `+${metrics?.newDemoRequestsThisWeek || 0} this week`,
-      changeType: (metrics?.newDemoRequestsThisWeek || 0) > 0 ? "increase" : "neutral",
+      changeType:
+        (metrics?.newDemoRequestsThisWeek || 0) > 0 ? "increase" : "neutral",
       icon: Mail,
     },
     {
@@ -55,7 +65,9 @@ export default function MarketingDashboard() {
         {/* Header - Fixed */}
         <div className="flex-shrink-0 border-b border-slate-700 p-6">
           <h2 className="text-3xl font-bold text-white">Marketing Overview</h2>
-          <p className="mt-2 text-slate-400">Track leads, signups, and platform growth metrics</p>
+          <p className="mt-2 text-slate-400">
+            Track leads, signups, and platform growth metrics
+          </p>
         </div>
 
         {/* Content - Scrollable */}
@@ -64,14 +76,7 @@ export default function MarketingDashboard() {
           {isLoading ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {[1, 2, 3, 4].map((i) => (
-                <div
-                  key={i}
-                  className="animate-pulse rounded-lg border border-slate-700 bg-slate-800 p-6 shadow-sm"
-                >
-                  <div className="mb-4 h-12 rounded bg-slate-900/50"></div>
-                  <div className="mb-2 h-8 rounded bg-slate-900/50"></div>
-                  <div className="h-4 w-1/2 rounded bg-slate-900/50"></div>
-                </div>
+                <MarketingMetricCardSkeleton key={i} />
               ))}
             </div>
           ) : (
@@ -88,12 +93,18 @@ export default function MarketingDashboard() {
                         <Icon className="h-6 w-6 text-purple-400" />
                       </div>
                       <span
-                        className={`text-sm font-medium ${stat.changeType === "increase" ? "text-green-400" : "text-slate-400"}`}
+                        className={`text-sm font-medium ${
+                          stat.changeType === "increase"
+                            ? "text-green-400"
+                            : "text-slate-400"
+                        }`}
                       >
                         {stat.change}
                       </span>
                     </div>
-                    <p className="mt-4 text-3xl font-bold text-white">{stat.value}</p>
+                    <p className="mt-4 text-3xl font-bold text-white">
+                      {stat.value}
+                    </p>
                     <p className="mt-1 text-sm text-slate-400">{stat.name}</p>
                   </div>
                 );
@@ -105,13 +116,11 @@ export default function MarketingDashboard() {
           <div className="grid gap-6 md:grid-cols-2">
             {/* User Breakdown */}
             <div className="rounded-lg border border-slate-700 bg-slate-800 p-6 shadow-sm">
-              <h3 className="mb-4 text-lg font-semibold text-white">User Breakdown</h3>
+              <h3 className="mb-4 text-lg font-semibold text-white">
+                User Breakdown
+              </h3>
               {isLoading ? (
-                <div className="space-y-3">
-                  <div className="h-6 animate-pulse rounded bg-slate-900/50"></div>
-                  <div className="h-6 animate-pulse rounded bg-slate-900/50"></div>
-                  <div className="h-6 animate-pulse rounded bg-slate-900/50"></div>
-                </div>
+                <UserBreakdownCardSkeleton />
               ) : (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
@@ -146,7 +155,9 @@ export default function MarketingDashboard() {
 
             {/* Recent Activity */}
             <div className="rounded-lg border border-slate-700 bg-slate-800 p-6 shadow-sm">
-              <h3 className="mb-4 text-lg font-semibold text-white">Quick Links</h3>
+              <h3 className="mb-4 text-lg font-semibold text-white">
+                Quick Links
+              </h3>
               <div className="space-y-3">
                 <Link
                   href="/inbound"
@@ -154,7 +165,9 @@ export default function MarketingDashboard() {
                 >
                   <div className="flex items-center gap-3">
                     <Users className="h-5 w-5 text-purple-400" />
-                    <span className="font-medium text-white">View Demo Requests</span>
+                    <span className="font-medium text-white">
+                      View Demo Requests
+                    </span>
                   </div>
                   <span className="text-sm text-purple-400">
                     {metrics?.totalDemoRequests} total
@@ -168,7 +181,9 @@ export default function MarketingDashboard() {
                     <UserCircle className="h-5 w-5 text-purple-400" />
                     <span className="font-medium text-white">Manage Users</span>
                   </div>
-                  <span className="text-sm text-purple-400">{metrics?.totalUsers} users</span>
+                  <span className="text-sm text-purple-400">
+                    {metrics?.totalUsers} users
+                  </span>
                 </Link>
                 <Link
                   href="/analytics"
@@ -176,7 +191,9 @@ export default function MarketingDashboard() {
                 >
                   <div className="flex items-center gap-3">
                     <BarChart3 className="h-5 w-5 text-purple-400" />
-                    <span className="font-medium text-white">Platform Analytics</span>
+                    <span className="font-medium text-white">
+                      Platform Analytics
+                    </span>
                   </div>
                   <span className="text-sm text-purple-400">
                     {metrics?.activeCampaigns} campaigns
@@ -199,7 +216,9 @@ export default function MarketingDashboard() {
                 </div>
                 <div>
                   <p className="font-medium text-white">Send Campaign</p>
-                  <p className="text-sm text-slate-400">Create a new campaign</p>
+                  <p className="text-sm text-slate-400">
+                    Create a new campaign
+                  </p>
                 </div>
               </Link>
               <Link
@@ -233,7 +252,9 @@ export default function MarketingDashboard() {
           <div className="rounded-lg border border-slate-700 bg-slate-800 shadow-sm">
             <div className="border-b border-slate-700 px-6 py-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-white">Email Campaigns</h3>
+                <h3 className="text-lg font-semibold text-white">
+                  Email Campaigns
+                </h3>
                 <Link
                   href="/campaigns"
                   className="text-sm font-medium text-purple-400 hover:text-purple-300"
@@ -242,19 +263,11 @@ export default function MarketingDashboard() {
                 </Link>
               </div>
             </div>
-            <div className="p-6">
-              <div className="py-12 text-center">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/10">
-                  <Mail className="h-8 w-8 text-purple-400" />
-                </div>
-                <p className="mt-4 text-lg font-medium text-white">
-                  Email campaign feature coming soon
-                </p>
-                <p className="mt-2 text-slate-400">
-                  For now, use demo requests to connect with leads directly
-                </p>
-              </div>
-            </div>
+            <EmptyState
+              icon={Mail}
+              title="Email campaign feature coming soon"
+              description="For now, use demo requests to connect with leads directly"
+            />
           </div>
         </div>
       </div>

@@ -5,31 +5,32 @@ import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   Bell,
-  Check,
   CheckCheck,
   Trash2,
   AlertCircle,
   DollarSign,
   MessageSquare,
   FileCheck,
-  XCircle,
   Calendar,
   Building,
   Megaphone,
-  X
+  X,
 } from "lucide-react";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
 import { NotificationBadge } from "./NotificationBadge";
-import type { NotificationType } from "@prisma/client";
-import { toast } from "sonner";
+// import { toast } from "sonner";
+import useUnreadNotifications from "@/shared/hooks/api/getters/useUnreadNotifications/useUnreadNotifications";
+import useAllNotificationsAsRead from "@/shared/hooks/api/actions/useAllNotificationsAsRead/useAllNotificationsAsRead";
+import useNotificationAsRead from "@/shared/hooks/api/actions/useNotificationAsRead/useNotificationAsRead";
+import useDeleteNotification from "@/shared/hooks/api/actions/useDeleteNotification/useDeleteNotification";
 
+type NotificationType = any;
 // 🆕 NEW: Native JavaScript date formatting (no date-fns in components)
 function formatTimeAgo(date: Date): string {
   const now = new Date();
   const diffMs = now.getTime() - new Date(date).getTime();
   const diffMinutes = Math.floor(diffMs / 60000);
 
-  if (diffMinutes < 1) return 'Just now';
+  if (diffMinutes < 1) return "Just now";
   if (diffMinutes < 60) return `${diffMinutes}m ago`;
 
   const diffHours = Math.floor(diffMinutes / 60);
@@ -46,29 +47,29 @@ function getNotificationIcon(type: NotificationType) {
   const iconProps = { className: "h-4 w-4" };
 
   switch (type) {
-    case 'BOOKING_REQUEST':
-    case 'BOOKING_APPROVED':
-    case 'BOOKING_REJECTED':
-    case 'BOOKING_CANCELLED':
+    case "BOOKING_REQUEST":
+    case "BOOKING_APPROVED":
+    case "BOOKING_REJECTED":
+    case "BOOKING_CANCELLED":
       return <Calendar {...iconProps} />;
-    case 'PAYMENT_RECEIVED':
-    case 'PAYOUT_PROCESSED':
-    case 'REFUND_PROCESSED':
-    case 'PAYMENT_FAILED':
+    case "PAYMENT_RECEIVED":
+    case "PAYOUT_PROCESSED":
+    case "REFUND_PROCESSED":
+    case "PAYMENT_FAILED":
       return <DollarSign {...iconProps} />;
-    case 'PROOF_UPLOADED':
-    case 'PROOF_APPROVED':
-    case 'PROOF_REJECTED':
-    case 'PROOF_DISPUTED':
+    case "PROOF_UPLOADED":
+    case "PROOF_APPROVED":
+    case "PROOF_REJECTED":
+    case "PROOF_DISPUTED":
       return <FileCheck {...iconProps} />;
-    case 'MESSAGE_RECEIVED':
+    case "MESSAGE_RECEIVED":
       return <MessageSquare {...iconProps} />;
-    case 'SPACE_APPROVED':
-    case 'SPACE_REJECTED':
-    case 'SPACE_SUSPENDED':
-    case 'SPACE_REACTIVATED':
+    case "SPACE_APPROVED":
+    case "SPACE_REJECTED":
+    case "SPACE_SUSPENDED":
+    case "SPACE_REACTIVATED":
       return <Building {...iconProps} />;
-    case 'SYSTEM_UPDATE':
+    case "SYSTEM_UPDATE":
       return <Megaphone {...iconProps} />;
     default:
       return <AlertCircle {...iconProps} />;
@@ -78,49 +79,53 @@ function getNotificationIcon(type: NotificationType) {
 // 🆕 NEW: Get notification link for navigation
 function getNotificationLink(notification: any): string {
   switch (notification.type) {
-    case 'BOOKING_REQUEST':
-      return '/requests';
-    case 'BOOKING_APPROVED':
-    case 'BOOKING_REJECTED':
-    case 'PROOF_UPLOADED':
-    case 'PROOF_APPROVED':
-    case 'PROOF_REJECTED':
-      return notification.campaignId ? `/campaigns/${notification.campaignId}` : '/campaigns';
-    case 'PAYMENT_RECEIVED':
-    case 'PAYOUT_PROCESSED':
-      return '/earnings';
-    case 'MESSAGE_RECEIVED':
-      return notification.campaignId ? `/messages?campaign=${notification.campaignId}` : '/messages';
-    case 'SPACE_APPROVED':
-    case 'SPACE_REJECTED':
-      return '/spaces';
+    case "BOOKING_REQUEST":
+      return "/requests";
+    case "BOOKING_APPROVED":
+    case "BOOKING_REJECTED":
+    case "PROOF_UPLOADED":
+    case "PROOF_APPROVED":
+    case "PROOF_REJECTED":
+      return notification.campaignId
+        ? `/campaigns/${notification.campaignId}`
+        : "/campaigns";
+    case "PAYMENT_RECEIVED":
+    case "PAYOUT_PROCESSED":
+      return "/earnings";
+    case "MESSAGE_RECEIVED":
+      return notification.campaignId
+        ? `/messages?campaign=${notification.campaignId}`
+        : "/messages";
+    case "SPACE_APPROVED":
+    case "SPACE_REJECTED":
+      return "/spaces";
     default:
-      return '/';
+      return "/";
   }
 }
 
 // 🆕 NEW: Get color for notification type
 function getNotificationColor(type: NotificationType): string {
   switch (type) {
-    case 'BOOKING_REQUEST':
-    case 'PROOF_UPLOADED':
-      return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-    case 'BOOKING_APPROVED':
-    case 'PROOF_APPROVED':
-    case 'PAYMENT_RECEIVED':
-    case 'PAYOUT_PROCESSED':
-    case 'SPACE_APPROVED':
-      return 'bg-green-500/10 text-green-400 border-green-500/20';
-    case 'BOOKING_REJECTED':
-    case 'PROOF_REJECTED':
-    case 'PAYMENT_FAILED':
-    case 'SPACE_REJECTED':
-      return 'bg-red-500/10 text-red-400 border-red-500/20';
-    case 'REFUND_PROCESSED':
-    case 'SPACE_SUSPENDED':
-      return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+    case "BOOKING_REQUEST":
+    case "PROOF_UPLOADED":
+      return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+    case "BOOKING_APPROVED":
+    case "PROOF_APPROVED":
+    case "PAYMENT_RECEIVED":
+    case "PAYOUT_PROCESSED":
+    case "SPACE_APPROVED":
+      return "bg-green-500/10 text-green-400 border-green-500/20";
+    case "BOOKING_REJECTED":
+    case "PROOF_REJECTED":
+    case "PAYMENT_FAILED":
+    case "SPACE_REJECTED":
+      return "bg-red-500/10 text-red-400 border-red-500/20";
+    case "REFUND_PROCESSED":
+    case "SPACE_SUSPENDED":
+      return "bg-orange-500/10 text-orange-400 border-orange-500/20";
     default:
-      return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+      return "bg-slate-500/10 text-slate-400 border-slate-500/20";
   }
 }
 
@@ -128,40 +133,29 @@ interface NotificationCenterProps {
   className?: string;
 }
 
-export function NotificationCenter({ className = '' }: NotificationCenterProps) {
+export function NotificationCenter({
+  className = "",
+}: NotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [panelPosition, setPanelPosition] = useState({ top: 0, right: 0 });
   const dropdownRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const router = useRouter();
-  const utils = api.useUtils();
 
   // 🆕 NEW: Fetch unread notifications with 30s polling
-  const { data, isLoading } = api.notifications.getUnread.useQuery(undefined, {
-    refetchInterval: 30000, // Poll every 30 seconds
-    refetchOnWindowFocus: true,
-    staleTime: 25000, // Don't refetch if data is <25s old
-  });
 
-  const markAsReadMutation = api.notifications.markAsRead.useMutation({
-    onSuccess: () => {
-      void utils.notifications.getUnread.invalidate();
-    },
-  });
-
-  const markAllAsReadMutation = api.notifications.markAllAsRead.useMutation({
-    onSuccess: (result) => {
-      void utils.notifications.getUnread.invalidate();
-      toast.success(`Marked ${result.count} notifications as read`);
-    },
-  });
-
-  const deleteMutation = api.notifications.delete.useMutation({
-    onSuccess: () => {
-      void utils.notifications.getUnread.invalidate();
-      toast.success('Notification deleted');
-    },
-  });
+  const { notificationData: data, isLoading } = useUnreadNotifications(
+    undefined,
+    {
+      refetchInterval: 30000, // Poll every 30 seconds
+      refetchOnWindowFocus: true,
+      staleTime: 25000, // Don't refetch if data is <25s old
+    }
+  );
+  const { markAsRead } = useNotificationAsRead();
+  const { markAllAsRead, isPending: markAllAsReadMutationPending } =
+    useAllNotificationsAsRead();
+  const { deleteNotification } = useDeleteNotification();
 
   // Calculate panel position relative to bell icon
   useEffect(() => {
@@ -179,21 +173,25 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     }
 
     if (isOpen) {
-      document.addEventListener('mousedown', handleClickOutside);
-      return () => document.removeEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
+      return () =>
+        document.removeEventListener("mousedown", handleClickOutside);
     }
   }, [isOpen]);
 
   const handleNotificationClick = (notification: any) => {
     // Mark as read
     if (!notification.isRead) {
-      markAsReadMutation.mutate({ notificationIds: [notification.id] });
+      markAsRead();
     }
 
     // Navigate to relevant page
@@ -203,12 +201,12 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
   };
 
   const handleMarkAllRead = () => {
-    markAllAsReadMutation.mutate();
+    markAllAsRead();
   };
 
   const handleDelete = (e: React.MouseEvent, notificationId: string) => {
     e.stopPropagation(); // Prevent navigation
-    deleteMutation.mutate({ notificationId });
+    deleteNotification();
   };
 
   const notifications = data?.notifications ?? [];
@@ -252,16 +250,20 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
             {/* Header - Sticky */}
             <div className="shrink-0 p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900">
               <div>
-                <h3 className="text-lg font-semibold text-white">Notifications</h3>
+                <h3 className="text-lg font-semibold text-white">
+                  Notifications
+                </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  {unreadCount === 0 ? 'All caught up!' : `${unreadCount} unread`}
+                  {unreadCount === 0
+                    ? "All caught up!"
+                    : `${unreadCount} unread`}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 {unreadCount > 0 && (
                   <button
                     onClick={handleMarkAllRead}
-                    disabled={markAllAsReadMutation.isPending}
+                    disabled={markAllAsReadMutationPending}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 rounded-lg transition-colors disabled:opacity-50"
                   >
                     <CheckCheck className="h-3.5 w-3.5" />
@@ -283,15 +285,21 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
               {isLoading ? (
                 <div className="p-8 text-center">
                   <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
-                  <p className="text-sm text-slate-400 mt-3">Loading notifications...</p>
+                  <p className="text-sm text-slate-400 mt-3">
+                    Loading notifications...
+                  </p>
                 </div>
               ) : notifications.length === 0 ? (
                 <div className="p-12 text-center">
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-800 mb-3">
                     <Bell className="h-6 w-6 text-slate-400" />
                   </div>
-                  <p className="text-sm font-medium text-white">No notifications</p>
-                  <p className="text-xs text-slate-400 mt-1">You're all caught up!</p>
+                  <p className="text-sm font-medium text-white">
+                    No notifications
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">
+                    You're all caught up!
+                  </p>
                 </div>
               ) : (
                 <div className="divide-y divide-slate-800">
@@ -301,19 +309,33 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
                       onClick={() => handleNotificationClick(notification)}
                       className={`
                         p-4 cursor-pointer transition-colors
-                        ${notification.isRead ? 'hover:bg-slate-800/50' : 'bg-blue-500/5 hover:bg-blue-500/10'}
+                        ${
+                          notification.isRead
+                            ? "hover:bg-slate-800/50"
+                            : "bg-blue-500/5 hover:bg-blue-500/10"
+                        }
                       `}
                     >
                       <div className="flex items-start gap-3">
                         {/* Icon */}
-                        <div className={`shrink-0 p-2 rounded-lg border ${getNotificationColor(notification.type)}`}>
+                        <div
+                          className={`shrink-0 p-2 rounded-lg border ${getNotificationColor(
+                            notification.type
+                          )}`}
+                        >
                           {getNotificationIcon(notification.type)}
                         </div>
 
                         {/* Content */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <p className={`text-sm font-medium ${notification.isRead ? 'text-slate-300' : 'text-white'}`}>
+                            <p
+                              className={`text-sm font-medium ${
+                                notification.isRead
+                                  ? "text-slate-300"
+                                  : "text-white"
+                              }`}
+                            >
                               {notification.title}
                             </p>
                             {!notification.isRead && (
@@ -348,7 +370,7 @@ export function NotificationCenter({ className = '' }: NotificationCenterProps) 
               <div className="shrink-0 p-3 border-t border-slate-800 bg-slate-900">
                 <button
                   onClick={() => {
-                    router.push('/notifications');
+                    router.push("/notifications");
                     setIsOpen(false);
                   }}
                   className="w-full text-center text-sm font-medium text-blue-400 hover:text-blue-300 py-2 rounded-lg hover:bg-blue-500/10 transition-colors"

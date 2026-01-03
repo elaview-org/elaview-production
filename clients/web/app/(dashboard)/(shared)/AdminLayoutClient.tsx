@@ -30,13 +30,14 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { NotificationCenter } from "../../../../elaview-mvp/src/components/notifications/NotificationCenter";
-import { NotificationBadge } from "../../../../elaview-mvp/src/components/notifications/NotificationBadge";
+// import { NotificationCenter } from "../../../../elaview-mvp/src/components/notifications/NotificationCenter";
+// import { NotificationBadge } from "../../../../elaview-mvp/src/components/notifications/NotificationBadge";
 import { AdminModeToggle } from "./AdminModeToggle";
-import { useAdminMode } from "../../../../elaview-mvp/src/contexts/AdminModeContext";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
-import type { NotificationType } from "@prisma/client";
-
+import useUnreadNotifications from "@/shared/hooks/api/getters/useUnreadNotifications/useUnreadNotifications";
+// import { useAdminMode } from "../../../../elaview-mvp/src/contexts/AdminModeContext";
+// import { api } from "../../../../elaview-mvp/src/trpc/react";
+// import type { NotificationType } from "@prisma/client";
+type NotificationType = any;
 interface NavItem {
   name: string;
   href: string;
@@ -50,7 +51,12 @@ const navigation: NavItem[] = [
     name: "Customers",
     href: "/payment-flows",
     icon: UserCheck,
-    notificationTypes: ["PAYMENT_RECEIVED", "PAYMENT_FAILED", "BOOKING_REQUEST", "DISPUTE_FILED"],
+    notificationTypes: [
+      "PAYMENT_RECEIVED",
+      "PAYMENT_FAILED",
+      "BOOKING_REQUEST",
+      "DISPUTE_FILED",
+    ],
   },
   {
     name: "Financial",
@@ -130,7 +136,7 @@ const marketingNavigation: NavItem[] = [
   { name: "Templates", href: "/templates", icon: FileText },
   { name: "Analytics", href: "/analytics", icon: BarChart3 },
   { name: "Automation", href: "/automation", icon: Zap },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Settings", href: "/marketingsettings", icon: Settings },
 ];
 
 // Helper function to count notifications for a nav item
@@ -152,7 +158,9 @@ function TopNav({ mode }: { mode: string }) {
       <div className="flex h-full items-center gap-4 px-4 lg:px-6">
         {/* Logo */}
         <Link href="/public" className="flex items-center gap-2 md:w-[304px]">
-          <div className={`h-8 w-8 ${bgColor} flex items-center justify-center rounded-lg`}>
+          <div
+            className={`h-8 w-8 ${bgColor} flex items-center justify-center rounded-lg`}
+          >
             <Icon className="h-4 w-4 text-white" />
           </div>
           <span className="hidden text-lg font-semibold tracking-tight text-white sm:inline">
@@ -166,9 +174,9 @@ function TopNav({ mode }: { mode: string }) {
           <AdminModeToggle />
 
           {/* Notifications */}
-          <div className="relative">
+          {/* <div className="relative">
             <NotificationCenter />
-          </div>
+          </div> */}
 
           {/* User Profile */}
           <div className="flex items-center gap-2 border-l border-slate-700 pl-2">
@@ -209,12 +217,16 @@ function SidebarContent({
   const [focusedIndex, setFocusedIndex] = useState(-1);
   const navRef = useRef<HTMLElement>(null);
 
-  const { data: notificationData, isLoading } = api.notifications.getUnread.useQuery(undefined, {
-    staleTime: 30000,
-    refetchOnWindowFocus: true,
-    refetchOnMount: true,
-  });
+  const { notificationData, isLoading } = useUnreadNotifications(
+    undefined,
 
+    {
+      staleTime: 30000,
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+    }
+  );
+  
   const notifications = notificationData?.notifications ?? [];
 
   // Get current active index
@@ -273,7 +285,9 @@ function SidebarContent({
   // Scroll focused item into view
   useEffect(() => {
     if (focusedIndex >= 0 && navRef.current) {
-      const focusedElement = navRef.current.querySelector(`[data-nav-index="${focusedIndex}"]`);
+      const focusedElement = navRef.current.querySelector(
+        `[data-nav-index="${focusedIndex}"]`
+      );
       if (focusedElement) {
         focusedElement.scrollIntoView({ block: "nearest", behavior: "smooth" });
       }
@@ -285,7 +299,9 @@ function SidebarContent({
       {/* Logo & Brand - Mobile Only */}
       <div className="flex h-16 items-center justify-between border-b border-slate-800 px-6 md:hidden">
         <div className="flex items-center gap-3">
-          <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${bgColor}`}>
+          <div
+            className={`flex h-10 w-10 items-center justify-center rounded-lg ${bgColor}`}
+          >
             {mode === "marketing" ? (
               <Mail className="h-5 w-5 text-white" />
             ) : (
@@ -307,7 +323,10 @@ function SidebarContent({
           // Loading skeleton
           <div className="space-y-1">
             {[...Array<NavItem>(navigation.length)].map((_, i) => (
-              <div key={i} className="h-10 animate-pulse rounded-lg bg-slate-800" />
+              <div
+                key={i}
+                className="h-10 animate-pulse rounded-lg bg-slate-800"
+              />
             ))}
           </div>
         ) : (
@@ -315,11 +334,15 @@ function SidebarContent({
             {navigation.map((item, index) => {
               const isActive =
                 pathname === item.href ||
-                (item.href !== "/overview" && pathname.startsWith(item.href + "/"));
+                (item.href !== "/overview" &&
+                  pathname.startsWith(item.href + "/"));
 
               const isFocused = focusedIndex === index;
               const Icon = item.icon;
-              const notificationCount = getNotificationCount(notifications, item.notificationTypes);
+              const notificationCount = getNotificationCount(
+                notifications,
+                item.notificationTypes
+              );
 
               return (
                 <Link
@@ -332,8 +355,8 @@ function SidebarContent({
                     isActive
                       ? `${bgColor} text-white shadow-lg shadow-${accentColor}-600/20`
                       : isFocused
-                        ? "bg-slate-800 text-white ring-2 ring-slate-700"
-                        : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                      ? "bg-slate-800 text-white ring-2 ring-slate-700"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
                   }`}
                 >
                   <Icon
@@ -341,17 +364,19 @@ function SidebarContent({
                       isActive
                         ? "text-white"
                         : isFocused
-                          ? "text-white"
-                          : "text-slate-500 group-hover:text-slate-300"
+                        ? "text-white"
+                        : "text-slate-500 group-hover:text-slate-300"
                     }`}
                   />
                   <span className="flex-1">{item.name}</span>
 
-                  {notificationCount > 0 && (
+                  {/* {notificationCount > 0 && (
                     <NotificationBadge count={notificationCount} size="sm" />
-                  )}
+                  )} */}
 
-                  {isActive && !notificationCount && <ChevronRight className="h-4 w-4" />}
+                  {isActive && !notificationCount && (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
                 </Link>
               );
             })}
@@ -363,7 +388,9 @@ function SidebarContent({
       <div className="space-y-3 border-t border-slate-800 p-4">
         <div className="flex items-center justify-center gap-2 rounded-lg bg-slate-800/50 px-3 py-2">
           <div
-            className={`h-2 w-2 rounded-full ${mode === "marketing" ? "bg-purple-500" : "bg-red-500"} animate-pulse`}
+            className={`h-2 w-2 rounded-full ${
+              mode === "marketing" ? "bg-purple-500" : "bg-red-500"
+            } animate-pulse`}
           ></div>
           <p className="text-xs font-medium text-slate-300">
             {mode === "marketing" ? "Marketing Mode" : "Admin Mode"}
@@ -372,9 +399,17 @@ function SidebarContent({
 
         <div className="px-2">
           <p className="text-center text-xs text-slate-500">
-            <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-400">↑</kbd>{" "}
-            <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-400">↓</kbd> navigate •{" "}
-            <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-400">Enter</kbd> select
+            <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-400">
+              ↑
+            </kbd>{" "}
+            <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-400">
+              ↓
+            </kbd>{" "}
+            navigate •{" "}
+            <kbd className="rounded bg-slate-800 px-1.5 py-0.5 text-slate-400">
+              Enter
+            </kbd>{" "}
+            select
           </p>
         </div>
       </div>
@@ -386,10 +421,11 @@ function SidebarContent({
 export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
-  const { mode } = useAdminMode();
-
+  // const { mode } = useAdminMode();
+  const mode = "marketing";
   // Choose navigation based on mode
-  const currentNavigation = mode === "marketing" ? marketingNavigation : navigation;
+  const currentNavigation =
+    mode === "marketing" ? marketingNavigation : navigation;
   const accentColor = mode === "marketing" ? "purple" : "red";
   const bgColor = mode === "marketing" ? "bg-purple-600" : "bg-red-600";
 
@@ -500,7 +536,11 @@ export function AdminLayoutClient({ children }: { children: React.ReactNode }) {
           }`}
         >
           <div
-            className={isContainerized ? "h-full" : "mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"}
+            className={
+              isContainerized
+                ? "h-full"
+                : "mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"
+            }
           >
             {children}
           </div>

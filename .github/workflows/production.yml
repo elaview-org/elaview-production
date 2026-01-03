@@ -2,9 +2,10 @@ name: Deploy Production
 
 on:
   push:
-    branches: [ main ]
     tags:
       - 'v*'
+  release:
+    types: [ published ]
 
 concurrency:
   group: production-deploy
@@ -15,9 +16,6 @@ jobs:
     name: Deploy Web
     runs-on: ubuntu-latest
     environment: production
-    defaults:
-      run:
-        working-directory: clients/web
     steps:
       - uses: actions/checkout@v4
       - uses: amondnet/vercel-action@v25
@@ -31,9 +29,6 @@ jobs:
     name: Deploy Mobile
     runs-on: ubuntu-latest
     environment: production
-    defaults:
-      run:
-        working-directory: clients/mobile
     steps:
       - uses: actions/checkout@v4
       - uses: expo/expo-github-action@v8
@@ -47,8 +42,10 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
+          cache-dependency-path: clients/mobile/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - name: EAS Build & Submit
+        working-directory: clients/mobile
         run: |
           eas build --profile production --platform all --non-interactive --auto-submit
 
@@ -61,6 +58,8 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 9
+      - run: |
+          cd clients/mobile
       - uses: actions/setup-node@v4
         with:
           node-version: 20

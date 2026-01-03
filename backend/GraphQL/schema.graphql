@@ -206,7 +206,8 @@ type NotificationSettings {
 }
 
 type Query {
-  currentUser: User! @cost(weight: "10")
+  currentUser: User @cost(weight: "10")
+  userById(id: String!): User @cost(weight: "10")
   notificationSettings: NotificationSettings!
   securitySettings: SecuritySettings!
 }

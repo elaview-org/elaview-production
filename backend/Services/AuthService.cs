@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.Services;
 
-public class AuthService(AppDbContext dbContext) : IAuthService {
+public class AuthService(AppDbContext dbContext) {
     public async Task<User?> CreateUserAsync(string email, string password,
         string? name = null) {
         var existingUser = await dbContext.Users
@@ -43,13 +43,5 @@ public class AuthService(AppDbContext dbContext) : IAuthService {
         user.LastLoginAt = DateTime.UtcNow;
         await dbContext.SaveChangesAsync();
         return user;
-    }
-
-    public static string HashPassword(string password) {
-        return BCrypt.Net.BCrypt.HashPassword(password);
-    }
-
-    public static bool VerifyPassword(string password, string hashedPassword) {
-        return BCrypt.Net.BCrypt.Verify(password, hashedPassword);
     }
 }

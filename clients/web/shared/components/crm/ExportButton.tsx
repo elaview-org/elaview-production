@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
+// import { api } from "../../../../elaview-mvp/src/trpc/react";
 import { Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,17 +17,18 @@ interface ExportButtonProps {
 export function ExportButton({ filters }: ExportButtonProps) {
   const [isExporting, setIsExporting] = useState(false);
 
-  const exportCSV = api.crm.exportLeadsCSV.useQuery(
-    {
-      status: filters.status,
-      phase1Only: filters.phase1Only,
-      search: filters.search,
-    },
-    {
-      enabled: false, // Don't auto-fetch
-    }
-  );
-
+  // const exportCSV = api.crm.exportLeadsCSV.useQuery(
+  //   {
+  //     status: filters.status,
+  //     phase1Only: filters.phase1Only,
+  //     search: filters.search,
+  //   },
+  //   {
+  //     enabled: false, // Don't auto-fetch
+  //   }
+  // );
+  const exportCSV = {};
+  
   const handleExport = async () => {
     try {
       setIsExporting(true);

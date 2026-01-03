@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
+// import { api } from "../../../../elaview-mvp/src/trpc/react";
 import { X, Loader2, Mail, Phone, MessageSquare, User, ExternalLink, Search } from "lucide-react";
 import { toast } from "sonner";
 
@@ -27,11 +27,14 @@ export function LogOutreachModal({ onClose, onSuccess }: LogOutreachModalProps) 
   const [showLeadDropdown, setShowLeadDropdown] = useState(false);
 
   // Fetch leads for selector
-  const { data: leadsData } = api.crm.getLeads.useQuery({
-    search: searchQuery || undefined,
-    limit: 50,
-  });
+  // const { data: leadsData } = api.crm.getLeads.useQuery({
+  //   search: searchQuery || undefined,
+  //   limit: 50,
+  // });
 
+  const leadsData = {
+    leads:[]
+  };
   // Filter leads based on search
   const filteredLeads = useMemo(() => {
     const leads = leadsData?.leads || [];
@@ -50,16 +53,16 @@ export function LogOutreachModal({ onClose, onSuccess }: LogOutreachModalProps) 
     return leadsData?.leads.find(l => l.id === formData.leadId);
   }, [leadsData?.leads, formData.leadId]);
 
-  const createOutreach = api.crm.createOutreach.useMutation({
-    onSuccess: () => {
-      toast.success('Outreach logged successfully');
-      onSuccess();
-    },
-    onError: (error) => {
-      toast.error(error.message || 'Failed to log outreach');
-    },
-  });
-
+  // const createOutreach = api.crm.createOutreach.useMutation({
+  //   onSuccess: () => {
+  //     toast.success('Outreach logged successfully');
+  //     onSuccess();
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error.message || 'Failed to log outreach');
+  //   },
+  // });
+const createOutreach = ()=>{};
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 

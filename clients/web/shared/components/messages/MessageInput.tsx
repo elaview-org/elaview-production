@@ -3,10 +3,10 @@
 
 import { useState, useRef } from "react";
 import { Send, Image as ImageIcon, X, Loader2, Camera, AlertCircle } from "lucide-react";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
 import { toast } from "sonner";
-import { uploadMultipleToCloudinary, validateImageFile } from "../../../../elaview-mvp/src/lib/cloudinary-upload";
-import { getInstallationWindowStatus } from "../../../../elaview-mvp/src/lib/installation-window";
+import { uploadMultipleToCloudinary, validateImageFile } from "@/shared/lib/cloudinary-upload";
+import { getInstallationWindowStatus } from "@/shared/lib/installation-window";
+import useSendMessage from "@/shared/hooks/api/actions/useSendMessage/useSendMessage";
 
 interface MessageInputProps {
   campaignId: string;
@@ -22,35 +22,10 @@ export function MessageInput({ campaignId, bookingId, bookingStartDate, userRole
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const utils = api.useUtils();
 
-  const sendMessageMutation = api.messages.sendMessage.useMutation({
-    onSuccess: async () => {
-      console.log('✅ [SEND SUCCESS] Message sent!');
-      console.log('🔄 [SEND SUCCESS] Invalidating with params:', { campaignId, bookingId });
-
-      // FIX: Invalidate with both campaignId AND bookingId to ensure messages refresh
-      await utils.messages.getConversation.invalidate({ campaignId, bookingId });
-      console.log('✅ [SEND SUCCESS] getConversation invalidated');
-
-      // Also invalidate conversations list
-      await utils.messages.getConversationsWithPreview.invalidate();
-      console.log('✅ [SEND SUCCESS] getConversationsWithPreview invalidated');
-
-      setMessage("");
-      setSelectedFiles([]);
-      setPreviews([]);
-      toast.success("Message sent successfully");
-
-      console.log('✅ [SEND SUCCESS] Complete!');
-    },
-    onError: (error) => {
-      console.error('❌ [SEND ERROR]', error);
-      toast.error(error.message || "Failed to send message", {
-        duration: 6000,
-      });
-    },
-  });
+  //getConverstion
+  //getConverstaion with Preview
+  const { sendMessageMutation, isPending} = useSendMessage();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -151,7 +126,8 @@ export function MessageInput({ campaignId, bookingId, bookingStartDate, userRole
         bookingId: bookingId,  // ✅ FIX: Always send bookingId for ALL messages
       });
 
-      await sendMessageMutation.mutateAsync({
+      //
+      await sendMessageMutation({
         campaignId,
         content: message.trim() || (isProofSubmission ? "📸 Installation proof submitted" : ""),
         attachments: attachmentUrls.length > 0 ? attachmentUrls : undefined,
@@ -179,7 +155,7 @@ export function MessageInput({ campaignId, bookingId, bookingStartDate, userRole
     }
   };
 
-  const isSending = sendMessageMutation.isPending || isUploading;
+  const isSending = isPending || isUploading;
 
   const windowStatus = bookingStartDate && userRole === "SPACE_OWNER"
     ? getInstallationWindowStatus(bookingStartDate)

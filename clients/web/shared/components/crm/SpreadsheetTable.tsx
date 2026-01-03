@@ -2,12 +2,11 @@
 "use client";
 
 import { useState } from "react";
-import type { Lead } from "@prisma/client";
 import { EditableCell } from "./EditableCell";
 import { Check, X } from "lucide-react";
 
 interface SpreadsheetTableProps {
-  leads: Lead[];
+  leads: any[];
   selectedLeads: string[];
   onSelectAll: (checked: boolean) => void;
   onToggleSelect: (id: string) => void;
@@ -128,7 +127,7 @@ export function SpreadsheetTable({
               <td className="px-3 py-1.5 border-r border-slate-700/50" style={{ maxWidth: '300px' }}>
                 <div className="flex items-baseline gap-2 overflow-hidden">
                   <div className="truncate flex-1" title={lead.company || ''}>
-                    <EditableCell
+                    {/* <EditableCell
                       leadId={lead.id}
                       field="company"
                       value={lead.company || ''}
@@ -136,13 +135,14 @@ export function SpreadsheetTable({
                       placeholder="Company"
                       onUpdate={onUpdate}
                       className="font-medium text-white text-xs"
-                    />
+                    /> */}
+                    hello
                   </div>
                   {lead.name && (
                     <>
                       <span className="text-slate-600 flex-shrink-0">|</span>
                       <div className="truncate flex-1" title={lead.name}>
-                        <EditableCell
+                        {/* <EditableCell
                           leadId={lead.id}
                           field="name"
                           value={lead.name}
@@ -150,7 +150,8 @@ export function SpreadsheetTable({
                           placeholder="Contact"
                           onUpdate={onUpdate}
                           className="text-xs text-slate-400"
-                        />
+                        /> */}
+                        edit
                       </div>
                     </>
                   )}
@@ -160,7 +161,7 @@ export function SpreadsheetTable({
               {/* Email */}
               <td className="px-3 py-1.5 border-r border-slate-700/50" style={{ maxWidth: '250px' }}>
                 <div className="truncate" title={lead.email || ''}>
-                  <EditableCell
+                  {/* <EditableCell
                     leadId={lead.id}
                     field="email"
                     value={lead.email || ''}
@@ -168,13 +169,14 @@ export function SpreadsheetTable({
                     placeholder="email@example.com"
                     onUpdate={onUpdate}
                     className="text-xs text-slate-300"
-                  />
+                  /> */}
+                  edit
                 </div>
               </td>
 
               {/* Phone */}
               <td className="px-3 py-1.5 border-r border-slate-700/50">
-                <EditableCell
+                {/* <EditableCell
                   leadId={lead.id}
                   field="phone"
                   value={lead.phone || ''}
@@ -182,12 +184,13 @@ export function SpreadsheetTable({
                   placeholder="Phone"
                   onUpdate={onUpdate}
                   className="text-xs text-slate-300"
-                />
+                /> */}
+                edit
               </td>
 
               {/* Source */}
               <td className="px-3 py-1.5 border-r border-slate-700/50">
-                <EditableCell
+                {/* <EditableCell
                   leadId={lead.id}
                   field="source"
                   value={lead.source}
@@ -203,12 +206,13 @@ export function SpreadsheetTable({
                   ]}
                   onUpdate={onUpdate}
                   className="text-xs text-slate-300"
-                />
+                /> */}
+                edit
               </td>
 
               {/* Business Type */}
               <td className="px-3 py-1.5 border-r border-slate-700/50">
-                <EditableCell
+                {/* <EditableCell
                   leadId={lead.id}
                   field="businessType"
                   value={lead.businessType}
@@ -224,12 +228,13 @@ export function SpreadsheetTable({
                   ]}
                   onUpdate={onUpdate}
                   className="text-xs text-slate-300"
-                />
+                /> */}
+                edit
               </td>
 
               {/* Location */}
               <td className="px-3 py-1.5 border-r border-slate-700/50">
-                <EditableCell
+                {/* <EditableCell
                   leadId={lead.id}
                   field="location"
                   value={lead.location || ''}
@@ -237,12 +242,13 @@ export function SpreadsheetTable({
                   placeholder="City, State"
                   onUpdate={onUpdate}
                   className="text-xs text-slate-300"
-                />
+                /> */}
+                edit
               </td>
 
               {/* Has Inventory */}
               <td className="px-3 py-1.5 border-r border-slate-700/50">
-                <EditableCell
+                {/* <EditableCell
                   leadId={lead.id}
                   field="hasInventory"
                   value={lead.hasInventory}
@@ -254,12 +260,13 @@ export function SpreadsheetTable({
                   ]}
                   onUpdate={onUpdate}
                   className="text-xs"
-                />
+                /> */}
+                edit
               </td>
 
               {/* Inventory Type */}
               <td className="px-3 py-1.5 border-r border-slate-700/50">
-                <EditableCell
+                {/* <EditableCell
                   leadId={lead.id}
                   field="inventoryType"
                   value={lead.inventoryType || ''}
@@ -276,12 +283,13 @@ export function SpreadsheetTable({
                   ]}
                   onUpdate={onUpdate}
                   className="text-xs text-slate-300"
-                />
+                /> */}
+                edit
               </td>
 
               {/* Est. Spaces */}
               <td className="px-3 py-1.5 border-r border-slate-700/50">
-                <EditableCell
+                {/* <EditableCell
                   leadId={lead.id}
                   field="estimatedSpaces"
                   value={lead.estimatedSpaces ? String(lead.estimatedSpaces) : ''}
@@ -289,12 +297,13 @@ export function SpreadsheetTable({
                   placeholder="0"
                   onUpdate={onUpdate}
                   className="text-xs text-slate-300"
-                />
+                /> */}
+                edit
               </td>
 
               {/* Does Installs */}
               <td className="px-3 py-1.5 border-r border-slate-700/50">
-                <EditableCell
+                {/* <EditableCell
                   leadId={lead.id}
                   field="hasInstallCapability"
                   value={lead.hasInstallCapability}
@@ -306,12 +315,13 @@ export function SpreadsheetTable({
                   ]}
                   onUpdate={onUpdate}
                   className="text-xs"
-                />
+                /> */}
+                edit
               </td>
 
               {/* Status */}
               <td className="px-3 py-1.5 border-r border-slate-700/50">
-                <EditableCell
+                {/* <EditableCell
                   leadId={lead.id}
                   field="status"
                   value={lead.status}
@@ -327,12 +337,13 @@ export function SpreadsheetTable({
                   ]}
                   onUpdate={onUpdate}
                   className="text-xs text-slate-300"
-                />
+                /> */}
+                edit
               </td>
 
               {/* Last Contact */}
               <td className="px-3 py-1.5 border-r border-slate-700/50">
-                <EditableCell
+                {/* <EditableCell
                   leadId={lead.id}
                   field="lastContactDate"
                   value={(lead.lastContactDate ? new Date(lead.lastContactDate).toISOString().split('T')[0] : '')!}
@@ -340,13 +351,14 @@ export function SpreadsheetTable({
                   placeholder="YYYY-MM-DD"
                   onUpdate={onUpdate}
                   className="text-xs text-slate-300"
-                />
+                /> */}
+                edit
               </td>
 
               {/* Next Action */}
               <td className="px-3 py-1.5 border-r border-slate-700/50" style={{ maxWidth: '200px' }}>
                 <div className="truncate" title={lead.nextAction || ''}>
-                  <EditableCell
+                  {/* <EditableCell
                     leadId={lead.id}
                     field="nextAction"
                     value={lead.nextAction || ''}
@@ -354,7 +366,8 @@ export function SpreadsheetTable({
                     placeholder="Next step..."
                     onUpdate={onUpdate}
                     className="text-xs text-slate-300"
-                  />
+                  /> */}
+                  edit
                 </div>
               </td>
 
@@ -379,7 +392,7 @@ export function SpreadsheetTable({
               {/* Notes */}
               <td className="px-3 py-1.5" style={{ maxWidth: '300px' }}>
                 <div className="truncate" title={lead.notes || ''}>
-                  <EditableCell
+                  {/* <EditableCell
                     leadId={lead.id}
                     field="notes"
                     value={lead.notes || ''}
@@ -387,7 +400,8 @@ export function SpreadsheetTable({
                     placeholder="Add notes..."
                     onUpdate={onUpdate}
                     className="text-xs text-slate-300"
-                  />
+                  /> */}
+                  edit
                 </div>
               </td>
             </tr>

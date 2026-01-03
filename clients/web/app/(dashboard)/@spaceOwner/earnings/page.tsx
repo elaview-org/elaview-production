@@ -14,18 +14,22 @@ import {
   Loader2,
   Clock,
 } from "lucide-react";
-import { api, type RouterOutputs } from "../../../../../elaview-mvp/src/trpc/react";
 import { format } from "date-fns";
+import useEarnings from "@/shared/hooks/api/getters/useEarnings/useEarnings";
+type RouterOutputs = any;
 
 type EarningsData = RouterOutputs["bookings"]["getEarnings"];
 type CompletedBooking = EarningsData["bookings"][number];
 
 export default function EarningsPage() {
-  const [selectedPeriod, setSelectedPeriod] = useState<"month" | "year" | "all">("month");
+  const [selectedPeriod, setSelectedPeriod] = useState<
+    "month" | "year" | "all"
+  >("month");
   const [expandedBooking, setExpandedBooking] = useState<string | null>(null);
 
-  const { data: earnings, isLoading } = api.bookings.getEarnings.useQuery();
+  //   const { data: earnings, isLoading } = api.bookings.getEarnings.useQuery();
 
+  const { earnings, isLoading } = useEarnings();
   const formatDate = (date: Date | null) => {
     if (!date) return "N/A";
     return format(new Date(date), "MMM d, yyyy");
@@ -42,7 +46,9 @@ export default function EarningsPage() {
     if (!earnings) return 0;
 
     // Only count ACTUAL transferred earnings (not promised amounts)
-    const paidBookings = earnings.bookings.filter((b) => b.firstPayoutProcessed);
+    const paidBookings = earnings.bookings.filter(
+      (b) => b.firstPayoutProcessed
+    );
 
     const calculateEarnings = (bookings: typeof paidBookings) => {
       return bookings.reduce((sum, booking) => {
@@ -62,7 +68,10 @@ export default function EarningsPage() {
           if (!payoutDate) return false;
           const date = new Date(payoutDate);
           const now = new Date();
-          return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+          return (
+            date.getMonth() === now.getMonth() &&
+            date.getFullYear() === now.getFullYear()
+          );
         });
         return calculateEarnings(thisMonth);
       }
@@ -70,7 +79,9 @@ export default function EarningsPage() {
         const thisYear = paidBookings.filter((b) => {
           const payoutDate = b.firstPayoutDate;
           if (!payoutDate) return false;
-          return new Date(payoutDate).getFullYear() === new Date().getFullYear();
+          return (
+            new Date(payoutDate).getFullYear() === new Date().getFullYear()
+          );
         });
         return calculateEarnings(thisYear);
       }
@@ -86,7 +97,9 @@ export default function EarningsPage() {
     return earnings.bookings.reduce((sum, booking) => {
       const totalOwed = Number(booking.spaceOwnerAmount);
       const firstPayout = Number(booking.firstPayoutAmount || 0);
-      const finalPayout = booking.finalPayoutProcessed ? Number(booking.finalPayoutAmount || 0) : 0;
+      const finalPayout = booking.finalPayoutProcessed
+        ? Number(booking.finalPayoutAmount || 0)
+        : 0;
       const totalTransferred = firstPayout + finalPayout;
       const pending = totalOwed - totalTransferred;
 
@@ -180,7 +193,9 @@ export default function EarningsPage() {
                       ? "bg-green-600 text-white shadow-lg shadow-green-600/20"
                       : "border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700"
                   }`}
-                  onClick={() => setSelectedPeriod(period.key as "month" | "year" | "all")}
+                  onClick={() =>
+                    setSelectedPeriod(period.key as "month" | "year" | "all")
+                  }
                 >
                   {period.label}
                 </button>
@@ -211,7 +226,9 @@ export default function EarningsPage() {
                   <TrendingUp className="h-5 w-5 text-white" />
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-sm font-medium text-slate-400">Total Paid Out</h3>
+                  <h3 className="text-sm font-medium text-slate-400">
+                    Total Paid Out
+                  </h3>
                   <p className="mt-1 text-2xl font-bold text-white">
                     {formatCurrency(getTotalPaidEarnings())}
                   </p>
@@ -224,11 +241,15 @@ export default function EarningsPage() {
                   <Clock className="h-5 w-5 text-white" />
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-sm font-medium text-slate-400">Pending (In Escrow)</h3>
+                  <h3 className="text-sm font-medium text-slate-400">
+                    Pending (In Escrow)
+                  </h3>
                   <p className="mt-1 text-2xl font-bold text-white">
                     {formatCurrency(getPendingEarnings())}
                   </p>
-                  <p className="mt-1 text-xs text-orange-400">Awaiting proof approval</p>
+                  <p className="mt-1 text-xs text-orange-400">
+                    Awaiting proof approval
+                  </p>
                 </div>
               </div>
             </div>
@@ -238,8 +259,12 @@ export default function EarningsPage() {
                   <Calendar className="h-5 w-5 text-white" />
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-sm font-medium text-slate-400">Paid Bookings</h3>
-                  <p className="mt-1 text-2xl font-bold text-white">{getPaidBookingsCount()}</p>
+                  <h3 className="text-sm font-medium text-slate-400">
+                    Paid Bookings
+                  </h3>
+                  <p className="mt-1 text-2xl font-bold text-white">
+                    {getPaidBookingsCount()}
+                  </p>
                   <p className="mt-1 text-xs text-slate-500">
                     of {earnings?.totalBookings || 0} total
                   </p>
@@ -251,13 +276,17 @@ export default function EarningsPage() {
           {/* Monthly Overview Chart Placeholder */}
           <div className="mb-6 rounded-xl border border-slate-700 bg-slate-800 shadow-lg">
             <div className="border-b border-slate-700 p-6">
-              <h2 className="text-xl font-semibold text-white">Earnings Overview</h2>
+              <h2 className="text-xl font-semibold text-white">
+                Earnings Overview
+              </h2>
             </div>
             <div className="p-6">
               <div className="flex h-64 items-center justify-center rounded-lg border border-slate-600 bg-slate-700/50">
                 <div className="text-center">
                   <TrendingUp className="mx-auto mb-4 h-12 w-12 text-slate-500" />
-                  <p className="font-medium text-slate-300">Chart visualization coming soon</p>
+                  <p className="font-medium text-slate-300">
+                    Chart visualization coming soon
+                  </p>
                   <p className="mt-1 text-sm text-slate-500">
                     Monthly earnings trend will be displayed here
                   </p>
@@ -269,7 +298,9 @@ export default function EarningsPage() {
           {/* Payment History */}
           <div className="rounded-xl border border-slate-700 bg-slate-800 shadow-lg">
             <div className="border-b border-slate-700 p-6">
-              <h2 className="text-xl font-semibold text-white">Payment History</h2>
+              <h2 className="text-xl font-semibold text-white">
+                Payment History
+              </h2>
             </div>
 
             {!earnings?.bookings || earnings.bookings.length === 0 ? (
@@ -277,10 +308,12 @@ export default function EarningsPage() {
                 <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-700">
                   <DollarSign className="h-7 w-7 text-slate-400" />
                 </div>
-                <h3 className="mb-2 text-lg font-semibold text-white">No payments yet</h3>
+                <h3 className="mb-2 text-lg font-semibold text-white">
+                  No payments yet
+                </h3>
                 <p className="text-slate-400">
-                  Once your spaces are booked and campaigns are completed, payments will appear
-                  here.
+                  Once your spaces are booked and campaigns are completed,
+                  payments will appear here.
                 </p>
               </div>
             ) : (
@@ -291,7 +324,9 @@ export default function EarningsPage() {
                     booking={booking}
                     isExpanded={expandedBooking === booking.id}
                     onToggleExpand={() =>
-                      setExpandedBooking(expandedBooking === booking.id ? null : booking.id)
+                      setExpandedBooking(
+                        expandedBooking === booking.id ? null : booking.id
+                      )
                     }
                     formatDate={formatDate}
                     formatCurrency={formatCurrency}
@@ -326,7 +361,9 @@ function PaymentRow({
 
   // Calculate actual transferred vs pending amounts
   const firstPayout = Number(booking.firstPayoutAmount || 0);
-  const finalPayout = booking.finalPayoutProcessed ? Number(booking.finalPayoutAmount || 0) : 0;
+  const finalPayout = booking.finalPayoutProcessed
+    ? Number(booking.finalPayoutAmount || 0)
+    : 0;
   const totalTransferred = firstPayout + finalPayout;
   const pendingAmount = spaceOwnerAmount - totalTransferred;
 
@@ -335,7 +372,10 @@ function PaymentRow({
 
   return (
     <div className="p-6 transition-colors hover:bg-slate-700/30">
-      <div className="flex cursor-pointer items-center justify-between" onClick={onToggleExpand}>
+      <div
+        className="flex cursor-pointer items-center justify-between"
+        onClick={onToggleExpand}
+      >
         <div className="flex-1">
           <div className="flex items-start space-x-4">
             <div className="min-w-0 flex-1">
@@ -347,8 +387,8 @@ function PaymentRow({
                   {booking.status === "COMPLETED"
                     ? "Completed"
                     : booking.status === "ACTIVE"
-                      ? "Active"
-                      : "Confirmed"}
+                    ? "Active"
+                    : "Confirmed"}
                 </span>
                 {/* Payout Status Badge */}
                 {pendingAmount <= 0 ? (
@@ -384,12 +424,16 @@ function PaymentRow({
               {pendingAmount <= 0 ? (
                 <p className="mb-2 text-xs text-green-400">
                   ✅ All payments completed -{" "}
-                  {formatDate(booking.finalPayoutDate || booking.firstPayoutDate)}
+                  {formatDate(
+                    booking.finalPayoutDate || booking.firstPayoutDate
+                  )}
                 </p>
               ) : booking.firstPayoutProcessed ? (
                 <p className="mb-2 text-xs text-orange-400">
-                  💰 First payout sent {formatDate(booking.firstPayoutDate || null)} - Final payout
-                  of {formatCurrency(pendingAmount)} will be processed after campaign completion
+                  💰 First payout sent{" "}
+                  {formatDate(booking.firstPayoutDate || null)} - Final payout
+                  of {formatCurrency(pendingAmount)} will be processed after
+                  campaign completion
                 </p>
               ) : booking.proofStatus === "PENDING" ? (
                 <p className="mb-2 text-xs text-yellow-400">
@@ -408,7 +452,8 @@ function PaymentRow({
                 </span>
                 <span className="flex items-center">
                   <Calendar className="mr-1 h-4 w-4" />
-                  {formatDate(booking.startDate)} - {formatDate(booking.endDate)}
+                  {formatDate(booking.startDate)} -{" "}
+                  {formatDate(booking.endDate)}
                 </span>
                 <span className="flex items-center">
                   <Building className="mr-1 h-4 w-4" />
@@ -419,7 +464,9 @@ function PaymentRow({
 
             <div className="text-right">
               <p
-                className={`text-lg font-semibold ${pendingAmount <= 0 ? "text-green-400" : "text-orange-400"}`}
+                className={`text-lg font-semibold ${
+                  pendingAmount <= 0 ? "text-green-400" : "text-orange-400"
+                }`}
               >
                 {formatCurrency(totalTransferred)}
               </p>
@@ -453,15 +500,21 @@ function PaymentRow({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Rate per day:</span>
-                  <span className="text-white">{formatCurrency(dailyRate)}</span>
+                  <span className="text-white">
+                    {formatCurrency(dailyRate)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Subtotal:</span>
-                  <span className="text-white">{formatCurrency(totalAmount)}</span>
+                  <span className="text-white">
+                    {formatCurrency(totalAmount)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Payment Date:</span>
-                  <span className="text-white">{formatDate(booking.paidAt)}</span>
+                  <span className="text-white">
+                    {formatDate(booking.paidAt)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -475,30 +528,46 @@ function PaymentRow({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Rate per day:</span>
-                  <span className="text-white">{formatCurrency(dailyRate)}</span>
+                  <span className="text-white">
+                    {formatCurrency(dailyRate)}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-400">Payment Date:</span>
-                  <span className="text-white">{formatDate(booking.paidAt)}</span>
+                  <span className="text-white">
+                    {formatDate(booking.paidAt)}
+                  </span>
                 </div>
                 <div className="mt-2 space-y-2 border-t border-slate-600 pt-2">
                   <div className="flex justify-between">
                     <span className="text-slate-400">Total Owed:</span>
-                    <span className="text-white">{formatCurrency(spaceOwnerAmount)}</span>
+                    <span className="text-white">
+                      {formatCurrency(spaceOwnerAmount)}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-slate-400">Transferred:</span>
-                    <span className="text-green-400">{formatCurrency(totalTransferred)}</span>
+                    <span className="text-green-400">
+                      {formatCurrency(totalTransferred)}
+                    </span>
                   </div>
                   {pendingAmount > 0 && (
                     <div className="flex justify-between">
                       <span className="text-slate-400">Pending:</span>
-                      <span className="text-orange-400">{formatCurrency(pendingAmount)}</span>
+                      <span className="text-orange-400">
+                        {formatCurrency(pendingAmount)}
+                      </span>
                     </div>
                   )}
                   <div className="flex justify-between border-t border-slate-600 pt-2 font-medium">
                     <span className="text-white">Status:</span>
-                    <span className={pendingAmount <= 0 ? "text-green-400" : "text-orange-400"}>
+                    <span
+                      className={
+                        pendingAmount <= 0
+                          ? "text-green-400"
+                          : "text-orange-400"
+                      }
+                    >
                       {pendingAmount <= 0 ? "Fully Paid" : "Partially Paid"}
                     </span>
                   </div>
@@ -511,7 +580,9 @@ function PaymentRow({
                     <p className="text-xs text-orange-400">
                       💡{" "}
                       {booking.firstPayoutProcessed
-                        ? `Final payout of ${formatCurrency(pendingAmount)} will be processed after campaign completion`
+                        ? `Final payout of ${formatCurrency(
+                            pendingAmount
+                          )} will be processed after campaign completion`
                         : "Upload installation proof to release these funds"}
                     </p>
                   </div>

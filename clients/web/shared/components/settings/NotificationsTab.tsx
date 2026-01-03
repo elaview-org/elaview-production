@@ -1,32 +1,22 @@
 // src/components/settings/NotificationsTab.tsx
 "use client";
 
-import { useState, useEffect } from 'react';
-import { api } from '../../../../elaview-mvp/src/trpc/react';
-import { 
-  Bell, 
-  Save, 
-  Loader2, 
+import { useState, useEffect } from "react";
+import {
+  Save,
+  Loader2,
   AlertCircle,
   Check,
   Mail,
-  Calendar
-} from 'lucide-react';
+  Calendar,
+} from "lucide-react";
+import useNotificationSettings from "@/shared/hooks/api/getters/useNotificationSettings/useNotificationSettings";
+import useUpdateSettings from "@/shared/hooks/api/actions/useUpdateSettings/useUpdateSettings";
 
 export function NotificationsTab() {
-  const utils = api.useUtils();
-  
-  const { data: settingsData, isLoading } = api.user.getNotificationSettings.useQuery();
-  const updateSettings = api.user.updateNotificationSettings.useMutation({
-    onSuccess: () => {
-      utils.user.getNotificationSettings.invalidate();
-      setSuccessMessage('Notification preferences updated successfully');
-      setTimeout(() => setSuccessMessage(null), 3000);
-    },
-    onError: (error) => {
-      setError(error.message);
-    },
-  });
+
+  const { settingsData, isLoading } = useNotificationSettings();
+  const { updateSettings, isPending } = useUpdateSettings();
 
   const [settings, setSettings] = useState({
     bookingRequests: true,
@@ -35,7 +25,7 @@ export function NotificationsTab() {
     campaignUpdates: true,
     marketingEmails: false,
     systemNotifications: true,
-    emailDigest: 'weekly' as 'daily' | 'weekly' | 'monthly' | 'never',
+    emailDigest: "weekly" as "daily" | "weekly" | "monthly" | "never",
   });
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -50,7 +40,7 @@ export function NotificationsTab() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    updateSettings.mutate(settings);
+    updateSettings(settings);
   };
 
   if (isLoading) {
@@ -65,7 +55,9 @@ export function NotificationsTab() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-white mb-2">Notification Preferences</h2>
+        <h2 className="text-2xl font-bold text-white mb-2">
+          Notification Preferences
+        </h2>
         <p className="text-gray-400">
           Choose how you want to be notified about activity on your account
         </p>
@@ -94,29 +86,64 @@ export function NotificationsTab() {
             <Mail className="w-5 h-5 mr-2 text-blue-400" />
             Email Notifications
           </h3>
-          
+
           <div className="space-y-3">
             {[
-              { key: 'bookingRequests', label: 'Booking Requests', description: 'Get notified when someone requests to book your space' },
-              { key: 'bookingApprovals', label: 'Booking Approvals', description: 'Notifications about booking approvals and rejections' },
-              { key: 'paymentReceipts', label: 'Payment Receipts', description: 'Receive payment confirmations and receipts' },
-              { key: 'campaignUpdates', label: 'Campaign Updates', description: 'Updates about your active campaigns' },
-              { key: 'systemNotifications', label: 'System Notifications', description: 'Important system updates and maintenance alerts' },
-              { key: 'marketingEmails', label: 'Marketing Emails', description: 'Promotional content and platform updates' },
+              {
+                key: "bookingRequests",
+                label: "Booking Requests",
+                description:
+                  "Get notified when someone requests to book your space",
+              },
+              {
+                key: "bookingApprovals",
+                label: "Booking Approvals",
+                description:
+                  "Notifications about booking approvals and rejections",
+              },
+              {
+                key: "paymentReceipts",
+                label: "Payment Receipts",
+                description: "Receive payment confirmations and receipts",
+              },
+              {
+                key: "campaignUpdates",
+                label: "Campaign Updates",
+                description: "Updates about your active campaigns",
+              },
+              {
+                key: "systemNotifications",
+                label: "System Notifications",
+                description: "Important system updates and maintenance alerts",
+              },
+              {
+                key: "marketingEmails",
+                label: "Marketing Emails",
+                description: "Promotional content and platform updates",
+              },
             ].map((item) => (
-              <label key={item.key} className="flex items-start space-x-3 p-4 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+              <label
+                key={item.key}
+                className="flex items-start space-x-3 p-4 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              >
                 <input
                   type="checkbox"
-                  checked={settings[item.key as keyof typeof settings] as boolean}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    [item.key]: e.target.checked
-                  })}
+                  checked={
+                    settings[item.key as keyof typeof settings] as boolean
+                  }
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      [item.key]: e.target.checked,
+                    })
+                  }
                   className="mt-1 h-5 w-5 text-blue-600 bg-white/5 border-white/20 rounded focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-transparent"
                 />
                 <div className="flex-1">
                   <div className="text-white font-medium">{item.label}</div>
-                  <div className="text-sm text-gray-400">{item.description}</div>
+                  <div className="text-sm text-gray-400">
+                    {item.description}
+                  </div>
                 </div>
               </label>
             ))}
@@ -129,33 +156,56 @@ export function NotificationsTab() {
             <Calendar className="w-5 h-5 mr-2 text-cyan-400" />
             Email Digest Frequency
           </h3>
-          
+
           <p className="text-sm text-gray-400">
             Receive a summary of your notifications in a single email
           </p>
-          
+
           <div className="space-y-3">
             {[
-              { value: 'daily', label: 'Daily', description: 'Receive a digest every day' },
-              { value: 'weekly', label: 'Weekly', description: 'Receive a digest every Monday' },
-              { value: 'monthly', label: 'Monthly', description: 'Receive a digest on the 1st of each month' },
-              { value: 'never', label: 'Never', description: 'Don\'t send me digest emails' },
+              {
+                value: "daily",
+                label: "Daily",
+                description: "Receive a digest every day",
+              },
+              {
+                value: "weekly",
+                label: "Weekly",
+                description: "Receive a digest every Monday",
+              },
+              {
+                value: "monthly",
+                label: "Monthly",
+                description: "Receive a digest on the 1st of each month",
+              },
+              {
+                value: "never",
+                label: "Never",
+                description: "Don't send me digest emails",
+              },
             ].map((option) => (
-              <label key={option.value} className="flex items-start space-x-3 p-4 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+              <label
+                key={option.value}
+                className="flex items-start space-x-3 p-4 rounded-lg hover:bg-white/5 transition-colors cursor-pointer"
+              >
                 <input
                   type="radio"
                   name="emailDigest"
                   value={option.value}
                   checked={settings.emailDigest === option.value}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    emailDigest: e.target.value as any
-                  })}
+                  onChange={(e) =>
+                    setSettings({
+                      ...settings,
+                      emailDigest: e.target.value as any,
+                    })
+                  }
                   className="mt-1 h-5 w-5 text-blue-600 bg-white/5 border-white/20 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 focus:ring-offset-transparent"
                 />
                 <div className="flex-1">
                   <div className="text-white font-medium">{option.label}</div>
-                  <div className="text-sm text-gray-400">{option.description}</div>
+                  <div className="text-sm text-gray-400">
+                    {option.description}
+                  </div>
                 </div>
               </label>
             ))}
@@ -166,10 +216,10 @@ export function NotificationsTab() {
         <div className="flex justify-end pt-6 border-t border-white/10">
           <button
             type="submit"
-            disabled={updateSettings.isPending}
+            disabled={isPending}
             className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {updateSettings.isPending ? (
+            {isPending ? (
               <>
                 <Loader2 className="w-5 h-5 animate-spin mr-2" />
                 Saving...

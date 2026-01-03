@@ -3,9 +3,9 @@
 
 import { useState, useRef } from "react";
 import { X, Upload, Loader2, AlertTriangle, Image as ImageIcon, Check } from "lucide-react";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
 import { toast } from "sonner";
-import { uploadToCloudinary, validateImageFile } from "../../../../elaview-mvp/src/lib/cloudinary-upload";
+import { uploadToCloudinary, validateImageFile } from "@/shared/lib/cloudinary-upload";
+import useReportIssue from "@/shared/hooks/api/actions/useReportIssue/useReportIssue";
 
 interface ReportIssueFormProps {
   booking: {
@@ -35,19 +35,20 @@ export function ReportIssueForm({ booking, onSuccess, onCancel }: ReportIssueFor
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const utils = api.useUtils();
 
-  const reportIssueMutation = api.messages.reportIssue.useMutation({
-    onSuccess: async () => {
-      await utils.messages.getConversation.invalidate();
-      await utils.campaigns.getById.invalidate();
-      toast.success("Issue reported successfully. Our support team will review within 24-48 hours.");
-      onSuccess();
-    },
-    onError: (error) => {
-      toast.error(error.message || "Failed to report issue");
-    },
-  });
+  const {reportIssue, isPending} = useReportIssue();
+
+  // const reportIssueMutation = api.messages.reportIssue.useMutation({
+  //   onSuccess: async () => {
+  //     await utils.messages.getConversation.invalidate();
+  //     await utils.campaigns.getById.invalidate();
+  //     toast.success("Issue reported successfully. Our support team will review within 24-48 hours.");
+  //     onSuccess();
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error.message || "Failed to report issue");
+  //   },
+  // });
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -111,7 +112,7 @@ export function ReportIssueForm({ booking, onSuccess, onCancel }: ReportIssueFor
       const photoUrls = await Promise.all(uploadPromises);
 
       // Submit report
-      await reportIssueMutation.mutateAsync({
+      await reportIssue({
         bookingId: booking.id,
         issueType: issueType as any,
         description: description.trim(),
@@ -126,7 +127,7 @@ export function ReportIssueForm({ booking, onSuccess, onCancel }: ReportIssueFor
     }
   };
 
-  const isSubmitting = reportIssueMutation.isPending || isUploading;
+  const isSubmitting = isPending || isUploading;
   const canSubmit = issueType && description.trim().length >= 20 && selectedFiles.length >= 2;
 
   return (

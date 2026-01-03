@@ -2,7 +2,6 @@
 "use client";
 
 import { useState } from "react";
-import { api } from "../../../../../elaview-mvp/src/trpc/react";
 import {
   Loader2,
   Search,
@@ -10,49 +9,49 @@ import {
   Phone,
   Building,
   Calendar,
-  Filter,
-  ChevronDown,
-  ExternalLink,
-  StickyNote,
   Check,
 } from "lucide-react";
-import { format } from "date-fns";
+import useDemoRequests from "@/shared/hooks/api/getters/useDemoRequests/useDemoRequests";
+import useUpdateDemoRequestStatus from "@/shared/hooks/api/actions/useUpdateDemoRequestStatus/useUpdateDemoRequestStatus";
+import { formatDateMDYH } from "@/shared/utils/formatDate";
 
-type DemoRequestStatus = 'NEW' | 'CONTACTED' | 'QUALIFIED' | 'DEMO_BOOKED' | 'CLOSED_WON' | 'CLOSED_LOST';
-type DemoRequestPriority = 'LOW' | 'MEDIUM' | 'HIGH';
+type DemoRequestStatus =
+  | "NEW"
+  | "CONTACTED"
+  | "QUALIFIED"
+  | "DEMO_BOOKED"
+  | "CLOSED_WON"
+  | "CLOSED_LOST";
+type DemoRequestPriority = "LOW" | "MEDIUM" | "HIGH";
 
 export default function LeadsManagementPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<DemoRequestStatus | 'ALL'>('ALL');
+  const [statusFilter, setStatusFilter] = useState<DemoRequestStatus | "ALL">(
+    "ALL"
+  );
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [notesValue, setNotesValue] = useState("");
 
-  // Fetch demo requests
-  const { data, isLoading, refetch } = api.admin.marketing.getDemoRequests.useQuery({
-    status: statusFilter === 'ALL' ? undefined : statusFilter,
-    search: searchQuery || undefined,
-    limit: 100,
-  });
+  const { data, isLoading, refetch } = useDemoRequests();
+  const { updateStatus, updateDemoRequestById } = useUpdateDemoRequestStatus();
 
-  // Update status mutation
-  const updateStatus = api.admin.marketing.updateDemoRequestStatus.useMutation({
-    onSuccess: () => {
-      refetch();
-    },
-  });
-
-  const handleStatusChange = async (id: string, newStatus: DemoRequestStatus) => {
-    await updateStatus.mutateAsync({
-      id,
-      status: newStatus,
-    });
+  const handleStatusChange = async (
+    id: string,
+    newStatus: DemoRequestStatus
+  ) => {
+    await updateDemoRequestById({ id, status: newStatus });
   };
 
-  const handlePriorityChange = async (id: string, newPriority: DemoRequestPriority) => {
-    await updateStatus.mutateAsync({
+  const handlePriorityChange = async (
+    id: string,
+    newPriority: DemoRequestPriority
+  ) => {
+    const demoRequestData = data?.requests.find((r) => r.id === id)
+      ?.status as DemoRequestStatus;
+    await updateDemoRequestById({
       id,
-      status: data?.requests.find(r => r.id === id)?.status as DemoRequestStatus,
+      status: demoRequestData,
       priority: newPriority,
     });
   };
@@ -60,9 +59,11 @@ export default function LeadsManagementPage() {
   const handleSaveNotes = async (id: string) => {
     if (!notesValue.trim()) return;
 
-    await updateStatus.mutateAsync({
+    const demoRequestData = data?.requests.find((r) => r.id === id)
+      ?.status as DemoRequestStatus;
+    await updateDemoRequestById({
       id,
-      status: data?.requests.find(r => r.id === id)?.status as DemoRequestStatus,
+      status: demoRequestData,
       notes: notesValue,
     });
 
@@ -72,45 +73,46 @@ export default function LeadsManagementPage() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'NEW':
-        return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-      case 'CONTACTED':
-        return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
-      case 'QUALIFIED':
-        return 'bg-purple-500/10 text-purple-400 border-purple-500/20';
-      case 'DEMO_BOOKED':
-        return 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20';
-      case 'CLOSED_WON':
-        return 'bg-green-500/10 text-green-400 border-green-500/20';
-      case 'CLOSED_LOST':
-        return 'bg-red-500/10 text-red-400 border-red-500/20';
+      case "NEW":
+        return "bg-blue-500/10 text-blue-400 border-blue-500/20";
+      case "CONTACTED":
+        return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
+      case "QUALIFIED":
+        return "bg-purple-500/10 text-purple-400 border-purple-500/20";
+      case "DEMO_BOOKED":
+        return "bg-cyan-500/10 text-cyan-400 border-cyan-500/20";
+      case "CLOSED_WON":
+        return "bg-green-500/10 text-green-400 border-green-500/20";
+      case "CLOSED_LOST":
+        return "bg-red-500/10 text-red-400 border-red-500/20";
       default:
-        return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+        return "bg-slate-500/10 text-slate-400 border-slate-500/20";
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'HIGH':
-        return 'bg-red-500/10 text-red-400 border-red-500/20';
-      case 'MEDIUM':
-        return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
-      case 'LOW':
-        return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+      case "HIGH":
+        return "bg-red-500/10 text-red-400 border-red-500/20";
+      case "MEDIUM":
+        return "bg-yellow-500/10 text-yellow-400 border-yellow-500/20";
+      case "LOW":
+        return "bg-slate-500/10 text-slate-400 border-slate-500/20";
       default:
-        return 'bg-slate-500/10 text-slate-400 border-slate-500/20';
+        return "bg-slate-500/10 text-slate-400 border-slate-500/20";
     }
   };
 
   const requests = data?.requests || [];
+
   const statusCounts = {
     ALL: requests.length,
-    NEW: requests.filter(r => r.status === 'NEW').length,
-    CONTACTED: requests.filter(r => r.status === 'CONTACTED').length,
-    QUALIFIED: requests.filter(r => r.status === 'QUALIFIED').length,
-    DEMO_BOOKED: requests.filter(r => r.status === 'DEMO_BOOKED').length,
-    CLOSED_WON: requests.filter(r => r.status === 'CLOSED_WON').length,
-    CLOSED_LOST: requests.filter(r => r.status === 'CLOSED_LOST').length,
+    NEW: requests.filter((r) => r.status === "NEW").length,
+    CONTACTED: requests.filter((r) => r.status === "CONTACTED").length,
+    QUALIFIED: requests.filter((r) => r.status === "QUALIFIED").length,
+    DEMO_BOOKED: requests.filter((r) => r.status === "DEMO_BOOKED").length,
+    CLOSED_WON: requests.filter((r) => r.status === "CLOSED_WON").length,
+    CLOSED_LOST: requests.filter((r) => r.status === "CLOSED_LOST").length,
   };
 
   return (
@@ -130,19 +132,27 @@ export default function LeadsManagementPage() {
           <div className="grid gap-4 md:grid-cols-4">
             <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
               <p className="text-sm text-slate-400">Total Leads</p>
-              <p className="text-2xl font-bold text-white">{statusCounts.ALL}</p>
+              <p className="text-2xl font-bold text-white">
+                {statusCounts.ALL}
+              </p>
             </div>
             <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
               <p className="text-sm text-slate-400">New</p>
-              <p className="text-2xl font-bold text-blue-400">{statusCounts.NEW}</p>
+              <p className="text-2xl font-bold text-blue-400">
+                {statusCounts.NEW}
+              </p>
             </div>
             <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
               <p className="text-sm text-slate-400">Qualified</p>
-              <p className="text-2xl font-bold text-purple-400">{statusCounts.QUALIFIED}</p>
+              <p className="text-2xl font-bold text-purple-400">
+                {statusCounts.QUALIFIED}
+              </p>
             </div>
             <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
               <p className="text-sm text-slate-400">Closed Won</p>
-              <p className="text-2xl font-bold text-green-400">{statusCounts.CLOSED_WON}</p>
+              <p className="text-2xl font-bold text-green-400">
+                {statusCounts.CLOSED_WON}
+              </p>
             </div>
           </div>
 
@@ -163,16 +173,28 @@ export default function LeadsManagementPage() {
             {/* Status Filter */}
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as typeof statusFilter)}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as typeof statusFilter)
+              }
               className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
             >
               <option value="ALL">All Status ({statusCounts.ALL})</option>
               <option value="NEW">New ({statusCounts.NEW})</option>
-              <option value="CONTACTED">Contacted ({statusCounts.CONTACTED})</option>
-              <option value="QUALIFIED">Qualified ({statusCounts.QUALIFIED})</option>
-              <option value="DEMO_BOOKED">Demo Booked ({statusCounts.DEMO_BOOKED})</option>
-              <option value="CLOSED_WON">Closed Won ({statusCounts.CLOSED_WON})</option>
-              <option value="CLOSED_LOST">Closed Lost ({statusCounts.CLOSED_LOST})</option>
+              <option value="CONTACTED">
+                Contacted ({statusCounts.CONTACTED})
+              </option>
+              <option value="QUALIFIED">
+                Qualified ({statusCounts.QUALIFIED})
+              </option>
+              <option value="DEMO_BOOKED">
+                Demo Booked ({statusCounts.DEMO_BOOKED})
+              </option>
+              <option value="CLOSED_WON">
+                Closed Won ({statusCounts.CLOSED_WON})
+              </option>
+              <option value="CLOSED_LOST">
+                Closed Lost ({statusCounts.CLOSED_LOST})
+              </option>
             </select>
           </div>
 
@@ -185,11 +207,13 @@ export default function LeadsManagementPage() {
             ) : requests.length === 0 ? (
               <div className="p-12 text-center">
                 <Mail className="h-12 w-12 text-slate-600 mx-auto mb-3" />
-                <p className="text-lg font-medium text-white">No demo requests found</p>
+                <p className="text-lg font-medium text-white">
+                  No demo requests found
+                </p>
                 <p className="text-slate-400 mt-1">
-                  {searchQuery || statusFilter !== 'ALL'
-                    ? 'Try adjusting your filters'
-                    : 'Demo requests will appear here'}
+                  {searchQuery || statusFilter !== "ALL"
+                    ? "Try adjusting your filters"
+                    : "Demo requests will appear here"}
                 </p>
               </div>
             ) : (
@@ -226,11 +250,17 @@ export default function LeadsManagementPage() {
                         <tr
                           key={request.id}
                           className="hover:bg-slate-900/50 transition-colors cursor-pointer"
-                          onClick={() => setExpandedRow(expandedRow === request.id ? null : request.id)}
+                          onClick={() =>
+                            setExpandedRow(
+                              expandedRow === request.id ? null : request.id
+                            )
+                          }
                         >
                           <td className="px-4 py-4">
                             <div>
-                              <p className="font-medium text-white">{request.name}</p>
+                              <p className="font-medium text-white">
+                                {request.name}
+                              </p>
                               <div className="flex items-center gap-1 text-sm text-slate-400 mt-1">
                                 <Mail className="h-3 w-3" />
                                 {request.email}
@@ -246,12 +276,14 @@ export default function LeadsManagementPage() {
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-2">
                               <Building className="h-4 w-4 text-slate-500" />
-                              <span className="font-medium text-white">{request.company}</span>
+                              <span className="font-medium text-white">
+                                {request.company}
+                              </span>
                             </div>
                           </td>
                           <td className="px-4 py-4">
                             <span className="text-sm text-slate-400">
-                              {request.companySize || 'Not specified'}
+                              {request.companySize || "Not specified"}
                             </span>
                           </td>
                           <td className="px-4 py-4">
@@ -259,10 +291,15 @@ export default function LeadsManagementPage() {
                               value={request.priority}
                               onChange={(e) => {
                                 e.stopPropagation();
-                                handlePriorityChange(request.id, e.target.value as DemoRequestPriority);
+                                handlePriorityChange(
+                                  request.id,
+                                  e.target.value as DemoRequestPriority
+                                );
                               }}
                               onClick={(e) => e.stopPropagation()}
-                              className={`text-xs font-medium px-2 py-1 rounded border ${getPriorityColor(request.priority)} bg-transparent cursor-pointer`}
+                              className={`text-xs font-medium px-2 py-1 rounded border ${getPriorityColor(
+                                request.priority
+                              )} bg-transparent cursor-pointer`}
                             >
                               <option value="LOW">Low</option>
                               <option value="MEDIUM">Medium</option>
@@ -274,10 +311,15 @@ export default function LeadsManagementPage() {
                               value={request.status}
                               onChange={(e) => {
                                 e.stopPropagation();
-                                handleStatusChange(request.id, e.target.value as DemoRequestStatus);
+                                handleStatusChange(
+                                  request.id,
+                                  e.target.value as DemoRequestStatus
+                                );
                               }}
                               onClick={(e) => e.stopPropagation()}
-                              className={`text-xs font-medium px-2 py-1 rounded border ${getStatusColor(request.status)} bg-transparent cursor-pointer`}
+                              className={`text-xs font-medium px-2 py-1 rounded border ${getStatusColor(
+                                request.status
+                              )} bg-transparent cursor-pointer`}
                             >
                               <option value="NEW">New</option>
                               <option value="CONTACTED">Contacted</option>
@@ -290,7 +332,7 @@ export default function LeadsManagementPage() {
                           <td className="px-4 py-4">
                             <div className="flex items-center gap-1 text-sm text-slate-400">
                               <Calendar className="h-3 w-3" />
-                              {format(new Date(request.createdAt), 'MMM d, yyyy')}
+                              {formatDateMDYH(request.createdAt)}
                             </div>
                           </td>
                           <td className="px-4 py-4">
@@ -313,7 +355,9 @@ export default function LeadsManagementPage() {
                                 {/* Message */}
                                 {request.message && (
                                   <div className="md:col-span-2">
-                                    <h4 className="text-sm font-medium text-slate-300 mb-2">Message</h4>
+                                    <h4 className="text-sm font-medium text-slate-300 mb-2">
+                                      Message
+                                    </h4>
                                     <div className="bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-300">
                                       {request.message}
                                     </div>
@@ -323,7 +367,9 @@ export default function LeadsManagementPage() {
                                 {/* Notes */}
                                 <div className="md:col-span-2">
                                   <div className="flex items-center justify-between mb-2">
-                                    <h4 className="text-sm font-medium text-slate-300">Internal Notes</h4>
+                                    <h4 className="text-sm font-medium text-slate-300">
+                                      Internal Notes
+                                    </h4>
                                     {editingNotes !== request.id && (
                                       <button
                                         onClick={() => {
@@ -347,14 +393,18 @@ export default function LeadsManagementPage() {
                                     <div className="flex gap-2">
                                       <textarea
                                         value={notesValue}
-                                        onChange={(e) => setNotesValue(e.target.value)}
+                                        onChange={(e) =>
+                                          setNotesValue(e.target.value)
+                                        }
                                         placeholder="Add internal notes about this lead..."
                                         rows={3}
                                         className="flex-1 px-3 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
                                       />
                                       <div className="flex flex-col gap-2">
                                         <button
-                                          onClick={() => handleSaveNotes(request.id)}
+                                          onClick={() =>
+                                            handleSaveNotes(request.id)
+                                          }
                                           disabled={!notesValue.trim()}
                                           className="px-3 py-1 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
                                         >
@@ -377,19 +427,33 @@ export default function LeadsManagementPage() {
 
                                 {/* Metadata */}
                                 <div>
-                                  <h4 className="text-sm font-medium text-slate-300 mb-2">Timeline</h4>
+                                  <h4 className="text-sm font-medium text-slate-300 mb-2">
+                                    Timeline
+                                  </h4>
                                   <div className="space-y-1 text-xs text-slate-400">
-                                    <div>Submitted: {format(new Date(request.createdAt), 'MMM d, yyyy h:mm a')}</div>
+                                    <div>
+                                      Submitted: {formatDateMDYH(request.createdAt)}
+                                    </div>
                                     {request.contactedAt && (
-                                      <div>Contacted: {format(new Date(request.contactedAt), 'MMM d, yyyy h:mm a')}</div>
+                                      <div>
+                                        Contacted:{" "}
+                                        {formatDateMDYH(request.contactedAt)}
+                                      </div>
                                     )}
-                                    <div>Last updated: {format(new Date(request.updatedAt), 'MMM d, yyyy h:mm a')}</div>
+                                    <div>
+                                      Last updated:{" "}
+                                      {formatDateMDYH(request.updatedAt)}
+                                    </div>
                                   </div>
                                 </div>
 
                                 <div>
-                                  <h4 className="text-sm font-medium text-slate-300 mb-2">Source</h4>
-                                  <div className="text-xs text-slate-400">{request.source}</div>
+                                  <h4 className="text-sm font-medium text-slate-300 mb-2">
+                                    Source
+                                  </h4>
+                                  <div className="text-xs text-slate-400">
+                                    {request.source}
+                                  </div>
                                 </div>
                               </div>
                             </td>

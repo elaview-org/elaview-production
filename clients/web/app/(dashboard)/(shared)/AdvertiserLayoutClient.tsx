@@ -20,14 +20,14 @@ import {
 } from "lucide-react";
 import { api } from "../../../../elaview-mvp/src/trpc/react";
 import { toast } from "sonner";
-import { NotificationCenter } from "../../../../elaview-mvp/src/components/notifications/NotificationCenter";
-import { NotificationBadge } from "../../../../elaview-mvp/src/components/notifications/NotificationBadge";
-import { BugReportModal } from "../../../../elaview-mvp/src/components/feedback/BugReportButton";
-import { MobileTopNav } from "../../../../elaview-mvp/src/components/layout/MobileTopNav";
-import { MobileBottomNav } from "../../../../elaview-mvp/src/components/layout/MobileBottomNav";
+import { NotificationCenter } from "@/shared/components/notifications/NotificationCenter";
+import { NotificationBadge } from "@/shared/components/notifications/NotificationBadge";
+import { BugReportModal } from "@/shared/components/feedback/BugReportButton";
+import { MobileTopNav } from "@/shared/components/layout/MobileTopNav";
+import { MobileBottomNav } from "@/shared/components/layout/MobileBottomNav";
 import { AdvertiserHamburgerDrawer } from "./AdvertiserHamburgerDrawer";
-import type { NotificationType } from "@prisma/client";
-
+// import type { NotificationType } from "@prisma/client";
+type NotificationType = undefined;
 interface NavItem {
   name: string;
   href: string;

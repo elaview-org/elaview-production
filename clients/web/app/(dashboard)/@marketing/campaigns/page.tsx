@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { PlusCircle, Mail } from "lucide-react";
+import { PlusCircle, Mail, Plus } from "lucide-react";
+import EmptyState from "@/shared/components/atoms/EmptyState";
 
 export default function MarketingCampaignsPage() {
   return (
@@ -29,26 +30,17 @@ export default function MarketingCampaignsPage() {
         {/* Content - Scrollable */}
         <div className="flex-1 overflow-y-auto p-6">
           <div className="rounded-lg border border-slate-700 bg-slate-800 shadow-sm">
-            <div className="p-6">
-              <div className="py-12 text-center">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-purple-500/10">
-                  <Mail className="h-8 w-8 text-purple-400" />
-                </div>
-                <p className="mt-4 text-lg font-medium text-white">
-                  No campaigns yet
-                </p>
-                <p className="mt-2 text-slate-400">
-                  Get started by creating your first marketing campaign
-                </p>
-                <Link
-                  href="/campaigns/new"
-                  className="mt-6 inline-flex items-center gap-2 rounded-lg bg-purple-600 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-700"
-                >
-                  <PlusCircle className="h-5 w-5" />
-                  Create Campaign
-                </Link>
-              </div>
-            </div>
+            <EmptyState
+              icon={Mail}
+              title="No campaigns yet"
+              description="Get started by creating your first marketing campaign"
+            >
+              <EmptyState.Button
+                icon={PlusCircle}
+                href="/campaigns/new"
+                label="Create Campaign"
+              />
+            </EmptyState>
           </div>
         </div>
       </div>

@@ -13,7 +13,7 @@ interface MessageSender {
   avatar: string | null;
 }
 
-interface MessageBooking {
+export interface MessageBooking {
   id: string;
   totalAmount: number;
   spaceOwnerAmount: number;
@@ -29,7 +29,7 @@ interface MessageBooking {
   };
 }
 
-interface MessageWithSender {
+export interface MessageWithSender {
   id: string;
   campaignId: string;
   senderId: string;

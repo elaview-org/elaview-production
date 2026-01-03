@@ -1,9 +1,9 @@
 // src/hooks/useSpaceOwnerOnboarding.ts
 "use client";
 
-import { useState, useEffect } from 'react';
-import { api } from '../../../elaview-mvp/src/trpc/react';
-
+import { useState, useEffect } from "react";
+// import { api } from '../../../elaview-mvp/src/trpc/react';
+const api = {};
 interface OnboardingState {
   shouldShowOnboarding: boolean;
   isLoading: boolean;
@@ -44,7 +44,7 @@ export function useSpaceOwnerOnboarding(): OnboardingState {
   // Get Stripe account status
   const { data: accountStatus, isLoading: accountLoading } =
     api.billing.getConnectAccountStatus.useQuery(undefined, {
-      enabled: currentUser?.role === 'SPACE_OWNER',
+      enabled: currentUser?.role === "SPACE_OWNER",
     });
 
   // Check if user needs onboarding
@@ -54,14 +54,16 @@ export function useSpaceOwnerOnboarding(): OnboardingState {
     }
 
     // Only show for space owners
-    if (currentUser?.role !== 'SPACE_OWNER') {
+    if (currentUser?.role !== "SPACE_OWNER") {
       setHasChecked(true);
       return;
     }
 
     // Check if they've already completed onboarding
-    const hasCompletedOnboarding = localStorage.getItem('spaceOwnerOnboardingComplete');
-    if (hasCompletedOnboarding === 'true') {
+    const hasCompletedOnboarding = localStorage.getItem(
+      "spaceOwnerOnboardingComplete"
+    );
+    if (hasCompletedOnboarding === "true") {
       setHasChecked(true);
       return;
     }
@@ -69,7 +71,7 @@ export function useSpaceOwnerOnboarding(): OnboardingState {
     // Show onboarding if they haven't completed Stripe setup
     const needsOnboarding = !accountStatus?.onboardingComplete;
 
-    console.log('[ONBOARDING HOOK] Check result:', {
+    console.log("[ONBOARDING HOOK] Check result:", {
       role: currentUser?.role,
       onboardingComplete: accountStatus?.onboardingComplete,
       needsOnboarding,
@@ -80,18 +82,18 @@ export function useSpaceOwnerOnboarding(): OnboardingState {
   }, [currentUser, accountStatus, userLoading, accountLoading, hasChecked]);
 
   const openOnboarding = () => {
-    console.log('[ONBOARDING HOOK] Opening onboarding modal');
+    console.log("[ONBOARDING HOOK] Opening onboarding modal");
     setShouldShow(true);
   };
 
   const closeOnboarding = () => {
-    console.log('[ONBOARDING HOOK] Closing onboarding modal');
+    console.log("[ONBOARDING HOOK] Closing onboarding modal");
     setShouldShow(false);
   };
 
   const markComplete = () => {
-    console.log('[ONBOARDING HOOK] Marking onboarding as complete');
-    localStorage.setItem('spaceOwnerOnboardingComplete', 'true');
+    console.log("[ONBOARDING HOOK] Marking onboarding as complete");
+    localStorage.setItem("spaceOwnerOnboardingComplete", "true");
     setShouldShow(false);
   };
 
@@ -112,9 +114,9 @@ export function useRoleSwitchOnboarding() {
   const [justSwitched, setJustSwitched] = useState(false);
 
   const handleRoleSwitch = (newRole: string) => {
-    if (newRole === 'SPACE_OWNER') {
+    if (newRole === "SPACE_OWNER") {
       // Clear any existing completion flag when switching to space owner
-      localStorage.removeItem('spaceOwnerOnboardingComplete');
+      localStorage.removeItem("spaceOwnerOnboardingComplete");
       setJustSwitched(true);
     }
   };

@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from 'react';
-import { useSignUp } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import { Modal } from './Modal';
-import { Mail, Lock, User, Loader2, AlertCircle, Info } from 'lucide-react';
+import { useState } from "react";
+import { useSignUp } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { Mail, Lock, User, Loader2, AlertCircle, Info } from "lucide-react";
+import Button from "../atoms/Button/Button";
+import TextField from "../atoms/TextField";
+import Modal from "../atoms/Modal";
 
 interface SignUpModalProps {
   isOpen: boolean;
@@ -12,29 +14,33 @@ interface SignUpModalProps {
   onSwitchToSignIn: () => void;
 }
 
-export function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignUpModalProps) {
+export function SignUpModal({
+  isOpen,
+  onClose,
+  onSwitchToSignIn,
+}: SignUpModalProps) {
   const { isLoaded, signUp, setActive } = useSignUp();
   const router = useRouter();
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [accountExistsMessage, setAccountExistsMessage] = useState('');
+  const [error, setError] = useState("");
+  const [accountExistsMessage, setAccountExistsMessage] = useState("");
 
   // Verification state
   const [pendingVerification, setPendingVerification] = useState(false);
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState("");
 
   const handleEmailSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoaded) return;
 
     setIsLoading(true);
-    setError('');
-    setAccountExistsMessage('');
+    setError("");
+    setAccountExistsMessage("");
 
     try {
       await signUp.create({
@@ -45,28 +51,30 @@ export function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignUpModalPr
       });
 
       // Send verification email
-      await signUp.prepareEmailAddressVerification({ strategy: 'email_code' });
+      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
 
       setPendingVerification(true);
     } catch (err: any) {
-      console.error('Sign up error:', err);
-      
+      console.error("Sign up error:", err);
+
       // Check if error is about existing account
-      const errorMessage = err.errors?.[0]?.message || '';
-      const errorCode = err.errors?.[0]?.code || '';
-      
+      const errorMessage = err.errors?.[0]?.message || "";
+      const errorCode = err.errors?.[0]?.code || "";
+
       if (
-        errorMessage.toLowerCase().includes('account') ||
-        errorCode === 'form_identifier_exists' ||
-        errorCode === 'external_account_exists'
+        errorMessage.toLowerCase().includes("account") ||
+        errorCode === "form_identifier_exists" ||
+        errorCode === "external_account_exists"
       ) {
         // Account exists - switch to sign in
-        setAccountExistsMessage('Looks like you already have an account. Please sign in instead.');
+        setAccountExistsMessage(
+          "Looks like you already have an account. Please sign in instead."
+        );
         setTimeout(() => {
           onSwitchToSignIn();
         }, 2000);
       } else {
-        setError(errorMessage || 'Failed to create account');
+        setError(errorMessage || "Failed to create account");
       }
     } finally {
       setIsLoading(false);
@@ -78,21 +86,21 @@ export function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignUpModalPr
     if (!isLoaded) return;
 
     setIsLoading(true);
-    setError('');
+    setError("");
 
     try {
       const completeSignUp = await signUp.attemptEmailAddressVerification({
         code,
       });
 
-      if (completeSignUp.status === 'complete') {
+      if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
         onClose();
-        router.push('/campaigns');
+        router.push("/campaigns");
       }
     } catch (err: any) {
-      console.error('Verification error:', err);
-      setError(err.errors?.[0]?.message || 'Invalid verification code');
+      console.error("Verification error:", err);
+      setError(err.errors?.[0]?.message || "Invalid verification code");
     } finally {
       setIsLoading(false);
     }
@@ -102,37 +110,39 @@ export function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignUpModalPr
     if (!isLoaded) return;
 
     setIsLoading(true);
-    setError('');
-    setAccountExistsMessage('');
+    setError("");
+    setAccountExistsMessage("");
 
     try {
       // Use absolute URL for OAuth redirect
       await signUp.authenticateWithRedirect({
-        strategy: 'oauth_google',
+        strategy: "oauth_google",
         redirectUrl: `${window.location.origin}/sso-callback`,
         redirectUrlComplete: `${window.location.origin}/campaigns`,
       });
     } catch (err: any) {
-      console.error('Google sign up error:', err);
-      
+      console.error("Google sign up error:", err);
+
       // Check if error is about existing account
-      const errorMessage = err.errors?.[0]?.message || '';
-      const errorCode = err.errors?.[0]?.code || '';
-      
+      const errorMessage = err.errors?.[0]?.message || "";
+      const errorCode = err.errors?.[0]?.code || "";
+
       if (
-        errorMessage.toLowerCase().includes('account') ||
-        errorMessage.toLowerCase().includes('exists') ||
-        errorCode === 'external_account_exists'
+        errorMessage.toLowerCase().includes("account") ||
+        errorMessage.toLowerCase().includes("exists") ||
+        errorCode === "external_account_exists"
       ) {
         // Account exists - switch to sign in
-        setAccountExistsMessage('Looks like you already have an account. Switching to sign in...');
+        setAccountExistsMessage(
+          "Looks like you already have an account. Switching to sign in..."
+        );
         setTimeout(() => {
           onSwitchToSignIn();
         }, 2000);
       } else {
-        setError(errorMessage || 'Failed to sign up with Google');
+        setError(errorMessage || "Failed to sign up with Google");
       }
-      
+
       setIsLoading(false);
     }
   };
@@ -141,11 +151,11 @@ export function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignUpModalPr
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={pendingVerification ? 'Verify Your Email' : 'Create Your Account'}
+      title={pendingVerification ? "Verify Your Email" : "Create Your Account"}
       subtitle={
         pendingVerification
           ? `We sent a code to ${email}`
-          : 'Join Elaview to start advertising'
+          : "Join Elaview to start advertising"
       }
     >
       {!pendingVerification ? (
@@ -155,8 +165,12 @@ export function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignUpModalPr
             <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 flex items-start space-x-3 animate-in fade-in slide-in-from-top-2 duration-300">
               <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm text-blue-400 font-medium">{accountExistsMessage}</p>
-                <p className="text-xs text-blue-300/70 mt-1">Redirecting in a moment...</p>
+                <p className="text-sm text-blue-400 font-medium">
+                  {accountExistsMessage}
+                </p>
+                <p className="text-xs text-blue-300/70 mt-1">
+                  Redirecting in a moment...
+                </p>
               </div>
             </div>
           )}
@@ -218,94 +232,67 @@ export function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignUpModalPr
 
           {/* Name Inputs */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="firstName" className="block text-sm font-medium text-gray-300 mb-2">
-                First name
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-500" />
-                </div>
-                <input
-                  id="firstName"
-                  type="text"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
-                  disabled={isLoading || !!accountExistsMessage}
-                  className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                  placeholder="John"
-                />
-              </div>
-            </div>
+            <TextField
+              label="First name"
+              htmlFor="firstName"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              icon={User}
+              placeholder="John"
+              disabled={isLoading || !!accountExistsMessage}
+              required
+              id="firstName"
+            />
 
-            <div>
-              <label htmlFor="lastName" className="block text-sm font-medium text-gray-300 mb-2">
-                Last name
-              </label>
-              <input
-                id="lastName"
-                type="text"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                required
-                disabled={isLoading || !!accountExistsMessage}
-                className="block w-full px-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="Doe"
-              />
-            </div>
+            <TextField
+              htmlFor="lastName"
+              label="Last name"
+              id="lastName"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+              disabled={isLoading || !!accountExistsMessage}
+              placeholder="Doe"
+            />
           </div>
 
           {/* Email Input */}
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-              Email address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-500" />
-              </div>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isLoading || !!accountExistsMessage}
-                className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="john@example.com"
-              />
-            </div>
-          </div>
+
+          <TextField
+            htmlFor="email"
+            label="Email address"
+            id="email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={isLoading || !!accountExistsMessage}
+            placeholder="john@example.com"
+            icon={Mail}
+          />
 
           {/* Password Input */}
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-              Password
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-500" />
-              </div>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={8}
-                disabled={isLoading || !!accountExistsMessage}
-                className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                placeholder="Min. 8 characters"
-              />
-            </div>
-          </div>
+
+          <TextField
+            htmlFor="password"
+            label="Password"
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength={8}
+            disabled={isLoading || !!accountExistsMessage}
+            placeholder="Min. 8 characters"
+            icon={Lock}
+          />
 
           {/* Submit Button */}
-          <button
-            type="submit"
+
+          <Button
+            variant="submitGradientWithGlow"
+            buttonType="submit"
             disabled={isLoading || !!accountExistsMessage}
-            className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-semibold py-3 px-4 rounded-xl hover:from-blue-600 hover:to-cyan-600 transition-all duration-200 flex items-center justify-center space-x-2 shadow-lg hover:shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
@@ -315,11 +302,11 @@ export function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignUpModalPr
             ) : (
               <span>Create Account</span>
             )}
-          </button>
+          </Button>
 
-          {/* Sign In Link */}
+          {/* Sign In Link this should be link not button */}
           <div className="text-center text-sm text-gray-400">
-            Already have an account?{' '}
+            Already have an account?{" "}
             <button
               type="button"
               onClick={onSwitchToSignIn}
@@ -341,22 +328,17 @@ export function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignUpModalPr
           )}
 
           {/* Verification Code Input */}
-          <div>
-            <label htmlFor="code" className="block text-sm font-medium text-gray-300 mb-2">
-              Verification Code
-            </label>
-            <input
-              id="code"
-              type="text"
-              value={code}
-              onChange={(e) => setCode(e.target.value)}
-              required
-              maxLength={6}
-              className="block w-full px-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white text-center text-2xl tracking-widest placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-              placeholder="000000"
-            />
-          </div>
-
+          <TextField
+            htmlFor="code"
+            label="Verification"
+            id="code"
+            type="text"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            required
+            maxLength={6}
+            placeholder="000000"
+          />
           {/* Submit Button */}
           <button
             type="submit"
@@ -375,10 +357,14 @@ export function SignUpModal({ isOpen, onClose, onSwitchToSignIn }: SignUpModalPr
 
           {/* Resend Link */}
           <div className="text-center text-sm text-gray-400">
-            Didn't receive a code?{' '}
+            Didn't receive a code?{" "}
             <button
               type="button"
-              onClick={() => signUp?.prepareEmailAddressVerification({ strategy: 'email_code' })}
+              onClick={() =>
+                signUp?.prepareEmailAddressVerification({
+                  strategy: "email_code",
+                })
+              }
               className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
             >
               Resend

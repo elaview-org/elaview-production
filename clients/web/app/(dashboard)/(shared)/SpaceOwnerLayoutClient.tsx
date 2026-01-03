@@ -18,15 +18,25 @@ import {
   Settings,
   X,
 } from "lucide-react";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
 import { toast } from "sonner";
-import { NotificationCenter } from "../../../../elaview-mvp/src/components/notifications/NotificationCenter";
-import { NotificationBadge } from "../../../../elaview-mvp/src/components/notifications/NotificationBadge";
-import { BugReportModal } from "../../../../elaview-mvp/src/components/feedback/BugReportButton";
-import { MobileTopNav } from "../../../../elaview-mvp/src/components/layout/MobileTopNav";
-import { MobileBottomNav } from "../../../../elaview-mvp/src/components/layout/MobileBottomNav";
+import { NotificationCenter } from "@/shared/components/notifications/NotificationCenter";
+import { NotificationBadge } from "@/shared/components/notifications/NotificationBadge";
+import { BugReportModal } from "@/shared/components/feedback/BugReportButton";
+import { MobileTopNav } from "@/shared/components/layout/MobileTopNav";
+import { MobileBottomNav } from "@/shared/components/layout/MobileBottomNav";
 import { SpaceOwnerHamburgerDrawer } from "./SpaceOwnerHamburgerDrawer";
-import type { NotificationType } from "@prisma/client";
+import useUnreadNotifications from "@/shared/hooks/api/getters/useUnreadNotifications/useUnreadNotifications";
+import useUserSwitchRole from "@/shared/hooks/api/actions/useUserSwitchRole/useUserSwitchRole";
+// import type { NotificationType } from "@prisma/client";
+
+type NotificationType =
+  | "SPACE_APPROVED"
+  | "SPACE_REJECTED"
+  | "SPACE_SUSPENDED"
+  | "SPACE_REACTIVATED"
+  | "BOOKING_REQUEST"
+  | "PAYOUT_PROCESSED"
+  | "MESSAGE_RECEIVED";
 
 interface NavItem {
   name: string;
@@ -41,7 +51,12 @@ const navigation: NavItem[] = [
     name: "My Spaces",
     href: "/spaces",
     icon: MapPin,
-    notificationTypes: ["SPACE_APPROVED", "SPACE_REJECTED", "SPACE_SUSPENDED", "SPACE_REACTIVATED"],
+    notificationTypes: [
+      "SPACE_APPROVED",
+      "SPACE_REJECTED",
+      "SPACE_SUSPENDED",
+      "SPACE_REACTIVATED",
+    ],
   },
   {
     name: "Campaign Requests",
@@ -49,7 +64,11 @@ const navigation: NavItem[] = [
     icon: ClipboardList,
     notificationTypes: ["BOOKING_REQUEST"],
   },
-  { name: "Active Campaigns", href: "/spaces/active-campaigns", icon: Megaphone },
+  {
+    name: "Active Campaigns",
+    href: "/spaces/active-campaigns",
+    icon: Megaphone,
+  },
   {
     name: "Earnings",
     href: "/earnings",
@@ -128,31 +147,25 @@ function TopNav({ onBugReportClick }: { onBugReportClick: () => void }) {
 }
 
 // Sidebar Content Component
-function SidebarContent({ pathname, onItemClick }: { pathname: string; onItemClick?: () => void }) {
+function SidebarContent({
+  pathname,
+  onItemClick,
+}: {
+  pathname: string;
+  onItemClick?: () => void;
+}) {
   const router = useRouter();
-  const utils = api.useUtils();
 
-  const { data: notificationData, isLoading } = api.notifications.getUnread.useQuery(undefined, {
+  const { notificationData, isLoading } = useUnreadNotifications(undefined, {
     staleTime: 30000,
     refetchOnWindowFocus: true,
     refetchOnMount: true,
   });
-
-  const switchRoleMutation = api.user.switchRole.useMutation({
-    onSuccess: async () => {
-      await utils.notifications.getUnread.invalidate();
-      await utils.user.getCurrentUser.invalidate();
-      toast.success("Switched to Advertiser mode!");
-      router.push("/browse");
-    },
-    onError: () => {
-      toast.error("Failed to switch role. Please try again.");
-    },
-  });
+  const { switchRole, isPending: switchRolePending } = useUserSwitchRole();
 
   const handleRoleSwitch = async () => {
     try {
-      await switchRoleMutation.mutateAsync({ role: "ADVERTISER" });
+      await switchRole();
     } catch (error) {
       console.error("Role switch error:", error);
     }
@@ -191,7 +204,10 @@ function SidebarContent({ pathname, onItemClick }: { pathname: string; onItemCli
           // Loading skeleton
           <div className="space-y-1">
             {Array.from({ length: 7 }).map((_, i) => (
-              <div key={i} className="h-10 animate-pulse rounded-lg bg-slate-800" />
+              <div
+                key={i}
+                className="h-10 animate-pulse rounded-lg bg-slate-800"
+              />
             ))}
           </div>
         ) : (
@@ -206,7 +222,10 @@ function SidebarContent({ pathname, onItemClick }: { pathname: string; onItemCli
                   pathname.startsWith(item.href + "/"));
 
               const Icon = item.icon;
-              const notificationCount = getNotificationCount(notifications, item.notificationTypes);
+              const notificationCount = getNotificationCount(
+                notifications,
+                item.notificationTypes
+              );
 
               return (
                 <Link
@@ -221,7 +240,9 @@ function SidebarContent({ pathname, onItemClick }: { pathname: string; onItemCli
                 >
                   <Icon
                     className={`h-5 w-5 transition-colors ${
-                      isActive ? "text-white" : "text-slate-500 group-hover:text-slate-300"
+                      isActive
+                        ? "text-white"
+                        : "text-slate-500 group-hover:text-slate-300"
                     }`}
                   />
                   <span className="flex-1">{item.name}</span>
@@ -230,7 +251,9 @@ function SidebarContent({ pathname, onItemClick }: { pathname: string; onItemCli
                     <NotificationBadge count={notificationCount} size="sm" />
                   )}
 
-                  {isActive && !notificationCount && <ChevronRight className="h-4 w-4" />}
+                  {isActive && !notificationCount && (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
                 </Link>
               );
             })}
@@ -243,23 +266,29 @@ function SidebarContent({ pathname, onItemClick }: { pathname: string; onItemCli
         {/* Role Switch Button */}
         <button
           onClick={handleRoleSwitch}
-          disabled={switchRoleMutation.isPending}
+          disabled={switchRolePending}
           title={
             otherRoleCount > 0
-              ? `${otherRoleCount} notification${otherRoleCount !== 1 ? "s" : ""} in Advertiser mode`
+              ? `${otherRoleCount} notification${
+                  otherRoleCount !== 1 ? "s" : ""
+                } in Advertiser mode`
               : undefined
           }
           className={`relative flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium shadow-lg transition-all ${
-            switchRoleMutation.isPending
+            switchRolePending
               ? "cursor-not-allowed bg-slate-800 text-slate-500 shadow-none"
               : "bg-blue-600 text-white shadow-blue-600/20 hover:bg-blue-700"
           }`}
         >
           <Megaphone className="h-4 w-4" />
-          {switchRoleMutation.isPending ? "Switching..." : "Browse Spaces"}
+          {switchRolePending ? "Switching..." : "Browse Spaces"}
           {otherRoleCount > 0 && (
             <div className="absolute -top-1 -right-1">
-              <NotificationBadge count={otherRoleCount} size="sm" variant="warning" />
+              <NotificationBadge
+                count={otherRoleCount}
+                size="sm"
+                variant="warning"
+              />
             </div>
           )}
         </button>
@@ -275,7 +304,11 @@ function SidebarContent({ pathname, onItemClick }: { pathname: string; onItemCli
 }
 
 // Main Layout Component
-export function SpaceOwnerLayoutClient({ children }: { children: React.ReactNode }) {
+export function SpaceOwnerLayoutClient({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hamburgerOpen, setHamburgerOpen] = useState(false);
   const [bugReportOpen, setBugReportOpen] = useState(false);
@@ -283,7 +316,8 @@ export function SpaceOwnerLayoutClient({ children }: { children: React.ReactNode
   const { user } = useUser();
 
   // Get notifications for mobile bottom nav
-  const { data: notificationData } = api.notifications.getUnread.useQuery(undefined, {
+
+  const { notificationData } = useUnreadNotifications(undefined, {
     staleTime: 30000,
     refetchOnWindowFocus: true,
   });
@@ -382,7 +416,10 @@ export function SpaceOwnerLayoutClient({ children }: { children: React.ReactNode
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <SidebarContent pathname={pathname} onItemClick={() => setSidebarOpen(false)} />
+            <SidebarContent
+              pathname={pathname}
+              onItemClick={() => setSidebarOpen(false)}
+            />
           </div>
         </div>
 
@@ -400,7 +437,11 @@ export function SpaceOwnerLayoutClient({ children }: { children: React.ReactNode
           } pb-16 md:pb-0`}
         >
           <div
-            className={isContainerized ? "h-full" : "mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"}
+            className={
+              isContainerized
+                ? "h-full"
+                : "mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8"
+            }
           >
             {children}
           </div>
@@ -415,10 +456,16 @@ export function SpaceOwnerLayoutClient({ children }: { children: React.ReactNode
       />
 
       {/* Mobile Hamburger Drawer */}
-      <SpaceOwnerHamburgerDrawer isOpen={hamburgerOpen} onClose={() => setHamburgerOpen(false)} />
+      <SpaceOwnerHamburgerDrawer
+        isOpen={hamburgerOpen}
+        onClose={() => setHamburgerOpen(false)}
+      />
 
       {/* Bug Report Modal */}
-      <BugReportModal isOpen={bugReportOpen} onClose={() => setBugReportOpen(false)} />
+      <BugReportModal
+        isOpen={bugReportOpen}
+        onClose={() => setBugReportOpen(false)}
+      />
     </div>
   );
 }

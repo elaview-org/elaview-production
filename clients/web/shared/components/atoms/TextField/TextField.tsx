@@ -2,33 +2,33 @@
 
 import React from "react";
 import { LucideIcon } from "lucide-react";
+import { VariantProps } from "class-variance-authority";
+import { cn } from "@/shared/lib/utils";
+import { inputVariants } from "./TextField.styled";
+
+
+const label = {
+  htmlFor:'text',
+  label:'string',
+  style:'block'
+}
 
 export interface TextFieldProps
-  extends Omit<
-    React.InputHTMLAttributes<HTMLInputElement>,
-    "onChange" | "value"
-  > {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, "size">,
+    VariantProps<typeof inputVariants> {
   errorMessage?: string;
   htmlFor?: string;
   label?: string;
-  value?: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   icon?: LucideIcon;
-  wrapperClassName?: string;
-  inputClassName?: string;
 }
 
 function TextField({
-  errorMessage,
+  variant,
+  size,
   htmlFor,
   label,
-  onChange,
-  value,
+  errorMessage,
   icon: Icon,
-  wrapperClassName = "",
-  inputClassName = "",
-  className,
-  disabled,
   ...rest
 }: TextFieldProps) {
   const hasIcon = !!Icon;
@@ -44,7 +44,7 @@ function TextField({
           {label}
         </label>
       )}
-      <div className={`relative ${wrapperClassName}`}>
+      <div className="relative">
         {Icon && (
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <Icon className="h-5 w-5 text-gray-500" />
@@ -52,12 +52,7 @@ function TextField({
         )}
         <input
           type="text"
-          value={value}
-          onChange={onChange}
-          disabled={disabled}
-          className={`block w-full ${paddingLeft} pr-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed ${inputClassName} ${
-            className || ""
-          }`}
+          className={cn(inputVariants({ variant, size }))}
           {...rest}
         />
       </div>

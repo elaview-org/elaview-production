@@ -1,16 +1,21 @@
 import Link from "next/link";
-import { api } from "../../../../../elaview-mvp/src/trpc/server";
+// import { api } from "../../../../../elaview-mvp/src/trpc/server";
 
 export default async function RecentDisputes() {
-  const disputes = await api.admin.bookings.getDisputedBookings({ limit: 5 });
-
+  // const disputes = await api.admin.bookings.getDisputedBookings({ limit: 5 });
+  const disputes = {};
   return (
     <>
       {disputes && disputes.bookings.length > 0 && (
         <div className="rounded-lg border border-red-500/20 bg-red-500/5 p-6">
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">Recent Disputes</h2>
-            <Link href="/disputes" className="text-sm text-blue-400 hover:text-blue-300">
+            <h2 className="text-xl font-semibold text-white">
+              Recent Disputes
+            </h2>
+            <Link
+              href="/disputes"
+              className="text-sm text-blue-400 hover:text-blue-300"
+            >
               View all →
             </Link>
           </div>

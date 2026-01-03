@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
+// import { api } from "../../../../elaview-mvp/src/trpc/react";
 import { Loader2, Check, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -39,20 +39,21 @@ export function EditableCell({
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(null);
 
   // Update mutation
-  const updateField = api.crm.updateLeadField.useMutation({
-    onSuccess: () => {
-      setIsSaving(false);
-      setIsEditing(false);
-      onUpdate();
-      toast.success('Updated');
-    },
-    onError: (error) => {
-      setIsSaving(false);
-      toast.error(error.message || 'Failed to update');
-      setEditValue(value?.toString() || '');
-    },
-  });
+  // const updateField = api.crm.updateLeadField.useMutation({
+  //   onSuccess: () => {
+  //     setIsSaving(false);
+  //     setIsEditing(false);
+  //     onUpdate();
+  //     toast.success('Updated');
+  //   },
+  //   onError: (error) => {
+  //     setIsSaving(false);
+  //     toast.error(error.message || 'Failed to update');
+  //     setEditValue(value?.toString() || '');
+  //   },
+  // });
 
+  const updateField = ()=>{};
   // Focus input when entering edit mode
   useEffect(() => {
     if (isEditing && inputRef.current) {

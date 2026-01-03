@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from 'react';
-import { useSignIn, useClerk } from '@clerk/nextjs';
-import { useRouter } from 'next/navigation';
-import { Modal } from './Modal';
-import { Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
+import { useState } from "react";
+import { useSignIn, useClerk } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import { Modal } from "./Modal";
+import { Mail, Lock, Loader2, AlertCircle } from "lucide-react";
+import TextField from "../atoms/TextField";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -15,7 +16,7 @@ interface AuthModalProps {
  * Unified Authentication Modal for Elaview
  * G
  * This component handles BOTH sign-in and sign-up in a single flow.
- * 
+ *
  * KEY INSIGHT from Clerk documentation:
  * With OAuth (Google), there's NO difference between sign-in and sign-up.
  * Clerk automatically:
@@ -23,7 +24,7 @@ interface AuthModalProps {
  * - Signs in existing users
  * - Links accounts by email
  * - Handles the transfer flow between SignIn and SignUp objects
- * 
+ *
  * This is the modern SaaS standard (used by Notion, Linear, Vercel, etc.)
  */
 export function AuthModal({ isOpen, onClose }: AuthModalProps) {
@@ -33,12 +34,12 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   // UI States
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   // Email/Password Form States (optional, hidden by default)
   const [showEmailForm, setShowEmailForm] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   /**
    * Google OAuth Handler
@@ -61,7 +62,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     try {
       setIsLoading(true);
-      setError('');
+      setError("");
 
       // CRITICAL FIX: Clear any stale sessions before OAuth
       // This prevents "Session already exists" errors from Clerk
@@ -69,18 +70,18 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         await signOut();
       } catch (signOutError) {
         // Ignore errors if no session exists - this is fine
-        console.log('No existing session to clear (expected)');
+        console.log("No existing session to clear (expected)");
       }
 
       // This one call handles BOTH sign-in and sign-up
       await signIn.authenticateWithRedirect({
-        strategy: 'oauth_google',
+        strategy: "oauth_google",
         redirectUrl: `${window.location.origin}/sso-callback`,
         redirectUrlComplete: `${window.location.origin}/campaigns`,
       });
     } catch (err: any) {
-      console.error('OAuth error:', err);
-      setError('Failed to connect with Google. Please try again.');
+      console.error("OAuth error:", err);
+      setError("Failed to connect with Google. Please try again.");
       setIsLoading(false);
     }
   };
@@ -100,14 +101,14 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
     try {
       setIsLoading(true);
-      setError('');
+      setError("");
 
       // CRITICAL FIX: Clear any stale sessions before email auth
       try {
         await signOut();
       } catch (signOutError) {
         // Ignore errors if no session exists
-        console.log('No existing session to clear (expected)');
+        console.log("No existing session to clear (expected)");
       }
 
       // Try to sign in
@@ -116,27 +117,31 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         password,
       });
 
-      if (result.status === 'complete') {
+      if (result.status === "complete") {
         // Success! Close modal and redirect
         onClose();
-        router.push('/campaigns');
+        router.push("/campaigns");
       } else {
         // Handle any additional verification steps
-        setError('Please complete the verification process.');
+        setError("Please complete the verification process.");
       }
     } catch (err: any) {
-      console.error('Email auth error:', err);
+      console.error("Email auth error:", err);
 
       // Check error codes to provide helpful messages
       const errorCode = err.errors?.[0]?.code;
 
-      if (errorCode === 'form_identifier_not_found') {
+      if (errorCode === "form_identifier_not_found") {
         // Account doesn't exist - direct them to use Google
-        setError('No account found. Please use "Continue with Google" to create an account instantly.');
-      } else if (errorCode === 'form_password_incorrect') {
-        setError('Incorrect password. Please try again.');
+        setError(
+          'No account found. Please use "Continue with Google" to create an account instantly.'
+        );
+      } else if (errorCode === "form_password_incorrect") {
+        setError("Incorrect password. Please try again.");
       } else {
-        setError(err.errors?.[0]?.message || 'Something went wrong. Please try again.');
+        setError(
+          err.errors?.[0]?.message || "Something went wrong. Please try again."
+        );
       }
     } finally {
       setIsLoading(false);
@@ -210,7 +215,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
               className="px-4 bg-slate-900 text-gray-400 hover:text-gray-300 transition-colors"
               type="button"
             >
-              {showEmailForm ? 'Hide email option' : 'Or use email'}
+              {showEmailForm ? "Hide email option" : "Or use email"}
             </button>
           </div>
         </div>
@@ -218,48 +223,30 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
         {/* Email/Password Form (Optional - Hidden by Default) */}
         {showEmailForm && (
           <form onSubmit={handleEmailAuth} className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                Email address
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-500" />
-                </div>
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5 text-gray-500" />
-                </div>
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your password"
-                  className="block w-full pl-10 pr-3 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
+            <TextField
+              htmlFor="email"
+              label="Email address"
+              icon={Mail}
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+              disabled={isLoading}
+            />
+            <TextField
+              htmlFor="password"
+              label="Password"
+              icon={Lock}
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              required
+              disabled={isLoading}
+            />
             <button
               type="submit"
               disabled={isLoading || !email || !password}
@@ -283,7 +270,8 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
         {/* Footer Note */}
         <p className="text-xs text-gray-500 text-center pt-2">
-          By continuing, you agree to Elaview's Terms of Service and Privacy Policy
+          By continuing, you agree to Elaview's Terms of Service and Privacy
+          Policy
         </p>
       </div>
     </Modal>

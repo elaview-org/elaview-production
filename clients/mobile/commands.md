@@ -1,5 +1,5 @@
 
 # commands
-# npm run android
-# npm run ios
-# npm run web
+# pnpm android
+# pnpm ios
+# pnpm web

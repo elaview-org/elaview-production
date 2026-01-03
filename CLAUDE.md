@@ -2,6 +2,8 @@
 
 > B2B advertising marketplace connecting local advertisers with physical ad space owners (storefronts, windows, walls).
 
+**🚀 New to the project? Start here:** [START_HERE.md](./START_HERE.md)
+
 ## Quick Reference
 
 **Stack:**
@@ -62,6 +64,7 @@ elaview/
 ### Always
 
 ✅ Use TypeScript strict mode
+✅ **ALWAYS use pnpm, never npm or yarn**
 ✅ Write tests alongside features (unit + component minimum)
 ✅ Read space type config from API, never hardcode
 ✅ Use factories for test data (createMockBooking, etc.)
@@ -70,6 +73,7 @@ elaview/
 
 ### Never
 
+❌ **NEVER use npm or yarn - ONLY use pnpm**
 ❌ Hardcode space types, fees, or verification requirements
 ❌ Skip tests for new features
 ❌ Commit console.log or debug code
@@ -115,8 +119,10 @@ pnpm build               # Build all packages
 
 ## Getting Help
 
+- **📍 Start here:** See `START_HERE.md` (comprehensive onboarding & documentation index)
 - **Architecture questions:** See `docs/ARCHITECTURE.md`
 - **API contracts:** See `docs/API-CONTRACTS.md`
 - **Mobile screens:** See `docs/MOBILE-SCREENS.md`
 - **Testing patterns:** See `docs/TESTING.md`
 - **Adding space types:** See `docs/EXTENSIBILITY.md`
+- **Daily workflow:** See `docs/DAILY-WORKFLOW.md`

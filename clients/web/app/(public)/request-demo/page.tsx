@@ -20,8 +20,10 @@ import {
   Zap,
   Shield,
 } from "lucide-react";
+
 import TextField from "@/shared/components/atoms/TextField";
 import Button from "@/shared/components/atoms/Button/Button";
+import Select from "@/shared/components/atoms/Select";
 
 const demoRequestSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -208,28 +210,21 @@ export default function RequestDemoPage() {
                 />
               </div>
 
-              {/* Company Size */}
-              <div>
-                <label
-                  htmlFor="companySize"
-                  className="block text-sm font-semibold text-slate-300 mb-2"
-                >
-                  Company Size
-                </label>
-                <select
-                  {...register("companySize")}
-                  id="companySize"
-                  className="block w-full px-4 py-3.5 bg-slate-800/50 border border-slate-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all backdrop-blur-sm"
-                >
-                  <option value="">Select company size</option>
-                  <option value="1-10">1-10 employees</option>
-                  <option value="11-50">11-50 employees</option>
-                  <option value="51-200">51-200 employees</option>
-                  <option value="201-500">201-500 employees</option>
-                  <option value="500+">500+ employees</option>
-                </select>
-              </div>
-
+              <Select
+                {...register("companySize")}
+                id="companySize"
+                htmlFor="companySize"
+                label="Company Size"
+                options={[
+                  { value: "1-10", label: "1-10 employees" },
+                  { value: "11-50", label: "11-50 employees" },
+                  { value: "51-200", label: "51-200 employees" },
+                  { value: "201-500", label: "201-500 employees" },
+                  { value: "500+", label: "500+ employees" },
+                ]}
+                placeholder="Select company size"
+                errorMessage={errors.companySize?.message}
+              />
               {/* Message */}
               <div>
                 <label

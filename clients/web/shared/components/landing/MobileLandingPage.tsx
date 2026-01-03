@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { ArrowRight, MapPin, Menu, TrendingUp, X, Zap } from "lucide-react";
 import Image from "next/image";
-import Logo from "../../../../elaview-mvp/public/assets/logo/logo-v1-white.png";
+import Logo from "@/public/images/logos/logo-v1-white.png";
 
 interface MobileLandingPageProps {
   onSignIn: () => void;

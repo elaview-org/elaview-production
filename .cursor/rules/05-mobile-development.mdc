@@ -59,6 +59,91 @@ Expo SDK 54 uses the **New Architecture** by default:
 }
 ```
 
+### EAS Development Builds (REQUIRED - NOT Expo Go)
+
+**CRITICAL**: Elaview mobile app requires EAS custom development builds. **Expo Go WILL NOT WORK**.
+
+**Why?**
+- `newArchEnabled: true` - Expo Go doesn't support the New Architecture
+- Reanimated 4.x requires `react-native-reanimated/plugin` in Babel config
+- Native dependencies (`react-native-reanimated`, `react-native-gesture-handler`, `react-native-svg`) work better with custom builds
+
+**Setup:**
+
+```bash
+# 1. Install EAS CLI globally
+pnpm add -g eas-cli
+
+# 2. Login to EAS
+eas login
+
+# 3. Build development client
+cd clients/mobile
+
+# iOS (simulator - Mac only):
+eas build --profile development --platform ios
+
+# Android (emulator/device):
+eas build --profile development --platform android
+```
+
+**First build takes 15-20 minutes.** Subsequent builds are faster (~5-10 min).
+
+**After build completes:**
+- **iOS**: Download `.tar.gz`, drag to iOS Simulator
+- **Android**: Download APK, install on emulator/device (`adb install app.apk`)
+
+**Start dev server with custom build:**
+```bash
+npx expo start --dev-client
+```
+
+**Configuration files:**
+
+```json
+// eas.json
+{
+  "cli": {
+    "version": ">= 14.0.0"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true
+    }
+  }
+}
+```
+
+```javascript
+// babel.config.js
+module.exports = function (api) {
+  api.cache(true);
+  return {
+    presets: ['babel-preset-expo'],
+    plugins: ['react-native-reanimated/plugin'], // ← Required for Reanimated 4.x
+  };
+};
+```
+
+**When to rebuild:**
+- After adding native dependencies
+- After changing `app.json` plugins
+- After updating Expo SDK version
+- NOT needed for JavaScript/TypeScript code changes (hot reload works)
+
 ### Reanimated v4
 
 Use Reanimated v4 for animations:

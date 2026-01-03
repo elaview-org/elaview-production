@@ -15,10 +15,10 @@ import {
   LogOut,
 } from "lucide-react";
 import { useClerk } from "@clerk/nextjs";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
+// import { api } from "../../../../elaview-mvp/src/trpc/react";
 import { toast } from "sonner";
-import { NotificationBadge } from "../../../../elaview-mvp/src/components/notifications/NotificationBadge";
-import { BugReportModal } from "../../../../elaview-mvp/src/components/feedback/BugReportButton";
+import { NotificationBadge } from "@/shared/components/notifications/NotificationBadge";
+import { BugReportModal } from "@/shared/components/feedback/BugReportButton";
 
 interface AdvertiserHamburgerDrawerProps {
   /** Whether drawer is open */
@@ -41,26 +41,28 @@ interface AdvertiserHamburgerDrawerProps {
 export function AdvertiserHamburgerDrawer({ isOpen, onClose }: AdvertiserHamburgerDrawerProps) {
   const router = useRouter();
   const { signOut } = useClerk();
-  const utils = api.useUtils();
+  const utils :any = undefined;
   const [bugReportOpen, setBugReportOpen] = useState(false);
 
-  const { data: notificationData } = api.notifications.getUnread.useQuery(undefined, {
-    staleTime: 30000,
-    refetchOnWindowFocus: true,
-  });
+  // const { data: notificationData } = api.notifications.getUnread.useQuery(undefined, {
+  //   staleTime: 30000,
+  //   refetchOnWindowFocus: true,
+  // });
+  const notificationData  = undefined;
 
-  const switchRoleMutation = api.user.switchRole.useMutation({
-    onSuccess: async () => {
-      await utils.notifications.getUnread.invalidate();
-      await utils.user.getCurrentUser.invalidate();
-      toast.success("Switched to Space Owner mode!");
-      onClose();
-      router.push("/spaces/dashboard");
-    },
-    onError: () => {
-      toast.error("Failed to switch role. Please try again.");
-    },
-  });
+  const switchRoleMutation :any = undefined;
+  // const switchRoleMutation :any = api.user.switchRole.useMutation({
+  //   onSuccess: async () => {
+  //     await utils.notifications.getUnread.invalidate();
+  //     await utils.user.getCurrentUser.invalidate();
+  //     toast.success("Switched to Space Owner mode!");
+  //     onClose();
+  //     router.push("/spaces/dashboard");
+  //   },
+  //   onError: () => {
+  //     toast.error("Failed to switch role. Please try again.");
+  //   },
+  // });
 
   const handleRoleSwitch = async () => {
     try {

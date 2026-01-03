@@ -1,10 +1,22 @@
-// src/components/landing/LandingPage.tsx - OPTIMISTIC UI - NO MARKER FLICKERING
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { DollarSign, Eye, Image as ImageIcon, Loader2, MapPin, Star } from "lucide-react";
+import {
+  DollarSign,
+  Eye,
+  Image as ImageIcon,
+  Loader2,
+  MapPin,
+  Star,
+} from "lucide-react";
 import { GoogleMap } from "../browse/maps/GoogleMap";
 import { FloatingMapControls } from "../browse/map/FloatingMapControls";
 import { SpaceDetailsSidebar } from "../browse/sheets/SpaceDetailsSidebar";
@@ -14,8 +26,9 @@ import { SignUpModal } from "../auth/SignUpModal";
 import { AuthModal } from "../auth/AuthModal";
 import { Navigation } from "../layout/Navigation";
 import { MobileLandingPage } from "./MobileLandingPage";
-import type { RouterOutputs } from "../../../../elaview-mvp/src/trpc/react";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
+import Button from "../atoms/Button/Button";
+
+type RouterOutputs = "spaces" | undefined;
 
 type SpaceFromAPI = RouterOutputs["spaces"]["browsePublic"]["spaces"][number];
 
@@ -56,7 +69,6 @@ export default function LandingPage() {
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [hasLoadedSpaces, setHasLoadedSpaces] = useState(false);
 
-  // ✅ OPTIMISTIC UI: Keep old markers visible until new ones load
   const [displaySpaces, setDisplaySpaces] = useState<SpaceFromAPI[]>([]);
 
   const [showSignIn, setShowSignIn] = useState(false);
@@ -70,17 +82,16 @@ export default function LandingPage() {
     spaceTypes: [],
   });
 
-  const { data: user, isLoading: userLoading } = api.user.getCurrentUser.useQuery(undefined, {
-    enabled: isSignedIn && clerkLoaded && isMounted,
-    retry: false,
-  });
+  const user = {};
+  const userLoading = true;
 
   useEffect(() => {
     setIsMounted(true);
 
     if (typeof window === "undefined") return;
 
-    const locationPreference = window.localStorage.getItem("locationPreference");
+    const locationPreference =
+      window.localStorage.getItem("locationPreference");
 
     if (!locationPreference && "geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
@@ -90,9 +101,15 @@ export default function LandingPage() {
             lng: position.coords.longitude,
           };
 
-          console.log("📍 User location cached (not auto-zooming):", userLocation);
+          console.log(
+            "📍 User location cached (not auto-zooming):",
+            userLocation
+          );
           window.localStorage.setItem("locationPreference", "allowed");
-          window.localStorage.setItem("userLocation", JSON.stringify(userLocation));
+          window.localStorage.setItem(
+            "userLocation",
+            JSON.stringify(userLocation)
+          );
         },
         (error) => {
           console.log("⚠️ Geolocation denied:", error.message);
@@ -115,7 +132,11 @@ export default function LandingPage() {
     const checkMobileViewport = () => {
       const isMobile = window.innerWidth < 768;
       setIsMobileViewport(isMobile);
-      console.log(`📱 Viewport: ${isMobile ? "Mobile" : "Desktop"} (${window.innerWidth}px)`);
+      console.log(
+        `📱 Viewport: ${isMobile ? "Mobile" : "Desktop"} (${
+          window.innerWidth
+        }px)`
+      );
     };
 
     checkMobileViewport();
@@ -198,37 +219,30 @@ export default function LandingPage() {
     return input;
   }, [mapBounds, filters, mapZoom]);
 
-  const {
-    data: spacesData,
-    isLoading: spacesLoading,
-    refetch,
-  } = api.spaces.browsePublic.useQuery(queryInput, {
-    enabled: !!mapBounds,
-    staleTime: 300000,
-    gcTime: 600000,
-    refetchOnWindowFocus: false,
-  });
+  const spacesData = {
+    spaces:[],
+  };
 
-  // Track when initial data loads
+  const spacesLoading = true;
+  // const 
+  //  = () => {};
+
   useEffect(() => {
     if (spacesData && !hasLoadedSpaces) {
       setHasLoadedSpaces(true);
     }
   }, [spacesData, hasLoadedSpaces]);
 
-  // ✅ OPTIMISTIC UI: Update displaySpaces only when new data arrives
+
   useEffect(() => {
     if (spacesData?.spaces && spacesData.spaces.length > 0) {
       setDisplaySpaces(spacesData.spaces);
 
       // Debug log geographic distribution
-      const stateDistribution = spacesData.spaces.reduce(
-        (acc, space) => {
-          acc[space.state] = (acc[space.state] || 0) + 1;
-          return acc;
-        },
-        {} as Record<string, number>
-      );
+      const stateDistribution = spacesData.spaces.reduce((acc, space) => {
+        acc[space.state] = (acc[space.state] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
 
       const states = Object.keys(stateDistribution).sort();
       const statesText =
@@ -245,7 +259,8 @@ export default function LandingPage() {
           .slice(0, 5)
           .map(([state, count]) => `${state}: ${count}`),
         sample: {
-          firstSpace: spacesData.spaces[0]?.city + ", " + spacesData.spaces[0]?.state,
+          firstSpace:
+            spacesData.spaces[0]?.city + ", " + spacesData.spaces[0]?.state,
           lastSpace:
             spacesData.spaces[spacesData.spaces.length - 1]?.city +
             ", " +
@@ -258,7 +273,12 @@ export default function LandingPage() {
   const nearestSpaces = useMemo(() => {
     if (!displaySpaces.length) return [];
 
-    const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const calculateDistance = (
+      lat1: number,
+      lon1: number,
+      lat2: number,
+      lon2: number
+    ) => {
       const R = 6371;
       const dLat = ((lat2 - lat1) * Math.PI) / 180;
       const dLon = ((lon2 - lon1) * Math.PI) / 180;
@@ -274,10 +294,17 @@ export default function LandingPage() {
 
     const spacesWithDistance = displaySpaces.map((space) => ({
       ...space,
-      distance: calculateDistance(mapCenter.lat, mapCenter.lng, space.latitude, space.longitude),
+      distance: calculateDistance(
+        mapCenter.lat,
+        mapCenter.lng,
+        space.latitude,
+        space.longitude
+      ),
     }));
 
-    return spacesWithDistance.sort((a, b) => a.distance - b.distance).slice(0, 18);
+    return spacesWithDistance
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 18);
   }, [displaySpaces, mapCenter]);
 
   const handleBoundsChange = useCallback((bounds: MapBounds, zoom: number) => {
@@ -292,7 +319,10 @@ export default function LandingPage() {
       coverage: {
         latRange: (bounds.north - bounds.south).toFixed(2) + "°",
         lngRange: (bounds.east - bounds.west).toFixed(2) + "°",
-        approximateArea: `${((bounds.north - bounds.south) * (bounds.east - bounds.west)).toFixed(0)}° squared`,
+        approximateArea: `${(
+          (bounds.north - bounds.south) *
+          (bounds.east - bounds.west)
+        ).toFixed(0)}° squared`,
       },
       dynamicLimit: getDynamicLimit(zoom),
     });
@@ -326,21 +356,21 @@ export default function LandingPage() {
 
   const applyFilters = useCallback(() => {
     console.log("✅ Applying filters");
-    refetch();
+    // refetch();
     setShowFilters(false);
-  }, [refetch]);
+  }, []);
 
   const resetFilters = useCallback(() => {
-    console.log("🔄 Resetting filters");
     setFilters({
       maxPrice: MAX_PRICE,
       spaceTypes: [],
     });
-    refetch();
-  }, [refetch]);
+    // refetch();
+  }, []);
 
   const activeFilterCount =
-    (filters.spaceTypes.length > 0 ? 1 : 0) + (filters.maxPrice < MAX_PRICE ? 1 : 0);
+    (filters.spaceTypes.length > 0 ? 1 : 0) +
+    (filters.maxPrice < MAX_PRICE ? 1 : 0);
 
   const handleMyLocation = useCallback(() => {
     if ("geolocation" in navigator) {
@@ -359,12 +389,17 @@ export default function LandingPage() {
           setIsLocating(false);
 
           window.localStorage.setItem("locationPreference", "allowed");
-          window.localStorage.setItem("userLocation", JSON.stringify(userLocation));
+          window.localStorage.setItem(
+            "userLocation",
+            JSON.stringify(userLocation)
+          );
         },
         (error) => {
           console.log("⚠️ Geolocation error:", error.message);
           setIsLocating(false);
-          alert("Unable to get your location. Please check your browser settings.");
+          alert(
+            "Unable to get your location. Please check your browser settings."
+          );
         },
         {
           enableHighAccuracy: false,
@@ -378,7 +413,6 @@ export default function LandingPage() {
   }, []);
 
   if (isMobileViewport && isMounted) {
-    console.log("🔍 RENDERING: Mobile Landing Page with AuthModal");
     return (
       <>
         <MobileLandingPage
@@ -406,7 +440,7 @@ export default function LandingPage() {
     );
   }
 
-  console.log("🔍 RENDERING: Desktop Landing Page with SignInModal");
+  
   return (
     <div className="flex h-screen flex-col bg-slate-950">
       <Navigation
@@ -426,10 +460,11 @@ export default function LandingPage() {
           <div className="border-b border-slate-800 p-4">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-xl font-bold text-white">Nearby Spaces</h2>
-              <button
+              <Button
                 onClick={handleMyLocation}
                 disabled={isLocating}
-                className="flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                variant="primary"
+                size="sm"
               >
                 {isLocating ? (
                   <>
@@ -442,12 +477,14 @@ export default function LandingPage() {
                     My Location
                   </>
                 )}
-              </button>
+              </Button>
             </div>
-            <p className="text-sm text-slate-400">Sorted by distance from map center</p>
+            <p className="text-sm text-slate-400">
+              Sorted by distance from map center
+            </p>
           </div>
-
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
+
             {spacesLoading && !hasLoadedSpaces ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
@@ -456,7 +493,9 @@ export default function LandingPage() {
               <div className="py-12 text-center">
                 <MapPin className="mx-auto mb-3 h-12 w-12 text-slate-600" />
                 <p className="text-slate-400">No spaces found nearby</p>
-                <p className="mt-1 text-sm text-slate-500">Try zooming out or moving the map</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  Try zooming out or moving the map
+                </p>
               </div>
             ) : (
               nearestSpaces.map((space) => (
@@ -575,7 +614,8 @@ export default function LandingPage() {
                 <div
                   className="absolute inset-0"
                   style={{
-                    backgroundImage: "radial-gradient(circle, #334155 1px, transparent 1px)",
+                    backgroundImage:
+                      "radial-gradient(circle, #334155 1px, transparent 1px)",
                     backgroundSize: "40px 40px",
                     opacity: 0.1,
                   }}
@@ -592,7 +632,9 @@ export default function LandingPage() {
               mapZoom={mapZoom}
               isLoading={false}
               isInCart={() => false}
-              className={`h-full w-full transition-opacity duration-500 ${isMapLoaded ? "opacity-100" : "opacity-0"}`}
+              className={`h-full w-full transition-opacity duration-500 ${
+                isMapLoaded ? "opacity-100" : "opacity-0"
+              }`}
               onTilesLoaded={() => setIsMapLoaded(true)}
             />
 
@@ -620,25 +662,30 @@ export default function LandingPage() {
               </div>
             )}
 
-            {!spacesLoading && mapBounds && displaySpaces.length === 0 && hasLoadedSpaces && (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
-                <div className="pointer-events-auto max-w-md rounded-xl border border-slate-800 bg-slate-900 p-8 text-center shadow-2xl">
-                  <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-800">
-                    <MapPin className="h-7 w-7 text-slate-400" />
+            {!spacesLoading &&
+              mapBounds &&
+              displaySpaces.length === 0 &&
+              hasLoadedSpaces && (
+                <div className="pointer-events-none absolute inset-0 flex items-center justify-center p-4">
+                  <div className="pointer-events-auto max-w-md rounded-xl border border-slate-800 bg-slate-900 p-8 text-center shadow-2xl">
+                    <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-slate-800">
+                      <MapPin className="h-7 w-7 text-slate-400" />
+                    </div>
+                    <h3 className="mb-2 text-xl font-bold text-white">
+                      No spaces found
+                    </h3>
+                    <p className="mb-6 text-slate-400">
+                      Try adjusting your filters or zoom out to see more areas.
+                    </p>
+                    <button
+                      onClick={resetFilters}
+                      className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-all hover:bg-blue-700"
+                    >
+                      Reset Filters
+                    </button>
                   </div>
-                  <h3 className="mb-2 text-xl font-bold text-white">No spaces found</h3>
-                  <p className="mb-6 text-slate-400">
-                    Try adjusting your filters or zoom out to see more areas.
-                  </p>
-                  <button
-                    onClick={resetFilters}
-                    className="rounded-lg bg-blue-600 px-6 py-3 font-medium text-white transition-all hover:bg-blue-700"
-                  >
-                    Reset Filters
-                  </button>
                 </div>
-              </div>
-            )}
+              )}
           </div>
         </div>
       </div>

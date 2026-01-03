@@ -229,15 +229,14 @@ export function FirstTimeSpaceOwnerOnboarding({
 
             <div className="flex justify-between items-center pt-4">
               <Button
-                variant="ghost"
                 onClick={handleClose}
-                className="text-slate-400 hover:text-white"
+                className="text-slate-400 hover:text-white flex border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors"
               >
                 Maybe Later
               </Button>
               <Button
                 onClick={handleStep1Continue}
-                className="bg-green-600 hover:bg-green-700 text-white px-8"
+                className="bg-green-600 hover:bg-green-700 text-white px-8 flex border-b-2 px-1 py-4 text-sm font-medium whitespace-nowrap transition-colors"
               >
                 Continue to Payment Setup
                 <ArrowRight className="ml-2 h-4 w-4" />

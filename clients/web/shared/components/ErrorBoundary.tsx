@@ -1,8 +1,8 @@
 // src/components/ErrorBoundary.tsx
-'use client';
+"use client";
 
-import { Component, type ReactNode } from 'react';
-import { AlertCircle } from 'lucide-react';
+import { Component, type ReactNode } from "react";
+import { AlertCircle } from "lucide-react";
 
 interface Props {
   children: ReactNode;
@@ -25,16 +25,12 @@ export class ErrorBoundary extends Component<Props, State> {
     return {
       hasError: true,
       error,
-      errorInfo: error.stack
+      errorInfo: error.stack,
     };
   }
 
   componentDidCatch(error: Error, errorInfo: any) {
-    // Log error to console or error reporting service
-    console.error('Error caught by Error Boundary:', error, errorInfo);
-
-    // You can also log to an error reporting service here
-    // Example: Sentry.captureException(error);
+    console.error("Error caught by Error Boundary:", error, errorInfo);
   }
 
   handleReset = () => {
@@ -60,7 +56,7 @@ export class ErrorBoundary extends Component<Props, State> {
               We encountered an unexpected error. Please try reloading the page.
             </p>
 
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {process.env.NODE_ENV === "development" && this.state.error && (
               <div className="mb-6 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
                 <p className="text-xs font-mono text-red-400 mb-2">
                   {this.state.error.message}

@@ -16,10 +16,11 @@ import {
   TrendingUp,
   Loader2,
 } from "lucide-react";
-import { api, type RouterOutputs } from "../../../../../elaview-mvp/src/trpc/react";
+import useSpacesDelete from "@/shared/hooks/api/actions/useSpacesDelete/useSpacesDelete";
+import useSpaces from "@/shared/hooks/api/getters/useSpaces/useSpaces";
 
-type Space = RouterOutputs["spaces"]["getMySpaces"][number];
-
+// type Space = RouterOutputs["spaces"]["getMySpaces"][number];
+type Space = any;
 const SPACE_TYPE_LABELS = {
   BILLBOARD: "Billboard",
   STOREFRONT: "Storefront",
@@ -34,19 +35,8 @@ export default function MySpacesPage() {
   const [selectedSpace, setSelectedSpace] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const { data: spaces, isLoading, refetch } = api.spaces.getMySpaces.useQuery();
-
-  const deleteSpaceMutation = api.spaces.delete.useMutation({
-    onSuccess: () => {
-      void refetch();
-      setShowDeleteModal(false);
-      setSelectedSpace(null);
-    },
-    onError: (error) => {
-      alert(`Error deleting space: ${error.message}`);
-    },
-  });
-
+  const {spaces, isLoading, refetch} = useSpaces();
+  const {deleteSpace, isPending:deleteSpaceMutationPending} = useSpacesDelete();
   const handleDeleteSpace = (spaceId: string) => {
     setSelectedSpace(spaceId);
     setShowDeleteModal(true);
@@ -54,7 +44,7 @@ export default function MySpacesPage() {
 
   const confirmDelete = () => {
     if (selectedSpace) {
-      deleteSpaceMutation.mutate({ id: selectedSpace });
+      deleteSpace();
     }
   };
 
@@ -250,9 +240,9 @@ export default function MySpacesPage() {
                   type="button"
                   className="inline-flex w-full justify-center rounded-lg border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm transition-all hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50 sm:ml-3 sm:w-auto sm:text-sm"
                   onClick={confirmDelete}
-                  disabled={deleteSpaceMutation.isPending}
+                  disabled={deleteSpaceMutationPending}
                 >
-                  {deleteSpaceMutation.isPending ? (
+                  {deleteSpaceMutationPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Deleting...
@@ -434,3 +424,4 @@ function SpaceCard({
     </div>
   );
 }
+

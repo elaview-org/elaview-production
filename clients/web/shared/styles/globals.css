@@ -1,0 +1,156 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+/* ============================================================================
+   THEME VARIABLES - HSL-BASED COLOR SYSTEM
+   ============================================================================ */
+
+:root {
+  /* Brand hues - adjust these to shift entire palette */
+  --hue-brand: 186;
+  --hue-accent: 270;
+  --hue-success: 160;
+  --hue-warning: 45;
+
+  /* Backgrounds */
+  --bg-page: hsl(220, 20%, 98%);
+  --bg-page-alt: hsl(220, 15%, 96%);
+  --bg-card: hsl(0, 0%, 100%);
+  --bg-card-hover: hsl(0, 0%, 100%);
+  --bg-muted: hsl(220, 15%, 95%);
+  --bg-input: hsl(0, 0%, 100%);
+
+  /* Text */
+  --text-primary: hsl(220, 25%, 12%);
+  --text-secondary: hsl(220, 10%, 40%);
+  --text-muted: hsl(220, 10%, 55%);
+  --text-inverted: hsl(0, 0%, 100%);
+
+  /* Borders */
+  --border-default: hsl(220, 15%, 88%);
+  --border-muted: hsl(220, 15%, 92%);
+
+  /* Brand accent */
+  --accent: hsl(var(--hue-brand), 85%, 45%);
+  --accent-light: hsl(var(--hue-brand), 85%, 55%);
+  --accent-muted: hsl(var(--hue-brand), 60%, 92%);
+  --accent-text: hsl(var(--hue-brand), 85%, 35%);
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(to right, hsl(var(--hue-brand), 85%, 45%), hsl(var(--hue-brand), 90%, 50%));
+  --gradient-brand-text: linear-gradient(to right, hsl(var(--hue-brand), 85%, 40%), hsl(var(--hue-brand), 90%, 45%));
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px hsl(220, 20%, 80%, 0.3);
+  --shadow-md: 0 4px 12px hsl(220, 20%, 70%, 0.15);
+  --shadow-lg: 0 8px 30px hsl(220, 20%, 60%, 0.12);
+  --shadow-accent: 0 8px 30px hsl(var(--hue-brand), 80%, 50%, 0.25);
+
+  /* Status colors */
+  --success: hsl(var(--hue-success), 70%, 45%);
+  --success-muted: hsl(var(--hue-success), 60%, 92%);
+  --warning: hsl(var(--hue-warning), 90%, 45%);
+  --warning-muted: hsl(var(--hue-warning), 80%, 92%);
+
+  /* Component-specific */
+  --tab-bg: hsl(220, 15%, 93%);
+  --tab-active-bg: hsl(0, 0%, 100%);
+  --tab-active-text: hsl(var(--hue-brand), 85%, 40%);
+  --progress-bg: hsl(220, 15%, 90%);
+  --browser-bar: linear-gradient(to right, hsl(var(--hue-brand), 75%, 45%), hsl(var(--hue-brand), 85%, 50%));
+}
+
+.dark {
+  /* Backgrounds */
+  --bg-page: hsl(225, 40%, 7%);
+  --bg-page-alt: hsl(225, 35%, 10%);
+  --bg-card: hsl(225, 35%, 12%);
+  --bg-card-hover: hsl(225, 35%, 15%);
+  --bg-muted: hsl(225, 30%, 18%);
+  --bg-input: hsl(225, 30%, 18%);
+
+  /* Text */
+  --text-primary: hsl(0, 0%, 100%);
+  --text-secondary: hsl(220, 15%, 65%);
+  --text-muted: hsl(220, 15%, 45%);
+  --text-inverted: hsl(225, 35%, 12%);
+
+  /* Borders */
+  --border-default: hsl(var(--hue-brand), 50%, 25%, 0.3);
+  --border-muted: hsl(225, 30%, 20%);
+
+  /* Brand accent - slightly lighter for dark mode */
+  --accent: hsl(var(--hue-brand), 85%, 55%);
+  --accent-light: hsl(var(--hue-brand), 90%, 65%);
+  --accent-muted: hsl(var(--hue-brand), 50%, 20%);
+  --accent-text: hsl(var(--hue-brand), 85%, 65%);
+
+  /* Gradients */
+  --gradient-brand: linear-gradient(to right, hsl(var(--hue-brand), 85%, 50%), hsl(var(--hue-brand), 90%, 55%));
+  --gradient-brand-text: linear-gradient(to right, hsl(var(--hue-brand), 85%, 55%), hsl(var(--hue-brand), 90%, 60%));
+
+  /* Shadows - accent glow in dark mode */
+  --shadow-sm: 0 1px 2px hsl(0, 0%, 0%, 0.3);
+  --shadow-md: 0 4px 12px hsl(0, 0%, 0%, 0.4);
+  --shadow-lg: 0 8px 30px hsl(var(--hue-brand), 80%, 50%, 0.1);
+  --shadow-accent: 0 8px 30px hsl(var(--hue-brand), 80%, 50%, 0.2);
+
+  /* Status colors - adjusted for dark */
+  --success: hsl(var(--hue-success), 70%, 55%);
+  --success-muted: hsl(var(--hue-success), 40%, 15%);
+  --warning: hsl(var(--hue-warning), 90%, 55%);
+  --warning-muted: hsl(var(--hue-warning), 50%, 15%);
+
+  /* Component-specific */
+  --tab-bg: hsl(225, 35%, 12%);
+  --tab-active-bg: var(--gradient-brand);
+  --tab-active-text: hsl(225, 35%, 12%);
+  --progress-bg: hsl(225, 30%, 18%);
+  --browser-bar: linear-gradient(to right, hsl(var(--hue-brand), 75%, 40%), hsl(var(--hue-brand), 85%, 45%));
+}
+
+/* ============================================================================
+   SCROLLBAR UTILITIES
+   ============================================================================ */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ============================================================================
+   TOAST NOTIFICATIONS - MOBILE OPTIMIZATION
+   ============================================================================ */
+
+/* Mobile: Bottom-center positioning (above bottom nav) */
+@media (max-width: 640px) {
+  [data-sonner-toaster] {
+    bottom: calc(env(safe-area-inset-bottom) + 80px) !important;
+    top: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+  }
+
+  [data-sonner-toast] {
+    margin: 0 auto;
+    width: calc(100vw - 32px);
+    max-width: calc(100vw - 32px);
+  }
+}
+
+/* Desktop: Top-right positioning (standard) */
+@media (min-width: 641px) {
+  [data-sonner-toaster] {
+    top: 16px !important;
+    right: 16px !important;
+  }
+}

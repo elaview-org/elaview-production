@@ -1,17 +1,33 @@
 // src/components/browse/SpaceDetailsSidebar.tsx
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import {
-  X, MapPin, Star, Calendar, DollarSign, Check, AlertCircle, Loader2, Plus,
-  ChevronDown, ChevronRight, Ruler, Eye, TrendingUp, Package
-} from 'lucide-react';
-import { api } from '../../../../../elaview-mvp/src/trpc/react';
-import { DatePickerModal } from '../../ui/DatePickerModal';
-import { ImageLightbox } from '../../ui/ImageLightbox';
-import { calculateBookingCost } from '../../../../../elaview-mvp/src/lib/booking-calculations';
-import { normalizeToUTCStartOfDay, normalizeToUTCEndOfDay } from '../../../../../elaview-mvp/src/lib/date-utils';
+  X,
+  MapPin,
+  Star,
+  Calendar,
+  DollarSign,
+  Check,
+  AlertCircle,
+  Loader2,
+  Plus,
+  ChevronDown,
+  ChevronRight,
+  Ruler,
+  Eye,
+  TrendingUp,
+  Package,
+} from "lucide-react";
+// import { api } from './trpc/react';
+import { DatePickerModal } from "../../ui/DatePickerModal";
+import { ImageLightbox } from "../../ui/ImageLightbox";
+import { calculateBookingCost } from "@/shared/lib/booking-calculations";
+import {
+  normalizeToUTCStartOfDay,
+  normalizeToUTCEndOfDay,
+} from "@/shared/lib/date-utils";
 
 interface Space {
   id: string;
@@ -70,13 +86,13 @@ interface SpaceDetailsSidebarProps {
 }
 
 const SPACE_TYPE_LABELS: Record<string, string> = {
-  BILLBOARD: 'Billboard',
-  STOREFRONT: 'Storefront',
-  TRANSIT: 'Transit Advertising',
-  DIGITAL_DISPLAY: 'Digital Display',
-  WINDOW_DISPLAY: 'Window Display',
-  VEHICLE_WRAP: 'Vehicle Wrap',
-  OTHER: 'Other',
+  BILLBOARD: "Billboard",
+  STOREFRONT: "Storefront",
+  TRANSIT: "Transit Advertising",
+  DIGITAL_DISPLAY: "Digital Display",
+  WINDOW_DISPLAY: "Window Display",
+  VEHICLE_WRAP: "Vehicle Wrap",
+  OTHER: "Other",
 };
 
 export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
@@ -93,7 +109,7 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
 }) => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
-  const [dateError, setDateError] = useState<string>('');
+  const [dateError, setDateError] = useState<string>("");
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showDescription, setShowDescription] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
@@ -104,22 +120,23 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
   const [creativeError, setCreativeError] = useState<string | null>(null);
   const [isImageLightboxOpen, setIsImageLightboxOpen] = useState(false);
 
-  const { data: confirmedBookings, isLoading: loadingBookings } = api.spaces.getConfirmedBookings.useQuery({
-    spaceId: space.id,
-  });
+  const confirmedBookings = null;
+  const loadingBookings = false;
 
   // Initialize dates - ONLY from cart, no defaults
   useEffect(() => {
     // Clear creative error when campaign changes
     setCreativeError(null);
-    
+
     if (cartDates) {
-      console.log('📅 SpaceDetailsSidebar: Setting dates from cart', cartDates);
+      console.log("📅 SpaceDetailsSidebar: Setting dates from cart", cartDates);
       setStartDate(cartDates.startDate);
       setEndDate(cartDates.endDate);
     } else {
       // ✅ NO DEFAULT DATES - Start with null
-      console.log('📅 SpaceDetailsSidebar: No default dates - user must select');
+      console.log(
+        "📅 SpaceDetailsSidebar: No default dates - user must select"
+      );
       setStartDate(null);
       setEndDate(null);
     }
@@ -129,7 +146,7 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
   const isDateAvailable = (date: Date): boolean => {
     // Normalize the date being checked to UTC start of day
     const normalizedDate = normalizeToUTCStartOfDay(date);
-    
+
     if (space.availableFrom) {
       const availFrom = normalizeToUTCStartOfDay(space.availableFrom);
       if (normalizedDate < availFrom) return false;
@@ -148,7 +165,7 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
       const bookingEnd = new Date(booking.endDate);
       bookingStart.setHours(0, 0, 0, 0);
       bookingEnd.setHours(23, 59, 59, 999);
-      
+
       const checkDate = new Date(date);
       checkDate.setHours(0, 0, 0, 0);
 
@@ -168,7 +185,7 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
     }
 
     if (!startDate || !endDate) {
-      setDateError('Both dates are required');
+      setDateError("Both dates are required");
       return;
     }
 
@@ -176,17 +193,19 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
     today.setHours(0, 0, 0, 0);
 
     if (startDate < today) {
-      setDateError('Start date must be in the future');
+      setDateError("Start date must be in the future");
       return;
     }
 
     if (endDate <= startDate) {
-      setDateError('End date must be after start date');
+      setDateError("End date must be after start date");
       return;
     }
 
-    const duration = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    
+    const duration = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     if (space.minDuration && duration < space.minDuration) {
       setDateError(`Minimum booking duration is ${space.minDuration} days`);
       return;
@@ -209,13 +228,19 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
     });
 
     if (hasOverlap) {
-      setDateError('Selected dates overlap with existing bookings');
+      setDateError("Selected dates overlap with existing bookings");
       return;
     }
 
-    console.log('✅ SpaceDetailsSidebar: Dates validated successfully');
-    setDateError('');
-  }, [startDate, endDate, confirmedBookings, space.minDuration, space.maxDuration]);
+    console.log("✅ SpaceDetailsSidebar: Dates validated successfully");
+    setDateError("");
+  }, [
+    startDate,
+    endDate,
+    confirmedBookings,
+    space.minDuration,
+    space.maxDuration,
+  ]);
 
   const calculateDuration = () => {
     if (!startDate || !endDate) return 0;
@@ -238,11 +263,14 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
       return null;
     }
 
-    const pricePerDay = typeof space.pricePerDay === 'number'
-      ? space.pricePerDay
-      : Number(space.pricePerDay);
+    const pricePerDay =
+      typeof space.pricePerDay === "number"
+        ? space.pricePerDay
+        : Number(space.pricePerDay);
     const installationFee = space.installationFee
-      ? (typeof space.installationFee === 'number' ? space.installationFee : Number(space.installationFee))
+      ? typeof space.installationFee === "number"
+        ? space.installationFee
+        : Number(space.installationFee)
       : 0;
 
     return calculateBookingCost(pricePerDay, duration, installationFee);
@@ -250,14 +278,14 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
 
   const addToCartMutation = api.cart.addToCart.useMutation({
     onSuccess: () => {
-      console.log('✅ SpaceDetailsSidebar: Space added to cart');
+      console.log("✅ SpaceDetailsSidebar: Space added to cart");
       setCreativeError(null);
       onSuccess();
     },
     onError: (error) => {
-      console.error('❌ SpaceDetailsSidebar: Failed to add to cart', error);
-      
-      if (error.message.includes('creative uploaded')) {
+      console.error("❌ SpaceDetailsSidebar: Failed to add to cart", error);
+
+      if (error.message.includes("creative uploaded")) {
         setCreativeError(error.message);
       }
     },
@@ -265,7 +293,9 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
 
   const handleAddToCart = () => {
     if (!startDate || !endDate) {
-      console.log('⚠️ SpaceDetailsSidebar: Missing dates - highlighting date selector');
+      console.log(
+        "⚠️ SpaceDetailsSidebar: Missing dates - highlighting date selector"
+      );
       setHighlightDates(true);
       setShakeButton(true);
       setTimeout(() => {
@@ -276,7 +306,9 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
     }
 
     if (dateError) {
-      console.log('⚠️ SpaceDetailsSidebar: Date validation error - highlighting');
+      console.log(
+        "⚠️ SpaceDetailsSidebar: Date validation error - highlighting"
+      );
       setHighlightDates(true);
       setHighlightError(true);
       setShakeButton(true);
@@ -289,11 +321,13 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
     }
 
     if (!campaignId) {
-      console.log('⚠️ SpaceDetailsSidebar: Cannot add to cart - missing campaign');
+      console.log(
+        "⚠️ SpaceDetailsSidebar: Cannot add to cart - missing campaign"
+      );
       return;
     }
 
-    console.log('🛒 SpaceDetailsSidebar: Adding to cart', {
+    console.log("🛒 SpaceDetailsSidebar: Adding to cart", {
       spaceId: space.id,
       campaignId,
       startDate: startDate.toISOString(),
@@ -308,7 +342,13 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
     });
   };
 
-  const isAddDisabled = !campaignId || !!dateError || !startDate || !endDate || isInCart || loadingBookings;
+  const isAddDisabled =
+    !campaignId ||
+    !!dateError ||
+    !startDate ||
+    !endDate ||
+    isInCart ||
+    loadingBookings;
   const squareFootage = calculateSquareFootage();
 
   // ✅ Check if dates are not selected
@@ -318,14 +358,14 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
     <>
       {/* Floating Card Sidebar */}
       <motion.div
-        initial={{ x: '100%', opacity: 0 }}
+        initial={{ x: "100%", opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        exit={{ x: '100%', opacity: 0 }}
-        transition={{ 
-          type: 'spring', 
-          damping: 30, 
+        exit={{ x: "100%", opacity: 0 }}
+        transition={{
+          type: "spring",
+          damping: 30,
           stiffness: 300,
-          opacity: { duration: 0.2 }
+          opacity: { duration: 0.2 },
         }}
         className="absolute top-4 right-4 bottom-4 w-md bg-slate-900/95 backdrop-blur-xl shadow-2xl border border-slate-800 rounded-xl overflow-y-auto z-50"
       >
@@ -340,17 +380,24 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
         </motion.button>
 
         {/* Image Gallery */}
-        <div className="relative h-56 bg-slate-800 cursor-pointer group" onClick={() => setIsImageLightboxOpen(true)}>
+        <div
+          className="relative h-56 bg-slate-800 cursor-pointer group"
+          onClick={() => setIsImageLightboxOpen(true)}
+        >
           <motion.img
             key={currentImageIndex}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            src={space.images?.[currentImageIndex] || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800'}
+            src={
+              space.images?.[currentImageIndex] ||
+              "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800"
+            }
             alt={space.title}
             className="w-full h-full object-cover"
             onError={(e) => {
-              e.currentTarget.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800';
+              e.currentTarget.src =
+                "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800";
             }}
           />
 
@@ -374,8 +421,8 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
                   }}
                   className={`h-1.5 rounded-full transition-all ${
                     index === currentImageIndex
-                      ? 'w-6 bg-white'
-                      : 'w-1.5 bg-white/60 hover:bg-white/80'
+                      ? "w-6 bg-white"
+                      : "w-1.5 bg-white/60 hover:bg-white/80"
                   }`}
                 />
               ))}
@@ -384,7 +431,7 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
         </div>
 
         {/* Content */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1, duration: 0.4 }}
@@ -399,28 +446,38 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
               {space.averageRating && (
                 <div className="flex items-center gap-1 px-2 py-1 bg-amber-500/10 rounded-md border border-amber-500/20 shrink-0">
                   <Star className="h-3.5 w-3.5 text-amber-400 fill-amber-400" />
-                  <span className="text-sm font-semibold text-amber-400">{space.averageRating.toFixed(1)}</span>
+                  <span className="text-sm font-semibold text-amber-400">
+                    {space.averageRating.toFixed(1)}
+                  </span>
                 </div>
               )}
             </div>
 
             <div className="flex items-start gap-2 text-sm text-slate-400 mb-3">
               <MapPin className="h-4 w-4 shrink-0 mt-0.5" />
-              <span>{space.city}, {space.state}</span>
+              <span>
+                {space.city}, {space.state}
+              </span>
             </div>
 
             {/* KEY STATS - Grid Layout */}
             <div className="grid grid-cols-2 gap-2 mb-4">
               {/* Dimensions */}
-              {(space.width && space.height) && (
+              {space.width && space.height && (
                 <div className="bg-slate-800 rounded-lg p-3 border border-slate-700">
                   <div className="flex items-center gap-2 mb-1">
                     <Ruler className="h-4 w-4 text-blue-400" />
-                    <span className="text-xs font-medium text-slate-400">Dimensions</span>
+                    <span className="text-xs font-medium text-slate-400">
+                      Dimensions
+                    </span>
                   </div>
-                  <p className="text-sm font-bold text-white">{space.width}' × {space.height}'</p>
+                  <p className="text-sm font-bold text-white">
+                    {space.width}' × {space.height}'
+                  </p>
                   {squareFootage && (
-                    <p className="text-xs text-slate-500 mt-0.5">{squareFootage} sq ft</p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {squareFootage} sq ft
+                    </p>
                   )}
                 </div>
               )}
@@ -430,9 +487,13 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
                 <div className="bg-slate-800 rounded-lg p-3 border border-slate-700">
                   <div className="flex items-center gap-2 mb-1">
                     <Eye className="h-4 w-4 text-purple-400" />
-                    <span className="text-xs font-medium text-slate-400">Visibility</span>
+                    <span className="text-xs font-medium text-slate-400">
+                      Visibility
+                    </span>
                   </div>
-                  <p className="text-sm font-bold text-white">{space.traffic}</p>
+                  <p className="text-sm font-bold text-white">
+                    {space.traffic}
+                  </p>
                 </div>
               )}
 
@@ -440,7 +501,9 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
               <div className="bg-slate-800 rounded-lg p-3 border border-slate-700">
                 <div className="flex items-center gap-2 mb-1">
                   <Package className="h-4 w-4 text-green-400" />
-                  <span className="text-xs font-medium text-slate-400">Type</span>
+                  <span className="text-xs font-medium text-slate-400">
+                    Type
+                  </span>
                 </div>
                 <p className="text-sm font-bold text-white">
                   {SPACE_TYPE_LABELS[space.type] || space.type}
@@ -451,16 +514,22 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
               <div className="bg-slate-800 rounded-lg p-3 border border-slate-700">
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="h-4 w-4 text-orange-400" />
-                  <span className="text-xs font-medium text-slate-400">Bookings</span>
+                  <span className="text-xs font-medium text-slate-400">
+                    Bookings
+                  </span>
                 </div>
-                <p className="text-sm font-bold text-white">{space._count.bookings}</p>
+                <p className="text-sm font-bold text-white">
+                  {space._count.bookings}
+                </p>
               </div>
             </div>
 
             {/* Price */}
             <div className="flex items-baseline gap-2 p-4 bg-green-500/10 rounded-lg border border-green-500/20">
               <DollarSign className="h-6 w-6 text-green-400" />
-              <span className="text-3xl font-bold text-green-400">{Number(space.pricePerDay).toFixed(0)}</span>
+              <span className="text-3xl font-bold text-green-400">
+                {Number(space.pricePerDay).toFixed(0)}
+              </span>
               <span className="text-sm text-green-300 font-medium">/day</span>
               {space.installationFee && Number(space.installationFee) > 0 && (
                 <span className="ml-auto text-xs text-green-400">
@@ -479,48 +548,77 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
                   setCreativeError(null);
                 }}
                 disabled={isInCart || loadingBookings}
-                animate={highlightDates ? {
-                  borderColor: ['#334155', '#3b82f6', '#3b82f6', '#334155'],
-                  scale: [1, 1.02, 1.02, 1]
-                } : {}}
+                animate={
+                  highlightDates
+                    ? {
+                        borderColor: [
+                          "#334155",
+                          "#3b82f6",
+                          "#3b82f6",
+                          "#334155",
+                        ],
+                        scale: [1, 1.02, 1.02, 1],
+                      }
+                    : {}
+                }
                 transition={{ duration: 0.6 }}
                 className={`w-full flex items-center justify-between p-4 bg-slate-800 border-2 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed group ${
-                  highlightDates 
-                    ? 'border-blue-500' 
-                    : datesNotSelected 
-                    ? 'border-red-500 hover:border-red-400' 
-                    : 'border-slate-700 hover:border-blue-500'
+                  highlightDates
+                    ? "border-blue-500"
+                    : datesNotSelected
+                    ? "border-red-500 hover:border-red-400"
+                    : "border-slate-700 hover:border-blue-500"
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${
-                    datesNotSelected 
-                      ? 'bg-red-500/10 group-hover:bg-red-500/20' 
-                      : 'bg-blue-500/10 group-hover:bg-blue-500/20'
-                  }`}>
-                    <Calendar className={`h-5 w-5 ${datesNotSelected ? 'text-red-400' : 'text-blue-400'}`} />
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-lg transition-colors ${
+                      datesNotSelected
+                        ? "bg-red-500/10 group-hover:bg-red-500/20"
+                        : "bg-blue-500/10 group-hover:bg-blue-500/20"
+                    }`}
+                  >
+                    <Calendar
+                      className={`h-5 w-5 ${
+                        datesNotSelected ? "text-red-400" : "text-blue-400"
+                      }`}
+                    />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-semibold text-white">Campaign Dates</p>
+                    <p className="text-sm font-semibold text-white">
+                      Campaign Dates
+                    </p>
                     {startDate && endDate ? (
                       <p className="text-xs text-slate-400">
-                        {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        {' - '}
-                        {endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        {startDate.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                        {" - "}
+                        {endDate.toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
                       </p>
                     ) : (
-                      <p className={`text-xs ${datesNotSelected ? 'text-red-400' : 'text-slate-400'}`}>
+                      <p
+                        className={`text-xs ${
+                          datesNotSelected ? "text-red-400" : "text-slate-400"
+                        }`}
+                      >
                         Click to select dates
                       </p>
                     )}
                   </div>
                 </div>
                 {!isInCart && (
-                  <ChevronRight className={`h-5 w-5 transition-colors ${
-                    datesNotSelected 
-                      ? 'text-red-400 group-hover:text-red-300' 
-                      : 'text-slate-400 group-hover:text-blue-400'
-                  }`} />
+                  <ChevronRight
+                    className={`h-5 w-5 transition-colors ${
+                      datesNotSelected
+                        ? "text-red-400 group-hover:text-red-300"
+                        : "text-slate-400 group-hover:text-blue-400"
+                    }`}
+                  />
                 )}
               </motion.button>
 
@@ -531,20 +629,19 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
                   <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400">
                     <Calendar className="h-3 w-3" />
                     <span>
-                      {space.minDuration && space.maxDuration 
+                      {space.minDuration && space.maxDuration
                         ? `Required: ${space.minDuration}-${space.maxDuration} days`
-                        : space.minDuration 
+                        : space.minDuration
                         ? `Minimum: ${space.minDuration} days`
-                        : `Maximum: ${space.maxDuration} days`
-                      }
+                        : `Maximum: ${space.maxDuration} days`}
                     </span>
                   </div>
                 )}
-                
+
                 {/* Show selected duration if valid */}
                 {startDate && endDate && !dateError && (
                   <div className="text-xs text-center text-green-400">
-                    ✓ {duration} {duration === 1 ? 'day' : 'days'} selected
+                    ✓ {duration} {duration === 1 ? "day" : "days"} selected
                   </div>
                 )}
               </div>
@@ -553,15 +650,24 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
               {dateError && startDate && endDate && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
-                  animate={highlightError ? {
-                    opacity: 1,
-                    y: 0,
-                    scale: [1, 1.03, 1.03, 1],
-                    borderColor: ['#7f1d1d', '#dc2626', '#dc2626', '#7f1d1d']
-                  } : {
-                    opacity: 1,
-                    y: 0
-                  }}
+                  animate={
+                    highlightError
+                      ? {
+                          opacity: 1,
+                          y: 0,
+                          scale: [1, 1.03, 1.03, 1],
+                          borderColor: [
+                            "#7f1d1d",
+                            "#dc2626",
+                            "#dc2626",
+                            "#7f1d1d",
+                          ],
+                        }
+                      : {
+                          opacity: 1,
+                          y: 0,
+                        }
+                  }
                   transition={{ duration: highlightError ? 0.6 : 0.2 }}
                   className="flex items-start gap-2 p-2.5 text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg"
                 >
@@ -585,48 +691,70 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
           )}
 
           {/* Cost Breakdown - Only show if NOT in public view AND dates are selected */}
-          {!isPublicView && breakdown && !dateError && campaignId && startDate && endDate && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.3 }}
-              className="bg-blue-500/10 rounded-lg p-4 space-y-2 border border-blue-500/20"
-            >
-              <div className="flex justify-between text-sm">
-                <span className="text-blue-300">{duration} days × ${(breakdown.rentalCost / duration).toFixed(0)}</span>
-                <span className="font-semibold text-blue-400">${breakdown.rentalCost.toFixed(2)}</span>
-              </div>
-
-              {breakdown.installationFee > 0 && (
+          {!isPublicView &&
+            breakdown &&
+            !dateError &&
+            campaignId &&
+            startDate &&
+            endDate && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.3 }}
+                className="bg-blue-500/10 rounded-lg p-4 space-y-2 border border-blue-500/20"
+              >
                 <div className="flex justify-between text-sm">
-                  <span className="text-blue-300">Installation</span>
-                  <span className="font-semibold text-blue-400">${breakdown.installationFee.toFixed(2)}</span>
+                  <span className="text-blue-300">
+                    {duration} days × $
+                    {(breakdown.rentalCost / duration).toFixed(0)}
+                  </span>
+                  <span className="font-semibold text-blue-400">
+                    ${breakdown.rentalCost.toFixed(2)}
+                  </span>
                 </div>
-              )}
 
-              <div className="flex justify-between text-sm pt-2 border-t border-blue-500/20">
-                <span className="text-blue-300">Subtotal</span>
-                <span className="font-semibold text-blue-400">${breakdown.subtotal.toFixed(2)}</span>
-              </div>
+                {breakdown.installationFee > 0 && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-blue-300">Installation</span>
+                    <span className="font-semibold text-blue-400">
+                      ${breakdown.installationFee.toFixed(2)}
+                    </span>
+                  </div>
+                )}
 
-              <div className="flex justify-between text-sm">
-                <span className="text-blue-300">Platform fee (10% of rental)</span>
-                <span className="font-semibold text-blue-400">${breakdown.platformFee.toFixed(2)}</span>
-              </div>
+                <div className="flex justify-between text-sm pt-2 border-t border-blue-500/20">
+                  <span className="text-blue-300">Subtotal</span>
+                  <span className="font-semibold text-blue-400">
+                    ${breakdown.subtotal.toFixed(2)}
+                  </span>
+                </div>
 
-              <div className="flex justify-between text-sm">
-                <span className="text-blue-300">Processing fee</span>
-                <span className="font-semibold text-blue-400">${breakdown.stripeFee.toFixed(2)}</span>
-              </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-blue-300">
+                    Platform fee (10% of rental)
+                  </span>
+                  <span className="font-semibold text-blue-400">
+                    ${breakdown.platformFee.toFixed(2)}
+                  </span>
+                </div>
 
-              <div className="pt-2 mt-2 border-t border-blue-500/20 flex justify-between items-baseline">
-                <span className="text-sm font-semibold text-blue-400">Total</span>
-                <span className="text-2xl font-bold text-blue-400">
-                  ${breakdown.totalWithFees.toFixed(2)}
-                </span>
-              </div>
-            </motion.div>
-          )}
+                <div className="flex justify-between text-sm">
+                  <span className="text-blue-300">Processing fee</span>
+                  <span className="font-semibold text-blue-400">
+                    ${breakdown.stripeFee.toFixed(2)}
+                  </span>
+                </div>
+
+                <div className="pt-2 mt-2 border-t border-blue-500/20 flex justify-between items-baseline">
+                  <span className="text-sm font-semibold text-blue-400">
+                    Total
+                  </span>
+                  <span className="text-2xl font-bold text-blue-400">
+                    ${breakdown.totalWithFees.toFixed(2)}
+                  </span>
+                </div>
+              </motion.div>
+            )}
 
           {/* Primary CTA */}
           <div className="space-y-2">
@@ -644,7 +772,8 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
                       Creative Required
                     </p>
                     <p className="text-xs text-red-300">
-                      You need to upload a creative design for your campaign before adding spaces
+                      You need to upload a creative design for your campaign
+                      before adding spaces
                     </p>
                   </div>
                 </div>
@@ -711,18 +840,28 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
               </div>
             ) : (
               <motion.button
-                whileHover={{ scale: (isAddDisabled || addToCartMutation.isPending) ? 1 : 1.02 }}
-                whileTap={{ scale: (isAddDisabled || addToCartMutation.isPending) ? 1 : 0.98 }}
-                animate={shakeButton ? {
-                  x: [0, -10, 10, -10, 10, 0],
-                  transition: { duration: 0.5 }
-                } : {}}
+                whileHover={{
+                  scale:
+                    isAddDisabled || addToCartMutation.isPending ? 1 : 1.02,
+                }}
+                whileTap={{
+                  scale:
+                    isAddDisabled || addToCartMutation.isPending ? 1 : 0.98,
+                }}
+                animate={
+                  shakeButton
+                    ? {
+                        x: [0, -10, 10, -10, 10, 0],
+                        transition: { duration: 0.5 },
+                      }
+                    : {}
+                }
                 onClick={handleAddToCart}
                 disabled={addToCartMutation.isPending}
                 className={`w-full px-4 py-3 rounded-lg transition-all font-semibold flex items-center justify-center shadow-md ${
-                  (isAddDisabled || addToCartMutation.isPending)
-                    ? 'bg-slate-700 text-slate-400 cursor-not-allowed hover:bg-slate-700'
-                    : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg'
+                  isAddDisabled || addToCartMutation.isPending
+                    ? "bg-slate-700 text-slate-400 cursor-not-allowed hover:bg-slate-700"
+                    : "bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg"
                 }`}
               >
                 {addToCartMutation.isPending ? (
@@ -731,7 +870,7 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
                     Adding...
                   </>
                 ) : (
-                  'Add to Cart'
+                  "Add to Cart"
                 )}
               </motion.button>
             )}
@@ -744,7 +883,9 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
               className="w-full text-left"
             >
               <div className="flex items-center justify-between p-3 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700">
-                <span className="text-sm font-medium text-white">About this space</span>
+                <span className="text-sm font-medium text-white">
+                  About this space
+                </span>
                 <motion.div
                   animate={{ rotate: showDescription ? 180 : 0 }}
                   transition={{ duration: 0.2 }}
@@ -755,7 +896,7 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
               {showDescription && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
+                  animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.2 }}
                   className="mt-2 p-3 text-sm text-slate-300 leading-relaxed bg-slate-800 rounded-lg border border-slate-700"
@@ -772,7 +913,9 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
             className="w-full text-left"
           >
             <div className="flex items-center justify-between p-3 bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors border border-slate-700">
-              <span className="text-sm font-medium text-white">Additional details</span>
+              <span className="text-sm font-medium text-white">
+                Additional details
+              </span>
               <motion.div
                 animate={{ rotate: showDetails ? 180 : 0 }}
                 transition={{ duration: 0.2 }}
@@ -783,31 +926,39 @@ export const SpaceDetailsSidebar: React.FC<SpaceDetailsSidebarProps> = ({
             {showDetails && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
                 className="mt-2 p-3 space-y-2 text-sm bg-slate-800 rounded-lg border border-slate-700"
               >
                 <div className="flex justify-between">
                   <span className="text-slate-400">Full address</span>
-                  <span className="font-medium text-white text-right">{space.address}</span>
+                  <span className="font-medium text-white text-right">
+                    {space.address}
+                  </span>
                 </div>
                 {space.minDuration && (
                   <div className="flex justify-between">
                     <span className="text-slate-400">Min duration</span>
-                    <span className="font-medium text-white">{space.minDuration} days</span>
+                    <span className="font-medium text-white">
+                      {space.minDuration} days
+                    </span>
                   </div>
                 )}
                 {space.maxDuration && (
                   <div className="flex justify-between">
                     <span className="text-slate-400">Max duration</span>
-                    <span className="font-medium text-white">{space.maxDuration} days</span>
+                    <span className="font-medium text-white">
+                      {space.maxDuration} days
+                    </span>
                   </div>
                 )}
                 {space._count.reviews > 0 && (
                   <div className="flex justify-between pt-2 border-t border-slate-700">
                     <span className="text-slate-400">Reviews</span>
-                    <span className="font-medium text-white">{space._count.reviews}</span>
+                    <span className="font-medium text-white">
+                      {space._count.reviews}
+                    </span>
                   </div>
                 )}
               </motion.div>

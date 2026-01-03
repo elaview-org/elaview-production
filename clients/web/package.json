@@ -2,20 +2,49 @@
   "name": "ev-web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=23.11.0",
+    "npm": ">=11.4.2",
+    "yarn": "please-use-npm",
+    "pnpm": "please-use-npm"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:race": "playwright test race-condition"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.36.5",
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@types/geojson": "^7946.0.16",
+    "@vercel/analytics": "^1.6.1",
+    "@vercel/speed-insights": "^1.3.1",
+    "@vis.gl/react-google-maps": "^1.7.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.2.3",
+    "framer-motion": "^12.23.26",
     "lucide-react": "^0.562.0",
     "next": "16.1.0",
+    "next-themes": "^0.4.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-datepicker": "^9.1.0",
+    "react-dom": "19.2.3",
+    "react-hook-form": "^7.69.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.4.0",
+    "use-supercluster": "^1.2.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

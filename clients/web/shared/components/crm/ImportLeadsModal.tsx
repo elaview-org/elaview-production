@@ -2,19 +2,45 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { api } from "../../../../elaview-mvp/src/trpc/react";
-import { X, Upload, FileText, Loader2, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Download } from "lucide-react";
+// import { api } from "../../../../elaview-mvp/src/trpc/react";
+import {
+  X,
+  Upload,
+  FileText,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  ChevronDown,
+  ChevronUp,
+  Download,
+} from "lucide-react";
 import { toast } from "sonner";
-import { type BusinessType } from "@prisma/client";
-import { downloadTemplate, downloadExcelTemplate } from "../../../../elaview-mvp/src/lib/import-utils";
+import {
+  downloadTemplate,
+  downloadExcelTemplate,
+} from "@/shared/lib/import-utils";
 import * as XLSX from "xlsx";
 
+type BusinessType = any;
 interface ImportLeadsModalProps {
   onClose: () => void;
   onSuccess: () => void;
 }
 
-type ColumnMapping = Record<string, 'name' | 'email' | 'phone' | 'website' | 'location' | 'businessType' | 'hasInventory' | 'hasInstallCapability' | 'estimatedSpaces' | 'notes' | 'skip'>;
+type ColumnMapping = Record<
+  string,
+  | "name"
+  | "email"
+  | "phone"
+  | "website"
+  | "location"
+  | "businessType"
+  | "hasInventory"
+  | "hasInstallCapability"
+  | "estimatedSpaces"
+  | "notes"
+  | "skip"
+>;
 
 type ParsedData = {
   headers: string[];
@@ -22,39 +48,49 @@ type ParsedData = {
 };
 
 const BUSINESS_TYPE_OPTIONS = [
-  { label: 'Billboard Company', value: 'BILLBOARD_OPERATOR' },
-  { label: 'Sign Company', value: 'SIGN_COMPANY' },
-  { label: 'Wrap/Vehicle Installer', value: 'WRAP_INSTALLER' },
-  { label: 'Property Manager', value: 'PROPERTY_MANAGER' },
-  { label: 'Print Shop', value: 'PRINT_SHOP' },
-  { label: 'Agency', value: 'AGENCY' },
-  { label: 'Other', value: 'OTHER' },
+  { label: "Billboard Company", value: "BILLBOARD_OPERATOR" },
+  { label: "Sign Company", value: "SIGN_COMPANY" },
+  { label: "Wrap/Vehicle Installer", value: "WRAP_INSTALLER" },
+  { label: "Property Manager", value: "PROPERTY_MANAGER" },
+  { label: "Print Shop", value: "PRINT_SHOP" },
+  { label: "Agency", value: "AGENCY" },
+  { label: "Other", value: "OTHER" },
 ];
 
-export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) {
-  const [inputMode, setInputMode] = useState<'upload' | 'paste'>('upload');
+export function ImportLeadsModal({
+  onClose,
+  onSuccess,
+}: ImportLeadsModalProps) {
+  const [inputMode, setInputMode] = useState<"upload" | "paste">("upload");
   const [parsedData, setParsedData] = useState<ParsedData | null>(null);
   const [columnMapping, setColumnMapping] = useState<ColumnMapping>({});
-  const [businessType, setBusinessType] = useState<BusinessType>('OTHER');
-  const [importSource, setImportSource] = useState('');
+  const [businessType, setBusinessType] = useState<BusinessType>("OTHER");
+  const [importSource, setImportSource] = useState("");
   const [showDuplicates, setShowDuplicates] = useState(false);
   const [importResults, setImportResults] = useState<any>(null);
 
   // Excel-specific state
   const [availableSheets, setAvailableSheets] = useState<string[]>([]);
-  const [selectedSheet, setSelectedSheet] = useState<string>('');
-  const [currentWorkbook, setCurrentWorkbook] = useState<XLSX.WorkBook | null>(null);
+  const [selectedSheet, setSelectedSheet] = useState<string>("");
+  const [currentWorkbook, setCurrentWorkbook] = useState<XLSX.WorkBook | null>(
+    null
+  );
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   // Helper to get header name for a field
   const getHeaderForField = (field: string): string | undefined => {
-    return Object.keys(columnMapping).find(header => columnMapping[header] === field);
+    return Object.keys(columnMapping).find(
+      (header) => columnMapping[header] === field
+    );
   };
 
   // Helper to get value from row by field
-  const getValueForField = (row: string[], field: string): string | undefined => {
+  const getValueForField = (
+    row: string[],
+    field: string
+  ): string | undefined => {
     const header = getHeaderForField(field);
     if (!header) return undefined;
     const headerIndex = parsedData?.headers.indexOf(header);
@@ -63,52 +99,55 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
   };
 
   // Check if name field is mapped
-  const hasNameField = Object.values(columnMapping).includes('name');
+  const hasNameField = Object.values(columnMapping).includes("name");
 
   // tRPC mutations - using mutation for preview to handle large payloads via POST
-  const previewMutation = api.crm.previewImport.useMutation();
-
+  // const previewMutation = api.crm.previewImport.useMutation();
+  const previewMutation = () => {};
   // Auto-trigger preview when data is ready
   useEffect(() => {
     if (parsedData && hasNameField && parsedData.rows.length > 0) {
-      console.log('🔄 Triggering preview for', parsedData.rows.length, 'leads');
-      const leadsToPreview = parsedData.rows.map(row => ({
-        name: getValueForField(row, 'name') || 'Unknown',
-        email: getValueForField(row, 'email') || undefined,
-        phone: getValueForField(row, 'phone') || undefined,
-        website: getValueForField(row, 'website') || undefined,
+      console.log("🔄 Triggering preview for", parsedData.rows.length, "leads");
+      const leadsToPreview = parsedData.rows.map((row) => ({
+        name: getValueForField(row, "name") || "Unknown",
+        email: getValueForField(row, "email") || undefined,
+        phone: getValueForField(row, "phone") || undefined,
+        website: getValueForField(row, "website") || undefined,
       }));
-      console.log('📤 Sending leads to preview:', leadsToPreview.length);
+      console.log("📤 Sending leads to preview:", leadsToPreview.length);
       previewMutation.mutate({ leads: leadsToPreview });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [parsedData, hasNameField]);
 
-  const importMutation = api.crm.importLeads.useMutation({
-    onSuccess: (results) => {
-      setImportResults(results);
-      toast.success(`Import complete: ${results.created} created, ${results.updated} updated, ${results.skipped} skipped`);
-      if (results.errors.length > 0) {
-        toast.error(`${results.errors.length} errors occurred`);
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message || 'Import failed');
-    },
-  });
+  // const importMutation = api.crm.importLeads.useMutation({
+  //   onSuccess: (results) => {
+  //     setImportResults(results);
+  //     toast.success(
+  //       `Import complete: ${results.created} created, ${results.updated} updated, ${results.skipped} skipped`
+  //     );
+  //     if (results.errors.length > 0) {
+  //       toast.error(`${results.errors.length} errors occurred`);
+  //     }
+  //   },
+  //   onError: (error) => {
+  //     toast.error(error.message || "Import failed");
+  //   },
+  // });
 
+  const importMutation = ()=>{}
   // CSV Parsing
   const parseCSVLine = (line: string): string[] => {
     const result: string[] = [];
-    let current = '';
+    let current = "";
     let inQuotes = false;
 
     for (const char of line) {
       if (char === '"') {
         inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
+      } else if (char === "," && !inQuotes) {
         result.push(current.trim());
-        current = '';
+        current = "";
       } else {
         current += char;
       }
@@ -118,16 +157,27 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
   };
 
   const parseCSV = (text: string): ParsedData => {
-    const lines = text.trim().split('\n').filter(line => line.trim());
+    const lines = text
+      .trim()
+      .split("\n")
+      .filter((line) => line.trim());
     const headers = parseCSVLine(lines[0]!);
-    const rows = lines.slice(1).map(parseCSVLine).filter(row => row.some(cell => cell.trim()));
+    const rows = lines
+      .slice(1)
+      .map(parseCSVLine)
+      .filter((row) => row.some((cell) => cell.trim()));
     return { headers, rows };
   };
 
   const parseTSV = (text: string): ParsedData => {
-    const lines = text.trim().split('\n').filter(line => line.trim());
-    const headers = lines[0]!.split('\t').map(h => h.trim());
-    const rows = lines.slice(1).map(line => line.split('\t').map(cell => cell.trim()));
+    const lines = text
+      .trim()
+      .split("\n")
+      .filter((line) => line.trim());
+    const headers = lines[0]!.split("\t").map((h) => h.trim());
+    const rows = lines
+      .slice(1)
+      .map((line) => line.split("\t").map((cell) => cell.trim()));
     return { headers, rows };
   };
 
@@ -139,7 +189,7 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
     const fileName = file.name.toLowerCase();
     setImportSource(file.name);
 
-    if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+    if (fileName.endsWith(".xlsx") || fileName.endsWith(".xls")) {
       // Parse Excel file
       try {
         const data = await file.arrayBuffer();
@@ -155,7 +205,7 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
           parseExcelSheet(workbook, firstSheet);
         }
       } catch (error) {
-        toast.error('Failed to parse Excel file');
+        toast.error("Failed to parse Excel file");
         console.error(error);
       }
     } else {
@@ -171,7 +221,7 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
 
       // Reset Excel state
       setAvailableSheets([]);
-      setSelectedSheet('');
+      setSelectedSheet("");
       setCurrentWorkbook(null);
     }
   };
@@ -184,32 +234,33 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
     // Convert to array of arrays
     const rows: unknown[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-    console.log('📊 XLSX parsed rows:', rows.length);
-    console.log('📋 First 5 rows:', rows.slice(0, 5));
+    console.log("📊 XLSX parsed rows:", rows.length);
+    console.log("📋 First 5 rows:", rows.slice(0, 5));
 
     if (rows.length > 0) {
-      const headers = rows[0]!.map(h => {
+      const headers = rows[0]!.map((h) => {
         // Handle rich text or object cells
-        if (h === null || h === undefined) return '';
-        if (typeof h === 'object' && 'v' in h) return String(h.v).trim();
-        if (typeof h === 'object' && 'text' in h) return String(h.text).trim();
+        if (h === null || h === undefined) return "";
+        if (typeof h === "object" && "v" in h) return String(h.v).trim();
+        if (typeof h === "object" && "text" in h) return String(h.text).trim();
         return String(h).trim();
       });
 
-      console.log('📌 Headers:', headers);
+      console.log("📌 Headers:", headers);
 
       // Process data rows - convert cells to strings
-      const dataRows = rows.slice(1)
+      const dataRows = rows
+        .slice(1)
         .map((row, idx) => {
-          const processedRow = row.map(cell => {
+          const processedRow = row.map((cell) => {
             // Handle null/undefined
-            if (cell === null || cell === undefined) return '';
+            if (cell === null || cell === undefined) return "";
 
             // Handle rich text or object cells
-            if (typeof cell === 'object') {
-              if ('v' in cell) return String(cell.v).trim();
-              if ('text' in cell) return String(cell.text).trim();
-              if ('w' in cell) return String(cell.w).trim(); // formatted value
+            if (typeof cell === "object") {
+              if ("v" in cell) return String(cell.v).trim();
+              if ("text" in cell) return String(cell.text).trim();
+              if ("w" in cell) return String(cell.w).trim(); // formatted value
               return String(cell).trim();
             }
 
@@ -224,13 +275,13 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
           return processedRow;
         })
         // Filter out completely empty rows (no data in any cell)
-        .filter(row => {
-          const hasData = row.some(cell => cell && cell.trim() !== '');
+        .filter((row) => {
+          const hasData = row.some((cell) => cell && cell.trim() !== "");
           return hasData;
         });
 
-      console.log('✅ Data rows after filtering:', dataRows.length);
-      console.log('Sample data row:', dataRows[0]);
+      console.log("✅ Data rows after filtering:", dataRows.length);
+      console.log("Sample data row:", dataRows[0]);
 
       const parsed: ParsedData = { headers, rows: dataRows };
       setParsedData(parsed);
@@ -252,7 +303,7 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
     if (!text) return;
 
     // Detect if TSV or CSV
-    const isTSV = text.includes('\t');
+    const isTSV = text.includes("\t");
     const parsed = isTSV ? parseTSV(text) : parseCSV(text);
     setParsedData(parsed);
     autoMapColumns(parsed.headers);
@@ -262,30 +313,37 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
   const autoMapColumns = (headers: string[]) => {
     const mapping: ColumnMapping = {};
 
-    headers.forEach(header => {
+    headers.forEach((header) => {
       const lower = header.toLowerCase();
-      if (lower.includes('name') || lower.includes('company')) {
-        mapping[header] = 'name';
-      } else if (lower.includes('email') || lower.includes('mail')) {
-        mapping[header] = 'email';
-      } else if (lower.includes('phone') || lower.includes('tel')) {
-        mapping[header] = 'phone';
-      } else if (lower.includes('website') || lower.includes('url')) {
-        mapping[header] = 'website';
-      } else if (lower.includes('location') || lower.includes('city') || lower.includes('address')) {
-        mapping[header] = 'location';
-      } else if (lower.includes('business') && lower.includes('type')) {
-        mapping[header] = 'businessType';
-      } else if (lower.includes('inventory') || lower.includes('has inventory')) {
-        mapping[header] = 'hasInventory';
-      } else if (lower.includes('install') || lower.includes('does install')) {
-        mapping[header] = 'hasInstallCapability';
-      } else if (lower.includes('spaces') || lower.includes('estimated')) {
-        mapping[header] = 'estimatedSpaces';
-      } else if (lower.includes('note')) {
-        mapping[header] = 'notes';
+      if (lower.includes("name") || lower.includes("company")) {
+        mapping[header] = "name";
+      } else if (lower.includes("email") || lower.includes("mail")) {
+        mapping[header] = "email";
+      } else if (lower.includes("phone") || lower.includes("tel")) {
+        mapping[header] = "phone";
+      } else if (lower.includes("website") || lower.includes("url")) {
+        mapping[header] = "website";
+      } else if (
+        lower.includes("location") ||
+        lower.includes("city") ||
+        lower.includes("address")
+      ) {
+        mapping[header] = "location";
+      } else if (lower.includes("business") && lower.includes("type")) {
+        mapping[header] = "businessType";
+      } else if (
+        lower.includes("inventory") ||
+        lower.includes("has inventory")
+      ) {
+        mapping[header] = "hasInventory";
+      } else if (lower.includes("install") || lower.includes("does install")) {
+        mapping[header] = "hasInstallCapability";
+      } else if (lower.includes("spaces") || lower.includes("estimated")) {
+        mapping[header] = "estimatedSpaces";
+      } else if (lower.includes("note")) {
+        mapping[header] = "notes";
       } else {
-        mapping[header] = 'skip';
+        mapping[header] = "skip";
       }
     });
 
@@ -295,61 +353,67 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
   // Execute import
   const handleImport = () => {
     if (!parsedData || !hasNameField) {
-      toast.error('Please map the Company Name column');
+      toast.error("Please map the Company Name column");
       return;
     }
 
-    console.log('🚀 Starting import...');
-    console.log('Column mapping:', columnMapping);
-    console.log('Headers:', parsedData.headers);
-    console.log('Total rows:', parsedData.rows.length);
+    console.log("🚀 Starting import...");
+    console.log("Column mapping:", columnMapping);
+    console.log("Headers:", parsedData.headers);
+    console.log("Total rows:", parsedData.rows.length);
 
     // Find which column is mapped to 'name'
-    const nameHeader = Object.keys(columnMapping).find(header => columnMapping[header] === 'name');
-    console.log('Name column header:', nameHeader);
+    const nameHeader = Object.keys(columnMapping).find(
+      (header) => columnMapping[header] === "name"
+    );
+    console.log("Name column header:", nameHeader);
 
-    const leads = parsedData.rows.map((row, idx) => {
-      const lead: any = {};
+    const leads = parsedData.rows
+      .map((row, idx) => {
+        const lead: any = {};
 
-      Object.keys(columnMapping).forEach(header => {
-        const field = columnMapping[header];
-        if (field && field !== 'skip') {
-          const headerIndex = parsedData.headers.indexOf(header);
-          if (headerIndex !== -1) {
-            const value = row[headerIndex];
-            // Don't skip if value is empty string - let the backend validation handle it
-            if (value !== undefined && value !== null) {
-              lead[field] = value;
+        Object.keys(columnMapping).forEach((header) => {
+          const field = columnMapping[header];
+          if (field && field !== "skip") {
+            const headerIndex = parsedData.headers.indexOf(header);
+            if (headerIndex !== -1) {
+              const value = row[headerIndex];
+              // Don't skip if value is empty string - let the backend validation handle it
+              if (value !== undefined && value !== null) {
+                lead[field] = value;
+              }
             }
           }
+        });
+
+        // Debug first few leads
+        if (idx < 3) {
+          console.log(`Lead ${idx + 1}:`, lead);
         }
+
+        return lead;
+      })
+      .filter((lead) => {
+        const hasName = lead.name && String(lead.name).trim() !== "";
+        if (!hasName && parsedData.rows.length < 10) {
+          console.log("Filtered out lead (no name):", lead);
+        }
+        return hasName;
       });
 
-      // Debug first few leads
-      if (idx < 3) {
-        console.log(`Lead ${idx + 1}:`, lead);
-      }
-
-      return lead;
-    }).filter(lead => {
-      const hasName = lead.name && String(lead.name).trim() !== '';
-      if (!hasName && parsedData.rows.length < 10) {
-        console.log('Filtered out lead (no name):', lead);
-      }
-      return hasName;
-    });
-
-    console.log('📤 Leads to import:', leads.length);
-    console.log('Sample lead:', leads[0]);
+    console.log("📤 Leads to import:", leads.length);
+    console.log("Sample lead:", leads[0]);
 
     if (leads.length === 0) {
-      toast.error('No valid leads found. Make sure the Company Name column is mapped and has data.');
+      toast.error(
+        "No valid leads found. Make sure the Company Name column is mapped and has data."
+      );
       return;
     }
 
     importMutation.mutate({
       leads,
-      importSource: importSource || 'CSV Import',
+      importSource: importSource || "CSV Import",
       defaultBusinessType: businessType,
     });
   };
@@ -363,7 +427,9 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
         <div className="flex items-center justify-between p-6 border-b border-slate-700">
           <div>
             <h2 className="text-2xl font-bold text-white">Import Leads</h2>
-            <p className="text-sm text-slate-400 mt-1">Upload CSV or paste data to batch import leads</p>
+            <p className="text-sm text-slate-400 mt-1">
+              Upload CSV or paste data to batch import leads
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -385,7 +451,8 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
                       Need a template?
                     </h4>
                     <p className="text-xs text-slate-400">
-                      Download a template with all available fields and example data.
+                      Download a template with all available fields and example
+                      data.
                     </p>
                   </div>
                   <div className="flex gap-2">
@@ -414,16 +481,47 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
                     View field descriptions
                   </summary>
                   <div className="mt-2 text-xs text-slate-500 space-y-1">
-                    <p><span className="text-slate-300">Company Name</span> — Required. Business name.</p>
-                    <p><span className="text-slate-300">Email</span> — Contact email address.</p>
-                    <p><span className="text-slate-300">Phone</span> — Any format, will be normalized.</p>
-                    <p><span className="text-slate-300">Website</span> — Company website URL.</p>
-                    <p><span className="text-slate-300">Location</span> — City, State or full address.</p>
-                    <p><span className="text-slate-300">Business Type</span> — SIGN_COMPANY, BILLBOARD_OPERATOR, WRAP_INSTALLER, PROPERTY_MANAGER, PRINT_SHOP, AGENCY, or OTHER</p>
-                    <p><span className="text-slate-300">Has Inventory</span> — YES, NO, or UNKNOWN (for Phase 1 qualification)</p>
-                    <p><span className="text-slate-300">Does Installs</span> — YES, NO, or UNKNOWN (for Phase 1 qualification)</p>
-                    <p><span className="text-slate-300">Estimated Spaces</span> — Approximate number of ad spaces they have.</p>
-                    <p><span className="text-slate-300">Notes</span> — Any additional context.</p>
+                    <p>
+                      <span className="text-slate-300">Company Name</span> —
+                      Required. Business name.
+                    </p>
+                    <p>
+                      <span className="text-slate-300">Email</span> — Contact
+                      email address.
+                    </p>
+                    <p>
+                      <span className="text-slate-300">Phone</span> — Any
+                      format, will be normalized.
+                    </p>
+                    <p>
+                      <span className="text-slate-300">Website</span> — Company
+                      website URL.
+                    </p>
+                    <p>
+                      <span className="text-slate-300">Location</span> — City,
+                      State or full address.
+                    </p>
+                    <p>
+                      <span className="text-slate-300">Business Type</span> —
+                      SIGN_COMPANY, BILLBOARD_OPERATOR, WRAP_INSTALLER,
+                      PROPERTY_MANAGER, PRINT_SHOP, AGENCY, or OTHER
+                    </p>
+                    <p>
+                      <span className="text-slate-300">Has Inventory</span> —
+                      YES, NO, or UNKNOWN (for Phase 1 qualification)
+                    </p>
+                    <p>
+                      <span className="text-slate-300">Does Installs</span> —
+                      YES, NO, or UNKNOWN (for Phase 1 qualification)
+                    </p>
+                    <p>
+                      <span className="text-slate-300">Estimated Spaces</span> —
+                      Approximate number of ad spaces they have.
+                    </p>
+                    <p>
+                      <span className="text-slate-300">Notes</span> — Any
+                      additional context.
+                    </p>
                   </div>
                 </details>
               </div>
@@ -431,22 +529,22 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
               {/* Input Mode Selector */}
               <div className="flex gap-2 p-1 bg-slate-800 rounded-lg w-fit">
                 <button
-                  onClick={() => setInputMode('upload')}
+                  onClick={() => setInputMode("upload")}
                   className={`px-4 py-2 rounded-md transition-colors flex items-center gap-2 ${
-                    inputMode === 'upload'
-                      ? 'bg-purple-600 text-white'
-                      : 'text-slate-400 hover:text-white'
+                    inputMode === "upload"
+                      ? "bg-purple-600 text-white"
+                      : "text-slate-400 hover:text-white"
                   }`}
                 >
                   <Upload className="h-4 w-4" />
                   Upload CSV
                 </button>
                 <button
-                  onClick={() => setInputMode('paste')}
+                  onClick={() => setInputMode("paste")}
                   className={`px-4 py-2 rounded-md transition-colors flex items-center gap-2 ${
-                    inputMode === 'paste'
-                      ? 'bg-purple-600 text-white'
-                      : 'text-slate-400 hover:text-white'
+                    inputMode === "paste"
+                      ? "bg-purple-600 text-white"
+                      : "text-slate-400 hover:text-white"
                   }`}
                 >
                   <FileText className="h-4 w-4" />
@@ -455,7 +553,7 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
               </div>
 
               {/* Upload/Paste Area */}
-              {inputMode === 'upload' ? (
+              {inputMode === "upload" ? (
                 <div>
                   <input
                     ref={fileInputRef}
@@ -470,8 +568,12 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
                   >
                     <Upload className="h-12 w-12 text-slate-400" />
                     <div>
-                      <p className="text-white font-medium">Click to upload CSV or Excel file</p>
-                      <p className="text-sm text-slate-400 mt-1">.csv, .xlsx, or .xls files accepted</p>
+                      <p className="text-white font-medium">
+                        Click to upload CSV or Excel file
+                      </p>
+                      <p className="text-sm text-slate-400 mt-1">
+                        .csv, .xlsx, or .xls files accepted
+                      </p>
                     </div>
                   </button>
 
@@ -486,8 +588,10 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
                         onChange={(e) => handleSheetChange(e.target.value)}
                         className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                       >
-                        {availableSheets.map(sheet => (
-                          <option key={sheet} value={sheet}>{sheet}</option>
+                        {availableSheets.map((sheet) => (
+                          <option key={sheet} value={sheet}>
+                            {sheet}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -513,8 +617,12 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
               {parsedData && (
                 <>
                   <div className="space-y-3">
-                    <h3 className="text-lg font-semibold text-white">Column Mapping</h3>
-                    <p className="text-sm text-slate-400">Map your CSV columns to lead fields</p>
+                    <h3 className="text-lg font-semibold text-white">
+                      Column Mapping
+                    </h3>
+                    <p className="text-sm text-slate-400">
+                      Map your CSV columns to lead fields
+                    </p>
 
                     <div className="grid grid-cols-2 gap-3">
                       {parsedData.headers.map((header, idx) => (
@@ -524,23 +632,31 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
                           </div>
                           <span className="text-slate-500">→</span>
                           <select
-                            value={columnMapping[header] || 'skip'}
-                            onChange={(e) => setColumnMapping({
-                              ...columnMapping,
-                              [header]: e.target.value as any
-                            })}
+                            value={columnMapping[header] || "skip"}
+                            onChange={(e) =>
+                              setColumnMapping({
+                                ...columnMapping,
+                                [header]: e.target.value as any,
+                              })
+                            }
                             className="flex-1 px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                           >
                             <option value="skip">(Skip this column)</option>
-                            <option value="name">Company Name ⭐ Required</option>
+                            <option value="name">
+                              Company Name ⭐ Required
+                            </option>
                             <option value="email">Email</option>
                             <option value="phone">Phone</option>
                             <option value="website">Website</option>
                             <option value="location">Location</option>
                             <option value="businessType">Business Type</option>
                             <option value="hasInventory">Has Inventory</option>
-                            <option value="hasInstallCapability">Does Installs</option>
-                            <option value="estimatedSpaces">Estimated Spaces</option>
+                            <option value="hasInstallCapability">
+                              Does Installs
+                            </option>
+                            <option value="estimatedSpaces">
+                              Estimated Spaces
+                            </option>
                             <option value="notes">Notes</option>
                           </select>
                         </div>
@@ -550,7 +666,9 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
 
                   {/* Import Settings */}
                   <div className="space-y-3">
-                    <h3 className="text-lg font-semibold text-white">Import Settings</h3>
+                    <h3 className="text-lg font-semibold text-white">
+                      Import Settings
+                    </h3>
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
@@ -559,11 +677,15 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
                         </label>
                         <select
                           value={businessType}
-                          onChange={(e) => setBusinessType(e.target.value as BusinessType)}
+                          onChange={(e) =>
+                            setBusinessType(e.target.value as BusinessType)
+                          }
                           className="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
                         >
-                          {BUSINESS_TYPE_OPTIONS.map(opt => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          {BUSINESS_TYPE_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -586,24 +708,36 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
                   {/* Preview */}
                   {preview && (
                     <div className="space-y-3">
-                      <h3 className="text-lg font-semibold text-white">Import Preview</h3>
+                      <h3 className="text-lg font-semibold text-white">
+                        Import Preview
+                      </h3>
 
                       <div className="grid grid-cols-4 gap-3">
                         <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
                           <p className="text-sm text-slate-400">Total Rows</p>
-                          <p className="text-2xl font-bold text-white">{preview.total}</p>
+                          <p className="text-2xl font-bold text-white">
+                            {preview.total}
+                          </p>
                         </div>
                         <div className="rounded-lg border border-emerald-700 bg-emerald-900/20 p-4">
-                          <p className="text-sm text-emerald-400">Will Create</p>
-                          <p className="text-2xl font-bold text-emerald-400">{preview.willCreate}</p>
+                          <p className="text-sm text-emerald-400">
+                            Will Create
+                          </p>
+                          <p className="text-2xl font-bold text-emerald-400">
+                            {preview.willCreate}
+                          </p>
                         </div>
                         <div className="rounded-lg border border-blue-700 bg-blue-900/20 p-4">
                           <p className="text-sm text-blue-400">Will Update</p>
-                          <p className="text-2xl font-bold text-blue-400">{preview.willUpdate}</p>
+                          <p className="text-2xl font-bold text-blue-400">
+                            {preview.willUpdate}
+                          </p>
                         </div>
                         <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
                           <p className="text-sm text-slate-400">Will Skip</p>
-                          <p className="text-2xl font-bold text-slate-400">{preview.willSkip}</p>
+                          <p className="text-2xl font-bold text-slate-400">
+                            {preview.willSkip}
+                          </p>
                         </div>
                       </div>
 
@@ -613,7 +747,11 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
                             onClick={() => setShowDuplicates(!showDuplicates)}
                             className="flex items-center gap-2 text-white hover:text-purple-400 transition-colors"
                           >
-                            {showDuplicates ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                            {showDuplicates ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
                             <span className="font-medium">
                               {preview.duplicates.length} Duplicates Detected
                             </span>
@@ -622,7 +760,10 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
                           {showDuplicates && (
                             <div className="mt-3 space-y-2 max-h-48 overflow-y-auto">
                               {preview.duplicates.map((dup, idx) => (
-                                <div key={idx} className="text-sm text-slate-400 flex items-center gap-2">
+                                <div
+                                  key={idx}
+                                  className="text-sm text-slate-400 flex items-center gap-2"
+                                >
                                   <AlertCircle className="h-4 w-4 text-yellow-500" />
                                   <span className="text-white">{dup.name}</span>
                                   <span className="text-slate-500">-</span>
@@ -644,32 +785,46 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
               <div className="flex items-center gap-3">
                 <CheckCircle className="h-12 w-12 text-emerald-500" />
                 <div>
-                  <h3 className="text-2xl font-bold text-white">Import Complete!</h3>
-                  <p className="text-slate-400">Your leads have been imported successfully</p>
+                  <h3 className="text-2xl font-bold text-white">
+                    Import Complete!
+                  </h3>
+                  <p className="text-slate-400">
+                    Your leads have been imported successfully
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div className="rounded-lg border border-emerald-700 bg-emerald-900/20 p-4">
                   <p className="text-sm text-emerald-400">Created</p>
-                  <p className="text-3xl font-bold text-emerald-400">{importResults.created}</p>
+                  <p className="text-3xl font-bold text-emerald-400">
+                    {importResults.created}
+                  </p>
                 </div>
                 <div className="rounded-lg border border-blue-700 bg-blue-900/20 p-4">
                   <p className="text-sm text-blue-400">Updated</p>
-                  <p className="text-3xl font-bold text-blue-400">{importResults.updated}</p>
+                  <p className="text-3xl font-bold text-blue-400">
+                    {importResults.updated}
+                  </p>
                 </div>
                 <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
                   <p className="text-sm text-slate-400">Skipped</p>
-                  <p className="text-3xl font-bold text-slate-400">{importResults.skipped}</p>
+                  <p className="text-3xl font-bold text-slate-400">
+                    {importResults.skipped}
+                  </p>
                 </div>
               </div>
 
               {importResults.errors.length > 0 && (
                 <div className="rounded-lg border border-red-700 bg-red-900/20 p-4">
-                  <h4 className="font-semibold text-red-400 mb-2">Errors ({importResults.errors.length})</h4>
+                  <h4 className="font-semibold text-red-400 mb-2">
+                    Errors ({importResults.errors.length})
+                  </h4>
                   <div className="space-y-1 max-h-32 overflow-y-auto">
                     {importResults.errors.map((error: string, idx: number) => (
-                      <p key={idx} className="text-sm text-red-300">{error}</p>
+                      <p key={idx} className="text-sm text-red-300">
+                        {error}
+                      </p>
                     ))}
                   </div>
                 </div>
@@ -708,9 +863,7 @@ export function ImportLeadsModal({ onClose, onSuccess }: ImportLeadsModalProps) 
                   Importing...
                 </>
               ) : (
-                <>
-                  Import {preview?.total || 0} Leads
-                </>
+                <>Import {preview?.total || 0} Leads</>
               )}
             </button>
           </div>

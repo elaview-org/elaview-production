@@ -7,11 +7,11 @@ services:
     env_file:
       - .env
     environment:
-      POSTGRES_USER: ${Database__User}
-      POSTGRES_PASSWORD: ${Database__Password}
-      POSTGRES_DB: ${Database__User}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_USER}
     networks: [ elaview-backend ]
-    ports: [ "5432:5432" ]
+    ports: [ "${DATABASE_PORT}:${DATABASE_PORT}" ]
     volumes:
       - type: volume
         source: elaview-postgres-data
@@ -19,7 +19,7 @@ services:
 
 networks:
   elaview-backend:
-    name: ${Database__User}
+    name: ${DATABASE_USER}
 
 volumes:
   elaview-postgres-data:

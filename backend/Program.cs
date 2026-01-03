@@ -1,3 +1,4 @@
+using dotenv.net;
 using ElaviewBackend.Data;
 using ElaviewBackend.Services;
 using ElaviewBackend.Settings;
@@ -8,8 +9,39 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("secrets.json", optional: false,
-    reloadOnChange: true);
+var envVars = Environment.GetEnvironmentVariables();
+var configData = new Dictionary<string, string?>();
+
+if (builder.Environment.IsDevelopment()) {
+    DotEnv.Load();
+    envVars = Environment.GetEnvironmentVariables();
+
+    configData["Database:Host"] = envVars["DATABASE_HOST"]?.ToString();
+    configData["Database:Port"] = envVars["DATABASE_PORT"]?.ToString();
+    configData["Database:User"] = envVars["DATABASE_USER"]?.ToString();
+    configData["Database:Password"] =
+        envVars["DATABASE_PASSWORD"]?.ToString();
+
+    var i = 0;
+    var emailKey = $"DEV_ACCOUNT_{i}_EMAIL";
+    while (envVars[emailKey] != null) {
+        configData[$"DevelopmentAccounts:{i}:Email"] =
+            envVars[emailKey]?.ToString();
+        configData[$"DevelopmentAccounts:{i}:Password"] =
+            envVars[$"DEV_ACCOUNT_{i}_PASSWORD"]?.ToString();
+        configData[$"DevelopmentAccounts:{i}:Name"] =
+            envVars[$"DEV_ACCOUNT_{i}_NAME"]?.ToString();
+        configData[$"DevelopmentAccounts:{i}:Role"] =
+            envVars[$"DEV_ACCOUNT_{i}_ROLE"]?.ToString();
+        ++i;
+        emailKey = $"DEV_ACCOUNT_{i}_EMAIL";
+    }
+}
+else {
+// todo: parse configs during staging and production
+}
+
+builder.Configuration.AddInMemoryCollection(configData);
 
 builder.WebHost.UseQuic(options => {
 #pragma warning disable CA2252
@@ -17,10 +49,15 @@ builder.WebHost.UseQuic(options => {
 #pragma warning restore CA2252
 });
 builder.WebHost.ConfigureKestrel((_, serverOptions) => {
-    serverOptions.ListenAnyIP(7106, listenOptions => {
-        listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
-        listenOptions.UseHttps("TLS/chopsticksuser.dev.pfx", "chopsticksuser");
-    });
+    // todo: staging and production should have a different TLS 1.3 cert
+    serverOptions.ListenAnyIP(int.Parse(envVars["SERVER_PORT"]!.ToString()!),
+        listenOptions => {
+            listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
+            listenOptions.UseHttps(
+                envVars["SERVER_TLS_CERT_PATH"]!.ToString()!,
+                envVars["SERVER_TLS_CERT_PASSWORD"]!.ToString()!
+            );
+        });
 });
 
 builder.Services
@@ -89,4 +126,14 @@ app
 app.MapGet("/", () => "Hello World!");
 app.MapControllers();
 app.MapGraphQL("/api/graphql");
+
+if (app.Environment.IsDevelopment()) {
+    var logger = app.Services.GetRequiredService<ILogger<Program>>();
+    var serverPort = envVars["SERVER_PORT"]!.ToString();
+    logger.LogInformation("Server running at https://localhost:{Port}",
+        serverPort);
+    logger.LogInformation(
+        "GraphQL endpoint: https://localhost:{Port}/api/graphql", serverPort);
+}
+
 app.RunWithGraphQLCommands(args);

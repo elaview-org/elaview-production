@@ -2,7 +2,9 @@ namespace ElaviewBackend.Settings;
 
 public class GlobalSettings {
     public DatabaseSettings Database { get; set; } = new();
-    public List<DevelopmentAccountSettings> DevelopmentAccounts { get; set; } = new();
+
+    public List<DevelopmentAccountSettings> DevelopmentAccounts { get; set; } =
+        new();
 }
 
 public class DatabaseSettings {

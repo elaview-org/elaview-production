@@ -7,7 +7,7 @@ import {
 } from 'react';
 import { useColorScheme } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { lightTheme, darkTheme, Theme } from '../constants/theme';
+import { lightTheme, darkTheme, Theme } from '@/constants/theme';
 
 type ThemeMode = 'light' | 'dark' | 'system';
 

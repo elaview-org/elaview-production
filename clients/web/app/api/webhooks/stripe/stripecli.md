@@ -50,7 +50,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # Change to your production URL when 
 Run this command in your terminal:
 
 ```bash
-npm install stripe @stripe/stripe-js
+pnpm add stripe @stripe/stripe-js
 ```
 
 ---
@@ -85,7 +85,7 @@ npm install stripe @stripe/stripe-js
 ### Option B: Use ngrok (Alternative)
 
 1. Install ngrok: https://ngrok.com/download
-2. Start your Next.js app: `npm run dev`
+2. Start your Next.js app: `pnpm dev`
 3. In another terminal, run: `ngrok http 3000`
 4. Copy the https URL (e.g., `https://abc123.ngrok.io`)
 5. Go to Stripe Dashboard → **Developers** → **Webhooks**
@@ -119,7 +119,7 @@ Then add the `createCheckoutSession` mutation to the `bookingsRouter` (the full 
 
 ```bash
 # Terminal 1: Start your app
-npm run dev
+pnpm dev
 
 # Terminal 2: Start Stripe webhook forwarding
 stripe listen --forward-to localhost:3000/api/webhooks/stripe

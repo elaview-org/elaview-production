@@ -1,4 +1,5 @@
 import "./globals.css";
+import {ApolloWrapper} from "@/shared/api/gql/client";
 
 import type {Metadata} from "next";
 import {ThemeProvider} from 'next-themes'
@@ -17,7 +18,9 @@ export default function RootLayout(props: LayoutProps<"/">) {
         </head>
         <body>
         <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
-            {props.children}
+            <ApolloWrapper>
+                {props.children}
+            </ApolloWrapper>
         </ThemeProvider>
         </body>
         </html>

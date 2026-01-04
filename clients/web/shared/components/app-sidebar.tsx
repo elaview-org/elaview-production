@@ -17,7 +17,7 @@ import {
     IconSearch,
     IconSettings,
     IconUsers,
-} from "@tabler/icons-react"
+} from "@tabler/icons-react";
 
 import {NavDocuments} from "@/shared/components/nav-documents"
 import {NavMain} from "@/shared/components/nav-main"

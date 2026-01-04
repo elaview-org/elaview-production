@@ -1,45 +1,35 @@
-// import { api } from "../../../elaview-mvp/src/trpc/server";
-import { AdvertiserLayoutClient } from "./(shared)/AdvertiserLayoutClient";
-import { AdminLayoutClient } from "./(shared)/AdminLayoutClient";
-import { SpaceOwnerLayoutClient } from "./(shared)/SpaceOwnerLayoutClient";
-import { AdminModeProvider } from "@/shared/contexts/AdminModeContext";
-// import { getAdminModeCookie } from "@/shred/lib/admin-mode-cookies";
+import {SidebarInset, SidebarProvider} from "@/shared/components/ui/sidebar";
+import {AppSidebar} from "@/shared/components/app-sidebar";
+import {SiteHeader} from "@/shared/components/site-header";
+import {CSSProperties} from "react";
 
-export default async function DashboardLayout({
-  admin,
-  marketing,
-  advertiser,
-  spaceOwner,
-}: LayoutProps<"/">) {
-  // const role = (await api.user.getCurrentUser()).role;
-  const role = "MARKETING" as
-    | "MARKETING"
-    | "ADMIN"
-    | "ADVERTISER"
-    | "SPACE_OWNER";
-  // const initialMode =
-  // (await getAdminModeCookie()) ?? (role === "ADMIN" ? "admin" : "marketing");
+type Role = "admin" | "advertiser" | "marketing" | "space-owner" | null;
+const role: Role = "admin";
 
-  // switch (role) {
-  //   case "ADMIN": {
-  //     return admin;
-  //   }
-  //   case "MARKETING": {
-  //     return (
-  //       <>{marketing}</>
-  // <AdminModeProvider userRole={role} initialMode={initialMode}>
-  // <AdminLayoutClient>
-  // </AdminLayoutClient>
-  // </AdminModeProvider>
-  //   );
-  // }
-  // case "ADVERTISER": {
-  // return <AdvertiserLayoutClient>{advertiser}</AdvertiserLayoutClient>;
-  //   return <>{advertiser}</>;
-  // }
-  // case "SPACE_OWNER": {
-  //   return <>{spaceOwner}</>;
-  // return <SpaceOwnerLayoutClient>{spaceOwner}</SpaceOwnerLayoutClient>;
-  // }
-return <SpaceOwnerLayoutClient>{spaceOwner}</SpaceOwnerLayoutClient>;
+export default function Layout(props: LayoutProps<"/">) {
+    return <SidebarProvider
+        style={
+            {
+                "--sidebar-width": "calc(var(--spacing) * 72)",
+                "--header-height": "calc(var(--spacing) * 12)",
+            } as CSSProperties
+        }
+    >
+        <AppSidebar variant="inset"/>
+        <SidebarInset>
+            <SiteHeader/>
+            {(() => {
+                switch (role) {
+                    case "admin":
+                        return props.admin;
+                    case "advertiser":
+                        return props.advertiser;
+                    case "marketing":
+                        return props.marketing;
+                    case "space-owner":
+                        return props.spaceOwner;
+                }
+            })()}
+        </SidebarInset>
+    </SidebarProvider>;
 }

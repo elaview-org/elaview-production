@@ -10,7 +10,6 @@ namespace ElaviewBackend.GraphQL.Queries;
 
 [QueryType]
 public static partial class UserQueries {
-    // todo: test
     [Authorize]
     public static async Task<User?> GetCurrentUser(
         AppDbContext dbContext, QueryContext<User> queryContext,
@@ -21,7 +20,6 @@ public static partial class UserQueries {
             t => t.Id == userService.PrincipalId(), ct
         );
 
-    // todo: test
     [Authorize(Roles = "Admin")]
     public static async Task<User?> GetUserById(
         String id, AppDbContext dbContext, QueryContext<User> queryContext,

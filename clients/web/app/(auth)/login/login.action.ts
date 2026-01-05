@@ -10,8 +10,9 @@ import {revalidatePath} from "next/cache";
 
 export type LoginState = ActionState<{ email: string, password: string }>;
 
-export default async function login(state: LoginState, formData: FormData) {
-    assert(formData.has("email") && formData.has("password"));
+export default async function login(_prevState: LoginState, formData: FormData) {
+    assert(formData.has("email"));
+    assert(formData.has("password"));
     const {email, password} = Object.fromEntries(formData);
     try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL!}/auth/login`, {
@@ -20,19 +21,19 @@ export default async function login(state: LoginState, formData: FormData) {
             },
             method: "POST",
             body: JSON.stringify({email, password}),
-            credentials: "include",
         });
 
         if (!res.ok) {
             return {
-                ...state,
                 success: false,
-                message: (await res.json()).error.message,
-            };
+                message: "Authentication failed",
+                data: {email, password},
+            } as LoginState;
         }
 
+        assert(!!process.env.AUTH_COOKIE_NAME);
         const authCookie: Cookie = setCookieParser.parse(res.headers.getSetCookie())
-            .find(cookie => cookie.name === "ElaviewAuth")!;
+            .find(cookie => cookie.name === process.env.AUTH_COOKIE_NAME)!;
         (await cookies()).set({
             name: authCookie.name,
             value: authCookie.value,
@@ -52,10 +53,10 @@ export default async function login(state: LoginState, formData: FormData) {
             typeof error.message === "string"
         );
         return {
-            ...state,
             success: false,
             message: error?.message ?? "Internal server error",
-        };
+            data: {email, password},
+        } as LoginState;
     }
 
     revalidatePath("/login");

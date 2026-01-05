@@ -1,6 +1,6 @@
 "use client";
 
-import {HttpLink} from "@apollo/client";
+import {gql, HttpLink} from "@apollo/client";
 import {ApolloClient, ApolloNextAppProvider, InMemoryCache} from "@apollo/client-integration-nextjs";
 import React from "react";
 
@@ -14,8 +14,6 @@ import {
     useReadQuery,
     useSuspenseQuery,
 } from "@apollo/client/react";
-
-export {gql} from "@apollo/client";
 
 function makeClient() {
     const httpLink = new HttpLink({
@@ -49,6 +47,7 @@ export function ApolloWrapper({children}: React.PropsWithChildren) {
 }
 
 const api = {
+    gql,
     useQuery,
     useMutation,
     useSuspenseQuery,

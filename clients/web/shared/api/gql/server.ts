@@ -1,4 +1,4 @@
-import {ApolloClient, HttpLink, InMemoryCache} from "@apollo/client";
+import {ApolloClient, gql, HttpLink, InMemoryCache} from "@apollo/client";
 import {registerApolloClient} from "@apollo/client-integration-nextjs";
 
 const {getClient, query, PreloadQuery} = registerApolloClient(() => {
@@ -17,6 +17,7 @@ const {getClient, query, PreloadQuery} = registerApolloClient(() => {
 });
 
 const api = {
+    gql,
     query,
     mutate: (options: Parameters<ReturnType<typeof getClient>['mutate']>[0])
         : ReturnType<ReturnType<typeof getClient>['mutate']> =>
@@ -25,5 +26,4 @@ const api = {
 };
 
 export default api;
-export {gql} from "@apollo/client";
 export {PreloadQuery};

@@ -10,19 +10,17 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout(props: LayoutProps<"/">) {
-    return (
-        <html lang="en" suppressHydrationWarning>
-        <head>
-            <title>{metadata.title as string}</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        </head>
-        <body>
-        <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
-            <ApolloWrapper>
-                {props.children}
-            </ApolloWrapper>
-        </ThemeProvider>
-        </body>
-        </html>
-    );
+    return <html lang="en" suppressHydrationWarning>
+    <head>
+        <title>{metadata.title as string}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+    <body>
+    <ThemeProvider attribute="data-theme" defaultTheme="system" enableSystem>
+        <ApolloWrapper>
+            {props.children}
+        </ApolloWrapper>
+    </ThemeProvider>
+    </body>
+    </html>
 }

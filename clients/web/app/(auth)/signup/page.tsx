@@ -1,4 +1,3 @@
-import {SignupForm} from "@/shared/components/signup-form";
 import {GalleryVerticalEnd} from "lucide-react";
 import Image from "next/image";
 
@@ -16,7 +15,7 @@ export default function Page() {
             </div>
             <div className="flex flex-1 items-center justify-center">
                 <div className="w-full max-w-xs">
-                    <SignupForm/>
+
                 </div>
             </div>
         </div>

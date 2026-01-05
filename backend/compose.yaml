@@ -17,6 +17,28 @@ services:
         source: elaview-postgres-data
         target: /var/lib/postgresql
 
+  elaview-backend-app:
+    container_name: elaview-backend-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      DATABASE_HOST: elaview-backend-postgres
+    networks: [ elaview-backend ]
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}/tcp"
+      - "${SERVER_PORT}:${SERVER_PORT}/udp"
+    volumes:
+      - type: bind
+        source: ./TLS
+        target: /app/TLS
+        read_only: true
+    depends_on:
+      - elaview-backend-postgres
+
 networks:
   elaview-backend:
     name: ${DATABASE_USER}

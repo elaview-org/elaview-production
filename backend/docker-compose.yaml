@@ -36,6 +36,9 @@ services:
         source: ./TLS
         target: /app/TLS
         read_only: true
+      - type: volume
+        source: elaview-dataprotection-keys
+        target: /root/.aspnet/DataProtection-Keys
     depends_on:
       - database
 
@@ -45,3 +48,4 @@ networks:
 
 volumes:
   elaview-postgres-data:
+  elaview-dataprotection-keys:

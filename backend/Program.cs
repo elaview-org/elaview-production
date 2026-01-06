@@ -140,8 +140,11 @@ if (developmentAccounts.Any()) {
         .SeedDevelopmentAccountsAsync();
 }
 
+if (!app.Environment.IsDevelopment()) {
+    app.UseHttpsRedirection();
+}
+
 app
-    .UseHttpsRedirection()
     .UseCors()
     .UseAuthentication()
     .UseAuthorization();

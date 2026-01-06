@@ -124,7 +124,7 @@ builder
     .AddProjections()
     .AddFiltering()
     .AddSorting()
-    .AddMutationConventions();
+    .AddMutationConventions(applyToAllMutations: true);
 
 var app = builder.Build();
 
@@ -137,7 +137,7 @@ var developmentAccounts = builder.Configuration
 if (developmentAccounts.Any()) {
     await app.Services.CreateScope().ServiceProvider
         .GetRequiredService<DatabaseSeeder>()
-        .SeedDevelopmentAccountsAsync();
+        .SeedDevelopmentAccountsAsync(app.Environment.IsDevelopment());
 }
 
 if (!app.Environment.IsDevelopment()) {

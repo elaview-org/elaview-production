@@ -39,5 +39,6 @@
 
     <ItemGroup>
       <Folder Include="Migrations\" />
+      <Folder Include="TLS\" />
     </ItemGroup>
 </Project>

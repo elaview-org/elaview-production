@@ -1,7 +1,7 @@
-﻿name: elaview-backend
+name: elaview-backend
 
 services:
-  elaview-backend-postgres:
+  database:
     container_name: elaview-backend-postgres
     image: postgres:latest
     env_file:
@@ -17,8 +17,8 @@ services:
         source: elaview-postgres-data
         target: /var/lib/postgresql
 
-  elaview-backend-app:
-    container_name: elaview-backend-app
+  server:
+    container_name: elaview-backend-server
     build:
       context: .
       dockerfile: Dockerfile
@@ -37,7 +37,7 @@ services:
         target: /app/TLS
         read_only: true
     depends_on:
-      - elaview-backend-postgres
+      - database
 
 networks:
   elaview-backend:
@@ -45,4 +45,3 @@ networks:
 
 volumes:
   elaview-postgres-data:
-

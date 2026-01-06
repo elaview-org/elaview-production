@@ -141,12 +141,6 @@ export function NavigationSection({ userRole }: NavigationSectionProps) {
               </DropdownMenu>
             </SidebarMenuItem>
           ))}
-          <SidebarMenuItem>
-            <SidebarMenuButton className="text-sidebar-foreground/70">
-              <IconDots className="text-sidebar-foreground/70" />
-              <span>More</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
         </SidebarMenu>
       </SidebarGroup>
       <SidebarGroup className={"mt-auto"}>

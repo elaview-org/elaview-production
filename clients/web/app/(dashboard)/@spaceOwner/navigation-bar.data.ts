@@ -7,12 +7,18 @@ import {
   IconFileWord,
   IconHelp,
   IconListDetails,
+  IconPlus,
   IconReport,
   IconSearch,
   IconSettings,
 } from "@tabler/icons-react";
 
 const spaceOwnerData = {
+  quickAction: {
+    title: "New Campaign",
+    url: "#",
+    icon: IconPlus,
+  },
   navMain: [
     {
       title: "Listings",

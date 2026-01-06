@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import {
   IconBell,
-  IconDashboard,
   IconDots,
   IconFolder,
   IconShare3,
@@ -63,12 +62,12 @@ export function NavigationSection({ userRole }: NavigationSectionProps) {
             <SidebarMenuItem className="flex items-center gap-2">
               <SidebarMenuButton
                 asChild
-                tooltip="Quick Create"
+                tooltip={data.quickAction.title}
                 className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
               >
-                <Link href={"/overview"}>
-                  <IconDashboard />
-                  <span>Overview</span>
+                <Link href={data.quickAction.url}>
+                  <data.quickAction.icon />
+                  <span>{data.quickAction.title}</span>
                 </Link>
               </SidebarMenuButton>
               <Button

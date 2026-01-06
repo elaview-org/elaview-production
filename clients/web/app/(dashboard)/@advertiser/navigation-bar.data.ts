@@ -1,48 +1,67 @@
 import {
-  IconChartBar,
+  IconClipboardText,
+  IconContract,
+  IconCookie,
+  IconDashboard,
   IconHelp,
-  IconListDetails,
+  IconMessage,
+  IconPlus,
   IconSearch,
   IconSettings,
 } from "@tabler/icons-react";
 
 const advertiserData = {
+  quickAction: {
+    title: "New Campaign",
+    url: "#",
+    icon: IconPlus,
+  },
   navMain: [
+    {
+      title: "Overview",
+      url: "/overview",
+      icon: IconDashboard,
+    },
     {
       title: "Discover",
       url: "/discover",
-      icon: IconListDetails,
+      icon: IconSearch,
     },
     {
       title: "Bookings",
       url: "/bookings",
-      icon: IconChartBar,
+      icon: IconClipboardText,
     },
     {
-      title: "Alerts",
-      url: "/alerts",
-      icon: IconChartBar,
+      title: "Messages",
+      url: "/settings",
+      icon: IconMessage,
     },
-  ],
-  navClouds: [],
-  navSecondary: [
     {
       title: "Settings",
       url: "/settings",
       icon: IconSettings,
     },
+  ],
+  documents: [],
+  navSecondary: [
     {
-      title: "Get Help",
+      title: "Help & Support",
       url: "/help",
       icon: IconHelp,
     },
     {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
+      title: "Terms of Service",
+      url: "/terms-of-service",
+      icon: IconContract,
+    },
+    {
+      title: "Privacy Policy",
+      url: "/privacy-policy",
+      icon: IconCookie,
     },
   ],
-  documents: [],
+  navClouds: [],
 };
 
 export default advertiserData;

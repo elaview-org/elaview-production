@@ -24,16 +24,10 @@ export function ThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm">
-          {!mounted && <Monitor className="h-[1.2rem] w-[1.2rem]" />}
-          {mounted && theme === "system" && (
-            <Monitor className="h-[1.2rem] w-[1.2rem]" />
-          )}
-          {mounted && theme === "light" && (
-            <Sun className="h-[1.2rem] w-[1.2rem]" />
-          )}
-          {mounted && theme === "dark" && (
-            <Moon className="h-[1.2rem] w-[1.2rem]" />
-          )}
+          {!mounted && <Monitor />}
+          {mounted && theme === "system" && <Monitor />}
+          {mounted && theme === "light" && <Sun />}
+          {mounted && theme === "dark" && <Moon />}
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>

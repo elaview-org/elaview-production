@@ -1,11 +1,12 @@
 "use client";
 
-import { ThemeToggle } from "@/shared/components/theme-toggle";
 import { Separator } from "@/shared/components/separator";
 import { SidebarTrigger } from "@/shared/components/sidebar";
 import { usePathname } from "next/dist/client/components/navigation";
+import * as React from "react";
 import { Fragment } from "react";
 import Link from "next/link";
+import { ThemeToggle } from "@/shared/components/theme-toggle";
 
 export default function ContentHeader() {
   return (

@@ -1,8 +1,8 @@
 import UnderConstruction from "@/shared/components/under-construction";
-import {authenticatedRedirect} from "@/shared/lib/utils";
+import { authenticatedRedirect } from "@/shared/lib/utils";
 
 export default async function Page() {
-    await authenticatedRedirect();
+  await authenticatedRedirect();
 
-    return <UnderConstruction/>;
+  return <UnderConstruction />;
 }

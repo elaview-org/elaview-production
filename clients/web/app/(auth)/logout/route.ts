@@ -12,5 +12,5 @@ export async function GET() {
   });
   assert(res.ok); // may fail if user fakes a cookie
   (await cookies()).delete(process.env.AUTH_COOKIE_NAME!);
-  redirect("/");
+  redirect("/login");
 }

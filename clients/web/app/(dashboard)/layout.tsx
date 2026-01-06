@@ -16,8 +16,8 @@ import { NavigationSection } from "./navigation-section";
 import { UserSection } from "./user-section";
 
 import { CSSProperties } from "react";
-import assert from "node:assert";
 import ContentHeader from "@/app/(dashboard)/content-header";
+import { redirect } from "next/navigation";
 
 export default async function Layout(props: LayoutProps<"/">) {
   const { data } = await api.query<Query>({
@@ -34,7 +34,9 @@ export default async function Layout(props: LayoutProps<"/">) {
     `,
   });
 
-  assert(!!data?.currentUser);
+  if (!data?.currentUser) {
+    redirect("/logout");
+  }
 
   return (
     <SidebarProvider

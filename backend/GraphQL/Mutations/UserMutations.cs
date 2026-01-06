@@ -1,14 +1,8 @@
-using ElaviewBackend.Data;
-using ElaviewBackend.Data.Entities;
-using ElaviewBackend.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
-
 namespace ElaviewBackend.GraphQL.Mutations;
 
+// todo: admin can delete user
 // [MutationType]
 // public static partial class UserMutations {
-//     // todo: selected fields to be updated
 //     [Authorize]
 //     public static async Task<User> UpdateCurrentUser(
 //         User updatedUser, AppDbContext dbContext,

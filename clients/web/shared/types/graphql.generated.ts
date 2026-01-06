@@ -867,6 +867,7 @@ export type Query = {
   spaceById: Maybe<Space>;
   spaces: Maybe<SpacesConnection>;
   userById: Maybe<User>;
+  users: Maybe<UsersConnection>;
 };
 
 
@@ -886,7 +887,17 @@ export type QuerySpacesArgs = {
 
 
 export type QueryUserByIdArgs = {
-  id: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryUsersArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<UserSortInput>>;
+  where?: InputMaybe<UserFilterInput>;
 };
 
 export type Review = {
@@ -1261,4 +1272,24 @@ export type UserStatusOperationFilterInput = {
   in?: InputMaybe<Array<UserStatus>>;
   neq?: InputMaybe<UserStatus>;
   nin?: InputMaybe<Array<UserStatus>>;
+};
+
+/** A connection to a list of items. */
+export type UsersConnection = {
+  __typename: 'UsersConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<UsersEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<User>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type UsersEdge = {
+  __typename: 'UsersEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: User;
 };

@@ -1,1 +1,0 @@
-export { QuickActionCard } from "./QuickActionCard";

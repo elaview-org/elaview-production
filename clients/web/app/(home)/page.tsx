@@ -1,5 +1,8 @@
-import LandingPage from "@/shared/components/landing/LandingPage";
+import UnderConstruction from "@/shared/components/under-construction";
+import { authenticatedRedirect } from "@/shared/lib/utils";
 
-export default function HomePage() {
-  return <LandingPage />;
+export default async function Page() {
+  await authenticatedRedirect();
+
+  return <UnderConstruction />;
 }

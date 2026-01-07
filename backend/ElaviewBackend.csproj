@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+        <PackageReference Include="dotenv.net" Version="4.0.0" />
         <PackageReference Include="GreenDonut.Data" Version="15.1.11" />
         <PackageReference Include="HotChocolate.Data" Version="15.1.11" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
@@ -38,5 +39,6 @@
 
     <ItemGroup>
       <Folder Include="Migrations\" />
+      <Folder Include="TLS\" />
     </ItemGroup>
 </Project>

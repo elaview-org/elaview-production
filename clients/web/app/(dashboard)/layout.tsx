@@ -1,45 +1,90 @@
-// import { api } from "../../../elaview-mvp/src/trpc/server";
-import { AdvertiserLayoutClient } from "./(shared)/AdvertiserLayoutClient";
-import { AdminLayoutClient } from "./(shared)/AdminLayoutClient";
-import { SpaceOwnerLayoutClient } from "./(shared)/SpaceOwnerLayoutClient";
-import { AdminModeProvider } from "@/shared/contexts/AdminModeContext";
-// import { getAdminModeCookie } from "@/shred/lib/admin-mode-cookies";
+import api from "@/shared/api/gql/server";
+import { Query, UserRole } from "@/shared/types/graphql.generated";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+} from "@/shared/components/sidebar";
+import { IconInnerShadowTop } from "@tabler/icons-react";
+import { NavigationSection } from "./navigation-section";
+import { UserSection } from "./user-section";
 
-export default async function DashboardLayout({
-  admin,
-  marketing,
-  advertiser,
-  spaceOwner,
-}: LayoutProps<"/">) {
-  // const role = (await api.user.getCurrentUser()).role;
-  const role = "MARKETING" as
-    | "MARKETING"
-    | "ADMIN"
-    | "ADVERTISER"
-    | "SPACE_OWNER";
-  // const initialMode =
-  // (await getAdminModeCookie()) ?? (role === "ADMIN" ? "admin" : "marketing");
+import { CSSProperties } from "react";
+import ContentHeader from "@/app/(dashboard)/content-header";
+import { redirect } from "next/navigation";
 
-  // switch (role) {
-  //   case "ADMIN": {
-  //     return admin;
-  //   }
-  //   case "MARKETING": {
-  //     return (
-  //       <>{marketing}</>
-  // <AdminModeProvider userRole={role} initialMode={initialMode}>
-  // <AdminLayoutClient>
-  // </AdminLayoutClient>
-  // </AdminModeProvider>
-  //   );
-  // }
-  // case "ADVERTISER": {
-  // return <AdvertiserLayoutClient>{advertiser}</AdvertiserLayoutClient>;
-  //   return <>{advertiser}</>;
-  // }
-  // case "SPACE_OWNER": {
-  //   return <>{spaceOwner}</>;
-  // return <SpaceOwnerLayoutClient>{spaceOwner}</SpaceOwnerLayoutClient>;
-  // }
-return <SpaceOwnerLayoutClient>{spaceOwner}</SpaceOwnerLayoutClient>;
+export default async function Layout(props: LayoutProps<"/">) {
+  const { data } = await api.query<Query>({
+    query: api.gql`
+      query {
+        currentUser {
+          id,
+          email,
+          name,
+          avatar,
+          role,
+        }
+      }
+    `,
+  });
+
+  if (!data?.currentUser) {
+    redirect("/logout");
+  }
+
+  return (
+    <SidebarProvider
+      style={
+        {
+          "--sidebar-width": "calc(var(--spacing) * 72)",
+          "--header-height": "calc(var(--spacing) * 12)",
+        } as CSSProperties
+      }
+    >
+      <Sidebar variant={"inset"} collapsible="offcanvas">
+        <SidebarHeader>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                className="data-[slot=sidebar-menu-button]:p-1.5!"
+              >
+                <a href="#">
+                  <IconInnerShadowTop className="size-5!" />
+                  <span className="text-base font-semibold">Elaview</span>
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+        <SidebarContent>
+          <NavigationSection userRole={data?.currentUser?.role} />
+        </SidebarContent>
+        <SidebarFooter>
+          <UserSection {...data?.currentUser} />
+        </SidebarFooter>
+      </Sidebar>
+      <SidebarInset>
+        <ContentHeader />
+        {(() => {
+          switch (data.currentUser.role) {
+            case UserRole.Admin:
+              return props.admin;
+            case UserRole.Advertiser:
+              return props.advertiser;
+            case UserRole.Marketing:
+              return props.marketing;
+            case UserRole.SpaceOwner:
+              return props.spaceOwner;
+          }
+        })()}
+      </SidebarInset>
+    </SidebarProvider>
+  );
 }

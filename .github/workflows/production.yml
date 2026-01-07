@@ -2,7 +2,10 @@ name: Deploy Production
 
 on:
   push:
-    branches: [main]
+    tags:
+      - 'v*'
+  release:
+    types: [ published ]
 
 concurrency:
   group: production-deploy
@@ -39,21 +42,24 @@ jobs:
         with:
           node-version: 20
           cache: 'pnpm'
+          cache-dependency-path: clients/mobile/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
       - name: EAS Build & Submit
-        working-directory: apps/mobile
+        working-directory: clients/mobile
         run: |
           eas build --profile production --platform all --non-interactive --auto-submit
 
   smoke-tests:
     name: Smoke Tests
     runs-on: ubuntu-latest
-    needs: [deploy-web-production]
+    needs: [ deploy-web-production ]
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
           version: 9
+      - run: |
+          cd clients/mobile
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -69,7 +75,7 @@ jobs:
   notify:
     name: Notify
     runs-on: ubuntu-latest
-    needs: [deploy-web-production, deploy-mobile-production, smoke-tests]
+    needs: [ deploy-web-production, deploy-mobile-production, smoke-tests ]
     if: always()
     steps:
       - uses: 8398a7/action-slack@v3

@@ -2,33 +2,34 @@ using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
 using ElaviewBackend.Models;
 using ElaviewBackend.Services;
-using GreenDonut.Data;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.GraphQL.Queries;
 
 [QueryType]
 public static partial class UserQueries {
-    // todo: test
     [Authorize]
-    public static async Task<User?> GetCurrentUser(
-        AppDbContext dbContext, QueryContext<User> queryContext,
-        CancellationToken ct, UserService userService
-    ) => await dbContext.Users
-        .With(queryContext.Include(t => t.Id))
-        .FirstOrDefaultAsync(
-            t => t.Id == userService.PrincipalId(), ct
-        );
+    [UseFirstOrDefault]
+    [UseProjection]
+    public static IQueryable<User> GetCurrentUser(
+        AppDbContext context, UserService userService
+    ) => context.Users.Where(t => t.Id == userService.PrincipalId());
 
-    // todo: test
     [Authorize(Roles = "Admin")]
-    public static async Task<User?> GetUserById(
-        String id, AppDbContext dbContext, QueryContext<User> queryContext,
-        CancellationToken ct
-    ) => await dbContext.Users
-        .With(queryContext.Include(t => t.Id))
-        .FirstOrDefaultAsync(t => t.Id == id, ct);
+    [UseFirstOrDefault]
+    [UseProjection]
+    public static IQueryable<User?> GetUserById(
+        [ID] string id, AppDbContext context
+    ) => context.Users.Where(t => t.Id == id);
+
+    [Authorize(Roles = "Admin")]
+    [UsePaging]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public static IQueryable<User> GetUsers(
+        AppDbContext context
+    ) => context.Users;
 
     [Authorize]
     public static NotificationSettings GetNotificationSettings(

@@ -1,0 +1,52 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+.next
+out
+build
+dist
+
+# Cache
+.cache
+.turbo
+.eslintcache
+
+# Environment
+.env
+.env*.local
+
+# Database
+prisma/migrations
+
+# Testing
+coverage
+playwright-report
+test-results
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Misc
+*.tsbuildinfo
+next-env.d.ts
+
+# Generated files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

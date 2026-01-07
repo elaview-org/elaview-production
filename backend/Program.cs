@@ -1,3 +1,4 @@
+using dotenv.net;
 using ElaviewBackend.Data;
 using ElaviewBackend.Services;
 using ElaviewBackend.Settings;
@@ -8,26 +9,74 @@ using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFile("secrets.json", optional: false,
-    reloadOnChange: true);
+DotEnv.Load();
+var envVars = Environment.GetEnvironmentVariables();
+var configData = new Dictionary<string, string?> {
+    ["Database:Host"] = envVars["DATABASE_HOST"]?.ToString(),
+    ["Database:Port"] = envVars["DATABASE_PORT"]?.ToString(),
+    ["Database:User"] = envVars["DATABASE_USER"]?.ToString(),
+    ["Database:Password"] = envVars["DATABASE_PASSWORD"]?.ToString()
+};
 
-builder.WebHost.UseQuic(options => {
-#pragma warning disable CA2252
-    options.MaxBidirectionalStreamCount = 200;
-#pragma warning restore CA2252
-});
-builder.WebHost.ConfigureKestrel((_, serverOptions) => {
-    serverOptions.ListenAnyIP(7106, listenOptions => {
-        listenOptions.Protocols = HttpProtocols.Http1AndHttp2AndHttp3;
-        listenOptions.UseHttps("TLS/chopsticksuser.dev.pfx", "chopsticksuser");
+var i = 0;
+var emailKey = $"ACCOUNT_{i}_EMAIL";
+while (envVars[emailKey] != null) {
+    configData[$"DevelopmentAccounts:{i}:Email"] =
+        envVars[emailKey]?.ToString();
+    configData[$"DevelopmentAccounts:{i}:Password"] =
+        envVars[$"ACCOUNT_{i}_PASSWORD"]?.ToString();
+    configData[$"DevelopmentAccounts:{i}:Name"] =
+        envVars[$"ACCOUNT_{i}_NAME"]?.ToString();
+    configData[$"DevelopmentAccounts:{i}:Role"] =
+        envVars[$"ACCOUNT_{i}_ROLE"]?.ToString();
+    ++i;
+    emailKey = $"ACCOUNT_{i}_EMAIL";
+}
+
+builder.Configuration.AddInMemoryCollection(configData);
+
+var certPath = envVars["SERVER_TLS_CERT_PATH"]?.ToString();
+var certPassword = envVars["SERVER_TLS_CERT_PASSWORD"]?.ToString();
+
+if (builder.Environment.IsDevelopment()) {
+    builder.WebHost.ConfigureKestrel((_, serverOptions) => {
+        serverOptions.ListenAnyIP(
+            int.Parse(envVars["SERVER_PORT"]!.ToString()!),
+            listenOptions => {
+                listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+            });
     });
-});
+}
+else {
+    if (string.IsNullOrEmpty(certPath)) {
+        throw new InvalidOperationException("SERVER_TLS_CERT_PATH is required");
+    }
+
+    builder.WebHost
+        .UseQuic(options => {
+#pragma warning disable CA2252
+            options.MaxBidirectionalStreamCount = 200;
+#pragma warning restore CA2252
+        })
+        .ConfigureKestrel((_, serverOptions) => {
+            serverOptions.ListenAnyIP(
+                int.Parse(envVars["SERVER_PORT"]!.ToString()!),
+                listenOptions => {
+                    listenOptions.Protocols =
+                        HttpProtocols.Http1AndHttp2AndHttp3;
+                    listenOptions.UseHttps(certPath, certPassword);
+                });
+        });
+}
 
 builder.Services
     .Configure<GlobalSettings>(builder.Configuration)
     .AddHttpContextAccessor()
     .AddDbContext<AppDbContext>((sp, options) => {
-        options.LogTo(Console.WriteLine);
+        if (builder.Environment.IsDevelopment()) {
+            options.LogTo(Console.WriteLine);
+        }
+
         var connectionString = sp.GetRequiredService<IOptions<GlobalSettings>>()
             .Value.Database.GetConnectionString();
         options.UseNpgsql(connectionString);
@@ -38,17 +87,23 @@ builder.Services
     .AddScoped<DatabaseSeeder>()
     .AddControllers();
 
+var corsOrigins =
+    envVars["CORS_ORIGINS"]?.ToString()?.Split(',') ??
+    throw new InvalidOperationException(
+        "Missing CORS origins"
+    );
+
 builder.Services
     .AddCors(options =>
         options.AddDefaultPolicy(policy =>
-            policy.WithOrigins("http://localhost:3000", "http://localhost:8081")
+            policy.WithOrigins(corsOrigins)
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()))
     .AddAuthorization()
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => {
-        options.Cookie.Name = "ElaviewAuth";
+        options.Cookie.Name = envVars["AUTH_COOKIE_NAME"]!.ToString()!;
         options.Cookie.HttpOnly = true;
         options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Strict;
@@ -69,24 +124,42 @@ builder
     .AddProjections()
     .AddFiltering()
     .AddSorting()
-    .AddMutationConventions();
+    .AddMutationConventions(applyToAllMutations: true);
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment()) {
     app.MapOpenApi();
+}
+
+var developmentAccounts = builder.Configuration
+    .GetSection("DevelopmentAccounts").GetChildren();
+if (developmentAccounts.Any()) {
     await app.Services.CreateScope().ServiceProvider
         .GetRequiredService<DatabaseSeeder>()
-        .SeedDevelopmentAccountsAsync();
+        .SeedDevelopmentAccountsAsync(app.Environment.IsDevelopment());
+}
+
+if (!app.Environment.IsDevelopment()) {
+    app.UseHttpsRedirection();
 }
 
 app
-    .UseHttpsRedirection()
     .UseCors()
     .UseAuthentication()
     .UseAuthorization();
 
-app.MapGet("/", () => "Hello World!");
 app.MapControllers();
 app.MapGraphQL("/api/graphql");
+
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+var serverPort = envVars["SERVER_PORT"]!.ToString();
+var protocol = app.Environment.IsDevelopment() ? "http" : "https";
+logger.LogInformation(
+    "{Protocol}://localhost:{ServerPort}", protocol, serverPort
+);
+logger.LogInformation(
+    "{Protocol}://localhost:{ServerPort}/api/graphql", protocol, serverPort
+);
+
 app.RunWithGraphQLCommands(args);

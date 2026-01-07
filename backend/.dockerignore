@@ -1,5 +1,5 @@
 ﻿**/.dockerignore
-**/.env
+**/.env*
 **/.git
 **/.gitignore
 **/.project
@@ -21,6 +21,46 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
-LICENSE
-README.md
-secrets.json
+
+# Additional IDE and OS files
+**/.DS_Store
+**/Thumbs.db
+**/*.swp
+**/*.swo
+**/*~
+**/*.DotSettings.user
+**/*.sln.DotSettings.user
+
+# Development and documentation files
+**/Tests
+**/Scripts
+**/Docs
+**/*.local.md
+**/CLAUDE*.md
+**/README.md
+**/devbox.json
+**/devbox.lock
+**/.devbox
+**/dotnet-tools.json
+**/*.sln
+**/LICENSE
+**/secrets*
+
+# Development configuration
+**/appsettings.Development.json
+**/Properties/launchSettings.json
+
+# Generated files
+**/GraphQL/schema.graphql
+
+# Local certificates and keys
+**/TLS/**
+**/*.pfx
+**/*.pem
+**/*.key
+**/*.crt
+
+# Rider specific
+**/.run
+**/rider.project.model.nuget.info
+**/rider.project.restore.info

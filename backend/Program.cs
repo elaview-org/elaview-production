@@ -3,6 +3,7 @@ using ElaviewBackend.Features.Auth;
 using ElaviewBackend.Features.Users;
 using ElaviewBackend.Shared;
 using ElaviewBackend.Shared.Settings;
+using HotChocolate.Execution;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -152,6 +153,15 @@ app
 
 app.MapControllers();
 app.MapGraphQL("/api/graphql");
+
+if (app.Environment.IsDevelopment()) {
+    var executorResolver = app.Services.GetRequiredService<IRequestExecutorResolver>();
+    var executor = await executorResolver.GetRequestExecutorAsync();
+    var schema = executor.Schema;
+    var schemaPath = System.IO.Path.Combine("Shared", "schema.graphql");
+    var schemaText = schema.Print();
+    await File.WriteAllTextAsync(schemaPath, schemaText);
+}
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 var serverPort = envVars["SERVER_PORT"]!.ToString();

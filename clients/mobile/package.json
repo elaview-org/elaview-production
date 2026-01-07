@@ -16,6 +16,8 @@
     "build:prod": "eas build --profile production --platform all"
   },
   "dependencies": {
+    "@expo/vector-icons": "^15.0.3",
+    "date-fns": "^4.1.0",
     "expo": "~54.0.30",
     "expo-auth-session": "~7.0.10",
     "expo-constants": "~18.0.12",

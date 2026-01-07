@@ -1,7 +1,8 @@
 using dotenv.net;
-using ElaviewBackend.Data;
-using ElaviewBackend.Services;
-using ElaviewBackend.Settings;
+using ElaviewBackend.Features.Auth;
+using ElaviewBackend.Features.Users;
+using ElaviewBackend.Shared;
+using ElaviewBackend.Shared.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -48,9 +49,8 @@ if (builder.Environment.IsDevelopment()) {
     });
 }
 else {
-    if (string.IsNullOrEmpty(certPath)) {
+    if (string.IsNullOrEmpty(certPath))
         throw new InvalidOperationException("SERVER_TLS_CERT_PATH is required");
-    }
 
     builder.WebHost
         .UseQuic(options => {
@@ -73,9 +73,8 @@ builder.Services
     .Configure<GlobalSettings>(builder.Configuration)
     .AddHttpContextAccessor()
     .AddDbContext<AppDbContext>((sp, options) => {
-        if (builder.Environment.IsDevelopment()) {
+        if (builder.Environment.IsDevelopment())
             options.LogTo(Console.WriteLine);
-        }
 
         var connectionString = sp.GetRequiredService<IOptions<GlobalSettings>>()
             .Value.Database.GetConnectionString();
@@ -124,25 +123,20 @@ builder
     .AddProjections()
     .AddFiltering()
     .AddSorting()
-    .AddMutationConventions(applyToAllMutations: true);
+    .AddMutationConventions();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment()) {
-    app.MapOpenApi();
-}
+if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 var developmentAccounts = builder.Configuration
     .GetSection("DevelopmentAccounts").GetChildren();
-if (developmentAccounts.Any()) {
+if (developmentAccounts.Any())
     await app.Services.CreateScope().ServiceProvider
         .GetRequiredService<DatabaseSeeder>()
         .SeedDevelopmentAccountsAsync(app.Environment.IsDevelopment());
-}
 
-if (!app.Environment.IsDevelopment()) {
-    app.UseHttpsRedirection();
-}
+if (!app.Environment.IsDevelopment()) app.UseHttpsRedirection();
 
 app
     .UseCors()

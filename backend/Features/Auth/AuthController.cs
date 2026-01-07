@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using ElaviewBackend.Features.Users;
 using ElaviewBackend.Shared.Entities;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -12,16 +11,13 @@ namespace ElaviewBackend.Features.Auth;
 public class AuthController(AuthService authService) : ControllerBase {
     [HttpPost("signup")]
     public async Task<IActionResult> Signup([FromBody] SignupRequest request) {
-        if (!ModelState.IsValid) {
-            return BadRequest(ModelState);
-        }
+        if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var user = await authService.CreateUserAsync(request.Email,
             request.Password, request.Name);
 
-        if (user == null) {
+        if (user == null)
             return Conflict(new { message = "Email already exists" });
-        }
 
         var claims = new List<Claim> {
             new(ClaimTypes.NameIdentifier, user.Id!),
@@ -29,9 +25,8 @@ public class AuthController(AuthService authService) : ControllerBase {
             new(ClaimTypes.Role, user.Role.ToString())
         };
 
-        if (!string.IsNullOrEmpty(user.Name)) {
+        if (!string.IsNullOrEmpty(user.Name))
             claims.Add(new Claim(ClaimTypes.Name, user.Name));
-        }
 
         var claimsIdentity = new ClaimsIdentity(claims,
             CookieAuthenticationDefaults.AuthenticationScheme);
@@ -62,21 +57,17 @@ public class AuthController(AuthService authService) : ControllerBase {
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request) {
-        if (!ModelState.IsValid) {
-            return BadRequest(ModelState);
-        }
+        if (!ModelState.IsValid) return BadRequest(ModelState);
 
         var user =
             await authService.ValidateUserAsync(request.Email,
                 request.Password);
 
-        if (user == null) {
+        if (user == null)
             return Unauthorized(new { message = "Invalid email or password" });
-        }
 
-        if (user.Status != UserStatus.Active) {
+        if (user.Status != UserStatus.Active)
             return Unauthorized(new { message = "Account is not active" });
-        }
 
         var claims = new List<Claim> {
             new(ClaimTypes.NameIdentifier, user.Id!),
@@ -84,9 +75,8 @@ public class AuthController(AuthService authService) : ControllerBase {
             new(ClaimTypes.Role, user.Role.ToString())
         };
 
-        if (!string.IsNullOrEmpty(user.Name)) {
+        if (!string.IsNullOrEmpty(user.Name))
             claims.Add(new Claim(ClaimTypes.Name, user.Name));
-        }
 
         var claimsIdentity = new ClaimsIdentity(claims,
             CookieAuthenticationDefaults.AuthenticationScheme);
@@ -124,9 +114,8 @@ public class AuthController(AuthService authService) : ControllerBase {
 
     [HttpGet("me")]
     public IActionResult GetCurrentUser() {
-        if (!User.Identity?.IsAuthenticated ?? true) {
+        if (!User.Identity?.IsAuthenticated ?? true)
             return Unauthorized(new { message = "Not authenticated" });
-        }
 
         var response = new LoginResponse {
             Id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value!,

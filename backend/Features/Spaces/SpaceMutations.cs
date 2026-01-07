@@ -8,16 +8,28 @@ namespace ElaviewBackend.Features.Spaces;
 
 [MutationType]
 public static partial class SpaceMutations {
-    [Authorize(Roles = "SpaceOwner")]
+    [Authorize]
     public static async Task<Space> CreateSpace(
         CreateSpaceInput input,
         AppDbContext context,
         UserService userService,
         CancellationToken ct
     ) {
+        var userId = userService.PrincipalId();
+        var user = await context.Users
+            .Include(u => u.ActiveProfile)
+            .FirstOrDefaultAsync(u => u.Id == userId, ct)
+            ?? throw new Exception("User not found");
+
+        if (user.ActiveProfile == null ||
+            user.ActiveProfile.ProfileType != ProfileType.SpaceOwner) {
+            throw new Exception(
+                "User must have an active SpaceOwner profile to create spaces");
+        }
+
         var space = new Space {
             Id = Guid.NewGuid().ToString(),
-            OwnerId = userService.PrincipalId(),
+            OwnerProfile = user.ActiveProfile,
             Title = input.Title,
             Description = input.Description,
             Type = input.Type,
@@ -49,7 +61,7 @@ public static partial class SpaceMutations {
         return space;
     }
 
-    [Authorize(Roles = "SpaceOwner,Admin")]
+    [Authorize]
     public static async Task<Space> DeleteSpace(
         [ID] string id,
         AppDbContext context,

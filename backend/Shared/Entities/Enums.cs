@@ -1,10 +1,14 @@
 namespace ElaviewBackend.Shared.Entities;
 
 public enum UserRole {
-    Advertiser,
-    SpaceOwner,
+    User,
     Admin,
     Marketing
+}
+
+public enum ProfileType {
+    Advertiser,
+    SpaceOwner
 }
 
 public enum UserStatus {

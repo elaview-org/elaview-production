@@ -3,7 +3,6 @@ using ElaviewBackend.Features.Auth;
 using ElaviewBackend.Features.Users;
 using ElaviewBackend.Shared;
 using ElaviewBackend.Shared.Settings;
-using HotChocolate.Execution;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -50,9 +49,8 @@ if (builder.Environment.IsDevelopment()) {
     });
 }
 else {
-    if (string.IsNullOrEmpty(certPath)) {
+    if (string.IsNullOrEmpty(certPath))
         throw new InvalidOperationException("SERVER_TLS_CERT_PATH is required");
-    }
 
     builder.WebHost
         .UseQuic(options => {
@@ -75,9 +73,8 @@ builder.Services
     .Configure<GlobalSettings>(builder.Configuration)
     .AddHttpContextAccessor()
     .AddDbContext<AppDbContext>((sp, options) => {
-        if (builder.Environment.IsDevelopment()) {
+        if (builder.Environment.IsDevelopment())
             options.LogTo(Console.WriteLine);
-        }
 
         var connectionString = sp.GetRequiredService<IOptions<GlobalSettings>>()
             .Value.Database.GetConnectionString();
@@ -126,25 +123,20 @@ builder
     .AddProjections()
     .AddFiltering()
     .AddSorting()
-    .AddMutationConventions(applyToAllMutations: true);
+    .AddMutationConventions();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment()) {
-    app.MapOpenApi();
-}
+if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 var developmentAccounts = builder.Configuration
     .GetSection("DevelopmentAccounts").GetChildren();
-if (developmentAccounts.Any()) {
+if (developmentAccounts.Any())
     await app.Services.CreateScope().ServiceProvider
         .GetRequiredService<DatabaseSeeder>()
         .SeedDevelopmentAccountsAsync(app.Environment.IsDevelopment());
-}
 
-if (!app.Environment.IsDevelopment()) {
-    app.UseHttpsRedirection();
-}
+if (!app.Environment.IsDevelopment()) app.UseHttpsRedirection();
 
 app
     .UseCors()
@@ -153,15 +145,6 @@ app
 
 app.MapControllers();
 app.MapGraphQL("/api/graphql");
-
-if (app.Environment.IsDevelopment()) {
-    var executorResolver = app.Services.GetRequiredService<IRequestExecutorResolver>();
-    var executor = await executorResolver.GetRequestExecutorAsync();
-    var schema = executor.Schema;
-    var schemaPath = System.IO.Path.Combine("Shared", "schema.graphql");
-    var schemaText = schema.Print();
-    await File.WriteAllTextAsync(schemaPath, schemaText);
-}
 
 var logger = app.Services.GetRequiredService<ILogger<Program>>();
 var serverPort = envVars["SERVER_PORT"]!.ToString();

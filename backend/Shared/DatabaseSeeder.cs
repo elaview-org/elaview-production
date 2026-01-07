@@ -14,7 +14,7 @@ public class DatabaseSeeder(
 
         if (developmentAccounts.Count == 0) {
             logger.LogInformation(
-                "No development accounts configured in secrets.json");
+                "No development accounts configured in .env");
             return;
         }
 
@@ -33,9 +33,9 @@ public class DatabaseSeeder(
                 BCrypt.Net.BCrypt.HashPassword(account.Password);
 
             if (!Enum.TryParse<UserRole>(account.Role, out var userRole)) {
-                userRole = UserRole.Advertiser;
+                userRole = UserRole.User;
                 logger.LogWarning(
-                    "Invalid role '{Role}' for {Email}, defaulting to Advertiser",
+                    "Invalid role '{Role}' for {Email}, defaulting to User",
                     account.Role, account.Email);
             }
 
@@ -50,84 +50,179 @@ public class DatabaseSeeder(
             dbContext.Users.Add(user);
             await dbContext.SaveChangesAsync();
 
+            if (userRole == UserRole.User) {
+                var advertiserProfile = new Profile {
+                    User = user,
+                    ProfileType = ProfileType.Advertiser
+                };
+                dbContext.Profiles.Add(advertiserProfile);
+                await dbContext.SaveChangesAsync();
+
+                var advertiserProfileExtension = new AdvertiserProfile {
+                    Profile = advertiserProfile,
+                    OnboardingComplete = false
+                };
+                dbContext.AdvertiserProfiles.Add(advertiserProfileExtension);
+
+                var spaceOwnerProfile = new Profile {
+                    User = user,
+                    ProfileType = ProfileType.SpaceOwner
+                };
+                dbContext.Profiles.Add(spaceOwnerProfile);
+                await dbContext.SaveChangesAsync();
+
+                var spaceOwnerProfileExtension = new SpaceOwnerProfile {
+                    Profile = spaceOwnerProfile,
+                    PayoutSchedule = PayoutSchedule.Weekly,
+                    OnboardingComplete = false
+                };
+                dbContext.SpaceOwnerProfiles.Add(spaceOwnerProfileExtension);
+
+                user.ActiveProfile = advertiserProfile;
+
+                await dbContext.SaveChangesAsync();
+            }
+
+#pragma warning disable CA1873
             logger.LogInformation(
                 "Created development account: {Email} with role {Role}",
                 account.Email, userRole);
+#pragma warning restore CA1873
         }
 
-        await SeedSpacesAsync();
+        if (development) {
+            await SeedSpacesAsync();
+        }
     }
 
-    async Task SeedSpacesAsync() {
-        var spaceOwner = await dbContext.Users
-            .FirstOrDefaultAsync(u => u.Email == "spaceowner@email.com");
+    private async Task SeedSpacesAsync() {
+        var regularUsers = await dbContext.Users
+            .Where(u => u.Role == UserRole.User)
+            .Take(2)
+            .ToListAsync();
 
-        if (spaceOwner == null) {
-            logger.LogWarning(
-                "SpaceOwner account not found, skipping space seeding");
+        if (regularUsers.Count < 2) {
+            logger.LogWarning("Not enough regular users to seed spaces");
             return;
         }
 
-        var existingSpacesCount = await dbContext.Spaces
-            .CountAsync(s => s.OwnerId == spaceOwner.Id);
+        foreach (var user in regularUsers) {
+            var profile = await dbContext.Profiles
+                .FirstOrDefaultAsync(p => p.User.Id == user.Id &&
+                                          p.ProfileType ==
+                                          ProfileType.SpaceOwner);
 
-        if (existingSpacesCount >= 128) {
+            if (profile == null) {
+                logger.LogWarning(
+                    "SpaceOwner profile not found for user {Email}, skipping",
+                    user.Email);
+                continue;
+            }
+
+            var existingSpacesCount = await dbContext.Spaces
+                .CountAsync(s => s.OwnerProfile.User.Id == user.Id);
+
+            if (existingSpacesCount >= 64) {
+                logger.LogInformation(
+                    "User {Email} already has {Count} spaces, skipping",
+                    user.Email, existingSpacesCount);
+                continue;
+            }
+
+            var spacesToCreate = 64 - existingSpacesCount;
+            await CreateSpacesForProfile(profile.Id, spacesToCreate);
+
             logger.LogInformation(
-                "SpaceOwner already has {Count} spaces, skipping seeding",
-                existingSpacesCount);
-            return;
+                "Created {Count} spaces for user {Email}",
+                spacesToCreate, user.Email);
         }
+    }
 
+    private async Task CreateSpacesForProfile(string profileId, int count) {
         var random = new Random(42);
-        var cities = new[] {
-            "New York", "Los Angeles", "Chicago", "Houston", "Phoenix",
-            "Philadelphia", "San Antonio", "San Diego"
-        };
-        var states = new[] { "NY", "CA", "IL", "TX", "AZ", "PA" };
-        var streetNames = new[] {
-            "Main St", "Oak Ave", "Broadway", "Market St", "Park Ave", "1st St",
-            "2nd Ave", "Elm St"
-        };
         var spaceTypes = Enum.GetValues<SpaceType>();
 
-        var spaces = new List<Space>();
+        var cities = new[] {
+            ("New York", "NY", 40.7128, -74.0060),
+            ("Los Angeles", "CA", 34.0522, -118.2437),
+            ("Chicago", "IL", 41.8781, -87.6298),
+            ("Houston", "TX", 29.7604, -95.3698),
+            ("Phoenix", "AZ", 33.4484, -112.0740),
+            ("Philadelphia", "PA", 39.9526, -75.1652),
+            ("San Antonio", "TX", 29.4241, -98.4936),
+            ("San Diego", "CA", 32.7157, -117.1611)
+        };
 
-        for (int i = 0; i < 128; i++) {
+        for (var i = 0; i < count; i++) {
+            var spaceType = spaceTypes[random.Next(spaceTypes.Length)];
             var city = cities[random.Next(cities.Length)];
-            var state = states[random.Next(states.Length)];
-            var streetNumber = random.Next(100, 9999);
-            var streetName = streetNames[random.Next(streetNames.Length)];
+
+            var latOffset = (random.NextDouble() - 0.5) * 0.1;
+            var lonOffset = (random.NextDouble() - 0.5) * 0.1;
 
             var space = new Space {
-                Id = Guid.NewGuid().ToString(),
-                OwnerId = spaceOwner.Id,
-                Title = $"{spaceTypes[i % spaceTypes.Length]} Space #{i + 1}",
-                Description = $"Premium advertising space in {city}",
-                Type = spaceTypes[i % spaceTypes.Length],
+                Title = GenerateSpaceTitle(spaceType, i),
+                Description = GenerateSpaceDescription(spaceType),
+                Type = spaceType,
                 Status = SpaceStatus.Active,
-                Address = $"{streetNumber} {streetName}",
-                City = city,
-                State = state,
-                ZipCode = $"{random.Next(10000, 99999)}",
-                Latitude = 40.7128 + (random.NextDouble() - 0.5) * 10,
-                Longitude = -74.0060 + (random.NextDouble() - 0.5) * 10,
-                Width = random.Next(10, 100),
-                Height = random.Next(10, 50),
-                PricePerDay = random.Next(50, 500),
-                InstallationFee = random.Next(10, 100),
+                Address =
+                    $"{random.Next(100, 9999)} {GenerateStreetName(random)}",
+                City = city.Item1,
+                State = city.Item2,
+                ZipCode = random.Next(10000, 99999).ToString(),
+                Latitude = city.Item3 + latOffset,
+                Longitude = city.Item4 + lonOffset,
+                Width = random.Next(4, 20),
+                Height = random.Next(3, 15),
+                PricePerDay = random.Next(10, 200),
+                InstallationFee = random.Next(10, 50),
                 MinDuration = random.Next(1, 7),
                 MaxDuration = random.Next(30, 365),
                 Images = new List<string>(),
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                OwnerProfile = await dbContext.Profiles.FindAsync(profileId) ??
+                               throw new InvalidOperationException(
+                                   "Profile not found")
             };
 
-            spaces.Add(space);
+            dbContext.Spaces.Add(space);
         }
 
-        dbContext.Spaces.AddRange(spaces);
         await dbContext.SaveChangesAsync();
+    }
 
-        logger.LogInformation("Created 128 spaces for SpaceOwner account");
+    private static string GenerateSpaceTitle(SpaceType type, int index) =>
+        type switch {
+            SpaceType.Billboard => $"Highway Billboard #{index + 1}",
+            SpaceType.Storefront => $"Storefront Window Display #{index + 1}",
+            SpaceType.Transit => $"Bus Stop Advertising #{index + 1}",
+            SpaceType.DigitalDisplay => $"Digital Screen #{index + 1}",
+            SpaceType.WindowDisplay => $"Retail Window #{index + 1}",
+            SpaceType.VehicleWrap => $"Vehicle Wrap Space #{index + 1}",
+            _ => $"Advertising Space #{index + 1}"
+        };
+
+    private static string GenerateSpaceDescription(SpaceType type) =>
+        type switch {
+            SpaceType.Billboard =>
+                "High-visibility billboard located on major highway with heavy traffic flow.",
+            SpaceType.Storefront =>
+                "Prime storefront window display in busy shopping district.",
+            SpaceType.Transit =>
+                "Bus shelter advertising space at high-traffic transit stop.",
+            SpaceType.DigitalDisplay =>
+                "Modern digital display screen in commercial area.",
+            SpaceType.WindowDisplay =>
+                "Street-facing retail window perfect for brand visibility.",
+            SpaceType.VehicleWrap =>
+                "Mobile advertising opportunity through vehicle wrap.",
+            _ => "Premium advertising space in excellent location."
+        };
+
+    private static string GenerateStreetName(Random random) {
+        var streetNames = new[] {
+            "Main St", "Broadway", "Park Ave", "Market St", "1st Ave",
+            "Oak St", "Elm St", "Washington St", "Maple Ave", "Pine St"
+        };
+        return streetNames[random.Next(streetNames.Length)];
     }
 }

@@ -11,7 +11,9 @@ public static partial class SpaceQueries {
     [UseProjection]
     public static IQueryable<Space?> GetSpaceById(
         [ID] string id, AppDbContext context
-    ) => context.Spaces.Where(t => t.Id == id);
+    ) {
+        return context.Spaces.Where(t => t.Id == id);
+    }
 
     [Authorize]
     [UsePaging]
@@ -20,5 +22,7 @@ public static partial class SpaceQueries {
     [UseSorting]
     public static IQueryable<Space> GetSpaces(
         AppDbContext context
-    ) => context.Spaces;
+    ) {
+        return context.Spaces;
+    }
 }

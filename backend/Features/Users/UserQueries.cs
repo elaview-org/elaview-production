@@ -11,14 +11,18 @@ public static partial class UserQueries {
     [UseProjection]
     public static IQueryable<User> GetCurrentUser(
         AppDbContext context, UserService userService
-    ) => context.Users.Where(t => t.Id == userService.PrincipalId());
+    ) {
+        return context.Users.Where(t => t.Id == userService.PrincipalId());
+    }
 
     [Authorize(Roles = "Admin")]
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<User?> GetUserById(
         [ID] string id, AppDbContext context
-    ) => context.Users.Where(t => t.Id == id);
+    ) {
+        return context.Users.Where(t => t.Id == id);
+    }
 
     [Authorize(Roles = "Admin")]
     [UsePaging]
@@ -27,5 +31,7 @@ public static partial class UserQueries {
     [UseSorting]
     public static IQueryable<User> GetUsers(
         AppDbContext context
-    ) => context.Users;
+    ) {
+        return context.Users;
+    }
 }

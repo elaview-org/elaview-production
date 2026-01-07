@@ -1,7 +1,8 @@
 using dotenv.net;
-using ElaviewBackend.Data;
-using ElaviewBackend.Services;
-using ElaviewBackend.Settings;
+using ElaviewBackend.Features.Auth;
+using ElaviewBackend.Features.Users;
+using ElaviewBackend.Shared;
+using ElaviewBackend.Shared.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;

@@ -46,25 +46,28 @@ Current Screen → Role Select → New Role Tabs
 src/app/
 ├── _layout.tsx                    # Root: ThemeProvider + RoleProvider
 ├── index.tsx                      # Welcome screen with role routing
+├── settings.tsx                   # ✅ Settings screen
+├── help.tsx                       # ✅ Help center screen
 ├── (auth)/
 │   ├── _layout.tsx
 │   ├── login.tsx
-│   ├── register.tsx (TODO)
-│   └── role-select.tsx
+│   ├── register.tsx
+│   ├── role-select.tsx
+│   └── forgot-password.tsx        # ✅ Password reset flow
 ├── (advertiser)/                  # Route group for advertisers
 │   ├── _layout.tsx                # Tabs config + TopNavBar + DrawerMenu
-│   ├── discover.tsx               # Tab 1
-│   ├── bookings.tsx               # Tab 2
-│   ├── messages.tsx               # Tab 3
-│   ├── alerts.tsx                 # Tab 4 (MVP implemented)
-│   └── profile.tsx                # Tab 5
+│   ├── discover.tsx               # ✅ Tab 1: Map + search + space cards
+│   ├── bookings.tsx               # ✅ Tab 2: Status filters + booking list
+│   ├── messages.tsx               # ✅ Tab 3: Conversation list
+│   ├── alerts.tsx                 # ✅ Tab 4: Notifications
+│   └── profile.tsx                # ✅ Tab 5: User profile + settings
 └── (owner)/                       # Route group for owners
     ├── _layout.tsx                # Tabs config + TopNavBar + DrawerMenu
-    ├── listings.tsx               # Tab 1
-    ├── bookings.tsx               # Tab 2
-    ├── messages.tsx               # Tab 3
-    ├── earnings.tsx               # Tab 4
-    └── profile.tsx                # Tab 5
+    ├── listings.tsx               # ✅ Tab 1: Space grid + FAB
+    ├── bookings.tsx               # ✅ Tab 2: Incoming requests + active
+    ├── messages.tsx               # ✅ Tab 3: Conversation list
+    ├── earnings.tsx               # ✅ Tab 4: Balance + transactions
+    └── profile.tsx                # ✅ Tab 5: User profile + settings
 ```
 
 ## Route Groups
@@ -85,21 +88,21 @@ Expo Router v6 supports **route groups** (folders wrapped in parentheses) that d
 
 | Order | Icon | Label | Route | Status |
 |-------|------|-------|-------|--------|
-| 1 | search | Discover | `/(advertiser)/discover` | Placeholder |
-| 2 | calendar-outline | Bookings | `/(advertiser)/bookings` | Placeholder |
-| 3 | chatbubble-outline | Messages | `/(advertiser)/messages` | Placeholder |
-| 4 | notifications-outline | Alerts | `/(advertiser)/alerts` | ✅ MVP |
-| 5 | person-outline | Profile | `/(advertiser)/profile` | Placeholder |
+| 1 | search | Discover | `/(advertiser)/discover` | ✅ Complete |
+| 2 | calendar-outline | Bookings | `/(advertiser)/bookings` | ✅ Complete |
+| 3 | chatbubble-outline | Messages | `/(advertiser)/messages` | ✅ Complete |
+| 4 | notifications-outline | Alerts | `/(advertiser)/alerts` | ✅ Complete |
+| 5 | person-outline | Profile | `/(advertiser)/profile` | ✅ Complete |
 
 ### Owner Tabs
 
 | Order | Icon | Label | Route | Status |
 |-------|------|-------|-------|--------|
-| 1 | location-outline | Listings | `/(owner)/listings` | Placeholder |
-| 2 | calendar-outline | Bookings | `/(owner)/bookings` | Placeholder |
-| 3 | chatbubble-outline | Messages | `/(owner)/messages` | Placeholder |
-| 4 | wallet-outline | Earnings | `/(owner)/earnings` | Placeholder |
-| 5 | person-outline | Profile | `/(owner)/profile` | Placeholder |
+| 1 | location-outline | Listings | `/(owner)/listings` | ✅ Complete |
+| 2 | calendar-outline | Bookings | `/(owner)/bookings` | ✅ Complete |
+| 3 | chatbubble-outline | Messages | `/(owner)/messages` | ✅ Complete |
+| 4 | wallet-outline | Earnings | `/(owner)/earnings` | ✅ Complete |
+| 5 | person-outline | Profile | `/(owner)/profile` | ✅ Complete |
 
 ## Shared Components
 

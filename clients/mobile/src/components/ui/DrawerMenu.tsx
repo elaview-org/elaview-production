@@ -45,12 +45,12 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
 
   const handleSettings = () => {
     onClose();
-    // TODO: Navigate to settings screen
+    router.push('/settings');
   };
 
   const handleHelp = () => {
     onClose();
-    // TODO: Navigate to help screen
+    router.push('/help');
   };
 
   const handleLogout = async () => {

@@ -5,33 +5,55 @@ import {
   StyleSheet,
   Dimensions,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as SplashScreen from 'expo-splash-screen';
 import ElaviewLogo from '@/components/features/ElaviewLogo';
 import SlideToStart from '@/components/features/SlideToStartExpoGo';
+import { useRole } from '@/contexts/RoleContext';
 import { colors, spacing } from '@/constants/theme';
 
 const { height } = Dimensions.get('window');
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { role, isLoading } = useRole();
 
   useEffect(() => {
-    // Hide the native splash screen once this component mounts
-    SplashScreen.hideAsync();
-  }, []);
+    if (!isLoading) {
+      // Hide the native splash screen once role is loaded
+      SplashScreen.hideAsync();
+
+      // Auth flow: If user has a role saved, they've completed auth + role selection
+      // Navigate them directly to their app
+      // TODO: When real auth is added, also check auth state here
+      if (role) {
+        const route = role === 'advertiser' ? '/(advertiser)/discover' : '/(owner)/listings';
+        router.replace(route);
+      }
+    }
+  }, [isLoading, role]);
 
   const handleSlideComplete = () => {
-    // Navigate to login (or check auth and go to app)
+    // Navigate to login (auth comes before role selection)
     router.replace('/(auth)/login');
   };
+
+  // Show loading indicator while checking for saved role
+  if (isLoading) {
+    return (
+      <View style={[styles.container, styles.loadingContainer]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      
+
       {/* Background gradient - blue to white fade */}
       <LinearGradient
         colors={['#7BB8E0', '#A8D0ED', '#FFFFFF', '#FFFFFF']}
@@ -66,6 +88,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
+  },
+  loadingContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   gradient: {
     position: 'absolute',

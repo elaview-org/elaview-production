@@ -7,16 +7,23 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRole } from '@/contexts/RoleContext';
 
 const { width, height } = Dimensions.get('window');
 
 export default function RoleSelect() {
   const router = useRouter();
+  const { setRole } = useRole();
 
-  const handleRoleSelect = (role: 'advertiser' | 'space_owner') => {
-    // TODO: Save role to .NET backend later
-    // For now, just navigate to app
-    router.replace('/(app)');
+  const handleRoleSelect = async (role: 'advertiser' | 'owner') => {
+    try {
+      await setRole(role);
+      // Navigate to the appropriate route group
+      const route = role === 'advertiser' ? '/(advertiser)/discover' : '/(owner)/listings';
+      router.replace(route);
+    } catch (error) {
+      console.error('Failed to save role:', error);
+    }
   };
 
   return (
@@ -56,7 +63,7 @@ export default function RoleSelect() {
 
           <TouchableOpacity
             style={styles.optionCard}
-            onPress={() => handleRoleSelect('space_owner')}
+            onPress={() => handleRoleSelect('owner')}
           >
             <View style={styles.optionContent}>
               <Text style={styles.optionTitle}>I want to list a</Text>

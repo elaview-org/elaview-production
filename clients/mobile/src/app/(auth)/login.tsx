@@ -20,8 +20,8 @@ export default function Login() {
 
   const handleSignIn = async () => {
     // TODO: Wire up .NET auth later
-    // For now, just navigate to app
-    router.replace('/(app)');
+    // For now, navigate to role selection
+    router.replace('/(auth)/role-select');
   };
 
   return (

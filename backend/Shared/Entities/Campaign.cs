@@ -2,9 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ElaviewBackend.Shared.Entities;
 
-public sealed class Campaign {
-    [MaxLength(50)]
-    public string Id { get; init; } = null!;
+public sealed class Campaign : EntityBase {
+    public AdvertiserProfile Advertiser { get; init; } = null!;
 
     [MaxLength(500)]
     public string Name { get; init; } = null!;
@@ -28,10 +27,4 @@ public sealed class Campaign {
     public DateTime? StartDate { get; init; }
 
     public DateTime? EndDate { get; init; }
-
-    public DateTime CreatedAt { get; init; }
-
-    public DateTime UpdatedAt { get; set; }
-
-    public Profile AdvertiserProfile { get; init; } = null!;
 }

@@ -1,5 +1,4 @@
 using ElaviewBackend.Shared.Entities;
-using ElaviewBackend.Shared.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -120,7 +119,7 @@ public class DatabaseSeeder(
             }
 
             var existingSpacesCount = await dbContext.Spaces
-                .CountAsync(s => s.OwnerProfile.User.Id == user.Id);
+                .CountAsync(s => s.SpaceOwner.Profile.User.Id == user.Id);
 
             if (existingSpacesCount >= 64) {
                 logger.LogInformation(
@@ -130,7 +129,7 @@ public class DatabaseSeeder(
             }
 
             var spacesToCreate = 64 - existingSpacesCount;
-            await CreateSpacesForProfile(profile.Id, spacesToCreate);
+            await CreateSpacesForProfile(profile.Id!, spacesToCreate);
 
             logger.LogInformation(
                 "Created {Count} spaces for user {Email}",
@@ -178,10 +177,12 @@ public class DatabaseSeeder(
                 InstallationFee = random.Next(10, 50),
                 MinDuration = random.Next(1, 7),
                 MaxDuration = random.Next(30, 365),
-                Images = new List<string>(),
-                OwnerProfile = await dbContext.Profiles.FindAsync(profileId) ??
-                               throw new InvalidOperationException(
-                                   "Profile not found")
+                Images = [],
+                SpaceOwner =
+                    await dbContext.SpaceOwnerProfiles.FirstOrDefaultAsync(p =>
+                        p.Profile.Id == profileId) ??
+                    throw new InvalidOperationException(
+                        "Profile not found")
             };
 
             dbContext.Spaces.Add(space);

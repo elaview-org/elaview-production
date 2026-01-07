@@ -67,7 +67,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .IsRequired();
             entity.HasKey("ProfileId");
 
-            entity.HasIndex(e => e.StripeCustomerId);
+            entity.HasIndex(e => e.StripeAccountId);
             entity.HasIndex(e => e.StripeAccountStatus);
 
             entity.Property(e => e.CreatedAt)
@@ -114,14 +114,11 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
             entity.HasIndex(e => new { e.Status, e.CreatedAt });
             entity.HasIndex(e => e.PricePerDay);
             entity.HasIndex(e => e.AverageRating);
-            entity.HasIndex(e => new { e.QuadtreeNodeId, e.QuadtreeDepth });
-            entity.HasIndex(e => e.QuadtreeNodeId);
 
             entity.Property(e => e.Id).HasDefaultValueSql("gen_random_uuid()");
             entity.Property(e => e.PricePerDay).HasPrecision(10, 2);
             entity.Property(e => e.InstallationFee).HasPrecision(10, 2);
             entity.Property(e => e.TotalRevenue).HasPrecision(10, 2);
-            entity.Property(e => e.QuadtreeNodeId).HasMaxLength(20);
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
             entity.Property(e => e.UpdatedAt)
@@ -131,7 +128,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasMaxLength(50)
                 .IsRequired();
 
-            entity.HasOne(e => e.OwnerProfile)
+            entity.HasOne(e => e.SpaceOwner)
                 .WithMany()
                 .HasForeignKey("OwnerProfileId");
         });
@@ -155,7 +152,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
                 .HasMaxLength(50)
                 .IsRequired();
 
-            entity.HasOne(e => e.AdvertiserProfile)
+            entity.HasOne(e => e.Advertiser)
                 .WithMany()
                 .HasForeignKey("AdvertiserProfileId");
         });

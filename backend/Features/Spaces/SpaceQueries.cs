@@ -1,10 +1,13 @@
+using System.Diagnostics.CodeAnalysis;
+using ElaviewBackend.Features.Users;
 using ElaviewBackend.Shared;
 using ElaviewBackend.Shared.Entities;
-using Microsoft.AspNetCore.Authorization;
+using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Spaces;
 
 [QueryType]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static partial class SpaceQueries {
     [Authorize]
     [UseFirstOrDefault]
@@ -15,14 +18,14 @@ public static partial class SpaceQueries {
         return context.Spaces.Where(t => t.Id == id);
     }
 
-    [Authorize]
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
     public static IQueryable<Space> GetSpaces(
-        AppDbContext context
-    ) {
-        return context.Spaces;
-    }
+        AppDbContext context, UserService userService
+    ) => userService.PrincipalId() is { } userId
+        ? context.Spaces.Where(s =>
+            s.SpaceOwner.Profile.User.Id != userId)
+        : context.Spaces;
 }

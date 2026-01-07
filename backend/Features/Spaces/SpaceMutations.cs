@@ -10,16 +10,14 @@ namespace ElaviewBackend.Features.Spaces;
 public static partial class SpaceMutations {
     [Authorize]
     public static async Task<Space> CreateSpace(
-        CreateSpaceInput input,
-        AppDbContext context,
-        UserService userService,
-        CancellationToken ct
+        CreateSpaceInput input, AppDbContext context,
+        UserService userService, CancellationToken ct
     ) {
         var userId = userService.PrincipalId();
         var user = await context.Users
-            .Include(u => u.ActiveProfile)
-            .FirstOrDefaultAsync(u => u.Id == userId, ct)
-            ?? throw new Exception("User not found");
+                       .Include(u => u.ActiveProfile)
+                       .FirstOrDefaultAsync(u => u.Id == userId, ct)
+                   ?? throw new Exception("User not found");
 
         if (user.ActiveProfile == null ||
             user.ActiveProfile.ProfileType != ProfileType.SpaceOwner) {
@@ -27,9 +25,12 @@ public static partial class SpaceMutations {
                 "User must have an active SpaceOwner profile to create spaces");
         }
 
+        var spaceOwnerProfile =
+            await context.SpaceOwnerProfiles.FirstOrDefaultAsync(p =>
+                p.Profile.Id == user.ActiveProfile.Id, ct);
         var space = new Space {
             Id = Guid.NewGuid().ToString(),
-            OwnerProfile = user.ActiveProfile,
+            SpaceOwner = spaceOwnerProfile!,
             Title = input.Title,
             Description = input.Description,
             Type = input.Type,
@@ -63,9 +64,7 @@ public static partial class SpaceMutations {
 
     [Authorize]
     public static async Task<Space> DeleteSpace(
-        [ID] string id,
-        AppDbContext context,
-        CancellationToken ct
+        [ID] string id, AppDbContext context, CancellationToken ct
     ) {
         var space = await context.Spaces.FirstOrDefaultAsync(
             s => s.Id == id, ct

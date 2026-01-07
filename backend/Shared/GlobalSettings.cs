@@ -1,4 +1,4 @@
-namespace ElaviewBackend.Shared.Settings;
+namespace ElaviewBackend.Shared;
 
 public class GlobalSettings {
     public DatabaseSettings Database { get; set; } = new();

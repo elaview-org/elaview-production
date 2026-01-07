@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ElaviewBackend.Shared.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260107155222_Initial")]
+    [Migration("20260107201110_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -54,13 +54,13 @@ namespace ElaviewBackend.Shared.Migrations
                     b.Property<DateTime?>("StripeAccountDisconnectedNotifiedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("StripeAccountId")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<string>("StripeAccountStatus")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
-
-                    b.Property<string>("StripeCustomerId")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime?>("StripeLastAccountHealthCheck")
                         .HasColumnType("timestamp with time zone");
@@ -76,9 +76,9 @@ namespace ElaviewBackend.Shared.Migrations
 
                     b.HasKey("ProfileId");
 
-                    b.HasIndex("StripeAccountStatus");
+                    b.HasIndex("StripeAccountId");
 
-                    b.HasIndex("StripeCustomerId");
+                    b.HasIndex("StripeAccountStatus");
 
                     b.ToTable("advertiser_profiles", (string)null);
                 });
@@ -266,13 +266,6 @@ namespace ElaviewBackend.Shared.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
 
-                    b.Property<int?>("QuadtreeDepth")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("QuadtreeNodeId")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
                     b.Property<string>("RejectionReason")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
@@ -324,8 +317,6 @@ namespace ElaviewBackend.Shared.Migrations
 
                     b.HasIndex("PricePerDay");
 
-                    b.HasIndex("QuadtreeNodeId");
-
                     b.HasIndex("Status");
 
                     b.HasIndex("Type");
@@ -333,8 +324,6 @@ namespace ElaviewBackend.Shared.Migrations
                     b.HasIndex("City", "State");
 
                     b.HasIndex("Latitude", "Longitude");
-
-                    b.HasIndex("QuadtreeNodeId", "QuadtreeDepth");
 
                     b.HasIndex("Status", "CreatedAt");
 
@@ -481,13 +470,13 @@ namespace ElaviewBackend.Shared.Migrations
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.Campaign", b =>
                 {
-                    b.HasOne("ElaviewBackend.Shared.Entities.Profile", "AdvertiserProfile")
+                    b.HasOne("ElaviewBackend.Shared.Entities.AdvertiserProfile", "Advertiser")
                         .WithMany()
                         .HasForeignKey("AdvertiserProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AdvertiserProfile");
+                    b.Navigation("Advertiser");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.Profile", b =>
@@ -503,13 +492,13 @@ namespace ElaviewBackend.Shared.Migrations
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.Space", b =>
                 {
-                    b.HasOne("ElaviewBackend.Shared.Entities.Profile", "OwnerProfile")
+                    b.HasOne("ElaviewBackend.Shared.Entities.SpaceOwnerProfile", "SpaceOwner")
                         .WithMany()
                         .HasForeignKey("OwnerProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("OwnerProfile");
+                    b.Navigation("SpaceOwner");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.SpaceOwnerProfile", b =>

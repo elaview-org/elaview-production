@@ -10,14 +10,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
-        <PackageReference Include="dotenv.net" Version="4.0.0"/>
-        <PackageReference Include="GreenDonut.Data" Version="15.1.11"/>
-        <PackageReference Include="HotChocolate.Data" Version="15.1.11"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
-        <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.11"/>
-        <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="15.1.11"/>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+        <PackageReference Include="dotenv.net" Version="4.0.0" />
+        <PackageReference Include="GreenDonut.Data" Version="15.1.11" />
+        <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="15.1.11" />
+        <PackageReference Include="HotChocolate.Data" Version="15.1.11" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+        <PackageReference Include="HotChocolate.AspNetCore" Version="15.1.11" />
+        <PackageReference Include="HotChocolate.AspNetCore.CommandLine" Version="15.1.11" />
         <PackageReference Include="HotChocolate.Types.Analyzers" Version="15.1.11">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -26,12 +27,12 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.1"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.1"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
-        <PackageReference Include="Moq" Version="4.20.72"/>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0"/>
-        <PackageReference Include="xunit" Version="2.9.2"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+        <PackageReference Include="Moq" Version="4.20.72" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+        <PackageReference Include="xunit" Version="2.9.2" />
         <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -39,10 +40,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="TLS\"/>
+        <Folder Include="TLS\" />
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="Shared/Legacy/**/*.cs"/>
+        <Compile Remove="Shared/Legacy/**/*.cs" />
     </ItemGroup>
 </Project>

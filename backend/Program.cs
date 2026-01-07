@@ -2,7 +2,6 @@ using dotenv.net;
 using ElaviewBackend.Features.Auth;
 using ElaviewBackend.Features.Users;
 using ElaviewBackend.Shared;
-using ElaviewBackend.Shared.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -99,7 +98,6 @@ builder.Services
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()))
-    .AddAuthorization()
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options => {
         options.Cookie.Name = envVars["AUTH_COOKIE_NAME"]!.ToString()!;
@@ -118,6 +116,7 @@ builder.Services
 
 builder
     .AddGraphQL()
+    .AddAuthorization()
     .AddTypes()
     .AddQueryContext()
     .AddProjections()

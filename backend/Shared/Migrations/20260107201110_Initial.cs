@@ -20,14 +20,14 @@ namespace ElaviewBackend.Shared.Migrations
                     CompanyName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Industry = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Website = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    StripeCustomerId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    OnboardingComplete = table.Column<bool>(type: "boolean", nullable: false),
+                    StripeAccountId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     StripeAccountStatus = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     StripeLastAccountHealthCheck = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     StripeAccountDisconnectedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    StripeAccountDisconnectedNotifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    OnboardingComplete = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    StripeAccountDisconnectedNotifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -39,6 +39,7 @@ namespace ElaviewBackend.Shared.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    AdvertiserProfileId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Name = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     ImageUrl = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
@@ -49,12 +50,17 @@ namespace ElaviewBackend.Shared.Migrations
                     StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    AdvertiserProfileId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_campaigns", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_campaigns_advertiser_profiles_AdvertiserProfileId",
+                        column: x => x.AdvertiserProfileId,
+                        principalTable: "advertiser_profiles",
+                        principalColumn: "ProfileId",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -63,9 +69,9 @@ namespace ElaviewBackend.Shared.Migrations
                 {
                     Id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValueSql: "gen_random_uuid()"),
                     ProfileType = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<string>(type: "character varying(50)", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UserId = table.Column<string>(type: "character varying(50)", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
@@ -79,15 +85,15 @@ namespace ElaviewBackend.Shared.Migrations
                     ProfileId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     BusinessName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     BusinessType = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    PayoutSchedule = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    OnboardingComplete = table.Column<bool>(type: "boolean", nullable: false),
                     StripeAccountId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     StripeAccountStatus = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     StripeLastAccountHealthCheck = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     StripeAccountDisconnectedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    StripeAccountDisconnectedNotifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    PayoutSchedule = table.Column<int>(type: "integer", nullable: false),
-                    OnboardingComplete = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                    StripeAccountDisconnectedNotifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -101,10 +107,39 @@ namespace ElaviewBackend.Shared.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "users",
+                columns: table => new
+                {
+                    Id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Password = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Phone = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    Avatar = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    Role = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    ActiveProfileId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    LastLoginAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_users_profiles_ActiveProfileId",
+                        column: x => x.ActiveProfileId,
+                        principalTable: "profiles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "spaces",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    OwnerProfileId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     Title = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     Type = table.Column<int>(type: "integer", nullable: false),
@@ -131,60 +166,29 @@ namespace ElaviewBackend.Shared.Migrations
                     AverageRating = table.Column<double>(type: "double precision", nullable: true),
                     RejectionReason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     Traffic = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    QuadtreeNodeId = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
-                    QuadtreeDepth = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    OwnerProfileId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_spaces", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_spaces_profiles_OwnerProfileId",
+                        name: "FK_spaces_space_owner_profiles_OwnerProfileId",
                         column: x => x.OwnerProfileId,
-                        principalTable: "profiles",
-                        principalColumn: "Id",
+                        principalTable: "space_owner_profiles",
+                        principalColumn: "ProfileId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
-            migrationBuilder.CreateTable(
-                name: "users",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Password = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    Phone = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    Avatar = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
-                    Role = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    ActiveProfileId = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    LastLoginAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_users", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_users_profiles_ActiveProfileId",
-                        column: x => x.ActiveProfileId,
-                        principalTable: "profiles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.SetNull);
-                });
+            migrationBuilder.CreateIndex(
+                name: "IX_advertiser_profiles_StripeAccountId",
+                table: "advertiser_profiles",
+                column: "StripeAccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_advertiser_profiles_StripeAccountStatus",
                 table: "advertiser_profiles",
                 column: "StripeAccountStatus");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_advertiser_profiles_StripeCustomerId",
-                table: "advertiser_profiles",
-                column: "StripeCustomerId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_campaigns_AdvertiserProfileId",
@@ -257,16 +261,6 @@ namespace ElaviewBackend.Shared.Migrations
                 column: "PricePerDay");
 
             migrationBuilder.CreateIndex(
-                name: "IX_spaces_QuadtreeNodeId",
-                table: "spaces",
-                column: "QuadtreeNodeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_spaces_QuadtreeNodeId_QuadtreeDepth",
-                table: "spaces",
-                columns: new[] { "QuadtreeNodeId", "QuadtreeDepth" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_spaces_Status",
                 table: "spaces",
                 column: "Status");
@@ -321,14 +315,6 @@ namespace ElaviewBackend.Shared.Migrations
                 onDelete: ReferentialAction.Cascade);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_campaigns_profiles_AdvertiserProfileId",
-                table: "campaigns",
-                column: "AdvertiserProfileId",
-                principalTable: "profiles",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Cascade);
-
-            migrationBuilder.AddForeignKey(
                 name: "FK_profiles_users_UserId",
                 table: "profiles",
                 column: "UserId",
@@ -345,16 +331,16 @@ namespace ElaviewBackend.Shared.Migrations
                 table: "users");
 
             migrationBuilder.DropTable(
-                name: "advertiser_profiles");
-
-            migrationBuilder.DropTable(
                 name: "campaigns");
 
             migrationBuilder.DropTable(
-                name: "space_owner_profiles");
+                name: "spaces");
 
             migrationBuilder.DropTable(
-                name: "spaces");
+                name: "advertiser_profiles");
+
+            migrationBuilder.DropTable(
+                name: "space_owner_profiles");
 
             migrationBuilder.DropTable(
                 name: "profiles");

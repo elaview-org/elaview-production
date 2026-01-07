@@ -2,9 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ElaviewBackend.Shared.Entities;
 
-public sealed class Space {
-    [MaxLength(50)]
-    public string Id { get; init; } = null!;
+public sealed class Space : EntityBase {
+    public SpaceOwnerProfile SpaceOwner { get; init; } = null!;
 
     [MaxLength(500)]
     public string Title { get; init; } = null!;
@@ -67,15 +66,4 @@ public sealed class Space {
 
     [MaxLength(500)]
     public string? Traffic { get; init; }
-
-    [MaxLength(20)]
-    public string? QuadtreeNodeId { get; init; }
-
-    public int? QuadtreeDepth { get; init; }
-
-    public DateTime CreatedAt { get; init; }
-
-    public DateTime UpdatedAt { get; set; }
-
-    public Profile OwnerProfile { get; init; } = null!;
 }

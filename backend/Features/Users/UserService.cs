@@ -4,9 +4,9 @@ namespace ElaviewBackend.Features.Users;
 
 public class UserService(
     IHttpContextAccessor httpContextAccessor) {
-    public string PrincipalId() {
+    public string? PrincipalId() {
         return httpContextAccessor.HttpContext?.User.FindFirstValue(
             ClaimTypes.NameIdentifier
-        )!;
+        );
     }
 }

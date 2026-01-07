@@ -2,11 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ElaviewBackend.Shared.Entities;
 
-public sealed class User {
-    [MaxLength(50)]
-    [IsProjected(true)]
-    public string? Id { get; init; }
-
+public sealed class User : EntityBase {
     [MaxLength(255)]
     public string Email { get; init; } = null!;
 
@@ -27,10 +23,6 @@ public sealed class User {
     public UserStatus Status { get; init; } = UserStatus.Active;
 
     public Profile? ActiveProfile { get; set; }
-
-    public DateTime CreatedAt { get; init; }
-
-    public DateTime UpdatedAt { get; set; }
 
     public DateTime? LastLoginAt { get; set; }
 }

@@ -72,12 +72,16 @@ builder.Services
     .Configure<GlobalSettings>(builder.Configuration)
     .AddHttpContextAccessor()
     .AddDbContext<AppDbContext>((sp, options) => {
-        if (builder.Environment.IsDevelopment())
-            options.LogTo(Console.WriteLine);
-
         var connectionString = sp.GetRequiredService<IOptions<GlobalSettings>>()
             .Value.Database.GetConnectionString();
         options.UseNpgsql(connectionString);
+
+        if (builder.Environment.IsDevelopment()) {
+            options.LogTo(Console.WriteLine,
+                    [DbLoggerCategory.Database.Command.Name],
+                    LogLevel.Information)
+                .EnableSensitiveDataLogging();
+        }
     })
     .AddOpenApi()
     .AddScoped<AuthService>()

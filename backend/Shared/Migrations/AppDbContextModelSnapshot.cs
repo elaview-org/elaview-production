@@ -25,9 +25,10 @@ namespace ElaviewBackend.Shared.Migrations
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.AdvertiserProfile", b =>
                 {
-                    b.Property<string>("ProfileId")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("CompanyName")
                         .HasMaxLength(255)
@@ -62,36 +63,31 @@ namespace ElaviewBackend.Shared.Migrations
                     b.Property<DateTime?>("StripeLastAccountHealthCheck")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Website")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.HasKey("ProfileId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("StripeAccountId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
-                    b.HasIndex("StripeAccountStatus");
-
-                    b.ToTable("advertiser_profiles", (string)null);
+                    b.ToTable("advertiser_profiles");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.Campaign", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<string>("AdvertiserProfileId")
-                        .IsRequired()
+                    b.Property<Guid>("AdvertiserProfileId")
                         .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -130,69 +126,20 @@ namespace ElaviewBackend.Shared.Migrations
                         .HasColumnType("character varying(50)");
 
                     b.Property<decimal?>("TotalBudget")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
                     b.HasIndex("AdvertiserProfileId");
 
-                    b.HasIndex("CreatedAt");
-
-                    b.HasIndex("EndDate");
-
-                    b.HasIndex("StartDate");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("campaigns", (string)null);
-                });
-
-            modelBuilder.Entity("ElaviewBackend.Shared.Entities.Profile", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<int>("ProfileType")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("character varying(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProfileType");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("profiles", (string)null);
+                    b.ToTable("campaigns");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.Space", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Address")
@@ -239,8 +186,7 @@ namespace ElaviewBackend.Shared.Migrations
                         .HasColumnType("text[]");
 
                     b.Property<decimal?>("InstallationFee")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<double>("Latitude")
                         .HasColumnType("double precision");
@@ -254,18 +200,16 @@ namespace ElaviewBackend.Shared.Migrations
                     b.Property<int>("MinDuration")
                         .HasColumnType("integer");
 
-                    b.Property<string>("OwnerProfileId")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
                     b.Property<decimal>("PricePerDay")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<string>("RejectionReason")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
+
+                    b.Property<Guid>("SpaceOwnerProfileId")
+                        .HasMaxLength(50)
+                        .HasColumnType("uuid");
 
                     b.Property<string>("State")
                         .IsRequired()
@@ -284,8 +228,7 @@ namespace ElaviewBackend.Shared.Migrations
                         .HasColumnType("integer");
 
                     b.Property<decimal>("TotalRevenue")
-                        .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)");
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Traffic")
                         .HasMaxLength(500)
@@ -293,11 +236,6 @@ namespace ElaviewBackend.Shared.Migrations
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<double?>("Width")
                         .HasColumnType("double precision");
@@ -308,32 +246,17 @@ namespace ElaviewBackend.Shared.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AverageRating");
+                    b.HasIndex("SpaceOwnerProfileId");
 
-                    b.HasIndex("OwnerProfileId");
-
-                    b.HasIndex("PricePerDay");
-
-                    b.HasIndex("Status");
-
-                    b.HasIndex("Type");
-
-                    b.HasIndex("City", "State");
-
-                    b.HasIndex("Latitude", "Longitude");
-
-                    b.HasIndex("Status", "CreatedAt");
-
-                    b.HasIndex("Type", "Status");
-
-                    b.ToTable("spaces", (string)null);
+                    b.ToTable("spaces");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.SpaceOwnerProfile", b =>
                 {
-                    b.Property<string>("ProfileId")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("BusinessName")
                         .HasMaxLength(255)
@@ -371,31 +294,26 @@ namespace ElaviewBackend.Shared.Migrations
                     b.Property<DateTime?>("StripeLastAccountHealthCheck")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
-                    b.HasKey("ProfileId");
+                    b.HasKey("Id");
 
-                    b.HasIndex("StripeAccountId");
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
-                    b.HasIndex("StripeAccountStatus");
-
-                    b.ToTable("space_owner_profiles", (string)null);
+                    b.ToTable("space_owner_profiles");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.User", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
+                        .HasColumnType("uuid")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<string>("ActiveProfileId")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                    b.Property<int>("ActiveProfileType")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Avatar")
                         .HasMaxLength(500)
@@ -415,6 +333,7 @@ namespace ElaviewBackend.Shared.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
@@ -433,90 +352,73 @@ namespace ElaviewBackend.Shared.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ActiveProfileId");
-
-                    b.HasIndex("CreatedAt");
 
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("Role");
-
-                    b.HasIndex("Status");
-
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.AdvertiserProfile", b =>
                 {
-                    b.HasOne("ElaviewBackend.Shared.Entities.Profile", "Profile")
-                        .WithOne()
-                        .HasForeignKey("ElaviewBackend.Shared.Entities.AdvertiserProfile", "ProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Profile");
-                });
-
-            modelBuilder.Entity("ElaviewBackend.Shared.Entities.Campaign", b =>
-                {
-                    b.HasOne("ElaviewBackend.Shared.Entities.AdvertiserProfile", "Advertiser")
-                        .WithMany()
-                        .HasForeignKey("AdvertiserProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Advertiser");
-                });
-
-            modelBuilder.Entity("ElaviewBackend.Shared.Entities.Profile", b =>
-                {
                     b.HasOne("ElaviewBackend.Shared.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .WithOne("AdvertiserProfile")
+                        .HasForeignKey("ElaviewBackend.Shared.Entities.AdvertiserProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ElaviewBackend.Shared.Entities.Space", b =>
+            modelBuilder.Entity("ElaviewBackend.Shared.Entities.Campaign", b =>
                 {
-                    b.HasOne("ElaviewBackend.Shared.Entities.SpaceOwnerProfile", "SpaceOwner")
-                        .WithMany()
-                        .HasForeignKey("OwnerProfileId")
+                    b.HasOne("ElaviewBackend.Shared.Entities.AdvertiserProfile", "AdvertiserProfile")
+                        .WithMany("Campaigns")
+                        .HasForeignKey("AdvertiserProfileId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("SpaceOwner");
+                    b.Navigation("AdvertiserProfile");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Shared.Entities.Space", b =>
+                {
+                    b.HasOne("ElaviewBackend.Shared.Entities.SpaceOwnerProfile", "SpaceOwnerProfile")
+                        .WithMany("Spaces")
+                        .HasForeignKey("SpaceOwnerProfileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("SpaceOwnerProfile");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.SpaceOwnerProfile", b =>
                 {
-                    b.HasOne("ElaviewBackend.Shared.Entities.Profile", "Profile")
-                        .WithOne()
-                        .HasForeignKey("ElaviewBackend.Shared.Entities.SpaceOwnerProfile", "ProfileId")
+                    b.HasOne("ElaviewBackend.Shared.Entities.User", "User")
+                        .WithOne("SpaceOwnerProfile")
+                        .HasForeignKey("ElaviewBackend.Shared.Entities.SpaceOwnerProfile", "UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Profile");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Shared.Entities.AdvertiserProfile", b =>
+                {
+                    b.Navigation("Campaigns");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Shared.Entities.SpaceOwnerProfile", b =>
+                {
+                    b.Navigation("Spaces");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Shared.Entities.User", b =>
                 {
-                    b.HasOne("ElaviewBackend.Shared.Entities.Profile", "ActiveProfile")
-                        .WithMany()
-                        .HasForeignKey("ActiveProfileId")
-                        .OnDelete(DeleteBehavior.SetNull);
+                    b.Navigation("AdvertiserProfile");
 
-                    b.Navigation("ActiveProfile");
+                    b.Navigation("SpaceOwnerProfile");
                 });
 #pragma warning restore 612, 618
         }

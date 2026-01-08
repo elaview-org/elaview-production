@@ -4,25 +4,29 @@ using Microsoft.Extensions.Options;
 
 namespace ElaviewBackend.Shared;
 
-public class DatabaseSeeder(
-    AppDbContext dbContext,
-    IOptions<GlobalSettings> settings,
-    ILogger<DatabaseSeeder> logger) {
-    public async Task SeedDevelopmentAccountsAsync(bool development) {
-        var developmentAccounts = settings.Value.DevelopmentAccounts;
+public class DatabaseSeeder {
+    private readonly AppDbContext _db;
+    private readonly IOptions<GlobalSettings> _settings;
+    private readonly ILogger<DatabaseSeeder> _logger;
 
-        if (developmentAccounts.Count == 0) {
-            logger.LogInformation(
+    public DatabaseSeeder(AppDbContext db, IOptions<GlobalSettings> settings,
+        ILogger<DatabaseSeeder> logger) {
+        _db = db;
+        _settings = settings;
+        _logger = logger;
+    }
+
+    public async Task SeedDevelopmentAccountsAsync(bool development) {
+        var devAccounts = _settings.Value.DevelopmentAccounts;
+        if (!devAccounts.Any()) {
+            _logger.LogInformation(
                 "No development accounts configured in .env");
             return;
         }
 
-        foreach (var account in developmentAccounts) {
-            var existingUser = await dbContext.Users
-                .FirstOrDefaultAsync(u => u.Email == account.Email);
-
-            if (existingUser != null) {
-                logger.LogInformation(
+        foreach (var account in devAccounts) {
+            if (await _db.Users.AnyAsync(u => u.Email == account.Email)) {
+                _logger.LogInformation(
                     "Development account {Email} already exists",
                     account.Email);
                 continue;
@@ -30,117 +34,94 @@ public class DatabaseSeeder(
 
             var hashedPassword =
                 BCrypt.Net.BCrypt.HashPassword(account.Password);
+            var role = Enum.TryParse<UserRole>(account.Role, out var parsedRole)
+                ? parsedRole
+                : UserRole.User;
 
-            if (!Enum.TryParse<UserRole>(account.Role, out var userRole)) {
-                userRole = UserRole.User;
-                logger.LogWarning(
+            if (role != parsedRole)
+                _logger.LogWarning(
                     "Invalid role '{Role}' for {Email}, defaulting to User",
                     account.Role, account.Email);
-            }
 
+            // create user
             var user = new User {
                 Email = account.Email,
                 Password = hashedPassword,
-                Name = account.Name,
-                Role = userRole,
+                Name = account.Name!,
+                Role = role,
                 Status = UserStatus.Active
             };
+            _db.Users.Add(user);
+            await _db.SaveChangesAsync();
 
-            dbContext.Users.Add(user);
-            await dbContext.SaveChangesAsync();
-
-            if (userRole == UserRole.User) {
-                var advertiserProfile = new Profile {
-                    User = user,
-                    ProfileType = ProfileType.Advertiser
-                };
-                dbContext.Profiles.Add(advertiserProfile);
-                await dbContext.SaveChangesAsync();
-
-                var advertiserProfileExtension = new AdvertiserProfile {
-                    Profile = advertiserProfile,
+            if (role == UserRole.User) {
+                // create AdvertiserProfile
+                var advertiserProfile = new AdvertiserProfile {
+                    UserId = user.Id,
                     OnboardingComplete = false
                 };
-                dbContext.AdvertiserProfiles.Add(advertiserProfileExtension);
+                _db.AdvertiserProfiles.Add(advertiserProfile);
 
-                var spaceOwnerProfile = new Profile {
-                    User = user,
-                    ProfileType = ProfileType.SpaceOwner
+                // create SpaceOwnerProfile
+                var spaceOwnerProfile = new SpaceOwnerProfile {
+                    UserId = user.Id,
+                    OnboardingComplete = false,
+                    PayoutSchedule = PayoutSchedule.Weekly
                 };
-                dbContext.Profiles.Add(spaceOwnerProfile);
-                await dbContext.SaveChangesAsync();
+                _db.SpaceOwnerProfiles.Add(spaceOwnerProfile);
 
-                var spaceOwnerProfileExtension = new SpaceOwnerProfile {
-                    Profile = spaceOwnerProfile,
-                    PayoutSchedule = PayoutSchedule.Weekly,
-                    OnboardingComplete = false
-                };
-                dbContext.SpaceOwnerProfiles.Add(spaceOwnerProfileExtension);
+                // set user's active profile to advertiser by default
+                user.ActiveProfileType = ProfileType.Advertiser;
 
-                user.ActiveProfile = advertiserProfile;
-
-                await dbContext.SaveChangesAsync();
+                await _db.SaveChangesAsync();
             }
 
-#pragma warning disable CA1873
-            logger.LogInformation(
+            _logger.LogInformation(
                 "Created development account: {Email} with role {Role}",
-                account.Email, userRole);
-#pragma warning restore CA1873
+                account.Email, role);
         }
 
-        if (development) {
+        if (development)
             await SeedSpacesAsync();
-        }
     }
 
     private async Task SeedSpacesAsync() {
-        var regularUsers = await dbContext.Users
+        var users = await _db.Users
             .Where(u => u.Role == UserRole.User)
+            .Include(u => u.SpaceOwnerProfile)
             .Take(2)
             .ToListAsync();
 
-        if (regularUsers.Count < 2) {
-            logger.LogWarning("Not enough regular users to seed spaces");
-            return;
-        }
-
-        foreach (var user in regularUsers) {
-            var profile = await dbContext.Profiles
-                .FirstOrDefaultAsync(p => p.User.Id == user.Id &&
-                                          p.ProfileType ==
-                                          ProfileType.SpaceOwner);
-
-            if (profile == null) {
-                logger.LogWarning(
-                    "SpaceOwner profile not found for user {Email}, skipping",
+        foreach (var user in users) {
+            var spaceOwnerProfile = user.SpaceOwnerProfile;
+            if (spaceOwnerProfile == null) {
+                _logger.LogWarning(
+                    "SpaceOwner profile not found for user {Email}",
                     user.Email);
                 continue;
             }
 
-            var existingSpacesCount = await dbContext.Spaces
-                .CountAsync(s => s.SpaceOwner.Profile.User.Id == user.Id);
+            var existingSpaces = await _db.Spaces
+                .CountAsync(s => s.SpaceOwnerProfileId == spaceOwnerProfile.Id);
 
-            if (existingSpacesCount >= 64) {
-                logger.LogInformation(
-                    "User {Email} already has {Count} spaces, skipping",
-                    user.Email, existingSpacesCount);
+            var toCreate = 64 - existingSpaces;
+            if (toCreate <= 0) {
+                _logger.LogInformation(
+                    "User {Email} already has {Count} spaces", user.Email,
+                    existingSpaces);
                 continue;
             }
 
-            var spacesToCreate = 64 - existingSpacesCount;
-            await CreateSpacesForProfile(profile.Id!, spacesToCreate);
-
-            logger.LogInformation(
-                "Created {Count} spaces for user {Email}",
-                spacesToCreate, user.Email);
+            await CreateSpacesForProfile(spaceOwnerProfile, toCreate);
+            _logger.LogInformation("Created {Count} spaces for user {Email}",
+                toCreate, user.Email);
         }
     }
 
-    private async Task CreateSpacesForProfile(string profileId, int count) {
+    private async Task CreateSpacesForProfile(SpaceOwnerProfile spaceOwner,
+        int count) {
         var random = new Random(42);
         var spaceTypes = Enum.GetValues<SpaceType>();
-
         var cities = new[] {
             ("New York", "NY", 40.7128, -74.0060),
             ("Los Angeles", "CA", 34.0522, -118.2437),
@@ -152,17 +133,18 @@ public class DatabaseSeeder(
             ("San Diego", "CA", 32.7157, -117.1611)
         };
 
-        for (var i = 0; i < count; i++) {
-            var spaceType = spaceTypes[random.Next(spaceTypes.Length)];
-            var city = cities[random.Next(cities.Length)];
+        var spaces = new List<Space>(count);
 
+        for (var i = 0; i < count; i++) {
+            var type = spaceTypes[random.Next(spaceTypes.Length)];
+            var city = cities[random.Next(cities.Length)];
             var latOffset = (random.NextDouble() - 0.5) * 0.1;
             var lonOffset = (random.NextDouble() - 0.5) * 0.1;
 
-            var space = new Space {
-                Title = GenerateSpaceTitle(spaceType, i),
-                Description = GenerateSpaceDescription(spaceType),
-                Type = spaceType,
+            spaces.Add(new Space {
+                Title = GenerateSpaceTitle(type, i),
+                Description = GenerateSpaceDescription(type),
+                Type = type,
                 Status = SpaceStatus.Active,
                 Address =
                     $"{random.Next(100, 9999)} {GenerateStreetName(random)}",
@@ -177,18 +159,13 @@ public class DatabaseSeeder(
                 InstallationFee = random.Next(10, 50),
                 MinDuration = random.Next(1, 7),
                 MaxDuration = random.Next(30, 365),
-                Images = [],
-                SpaceOwner =
-                    await dbContext.SpaceOwnerProfiles.FirstOrDefaultAsync(p =>
-                        p.Profile.Id == profileId) ??
-                    throw new InvalidOperationException(
-                        "Profile not found")
-            };
-
-            dbContext.Spaces.Add(space);
+                Images = new List<string>(),
+                SpaceOwnerProfileId = spaceOwner.Id
+            });
         }
 
-        await dbContext.SaveChangesAsync();
+        _db.Spaces.AddRange(spaces);
+        await _db.SaveChangesAsync();
     }
 
     private static string GenerateSpaceTitle(SpaceType type, int index) =>

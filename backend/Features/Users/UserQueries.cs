@@ -1,6 +1,6 @@
 using ElaviewBackend.Shared;
 using ElaviewBackend.Shared.Entities;
-using Microsoft.AspNetCore.Authorization;
+using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Users;
 
@@ -12,19 +12,20 @@ public static partial class UserQueries {
     public static IQueryable<User> GetCurrentUser(
         AppDbContext context, UserService userService
     ) {
-        return context.Users.Where(t => t.Id == userService.PrincipalId());
+        return context.Users.Where(t =>
+            t.Id.ToString() == userService.PrincipalId());
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = ["Admin"])]
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<User?> GetUserById(
-        [ID] string id, AppDbContext context
+        [ID] Guid id, AppDbContext context
     ) {
         return context.Users.Where(t => t.Id == id);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = ["Admin"])]
     [UsePaging]
     [UseProjection]
     [UseFiltering]

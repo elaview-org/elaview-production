@@ -2,19 +2,17 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ElaviewBackend.Shared.Entities;
 
-public abstract class TimestampBase {
+public abstract class EntityBase {
+    [IsProjected]
+    public Guid Id { get; init; }
+
     public DateTime CreatedAt { get; init; }
-    public DateTime UpdatedAt { get; set; }
 }
 
-public abstract class EntityBase : TimestampBase {
-    [MaxLength(50)]
-    [IsProjected(true)]
-    public string? Id { get; init; }
-}
+public abstract class UserProfileBase : EntityBase {
+    public Guid UserId { get; set; }
 
-public abstract class UserProfileBase : TimestampBase {
-    public Profile Profile { get; init; } = null!;
+    public User User { get; set; } = null!;
 
     public bool OnboardingComplete { get; set; } = false;
 

@@ -20,7 +20,7 @@ public class AuthController(AuthService authService) : ControllerBase {
             return Conflict(new { message = "Email already exists" });
 
         var claims = new List<Claim> {
-            new(ClaimTypes.NameIdentifier, user.Id!),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
             new(ClaimTypes.Role, user.Role.ToString())
         };
@@ -45,7 +45,7 @@ public class AuthController(AuthService authService) : ControllerBase {
         );
 
         var response = new LoginResponse {
-            Id = user.Id!,
+            Id = user.Id.ToString(),
             Email = user.Email,
             Name = user.Name,
             Role = user.Role,
@@ -70,7 +70,7 @@ public class AuthController(AuthService authService) : ControllerBase {
             return Unauthorized(new { message = "Account is not active" });
 
         var claims = new List<Claim> {
-            new(ClaimTypes.NameIdentifier, user.Id!),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
             new(ClaimTypes.Role, user.Role.ToString())
         };
@@ -95,7 +95,7 @@ public class AuthController(AuthService authService) : ControllerBase {
         );
 
         var response = new LoginResponse {
-            Id = user.Id!,
+            Id = user.Id.ToString(),
             Email = user.Email,
             Name = user.Name,
             Role = user.Role,

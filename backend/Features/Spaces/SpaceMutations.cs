@@ -15,22 +15,14 @@ public static partial class SpaceMutations {
     ) {
         var userId = userService.PrincipalId();
         var user = await context.Users
-                       .Include(u => u.ActiveProfile)
-                       .FirstOrDefaultAsync(u => u.Id == userId, ct)
+                       .FirstOrDefaultAsync(u => u.Id.ToString() == userId, ct)
                    ?? throw new Exception("User not found");
-
-        if (user.ActiveProfile == null ||
-            user.ActiveProfile.ProfileType != ProfileType.SpaceOwner) {
-            throw new Exception(
-                "User must have an active SpaceOwner profile to create spaces");
-        }
 
         var spaceOwnerProfile =
             await context.SpaceOwnerProfiles.FirstOrDefaultAsync(p =>
-                p.Profile.Id == user.ActiveProfile.Id, ct);
+                p.Id == user.SpaceOwnerProfile!.Id, ct);
         var space = new Space {
-            Id = Guid.NewGuid().ToString(),
-            SpaceOwner = spaceOwnerProfile!,
+            SpaceOwnerProfileId = spaceOwnerProfile!.Id,
             Title = input.Title,
             Description = input.Description,
             Type = input.Type,
@@ -48,13 +40,12 @@ public static partial class SpaceMutations {
             InstallationFee = input.InstallationFee,
             MinDuration = input.MinDuration,
             MaxDuration = input.MaxDuration,
-            Images = input.Images ?? new List<string>(),
+            Images = input.Images ?? [],
             AvailableFrom = input.AvailableFrom,
             AvailableTo = input.AvailableTo,
             DimensionsText = input.DimensionsText,
             Traffic = input.Traffic,
             CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
         };
 
         context.Spaces.Add(space);
@@ -64,7 +55,7 @@ public static partial class SpaceMutations {
 
     [Authorize]
     public static async Task<Space> DeleteSpace(
-        [ID] string id, AppDbContext context, CancellationToken ct
+        [ID] Guid id, AppDbContext context, CancellationToken ct
     ) {
         var space = await context.Spaces.FirstOrDefaultAsync(
             s => s.Id == id, ct

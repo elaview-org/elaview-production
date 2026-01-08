@@ -19,10 +19,8 @@ dotnet ef database update
 
 ```bash
 dotnet ef migrations add MyMigrationName --project ElaviewBackend.csproj --output-dir Shared/Migrations
-docker compose up -d database
 dotnet ef database drop -f
-docker compose up -d database
-dotnet ef database update --project ElaviewBackend.csproj
+dotnet ef database update
 docker compose up -d server
 ```
 

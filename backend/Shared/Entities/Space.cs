@@ -1,9 +1,17 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ElaviewBackend.Shared.Entities;
 
+[Table("spaces")]
 public sealed class Space : EntityBase {
-    public SpaceOwnerProfile SpaceOwner { get; init; } = null!;
+    [MaxLength(50)]
+
+    public Guid SpaceOwnerProfileId { get; set; }
+
+    public SpaceOwnerProfile SpaceOwnerProfile { get; set; } = null!;
 
     [MaxLength(500)]
     public string Title { get; init; } = null!;
@@ -66,4 +74,23 @@ public sealed class Space : EntityBase {
 
     [MaxLength(500)]
     public string? Traffic { get; init; }
+}
+
+public sealed class SpaceConfig :
+    IEntityTypeConfiguration<Space> {
+    public void Configure(EntityTypeBuilder<Space> builder) {
+        builder.HasIndex(e => e.SpaceOwnerProfileId);
+
+        builder.Property(e => e.Id)
+            .HasDefaultValueSql("gen_random_uuid()");
+
+        builder.Property(e => e.CreatedAt)
+            .IsRequired()
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+        builder.HasOne(e => e.SpaceOwnerProfile)
+            .WithMany(e => e.Spaces)
+            .HasForeignKey(e => e.SpaceOwnerProfileId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
 }

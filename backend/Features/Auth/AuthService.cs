@@ -6,7 +6,7 @@ namespace ElaviewBackend.Features.Auth;
 
 public class AuthService(AppDbContext dbContext) {
     public async Task<User?> CreateUserAsync(string email, string password,
-        string? name = null) {
+        string name) {
         var existingUser = await dbContext.Users
             .FirstOrDefaultAsync(u => u.Email == email);
 
@@ -18,44 +18,26 @@ public class AuthService(AppDbContext dbContext) {
             Password = hashedPassword,
             Name = name
         };
-        
-        var advertiserProfile = new Profile {
-            User = user,
-            ProfileType = ProfileType.Advertiser
-        };
-        dbContext.Profiles.Add(advertiserProfile);
-        await dbContext.SaveChangesAsync();
 
-        var advertiserProfileExtension = new AdvertiserProfile {
-            Profile = advertiserProfile,
-            OnboardingComplete = false
+        var advertiserProfile = new AdvertiserProfile {
+            UserId = user.Id,
+            User = user
         };
-        dbContext.AdvertiserProfiles.Add(advertiserProfileExtension);
-
-        var spaceOwnerProfile = new Profile {
-            User = user,
-            ProfileType = ProfileType.SpaceOwner
-        };
-        dbContext.Profiles.Add(spaceOwnerProfile);
-        await dbContext.SaveChangesAsync();
+        await dbContext.AdvertiserProfiles.AddAsync(advertiserProfile);
 
         var spaceOwnerProfileExtension = new SpaceOwnerProfile {
-            Profile = spaceOwnerProfile,
-            PayoutSchedule = PayoutSchedule.Weekly,
-            OnboardingComplete = false
+            UserId = user.Id,
+            User = user
         };
-        dbContext.SpaceOwnerProfiles.Add(spaceOwnerProfileExtension);
+        await dbContext.SpaceOwnerProfiles.AddAsync(spaceOwnerProfileExtension);
 
-        user.ActiveProfile = advertiserProfile;
-
-        dbContext.Users.Add(user);
+        await dbContext.Users.AddAsync(user);
         await dbContext.SaveChangesAsync();
         return user;
     }
 
     public async Task<User?> ValidateUserAsync(string email, string password) {
         var user = await dbContext.Users
-            .Include(u => u.ActiveProfile)
             .FirstOrDefaultAsync(u => u.Email == email);
 
         if (user == null) return null;

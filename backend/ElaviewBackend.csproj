@@ -7,6 +7,7 @@
         <AllowMissingPrunePackageData>true</AllowMissingPrunePackageData>
         <UserSecretsId>6076afc8-7367-499c-8ce0-ef64476a0a59</UserSecretsId>
         <NoWarn>CS7022</NoWarn>
+        <StartupObject>ElaviewBackend.Bootstrap.Program</StartupObject>
     </PropertyGroup>
 
     <ItemGroup>
@@ -41,7 +42,6 @@
 
     <ItemGroup>
         <Folder Include="Shared\Migrations\" />
-        <Folder Include="TLS\" />
     </ItemGroup>
 
     <ItemGroup>

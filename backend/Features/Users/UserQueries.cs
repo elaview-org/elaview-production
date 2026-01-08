@@ -30,9 +30,7 @@ public static partial class UserQueries {
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<User> GetUsers(
-        AppDbContext context
-    ) {
+    public static IQueryable<User> GetUsers(AppDbContext context) {
         return context.Users;
     }
 }

@@ -1,0 +1,18 @@
+using ElaviewBackend.Shared;
+using ElaviewBackend.Shared.Entities;
+using HotChocolate.Authorization;
+
+namespace ElaviewBackend.Features.Users;
+
+[ExtendObjectType<SpaceOwnerProfile>]
+public static class SpaceOwnerExtensions {
+    [Authorize]
+    [UsePaging]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public static IQueryable<Space> GetSpaces(
+        [Parent] SpaceOwnerProfile spaceOwner, AppDbContext context
+    ) => context.Spaces.Where(s =>
+        s.SpaceOwnerProfileId == spaceOwner.Id);
+}

@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "bun --bun next dev",
-    "build": "bun --bun next build",
-    "start": "bun --bun next start",
-    "lint": "bun run eslint",
-    "format": "bun run prettier --write .",
-    "format:check": "bun run prettier --check .",
-    "gql:codegen": "bun run graphql-codegen --config lib/gql-codegen.ts",
-    "gql:codegen:watch": "bun run graphql-codegen --config lib/gql-codegen.ts --watch"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "gql:codegen": "graphql-codegen --config shared/lib/gql-codegen.ts",
+    "gql:codegen:watch": "graphql-codegen --config shared/lib/gql-codegen.ts --watch"
   },
   "dependencies": {
     "@apollo/client": "^4.0.11",

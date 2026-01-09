@@ -3,8 +3,8 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ReactNode, useCallback, useEffect } from "react";
 import { IconLayoutGrid, IconMap, IconSearch } from "@tabler/icons-react";
-import { Input } from "@/shared/components/input";
-import { Button } from "@/shared/components/button";
+import { Input } from "@/components/input";
+import { Button } from "@/components/button";
 
 interface ContentProps {
   gridView: ReactNode;

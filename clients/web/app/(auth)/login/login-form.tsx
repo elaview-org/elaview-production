@@ -1,15 +1,15 @@
 "use client";
 
 import login from "./login.action";
-import { Button } from "@/shared/components/button";
+import { Button } from "@/components/button";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/shared/components/field";
-import { Input } from "@/shared/components/input";
+} from "@/components/field";
+import { Input } from "@/components/input";
 
 import { useActionState } from "react";
 

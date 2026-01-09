@@ -1,18 +1,14 @@
 "use client";
 
 import { IconLogout } from "@tabler/icons-react";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/shared/components/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/shared/components/sidebar";
+} from "@/components/sidebar";
 import Link from "next/link";
-import { Maybe } from "@/shared/types/graphql.generated";
+import { Maybe } from "@/types/graphql.generated";
 
 export interface NavUserProps {
   email: string;

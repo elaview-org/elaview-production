@@ -1,5 +1,5 @@
-import UnderConstruction from "@/shared/components/under-construction";
+import UnderConstruction from "@/components/under-construction";
 
 export default function Page() {
-    return <UnderConstruction/>;
+  return <UnderConstruction />;
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { ActionState } from "@/shared/actions/types";
+import { ActionState } from "@/actions/types";
 
 import assert from "node:assert";
 import { redirect } from "next/navigation";

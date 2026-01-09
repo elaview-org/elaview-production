@@ -1,5 +1,5 @@
-import api from "@/shared/api/gql/server";
-import { ProfileType, Query, UserRole } from "@/shared/types/graphql.generated";
+import api from "@/api/gql/server";
+import { ProfileType, Query, UserRole } from "@/types/graphql.generated";
 import {
   Sidebar,
   SidebarContent,
@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-} from "@/shared/components/sidebar";
+} from "@/components/sidebar";
 import { IconInnerShadowTop } from "@tabler/icons-react";
 import { NavigationSection } from "./navigation-section";
 import { UserSection } from "./user-section";

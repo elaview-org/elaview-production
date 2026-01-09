@@ -1,6 +1,6 @@
-import { Button } from "@/shared/components/button";
+import { Button } from "@/components/button";
 import { IconHeart, IconShare } from "@tabler/icons-react";
-import { Badge } from "@/shared/components/badge";
+import { Badge } from "@/components/badge";
 
 interface SpaceCardProps {
   address: string;

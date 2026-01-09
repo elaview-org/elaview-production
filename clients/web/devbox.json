@@ -1,0 +1,13 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
+  "packages": {
+    "bun": {
+      "version": "latest"
+    },
+    "docker": { "version": "latest" }
+  },
+  "shell": {
+    "init_hook": ["bun install"],
+    "scripts": {}
+  }
+}

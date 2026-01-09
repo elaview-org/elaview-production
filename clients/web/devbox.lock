@@ -1,0 +1,105 @@
+{
+  "lockfile_version": "1",
+  "packages": {
+    "bun@latest": {
+      "last_modified": "2025-12-31T03:27:36Z",
+      "resolved": "github:NixOS/nixpkgs/f665af0cdb70ed27e1bd8f9fdfecaf451260fc55#bun",
+      "source": "devbox-search",
+      "version": "1.3.5",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/l95lxycv81h0dd313cznpkqjqyny7fnl-bun-1.3.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/l95lxycv81h0dd313cznpkqjqyny7fnl-bun-1.3.5"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/64zyjf8y41ddxys3c8fswmfjl7a1dq0r-bun-1.3.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/64zyjf8y41ddxys3c8fswmfjl7a1dq0r-bun-1.3.5"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/bigwxxi4a1plg9cssmv7l0llmna0j5gk-bun-1.3.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/bigwxxi4a1plg9cssmv7l0llmna0j5gk-bun-1.3.5"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/qgwwg2jr2yrksig72y9cmhj65bdcnxhn-bun-1.3.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/qgwwg2jr2yrksig72y9cmhj65bdcnxhn-bun-1.3.5"
+        }
+      }
+    },
+    "docker@latest": {
+      "last_modified": "2025-12-31T03:27:36Z",
+      "resolved": "github:NixOS/nixpkgs/f665af0cdb70ed27e1bd8f9fdfecaf451260fc55#docker",
+      "source": "devbox-search",
+      "version": "29.1.3",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/xaysfh8xlwd9ikjadgm12zhgi66nbdf3-docker-29.1.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/xaysfh8xlwd9ikjadgm12zhgi66nbdf3-docker-29.1.3"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/pzaif699hw0xlszz19jfywcmy5b8hk4s-docker-29.1.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/pzaif699hw0xlszz19jfywcmy5b8hk4s-docker-29.1.3"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/c92lg5xhdm6v2kmbbczbn83cs46m8ghc-docker-29.1.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/c92lg5xhdm6v2kmbbczbn83cs46m8ghc-docker-29.1.3"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/fkg6qlbkr1hgl8gn5ly1vs0s7926m7qd-docker-29.1.3",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/fkg6qlbkr1hgl8gn5ly1vs0s7926m7qd-docker-29.1.3"
+        }
+      }
+    },
+    "github:NixOS/nixpkgs/nixpkgs-unstable": {
+      "last_modified": "2026-01-02T14:39:32Z",
+      "resolved": "github:NixOS/nixpkgs/16c7794d0a28b5a37904d55bcca36003b9109aaa?lastModified=1767364772"
+    }
+  }
+}

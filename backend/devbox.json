@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.13.7/.schema/devbox.schema.json",
   "packages": [
-    "dotnet-sdk@latest",
+    "dotnet-sdk_10@latest",
     "postgresql@latest",
     "docker@latest",
     "docker-compose@latest"

@@ -27,7 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/components/dropdown-menu";
-import { UserRole } from "@/shared/types/graphql.generated";
+import { ProfileType, UserRole } from "@/shared/types/graphql.generated";
 import adminData from "./@admin/navigation-bar.data";
 import advertiserData from "./@advertiser/navigation-bar.data";
 import marketingData from "./@marketing/navigation-bar.data";
@@ -36,23 +36,28 @@ import Link from "next/link";
 
 export interface NavigationSectionProps {
   userRole: UserRole;
+  activeProfileType: ProfileType;
 }
 
-export function NavigationSection({ userRole }: NavigationSectionProps) {
+export function NavigationSection({
+  userRole,
+  activeProfileType,
+}: NavigationSectionProps) {
   const { isMobile } = useSidebar();
 
   const data = useMemo(() => {
     switch (userRole) {
       case UserRole.Admin:
         return adminData;
-      case UserRole.Advertiser:
-        return advertiserData;
       case UserRole.Marketing:
         return marketingData;
-      case UserRole.SpaceOwner:
-        return spaceOwnerData;
+      case UserRole.User: {
+        return activeProfileType === ProfileType.SpaceOwner
+          ? spaceOwnerData
+          : advertiserData;
+      }
     }
-  }, [userRole]);
+  }, [userRole, activeProfileType]);
 
   return (
     <>

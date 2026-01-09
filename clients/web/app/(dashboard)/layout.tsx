@@ -1,5 +1,5 @@
 import api from "@/shared/api/gql/server";
-import { Query, UserRole } from "@/shared/types/graphql.generated";
+import { ProfileType, Query, UserRole } from "@/shared/types/graphql.generated";
 import {
   Sidebar,
   SidebarContent,
@@ -29,6 +29,7 @@ export default async function Layout(props: LayoutProps<"/">) {
           name,
           avatar,
           role,
+          activeProfileType,
         }
       }
     `,
@@ -64,7 +65,10 @@ export default async function Layout(props: LayoutProps<"/">) {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <NavigationSection userRole={data?.currentUser?.role} />
+          <NavigationSection
+            userRole={data?.currentUser?.role}
+            activeProfileType={data?.currentUser?.activeProfileType}
+          />
         </SidebarContent>
         <SidebarFooter>
           <UserSection {...data?.currentUser} />
@@ -76,12 +80,14 @@ export default async function Layout(props: LayoutProps<"/">) {
           switch (data.currentUser.role) {
             case UserRole.Admin:
               return props.admin;
-            case UserRole.Advertiser:
-              return props.advertiser;
             case UserRole.Marketing:
               return props.marketing;
-            case UserRole.SpaceOwner:
-              return props.spaceOwner;
+            case UserRole.User: {
+              return data.currentUser.activeProfileType ===
+                ProfileType.SpaceOwner
+                ? props.spaceOwner
+                : props.advertiser;
+            }
           }
         })()}
       </SidebarInset>

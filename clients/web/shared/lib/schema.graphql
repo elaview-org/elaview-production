@@ -40,29 +40,69 @@ directive @listSize(
 ) on FIELD_DEFINITION
 
 type AdvertiserProfile {
+  campaigns(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [CampaignSortInput!]
+    where: CampaignFilterInput
+  ): CampaignsConnection
   companyName: String
   createdAt: DateTime!
-  id: String!
+  id: UUID!
   industry: String
-  stripeCustomerId: String
-  updatedAt: DateTime!
+  onboardingComplete: Boolean!
+  stripeAccountDisconnectedAt: DateTime
+  stripeAccountDisconnectedNotifiedAt: DateTime
+  stripeAccountId: String
+  stripeAccountStatus: String
+  stripeLastAccountHealthCheck: DateTime
   user: User!
-  userId: String!
+  userId: UUID!
   website: String
 }
 
 input AdvertiserProfileFilterInput {
   and: [AdvertiserProfileFilterInput!]
+  campaigns: ListFilterInputTypeOfCampaignFilterInput
   companyName: StringOperationFilterInput
   createdAt: DateTimeOperationFilterInput
-  id: StringOperationFilterInput
+  id: UuidOperationFilterInput
   industry: StringOperationFilterInput
+  onboardingComplete: BooleanOperationFilterInput
   or: [AdvertiserProfileFilterInput!]
-  stripeCustomerId: StringOperationFilterInput
-  updatedAt: DateTimeOperationFilterInput
+  stripeAccountDisconnectedAt: DateTimeOperationFilterInput
+  stripeAccountDisconnectedNotifiedAt: DateTimeOperationFilterInput
+  stripeAccountId: StringOperationFilterInput
+  stripeAccountStatus: StringOperationFilterInput
+  stripeLastAccountHealthCheck: DateTimeOperationFilterInput
   user: UserFilterInput
-  userId: StringOperationFilterInput
+  userId: UuidOperationFilterInput
   website: StringOperationFilterInput
+}
+
+input AdvertiserProfileInput {
+  campaigns: [CampaignInput!]!
+  companyName: String
+  createdAt: DateTime!
+  id: UUID!
+  industry: String
+  onboardingComplete: Boolean!
+  stripeAccountDisconnectedAt: DateTime
+  stripeAccountDisconnectedNotifiedAt: DateTime
+  stripeAccountId: String
+  stripeAccountStatus: String
+  stripeLastAccountHealthCheck: DateTime
+  user: UserInput!
+  userId: UUID!
+  website: String
 }
 
 input AdvertiserProfileSortInput {
@@ -70,219 +110,25 @@ input AdvertiserProfileSortInput {
   createdAt: SortEnumType
   id: SortEnumType
   industry: SortEnumType
-  stripeCustomerId: SortEnumType
-  updatedAt: SortEnumType
+  onboardingComplete: SortEnumType
+  stripeAccountDisconnectedAt: SortEnumType
+  stripeAccountDisconnectedNotifiedAt: SortEnumType
+  stripeAccountId: SortEnumType
+  stripeAccountStatus: SortEnumType
+  stripeLastAccountHealthCheck: SortEnumType
   user: UserSortInput
   userId: SortEnumType
   website: SortEnumType
 }
 
-type Booking {
-  adminNotes: String
-  advertiserNotes: String
-  balanceAmount: Decimal
-  balanceChargeAttempts: Int!
-  balanceChargeError: String
-  balanceChargeId: String
-  balanceDueDate: DateTime
-  balancePaidAt: DateTime
-  balanceStripeChargeId: String
-  campaign: Campaign!
-  campaignId: String!
-  cancellationReason: String
-  cancelledAt: DateTime
-  cancelledBy: String
-  checkpointTransferIds: [String!]!
-  createdAt: DateTime!
-  depositAmount: Decimal
-  depositChargeId: String
-  depositPaidAt: DateTime
-  depositStripeChargeId: String
-  disputePhotos: [String!]!
-  disputeReason: String
-  disputeType: DisputeIssueType
-  disputedAt: DateTime
-  disputedBy: String
-  endDate: DateTime!
-  finalPayoutAmount: Decimal
-  finalPayoutDate: DateTime
-  finalPayoutProcessed: Boolean!
-  finalTransferId: String
-  finalTransferredAt: DateTime
-  firstPayoutAmount: Decimal
-  firstPayoutDate: DateTime
-  firstPayoutProcessed: Boolean!
-  firstRentalTransferId: String
-  firstRentalTransferredAt: DateTime
-  id: String!
-  installationFeeTransferId: String
-  installationFeeTransferredAt: DateTime
-  isTestData: Boolean!
-  lastBalanceChargeAttempt: DateTime
-  lastPayoutAttempt: DateTime
-  messages: [Message!]!
-  missedVerifications: Int!
-  nextVerificationDue: DateTime
-  ownerNotes: String
-  paidAt: DateTime
-  paymentType: PaymentType!
-  payoutAttempts: Int!
-  payoutError: String
-  payoutProcessedAt: DateTime
-  payoutStatus: PayoutStatus
-  pendingPayoutReason: String
-  platformFee: Decimal!
-  pricePerDay: Decimal!
-  proofApprovedAt: DateTime
-  proofApprovedBy: String
-  proofMessageId: String
-  proofPhotos: [String!]!
-  proofStatus: ProofStatus
-  proofUploadedAt: DateTime
-  qualityGuaranteePeriod: DateTime
-  refundAmount: Decimal
-  refundHistory: JsonDocument
-  refundProcessedAt: DateTime
-  refundedAt: DateTime
-  reservedUntil: DateTime
-  resolutionAction: String
-  resolutionNotes: String
-  resolvedAt: DateTime
-  resolvedBy: String
-  review: Review
-  space: Space!
-  spaceId: String!
-  spaceOwnerAmount: Decimal!
-  startDate: DateTime!
-  status: BookingStatus!
-  stripeChargeId: String
-  stripeFee: Decimal
-  stripePaymentIntentId: String
-  stripeRefundId: String
-  stripeTransferId: String
-  totalAmount: Decimal!
-  totalDays: Int!
-  totalWithFees: Decimal
-  transferAmount: Decimal
-  transferredAt: DateTime
-  updatedAt: DateTime!
-  verificationPhotos: JsonDocument
-  verificationSchedule: JsonDocument
-}
-
-input BookingFilterInput {
-  adminNotes: StringOperationFilterInput
-  advertiserNotes: StringOperationFilterInput
-  and: [BookingFilterInput!]
-  balanceAmount: DecimalOperationFilterInput
-  balanceChargeAttempts: IntOperationFilterInput
-  balanceChargeError: StringOperationFilterInput
-  balanceChargeId: StringOperationFilterInput
-  balanceDueDate: DateTimeOperationFilterInput
-  balancePaidAt: DateTimeOperationFilterInput
-  balanceStripeChargeId: StringOperationFilterInput
-  campaign: CampaignFilterInput
-  campaignId: StringOperationFilterInput
-  cancellationReason: StringOperationFilterInput
-  cancelledAt: DateTimeOperationFilterInput
-  cancelledBy: StringOperationFilterInput
-  checkpointTransferIds: ListStringOperationFilterInput
-  createdAt: DateTimeOperationFilterInput
-  depositAmount: DecimalOperationFilterInput
-  depositChargeId: StringOperationFilterInput
-  depositPaidAt: DateTimeOperationFilterInput
-  depositStripeChargeId: StringOperationFilterInput
-  disputePhotos: ListStringOperationFilterInput
-  disputeReason: StringOperationFilterInput
-  disputeType: NullableOfDisputeIssueTypeOperationFilterInput
-  disputedAt: DateTimeOperationFilterInput
-  disputedBy: StringOperationFilterInput
-  endDate: DateTimeOperationFilterInput
-  finalPayoutAmount: DecimalOperationFilterInput
-  finalPayoutDate: DateTimeOperationFilterInput
-  finalPayoutProcessed: BooleanOperationFilterInput
-  finalTransferId: StringOperationFilterInput
-  finalTransferredAt: DateTimeOperationFilterInput
-  firstPayoutAmount: DecimalOperationFilterInput
-  firstPayoutDate: DateTimeOperationFilterInput
-  firstPayoutProcessed: BooleanOperationFilterInput
-  firstRentalTransferId: StringOperationFilterInput
-  firstRentalTransferredAt: DateTimeOperationFilterInput
-  id: StringOperationFilterInput
-  installationFeeTransferId: StringOperationFilterInput
-  installationFeeTransferredAt: DateTimeOperationFilterInput
-  isTestData: BooleanOperationFilterInput
-  lastBalanceChargeAttempt: DateTimeOperationFilterInput
-  lastPayoutAttempt: DateTimeOperationFilterInput
-  messages: ListFilterInputTypeOfMessageFilterInput
-  missedVerifications: IntOperationFilterInput
-  nextVerificationDue: DateTimeOperationFilterInput
-  or: [BookingFilterInput!]
-  ownerNotes: StringOperationFilterInput
-  paidAt: DateTimeOperationFilterInput
-  paymentType: PaymentTypeOperationFilterInput
-  payoutAttempts: IntOperationFilterInput
-  payoutError: StringOperationFilterInput
-  payoutProcessedAt: DateTimeOperationFilterInput
-  payoutStatus: NullableOfPayoutStatusOperationFilterInput
-  pendingPayoutReason: StringOperationFilterInput
-  platformFee: DecimalOperationFilterInput
-  pricePerDay: DecimalOperationFilterInput
-  proofApprovedAt: DateTimeOperationFilterInput
-  proofApprovedBy: StringOperationFilterInput
-  proofMessageId: StringOperationFilterInput
-  proofPhotos: ListStringOperationFilterInput
-  proofStatus: NullableOfProofStatusOperationFilterInput
-  proofUploadedAt: DateTimeOperationFilterInput
-  qualityGuaranteePeriod: DateTimeOperationFilterInput
-  refundAmount: DecimalOperationFilterInput
-  refundHistory: JsonDocumentFilterInput
-  refundProcessedAt: DateTimeOperationFilterInput
-  refundedAt: DateTimeOperationFilterInput
-  reservedUntil: DateTimeOperationFilterInput
-  resolutionAction: StringOperationFilterInput
-  resolutionNotes: StringOperationFilterInput
-  resolvedAt: DateTimeOperationFilterInput
-  resolvedBy: StringOperationFilterInput
-  review: ReviewFilterInput
-  space: SpaceFilterInput
-  spaceId: StringOperationFilterInput
-  spaceOwnerAmount: DecimalOperationFilterInput
-  startDate: DateTimeOperationFilterInput
-  status: BookingStatusOperationFilterInput
-  stripeChargeId: StringOperationFilterInput
-  stripeFee: DecimalOperationFilterInput
-  stripePaymentIntentId: StringOperationFilterInput
-  stripeRefundId: StringOperationFilterInput
-  stripeTransferId: StringOperationFilterInput
-  totalAmount: DecimalOperationFilterInput
-  totalDays: IntOperationFilterInput
-  totalWithFees: DecimalOperationFilterInput
-  transferAmount: DecimalOperationFilterInput
-  transferredAt: DateTimeOperationFilterInput
-  updatedAt: DateTimeOperationFilterInput
-  verificationPhotos: JsonDocumentFilterInput
-  verificationSchedule: JsonDocumentFilterInput
-}
-
-enum BookingStatus {
-  ACTIVE
-  APPROVED
-  AWAITING_PROOF
-  CANCELLED
-  COMPLETED
-  CONFIRMED
-  DISPUTED
-  PENDING_APPROVAL
-  PENDING_BALANCE
-  REJECTED
-}
-
-input BookingStatusOperationFilterInput {
-  eq: BookingStatus
-  in: [BookingStatus!]
-  neq: BookingStatus
-  nin: [BookingStatus!]
+"""Defines when a policy shall be executed."""
+enum ApplyPolicy {
+  """After the resolver was executed."""
+  AFTER_RESOLVER
+  """Before the resolver was executed."""
+  BEFORE_RESOLVER
+  """The policy is applied in the validation step before the execution."""
+  VALIDATION
 }
 
 input BooleanOperationFilterInput {
@@ -290,137 +136,70 @@ input BooleanOperationFilterInput {
   neq: Boolean
 }
 
-enum BugCategory {
-  AUTHENTICATION
-  BOOKING
-  CAMPAIGN
-  DATA_INTEGRITY
-  MESSAGING
-  NOTIFICATIONS
-  OTHER
-  PAYMENT
-  PERFORMANCE
-  SPACE_MANAGEMENT
-  UI_UX
-}
-
-input BugCategoryOperationFilterInput {
-  eq: BugCategory
-  in: [BugCategory!]
-  neq: BugCategory
-  nin: [BugCategory!]
-}
-
-type BugReport {
-  adminNotes: String
-  category: BugCategory!
-  createdAt: DateTime!
-  description: String!
-  id: String!
-  linkedBugId: String
-  pageUrl: String
-  processedAt: DateTime
-  processedBy: String
-  screenshots: [String!]!
-  severity: BugSeverity!
-  status: BugStatus!
-  title: String!
-  updatedAt: DateTime!
-  user: User
-  userAgent: String
-  userId: String
-}
-
-input BugReportFilterInput {
-  adminNotes: StringOperationFilterInput
-  and: [BugReportFilterInput!]
-  category: BugCategoryOperationFilterInput
-  createdAt: DateTimeOperationFilterInput
-  description: StringOperationFilterInput
-  id: StringOperationFilterInput
-  linkedBugId: StringOperationFilterInput
-  or: [BugReportFilterInput!]
-  pageUrl: StringOperationFilterInput
-  processedAt: DateTimeOperationFilterInput
-  processedBy: StringOperationFilterInput
-  screenshots: ListStringOperationFilterInput
-  severity: BugSeverityOperationFilterInput
-  status: BugStatusOperationFilterInput
-  title: StringOperationFilterInput
-  updatedAt: DateTimeOperationFilterInput
-  user: UserFilterInput
-  userAgent: StringOperationFilterInput
-  userId: StringOperationFilterInput
-}
-
-enum BugSeverity {
-  CRITICAL
-  HIGH
-  LOW
-  MEDIUM
-}
-
-input BugSeverityOperationFilterInput {
-  eq: BugSeverity
-  in: [BugSeverity!]
-  neq: BugSeverity
-  nin: [BugSeverity!]
-}
-
-enum BugStatus {
-  CONFIRMED
-  DUPLICATE
-  FIXED
-  IN_PROGRESS
-  NEW
-  WONT_FIX
-}
-
-input BugStatusOperationFilterInput {
-  eq: BugStatus
-  in: [BugStatus!]
-  neq: BugStatus
-  nin: [BugStatus!]
-}
-
 type Campaign {
-  advertiser: User!
-  advertiserId: String!
-  bookings: [Booking!]!
+  advertiserProfile: AdvertiserProfile!
+  advertiserProfileId: UUID!
   createdAt: DateTime!
   description: String
   endDate: DateTime
   goals: String
-  id: String!
+  id: UUID!
   imageUrl: String!
-  messages: [Message!]!
   name: String!
   startDate: DateTime
   status: CampaignStatus!
   targetAudience: String
   totalBudget: Decimal
-  updatedAt: DateTime!
 }
 
 input CampaignFilterInput {
-  advertiser: UserFilterInput
-  advertiserId: StringOperationFilterInput
+  advertiserProfile: AdvertiserProfileFilterInput
+  advertiserProfileId: UuidOperationFilterInput
   and: [CampaignFilterInput!]
-  bookings: ListFilterInputTypeOfBookingFilterInput
   createdAt: DateTimeOperationFilterInput
   description: StringOperationFilterInput
   endDate: DateTimeOperationFilterInput
   goals: StringOperationFilterInput
-  id: StringOperationFilterInput
+  id: UuidOperationFilterInput
   imageUrl: StringOperationFilterInput
-  messages: ListFilterInputTypeOfMessageFilterInput
   name: StringOperationFilterInput
   or: [CampaignFilterInput!]
   startDate: DateTimeOperationFilterInput
   status: CampaignStatusOperationFilterInput
   targetAudience: StringOperationFilterInput
   totalBudget: DecimalOperationFilterInput
-  updatedAt: DateTimeOperationFilterInput
+}
+
+input CampaignInput {
+  advertiserProfile: AdvertiserProfileInput!
+  advertiserProfileId: UUID!
+  createdAt: DateTime!
+  description: String
+  endDate: DateTime
+  goals: String
+  id: UUID!
+  imageUrl: String!
+  name: String!
+  startDate: DateTime
+  status: CampaignStatus!
+  targetAudience: String
+  totalBudget: Decimal
+}
+
+input CampaignSortInput {
+  advertiserProfile: AdvertiserProfileSortInput
+  advertiserProfileId: SortEnumType
+  createdAt: SortEnumType
+  description: SortEnumType
+  endDate: SortEnumType
+  goals: SortEnumType
+  id: SortEnumType
+  imageUrl: SortEnumType
+  name: SortEnumType
+  startDate: SortEnumType
+  status: SortEnumType
+  targetAudience: SortEnumType
+  totalBudget: SortEnumType
 }
 
 enum CampaignStatus {
@@ -436,6 +215,24 @@ input CampaignStatusOperationFilterInput {
   in: [CampaignStatus!]
   neq: CampaignStatus
   nin: [CampaignStatus!]
+}
+
+"""A connection to a list of items."""
+type CampaignsConnection {
+  """A list of edges."""
+  edges: [CampaignsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Campaign!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type CampaignsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Campaign!
 }
 
 input CreateSpaceInput {
@@ -510,23 +307,6 @@ type DeleteSpacePayload {
   space: Space
 }
 
-type DeviceSession {
-  current: Boolean!
-  device: String!
-  id: String!
-  lastActive: DateTime!
-  location: String!
-}
-
-enum DisputeIssueType {
-  DAMAGE_TO_CREATIVE
-  MISLEADING_LISTING
-  NOT_VISIBLE
-  POOR_QUALITY
-  SAFETY_ISSUE
-  WRONG_LOCATION
-}
-
 input FloatOperationFilterInput {
   eq: Float
   gt: Float
@@ -557,82 +337,11 @@ input IntOperationFilterInput {
   nlte: Int
 }
 
-scalar JSON
-
-type JsonDocument {
-  rootElement: JSON!
-}
-
-input JsonDocumentFilterInput {
-  and: [JsonDocumentFilterInput!]
-  or: [JsonDocumentFilterInput!]
-  rootElement: JsonElementFilterInput
-}
-
-input JsonElementFilterInput {
-  and: [JsonElementFilterInput!]
-  or: [JsonElementFilterInput!]
-  valueKind: JsonValueKindOperationFilterInput
-}
-
-enum JsonValueKind {
-  ARRAY
-  FALSE
-  NULL
-  NUMBER
-  OBJECT
-  STRING
-  TRUE
-  UNDEFINED
-}
-
-input JsonValueKindOperationFilterInput {
-  eq: JsonValueKind
-  in: [JsonValueKind!]
-  neq: JsonValueKind
-  nin: [JsonValueKind!]
-}
-
-input ListFilterInputTypeOfBookingFilterInput {
-  all: BookingFilterInput
-  any: Boolean
-  none: BookingFilterInput
-  some: BookingFilterInput
-}
-
-input ListFilterInputTypeOfBugReportFilterInput {
-  all: BugReportFilterInput
-  any: Boolean
-  none: BugReportFilterInput
-  some: BugReportFilterInput
-}
-
 input ListFilterInputTypeOfCampaignFilterInput {
   all: CampaignFilterInput
   any: Boolean
   none: CampaignFilterInput
   some: CampaignFilterInput
-}
-
-input ListFilterInputTypeOfMessageFilterInput {
-  all: MessageFilterInput
-  any: Boolean
-  none: MessageFilterInput
-  some: MessageFilterInput
-}
-
-input ListFilterInputTypeOfNotificationFilterInput {
-  all: NotificationFilterInput
-  any: Boolean
-  none: NotificationFilterInput
-  some: NotificationFilterInput
-}
-
-input ListFilterInputTypeOfReviewFilterInput {
-  all: ReviewFilterInput
-  any: Boolean
-  none: ReviewFilterInput
-  some: ReviewFilterInput
 }
 
 input ListFilterInputTypeOfSpaceFilterInput {
@@ -649,167 +358,10 @@ input ListStringOperationFilterInput {
   some: StringOperationFilterInput
 }
 
-type Message {
-  attachments: [String!]!
-  attemptedResolution: String
-  autoApprovedAt: DateTime
-  booking: Booking
-  bookingId: String
-  campaign: Campaign!
-  campaignId: String!
-  content: String!
-  correctionDetails: String
-  createdAt: DateTime!
-  disputeReason: String
-  id: String!
-  isRead: Boolean!
-  issueType: DisputeIssueType
-  messageType: MessageType!
-  proofApprovedAt: DateTime
-  proofApprovedBy: String
-  proofDisputedAt: DateTime
-  proofStatus: ProofStatus
-  sender: User!
-  senderId: String!
-}
-
-input MessageFilterInput {
-  and: [MessageFilterInput!]
-  attachments: ListStringOperationFilterInput
-  attemptedResolution: StringOperationFilterInput
-  autoApprovedAt: DateTimeOperationFilterInput
-  booking: BookingFilterInput
-  bookingId: StringOperationFilterInput
-  campaign: CampaignFilterInput
-  campaignId: StringOperationFilterInput
-  content: StringOperationFilterInput
-  correctionDetails: StringOperationFilterInput
-  createdAt: DateTimeOperationFilterInput
-  disputeReason: StringOperationFilterInput
-  id: StringOperationFilterInput
-  isRead: BooleanOperationFilterInput
-  issueType: NullableOfDisputeIssueTypeOperationFilterInput
-  messageType: MessageTypeOperationFilterInput
-  or: [MessageFilterInput!]
-  proofApprovedAt: DateTimeOperationFilterInput
-  proofApprovedBy: StringOperationFilterInput
-  proofDisputedAt: DateTimeOperationFilterInput
-  proofStatus: NullableOfProofStatusOperationFilterInput
-  sender: UserFilterInput
-  senderId: StringOperationFilterInput
-}
-
-enum MessageType {
-  CORRECTION_REQUEST
-  PROOF_APPROVED
-  PROOF_DISPUTED
-  PROOF_REJECTED
-  PROOF_SUBMISSION
-  QUALITY_CONCERN
-  SYSTEM
-  TEXT
-}
-
-input MessageTypeOperationFilterInput {
-  eq: MessageType
-  in: [MessageType!]
-  neq: MessageType
-  nin: [MessageType!]
-}
-
 type Mutation {
   createSpace(input: CreateSpaceInput!): CreateSpacePayload!
   deleteSpace(input: DeleteSpaceInput!): DeleteSpacePayload!
-}
-
-type Notification {
-  bookingId: String
-  campaignId: String
-  content: String!
-  createdAt: DateTime!
-  id: String!
-  isRead: Boolean!
-  title: String!
-  type: NotificationType!
-  user: User!
-  userId: String!
-}
-
-input NotificationFilterInput {
-  and: [NotificationFilterInput!]
-  bookingId: StringOperationFilterInput
-  campaignId: StringOperationFilterInput
-  content: StringOperationFilterInput
-  createdAt: DateTimeOperationFilterInput
-  id: StringOperationFilterInput
-  isRead: BooleanOperationFilterInput
-  or: [NotificationFilterInput!]
-  title: StringOperationFilterInput
-  type: NotificationTypeOperationFilterInput
-  user: UserFilterInput
-  userId: StringOperationFilterInput
-}
-
-type NotificationSettings {
-  bookingApprovals: Boolean!
-  bookingRequests: Boolean!
-  campaignUpdates: Boolean!
-  emailDigest: String!
-  marketingEmails: Boolean!
-  paymentReceipts: Boolean!
-  systemNotifications: Boolean!
-}
-
-enum NotificationType {
-  BOOKING_APPROVED
-  BOOKING_CANCELLED
-  BOOKING_REJECTED
-  BOOKING_REQUESTED
-  DISPUTE_FILED
-  MESSAGE_RECEIVED
-  PAYMENT_FAILED
-  PAYMENT_RECEIVED
-  PAYMENT_REMINDER
-  PAYOUT_PROCESSED
-  PROOF_APPROVED
-  PROOF_DISPUTED
-  PROOF_REJECTED
-  PROOF_UPLOADED
-  REFUND_PROCESSED
-  SESSION_EXPIRED
-  SPACE_APPROVED
-  SPACE_REACTIVATED
-  SPACE_REJECTED
-  SPACE_SUSPENDED
-  SYSTEM_UPDATE
-}
-
-input NotificationTypeOperationFilterInput {
-  eq: NotificationType
-  in: [NotificationType!]
-  neq: NotificationType
-  nin: [NotificationType!]
-}
-
-input NullableOfDisputeIssueTypeOperationFilterInput {
-  eq: DisputeIssueType
-  in: [DisputeIssueType]
-  neq: DisputeIssueType
-  nin: [DisputeIssueType]
-}
-
-input NullableOfPayoutStatusOperationFilterInput {
-  eq: PayoutStatus
-  in: [PayoutStatus]
-  neq: PayoutStatus
-  nin: [PayoutStatus]
-}
-
-input NullableOfProofStatusOperationFilterInput {
-  eq: ProofStatus
-  in: [ProofStatus]
-  neq: ProofStatus
-  nin: [ProofStatus]
+  updateCurrentUser(input: UpdateCurrentUserInput!): UpdateCurrentUserPayload!
 }
 
 """Information about pagination in a connection."""
@@ -828,18 +380,6 @@ type PageInfo {
   startCursor: String
 }
 
-enum PaymentType {
-  DEPOSIT
-  IMMEDIATE
-}
-
-input PaymentTypeOperationFilterInput {
-  eq: PaymentType
-  in: [PaymentType!]
-  neq: PaymentType
-  nin: [PaymentType!]
-}
-
 enum PayoutSchedule {
   BIWEEKLY
   MONTHLY
@@ -853,27 +393,20 @@ input PayoutScheduleOperationFilterInput {
   nin: [PayoutSchedule!]
 }
 
-enum PayoutStatus {
-  COMPLETED
-  FAILED
-  PARTIALLY_PAID
-  PENDING
-  PROCESSING
+enum ProfileType {
+  ADVERTISER
+  SPACE_OWNER
 }
 
-enum ProofStatus {
-  APPROVED
-  CORRECTION_REQUESTED
-  DISPUTED
-  PENDING
-  REJECTED
-  UNDER_REVIEW
+input ProfileTypeOperationFilterInput {
+  eq: ProfileType
+  in: [ProfileType!]
+  neq: ProfileType
+  nin: [ProfileType!]
 }
 
 type Query {
   currentUser: User
-  notificationSettings: NotificationSettings!
-  securitySettings: SecuritySettings!
   spaceById(id: ID!): Space
   spaces(
     """Returns the elements in the list that come after the specified cursor."""
@@ -906,50 +439,6 @@ type Query {
   ): UsersConnection
 }
 
-type Review {
-  booking: Booking!
-  bookingId: String!
-  comment: String
-  createdAt: DateTime!
-  id: String!
-  rating: Int!
-  reviewerType: ReviewerType!
-  space: Space!
-  spaceId: String!
-}
-
-input ReviewFilterInput {
-  and: [ReviewFilterInput!]
-  booking: BookingFilterInput
-  bookingId: StringOperationFilterInput
-  comment: StringOperationFilterInput
-  createdAt: DateTimeOperationFilterInput
-  id: StringOperationFilterInput
-  or: [ReviewFilterInput!]
-  rating: IntOperationFilterInput
-  reviewerType: ReviewerTypeOperationFilterInput
-  space: SpaceFilterInput
-  spaceId: StringOperationFilterInput
-}
-
-enum ReviewerType {
-  ADVERTISER
-  SPACE_OWNER
-}
-
-input ReviewerTypeOperationFilterInput {
-  eq: ReviewerType
-  in: [ReviewerType!]
-  neq: ReviewerType
-  nin: [ReviewerType!]
-}
-
-type SecuritySettings {
-  deviceSessions: [DeviceSession!]!
-  loginNotifications: Boolean!
-  twoFactorEnabled: Boolean!
-}
-
 enum SortEnumType {
   ASC
   DESC
@@ -960,27 +449,23 @@ type Space {
   availableFrom: DateTime
   availableTo: DateTime
   averageRating: Float
-  bookings: [Booking!]!
   city: String!
   createdAt: DateTime!
   description: String
   dimensions: String
   dimensionsText: String
   height: Float
-  id: String!
+  id: UUID!
   images: [String!]!
   installationFee: Decimal
   latitude: Float!
   longitude: Float!
   maxDuration: Int
   minDuration: Int!
-  owner: User!
-  ownerId: String!
   pricePerDay: Decimal!
-  quadtreeDepth: Int
-  quadtreeNodeId: String
   rejectionReason: String
-  reviews: [Review!]!
+  spaceOwnerProfile: SpaceOwnerProfile!
+  spaceOwnerProfileId: UUID!
   state: String!
   status: SpaceStatus!
   title: String!
@@ -988,7 +473,6 @@ type Space {
   totalRevenue: Decimal!
   traffic: String
   type: SpaceType!
-  updatedAt: DateTime!
   width: Float
   zipCode: String
 }
@@ -999,14 +483,13 @@ input SpaceFilterInput {
   availableFrom: DateTimeOperationFilterInput
   availableTo: DateTimeOperationFilterInput
   averageRating: FloatOperationFilterInput
-  bookings: ListFilterInputTypeOfBookingFilterInput
   city: StringOperationFilterInput
   createdAt: DateTimeOperationFilterInput
   description: StringOperationFilterInput
   dimensions: StringOperationFilterInput
   dimensionsText: StringOperationFilterInput
   height: FloatOperationFilterInput
-  id: StringOperationFilterInput
+  id: UuidOperationFilterInput
   images: ListStringOperationFilterInput
   installationFee: DecimalOperationFilterInput
   latitude: FloatOperationFilterInput
@@ -1014,13 +497,10 @@ input SpaceFilterInput {
   maxDuration: IntOperationFilterInput
   minDuration: IntOperationFilterInput
   or: [SpaceFilterInput!]
-  owner: UserFilterInput
-  ownerId: StringOperationFilterInput
   pricePerDay: DecimalOperationFilterInput
-  quadtreeDepth: IntOperationFilterInput
-  quadtreeNodeId: StringOperationFilterInput
   rejectionReason: StringOperationFilterInput
-  reviews: ListFilterInputTypeOfReviewFilterInput
+  spaceOwnerProfile: SpaceOwnerProfileFilterInput
+  spaceOwnerProfileId: UuidOperationFilterInput
   state: StringOperationFilterInput
   status: SpaceStatusOperationFilterInput
   title: StringOperationFilterInput
@@ -1028,60 +508,121 @@ input SpaceFilterInput {
   totalRevenue: DecimalOperationFilterInput
   traffic: StringOperationFilterInput
   type: SpaceTypeOperationFilterInput
-  updatedAt: DateTimeOperationFilterInput
   width: FloatOperationFilterInput
   zipCode: StringOperationFilterInput
 }
 
+input SpaceInput {
+  address: String!
+  availableFrom: DateTime
+  availableTo: DateTime
+  averageRating: Float
+  city: String!
+  createdAt: DateTime!
+  description: String
+  dimensions: String
+  dimensionsText: String
+  height: Float
+  id: UUID!
+  images: [String!]!
+  installationFee: Decimal
+  latitude: Float!
+  longitude: Float!
+  maxDuration: Int
+  minDuration: Int!
+  pricePerDay: Decimal!
+  rejectionReason: String
+  spaceOwnerProfile: SpaceOwnerProfileInput!
+  spaceOwnerProfileId: UUID!
+  state: String!
+  status: SpaceStatus!
+  title: String!
+  totalBookings: Int!
+  totalRevenue: Decimal!
+  traffic: String
+  type: SpaceType!
+  width: Float
+  zipCode: String
+}
+
 type SpaceOwnerProfile {
-  accountDisconnectedAt: DateTime
-  accountDisconnectedNotifiedAt: DateTime
   businessName: String
   businessType: String
   createdAt: DateTime!
-  id: String!
-  lastAccountHealthCheck: DateTime
+  id: UUID!
   onboardingComplete: Boolean!
   payoutSchedule: PayoutSchedule!
+  spaces(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [SpaceSortInput!]
+    where: SpaceFilterInput
+  ): SpacesConnection
+  stripeAccountDisconnectedAt: DateTime
+  stripeAccountDisconnectedNotifiedAt: DateTime
   stripeAccountId: String
   stripeAccountStatus: String
-  updatedAt: DateTime!
+  stripeLastAccountHealthCheck: DateTime
   user: User!
-  userId: String!
+  userId: UUID!
 }
 
 input SpaceOwnerProfileFilterInput {
-  accountDisconnectedAt: DateTimeOperationFilterInput
-  accountDisconnectedNotifiedAt: DateTimeOperationFilterInput
   and: [SpaceOwnerProfileFilterInput!]
   businessName: StringOperationFilterInput
   businessType: StringOperationFilterInput
   createdAt: DateTimeOperationFilterInput
-  id: StringOperationFilterInput
-  lastAccountHealthCheck: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
   onboardingComplete: BooleanOperationFilterInput
   or: [SpaceOwnerProfileFilterInput!]
   payoutSchedule: PayoutScheduleOperationFilterInput
+  spaces: ListFilterInputTypeOfSpaceFilterInput
+  stripeAccountDisconnectedAt: DateTimeOperationFilterInput
+  stripeAccountDisconnectedNotifiedAt: DateTimeOperationFilterInput
   stripeAccountId: StringOperationFilterInput
   stripeAccountStatus: StringOperationFilterInput
-  updatedAt: DateTimeOperationFilterInput
+  stripeLastAccountHealthCheck: DateTimeOperationFilterInput
   user: UserFilterInput
-  userId: StringOperationFilterInput
+  userId: UuidOperationFilterInput
+}
+
+input SpaceOwnerProfileInput {
+  businessName: String
+  businessType: String
+  createdAt: DateTime!
+  id: UUID!
+  onboardingComplete: Boolean!
+  payoutSchedule: PayoutSchedule!
+  spaces: [SpaceInput!]!
+  stripeAccountDisconnectedAt: DateTime
+  stripeAccountDisconnectedNotifiedAt: DateTime
+  stripeAccountId: String
+  stripeAccountStatus: String
+  stripeLastAccountHealthCheck: DateTime
+  user: UserInput!
+  userId: UUID!
 }
 
 input SpaceOwnerProfileSortInput {
-  accountDisconnectedAt: SortEnumType
-  accountDisconnectedNotifiedAt: SortEnumType
   businessName: SortEnumType
   businessType: SortEnumType
   createdAt: SortEnumType
   id: SortEnumType
-  lastAccountHealthCheck: SortEnumType
   onboardingComplete: SortEnumType
   payoutSchedule: SortEnumType
+  stripeAccountDisconnectedAt: SortEnumType
+  stripeAccountDisconnectedNotifiedAt: SortEnumType
   stripeAccountId: SortEnumType
   stripeAccountStatus: SortEnumType
-  updatedAt: SortEnumType
+  stripeLastAccountHealthCheck: SortEnumType
   user: UserSortInput
   userId: SortEnumType
 }
@@ -1103,12 +644,10 @@ input SpaceSortInput {
   longitude: SortEnumType
   maxDuration: SortEnumType
   minDuration: SortEnumType
-  owner: UserSortInput
-  ownerId: SortEnumType
   pricePerDay: SortEnumType
-  quadtreeDepth: SortEnumType
-  quadtreeNodeId: SortEnumType
   rejectionReason: SortEnumType
+  spaceOwnerProfile: SpaceOwnerProfileSortInput
+  spaceOwnerProfileId: SortEnumType
   state: SortEnumType
   status: SortEnumType
   title: SortEnumType
@@ -1116,7 +655,6 @@ input SpaceSortInput {
   totalRevenue: SortEnumType
   traffic: SortEnumType
   type: SortEnumType
-  updatedAt: SortEnumType
   width: SortEnumType
   zipCode: SortEnumType
 }
@@ -1186,55 +724,70 @@ input StringOperationFilterInput {
   startsWith: String
 }
 
+scalar UUID
+
+input UpdateCurrentUserInput {
+  updatedUser: UserInput!
+}
+
+type UpdateCurrentUserPayload {
+  user: User
+}
+
 type User {
+  activeProfileType: ProfileType!
   advertiserProfile: AdvertiserProfile
   avatar: String
-  bugReports: [BugReport!]!
-  campaigns: [Campaign!]!
   createdAt: DateTime!
   email: String!
-  id: String
+  id: UUID!
   lastLoginAt: DateTime
-  name: String
-  notifications: [Notification!]!
-  ownedSpaces: [Space!]!
+  name: String!
   password: String!
   phone: String
   role: UserRole!
-  sentMessages: [Message!]!
   spaceOwnerProfile: SpaceOwnerProfile
   status: UserStatus!
-  updatedAt: DateTime!
 }
 
 input UserFilterInput {
+  activeProfileType: ProfileTypeOperationFilterInput
   advertiserProfile: AdvertiserProfileFilterInput
   and: [UserFilterInput!]
   avatar: StringOperationFilterInput
-  bugReports: ListFilterInputTypeOfBugReportFilterInput
-  campaigns: ListFilterInputTypeOfCampaignFilterInput
   createdAt: DateTimeOperationFilterInput
   email: StringOperationFilterInput
-  id: StringOperationFilterInput
+  id: UuidOperationFilterInput
   lastLoginAt: DateTimeOperationFilterInput
   name: StringOperationFilterInput
-  notifications: ListFilterInputTypeOfNotificationFilterInput
   or: [UserFilterInput!]
-  ownedSpaces: ListFilterInputTypeOfSpaceFilterInput
   password: StringOperationFilterInput
   phone: StringOperationFilterInput
   role: UserRoleOperationFilterInput
-  sentMessages: ListFilterInputTypeOfMessageFilterInput
   spaceOwnerProfile: SpaceOwnerProfileFilterInput
   status: UserStatusOperationFilterInput
-  updatedAt: DateTimeOperationFilterInput
+}
+
+input UserInput {
+  activeProfileType: ProfileType!
+  advertiserProfile: AdvertiserProfileInput
+  avatar: String
+  createdAt: DateTime!
+  email: String!
+  id: UUID!
+  lastLoginAt: DateTime
+  name: String!
+  password: String!
+  phone: String
+  role: UserRole!
+  spaceOwnerProfile: SpaceOwnerProfileInput
+  status: UserStatus!
 }
 
 enum UserRole {
   ADMIN
-  ADVERTISER
   MARKETING
-  SPACE_OWNER
+  USER
 }
 
 input UserRoleOperationFilterInput {
@@ -1245,6 +798,7 @@ input UserRoleOperationFilterInput {
 }
 
 input UserSortInput {
+  activeProfileType: SortEnumType
   advertiserProfile: AdvertiserProfileSortInput
   avatar: SortEnumType
   createdAt: SortEnumType
@@ -1257,7 +811,6 @@ input UserSortInput {
   role: SortEnumType
   spaceOwnerProfile: SpaceOwnerProfileSortInput
   status: SortEnumType
-  updatedAt: SortEnumType
 }
 
 enum UserStatus {
@@ -1289,4 +842,19 @@ type UsersEdge {
   cursor: String!
   """The item at the end of the edge."""
   node: User!
+}
+
+input UuidOperationFilterInput {
+  eq: UUID
+  gt: UUID
+  gte: UUID
+  in: [UUID]
+  lt: UUID
+  lte: UUID
+  neq: UUID
+  ngt: UUID
+  ngte: UUID
+  nin: [UUID]
+  nlt: UUID
+  nlte: UUID
 }

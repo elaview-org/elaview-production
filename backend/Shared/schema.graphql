@@ -82,6 +82,7 @@ type PageInfo {
 
 type Query {
   spaceById(id: ID!): Space @authorize @cost(weight: "10")
+  spaces("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: SpaceFilterInput @cost(weight: "10") order: [SpaceSortInput!] @cost(weight: "10")): SpacesConnection @listSize(assumedSize: 50, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 10, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")
   currentUser: User @authorize @cost(weight: "10")
   userById(id: ID!): User @authorize(roles: [ "Admin" ]) @cost(weight: "10")
   users("Returns the first _n_ elements from the list." first: Int "Returns the elements in the list that come after the specified cursor." after: String "Returns the last _n_ elements from the list." last: Int "Returns the elements in the list that come before the specified cursor." before: String where: UserFilterInput @cost(weight: "10") order: [UserSortInput!] @cost(weight: "10")): UsersConnection @authorize(roles: [ "Admin" ]) @listSize(assumedSize: 50, slicingArguments: [ "first", "last" ], slicingArgumentDefaultValue: 10, sizedFields: [ "edges", "nodes" ], requireOneSlicingArgument: false) @cost(weight: "10")

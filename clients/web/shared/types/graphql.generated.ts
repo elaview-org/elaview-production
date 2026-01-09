@@ -14,34 +14,71 @@ export type Scalars = {
   Float: { input: number; output: number; }
   DateTime: { input: unknown; output: unknown; }
   Decimal: { input: unknown; output: unknown; }
-  JSON: { input: unknown; output: unknown; }
+  UUID: { input: unknown; output: unknown; }
 };
 
 export type AdvertiserProfile = {
   __typename: 'AdvertiserProfile';
+  campaigns: Maybe<CampaignsConnection>;
   companyName: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
-  id: Scalars['String']['output'];
+  id: Scalars['UUID']['output'];
   industry: Maybe<Scalars['String']['output']>;
-  stripeCustomerId: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
+  onboardingComplete: Scalars['Boolean']['output'];
+  stripeAccountDisconnectedAt: Maybe<Scalars['DateTime']['output']>;
+  stripeAccountDisconnectedNotifiedAt: Maybe<Scalars['DateTime']['output']>;
+  stripeAccountId: Maybe<Scalars['String']['output']>;
+  stripeAccountStatus: Maybe<Scalars['String']['output']>;
+  stripeLastAccountHealthCheck: Maybe<Scalars['DateTime']['output']>;
   user: User;
-  userId: Scalars['String']['output'];
+  userId: Scalars['UUID']['output'];
   website: Maybe<Scalars['String']['output']>;
+};
+
+
+export type AdvertiserProfileCampaignsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<CampaignSortInput>>;
+  where?: InputMaybe<CampaignFilterInput>;
 };
 
 export type AdvertiserProfileFilterInput = {
   and?: InputMaybe<Array<AdvertiserProfileFilterInput>>;
+  campaigns?: InputMaybe<ListFilterInputTypeOfCampaignFilterInput>;
   companyName?: InputMaybe<StringOperationFilterInput>;
   createdAt?: InputMaybe<DateTimeOperationFilterInput>;
-  id?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
   industry?: InputMaybe<StringOperationFilterInput>;
+  onboardingComplete?: InputMaybe<BooleanOperationFilterInput>;
   or?: InputMaybe<Array<AdvertiserProfileFilterInput>>;
-  stripeCustomerId?: InputMaybe<StringOperationFilterInput>;
-  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  stripeAccountDisconnectedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  stripeAccountDisconnectedNotifiedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  stripeAccountId?: InputMaybe<StringOperationFilterInput>;
+  stripeAccountStatus?: InputMaybe<StringOperationFilterInput>;
+  stripeLastAccountHealthCheck?: InputMaybe<DateTimeOperationFilterInput>;
   user?: InputMaybe<UserFilterInput>;
-  userId?: InputMaybe<StringOperationFilterInput>;
+  userId?: InputMaybe<UuidOperationFilterInput>;
   website?: InputMaybe<StringOperationFilterInput>;
+};
+
+export type AdvertiserProfileInput = {
+  campaigns: Array<CampaignInput>;
+  companyName?: InputMaybe<Scalars['String']['input']>;
+  createdAt: Scalars['DateTime']['input'];
+  id: Scalars['UUID']['input'];
+  industry?: InputMaybe<Scalars['String']['input']>;
+  onboardingComplete: Scalars['Boolean']['input'];
+  stripeAccountDisconnectedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  stripeAccountDisconnectedNotifiedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  stripeAccountId?: InputMaybe<Scalars['String']['input']>;
+  stripeAccountStatus?: InputMaybe<Scalars['String']['input']>;
+  stripeLastAccountHealthCheck?: InputMaybe<Scalars['DateTime']['input']>;
+  user: UserInput;
+  userId: Scalars['UUID']['input'];
+  website?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AdvertiserProfileSortInput = {
@@ -49,360 +86,97 @@ export type AdvertiserProfileSortInput = {
   createdAt?: InputMaybe<SortEnumType>;
   id?: InputMaybe<SortEnumType>;
   industry?: InputMaybe<SortEnumType>;
-  stripeCustomerId?: InputMaybe<SortEnumType>;
-  updatedAt?: InputMaybe<SortEnumType>;
+  onboardingComplete?: InputMaybe<SortEnumType>;
+  stripeAccountDisconnectedAt?: InputMaybe<SortEnumType>;
+  stripeAccountDisconnectedNotifiedAt?: InputMaybe<SortEnumType>;
+  stripeAccountId?: InputMaybe<SortEnumType>;
+  stripeAccountStatus?: InputMaybe<SortEnumType>;
+  stripeLastAccountHealthCheck?: InputMaybe<SortEnumType>;
   user?: InputMaybe<UserSortInput>;
   userId?: InputMaybe<SortEnumType>;
   website?: InputMaybe<SortEnumType>;
 };
 
-export type Booking = {
-  __typename: 'Booking';
-  adminNotes: Maybe<Scalars['String']['output']>;
-  advertiserNotes: Maybe<Scalars['String']['output']>;
-  balanceAmount: Maybe<Scalars['Decimal']['output']>;
-  balanceChargeAttempts: Scalars['Int']['output'];
-  balanceChargeError: Maybe<Scalars['String']['output']>;
-  balanceChargeId: Maybe<Scalars['String']['output']>;
-  balanceDueDate: Maybe<Scalars['DateTime']['output']>;
-  balancePaidAt: Maybe<Scalars['DateTime']['output']>;
-  balanceStripeChargeId: Maybe<Scalars['String']['output']>;
-  campaign: Campaign;
-  campaignId: Scalars['String']['output'];
-  cancellationReason: Maybe<Scalars['String']['output']>;
-  cancelledAt: Maybe<Scalars['DateTime']['output']>;
-  cancelledBy: Maybe<Scalars['String']['output']>;
-  checkpointTransferIds: Array<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  depositAmount: Maybe<Scalars['Decimal']['output']>;
-  depositChargeId: Maybe<Scalars['String']['output']>;
-  depositPaidAt: Maybe<Scalars['DateTime']['output']>;
-  depositStripeChargeId: Maybe<Scalars['String']['output']>;
-  disputePhotos: Array<Scalars['String']['output']>;
-  disputeReason: Maybe<Scalars['String']['output']>;
-  disputeType: Maybe<DisputeIssueType>;
-  disputedAt: Maybe<Scalars['DateTime']['output']>;
-  disputedBy: Maybe<Scalars['String']['output']>;
-  endDate: Scalars['DateTime']['output'];
-  finalPayoutAmount: Maybe<Scalars['Decimal']['output']>;
-  finalPayoutDate: Maybe<Scalars['DateTime']['output']>;
-  finalPayoutProcessed: Scalars['Boolean']['output'];
-  finalTransferId: Maybe<Scalars['String']['output']>;
-  finalTransferredAt: Maybe<Scalars['DateTime']['output']>;
-  firstPayoutAmount: Maybe<Scalars['Decimal']['output']>;
-  firstPayoutDate: Maybe<Scalars['DateTime']['output']>;
-  firstPayoutProcessed: Scalars['Boolean']['output'];
-  firstRentalTransferId: Maybe<Scalars['String']['output']>;
-  firstRentalTransferredAt: Maybe<Scalars['DateTime']['output']>;
-  id: Scalars['String']['output'];
-  installationFeeTransferId: Maybe<Scalars['String']['output']>;
-  installationFeeTransferredAt: Maybe<Scalars['DateTime']['output']>;
-  isTestData: Scalars['Boolean']['output'];
-  lastBalanceChargeAttempt: Maybe<Scalars['DateTime']['output']>;
-  lastPayoutAttempt: Maybe<Scalars['DateTime']['output']>;
-  messages: Array<Message>;
-  missedVerifications: Scalars['Int']['output'];
-  nextVerificationDue: Maybe<Scalars['DateTime']['output']>;
-  ownerNotes: Maybe<Scalars['String']['output']>;
-  paidAt: Maybe<Scalars['DateTime']['output']>;
-  paymentType: PaymentType;
-  payoutAttempts: Scalars['Int']['output'];
-  payoutError: Maybe<Scalars['String']['output']>;
-  payoutProcessedAt: Maybe<Scalars['DateTime']['output']>;
-  payoutStatus: Maybe<PayoutStatus>;
-  pendingPayoutReason: Maybe<Scalars['String']['output']>;
-  platformFee: Scalars['Decimal']['output'];
-  pricePerDay: Scalars['Decimal']['output'];
-  proofApprovedAt: Maybe<Scalars['DateTime']['output']>;
-  proofApprovedBy: Maybe<Scalars['String']['output']>;
-  proofMessageId: Maybe<Scalars['String']['output']>;
-  proofPhotos: Array<Scalars['String']['output']>;
-  proofStatus: Maybe<ProofStatus>;
-  proofUploadedAt: Maybe<Scalars['DateTime']['output']>;
-  qualityGuaranteePeriod: Maybe<Scalars['DateTime']['output']>;
-  refundAmount: Maybe<Scalars['Decimal']['output']>;
-  refundHistory: Maybe<JsonDocument>;
-  refundProcessedAt: Maybe<Scalars['DateTime']['output']>;
-  refundedAt: Maybe<Scalars['DateTime']['output']>;
-  reservedUntil: Maybe<Scalars['DateTime']['output']>;
-  resolutionAction: Maybe<Scalars['String']['output']>;
-  resolutionNotes: Maybe<Scalars['String']['output']>;
-  resolvedAt: Maybe<Scalars['DateTime']['output']>;
-  resolvedBy: Maybe<Scalars['String']['output']>;
-  review: Maybe<Review>;
-  space: Space;
-  spaceId: Scalars['String']['output'];
-  spaceOwnerAmount: Scalars['Decimal']['output'];
-  startDate: Scalars['DateTime']['output'];
-  status: BookingStatus;
-  stripeChargeId: Maybe<Scalars['String']['output']>;
-  stripeFee: Maybe<Scalars['Decimal']['output']>;
-  stripePaymentIntentId: Maybe<Scalars['String']['output']>;
-  stripeRefundId: Maybe<Scalars['String']['output']>;
-  stripeTransferId: Maybe<Scalars['String']['output']>;
-  totalAmount: Scalars['Decimal']['output'];
-  totalDays: Scalars['Int']['output'];
-  totalWithFees: Maybe<Scalars['Decimal']['output']>;
-  transferAmount: Maybe<Scalars['Decimal']['output']>;
-  transferredAt: Maybe<Scalars['DateTime']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
-  verificationPhotos: Maybe<JsonDocument>;
-  verificationSchedule: Maybe<JsonDocument>;
-};
-
-export type BookingFilterInput = {
-  adminNotes?: InputMaybe<StringOperationFilterInput>;
-  advertiserNotes?: InputMaybe<StringOperationFilterInput>;
-  and?: InputMaybe<Array<BookingFilterInput>>;
-  balanceAmount?: InputMaybe<DecimalOperationFilterInput>;
-  balanceChargeAttempts?: InputMaybe<IntOperationFilterInput>;
-  balanceChargeError?: InputMaybe<StringOperationFilterInput>;
-  balanceChargeId?: InputMaybe<StringOperationFilterInput>;
-  balanceDueDate?: InputMaybe<DateTimeOperationFilterInput>;
-  balancePaidAt?: InputMaybe<DateTimeOperationFilterInput>;
-  balanceStripeChargeId?: InputMaybe<StringOperationFilterInput>;
-  campaign?: InputMaybe<CampaignFilterInput>;
-  campaignId?: InputMaybe<StringOperationFilterInput>;
-  cancellationReason?: InputMaybe<StringOperationFilterInput>;
-  cancelledAt?: InputMaybe<DateTimeOperationFilterInput>;
-  cancelledBy?: InputMaybe<StringOperationFilterInput>;
-  checkpointTransferIds?: InputMaybe<ListStringOperationFilterInput>;
-  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
-  depositAmount?: InputMaybe<DecimalOperationFilterInput>;
-  depositChargeId?: InputMaybe<StringOperationFilterInput>;
-  depositPaidAt?: InputMaybe<DateTimeOperationFilterInput>;
-  depositStripeChargeId?: InputMaybe<StringOperationFilterInput>;
-  disputePhotos?: InputMaybe<ListStringOperationFilterInput>;
-  disputeReason?: InputMaybe<StringOperationFilterInput>;
-  disputeType?: InputMaybe<NullableOfDisputeIssueTypeOperationFilterInput>;
-  disputedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  disputedBy?: InputMaybe<StringOperationFilterInput>;
-  endDate?: InputMaybe<DateTimeOperationFilterInput>;
-  finalPayoutAmount?: InputMaybe<DecimalOperationFilterInput>;
-  finalPayoutDate?: InputMaybe<DateTimeOperationFilterInput>;
-  finalPayoutProcessed?: InputMaybe<BooleanOperationFilterInput>;
-  finalTransferId?: InputMaybe<StringOperationFilterInput>;
-  finalTransferredAt?: InputMaybe<DateTimeOperationFilterInput>;
-  firstPayoutAmount?: InputMaybe<DecimalOperationFilterInput>;
-  firstPayoutDate?: InputMaybe<DateTimeOperationFilterInput>;
-  firstPayoutProcessed?: InputMaybe<BooleanOperationFilterInput>;
-  firstRentalTransferId?: InputMaybe<StringOperationFilterInput>;
-  firstRentalTransferredAt?: InputMaybe<DateTimeOperationFilterInput>;
-  id?: InputMaybe<StringOperationFilterInput>;
-  installationFeeTransferId?: InputMaybe<StringOperationFilterInput>;
-  installationFeeTransferredAt?: InputMaybe<DateTimeOperationFilterInput>;
-  isTestData?: InputMaybe<BooleanOperationFilterInput>;
-  lastBalanceChargeAttempt?: InputMaybe<DateTimeOperationFilterInput>;
-  lastPayoutAttempt?: InputMaybe<DateTimeOperationFilterInput>;
-  messages?: InputMaybe<ListFilterInputTypeOfMessageFilterInput>;
-  missedVerifications?: InputMaybe<IntOperationFilterInput>;
-  nextVerificationDue?: InputMaybe<DateTimeOperationFilterInput>;
-  or?: InputMaybe<Array<BookingFilterInput>>;
-  ownerNotes?: InputMaybe<StringOperationFilterInput>;
-  paidAt?: InputMaybe<DateTimeOperationFilterInput>;
-  paymentType?: InputMaybe<PaymentTypeOperationFilterInput>;
-  payoutAttempts?: InputMaybe<IntOperationFilterInput>;
-  payoutError?: InputMaybe<StringOperationFilterInput>;
-  payoutProcessedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  payoutStatus?: InputMaybe<NullableOfPayoutStatusOperationFilterInput>;
-  pendingPayoutReason?: InputMaybe<StringOperationFilterInput>;
-  platformFee?: InputMaybe<DecimalOperationFilterInput>;
-  pricePerDay?: InputMaybe<DecimalOperationFilterInput>;
-  proofApprovedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  proofApprovedBy?: InputMaybe<StringOperationFilterInput>;
-  proofMessageId?: InputMaybe<StringOperationFilterInput>;
-  proofPhotos?: InputMaybe<ListStringOperationFilterInput>;
-  proofStatus?: InputMaybe<NullableOfProofStatusOperationFilterInput>;
-  proofUploadedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  qualityGuaranteePeriod?: InputMaybe<DateTimeOperationFilterInput>;
-  refundAmount?: InputMaybe<DecimalOperationFilterInput>;
-  refundHistory?: InputMaybe<JsonDocumentFilterInput>;
-  refundProcessedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  refundedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  reservedUntil?: InputMaybe<DateTimeOperationFilterInput>;
-  resolutionAction?: InputMaybe<StringOperationFilterInput>;
-  resolutionNotes?: InputMaybe<StringOperationFilterInput>;
-  resolvedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  resolvedBy?: InputMaybe<StringOperationFilterInput>;
-  review?: InputMaybe<ReviewFilterInput>;
-  space?: InputMaybe<SpaceFilterInput>;
-  spaceId?: InputMaybe<StringOperationFilterInput>;
-  spaceOwnerAmount?: InputMaybe<DecimalOperationFilterInput>;
-  startDate?: InputMaybe<DateTimeOperationFilterInput>;
-  status?: InputMaybe<BookingStatusOperationFilterInput>;
-  stripeChargeId?: InputMaybe<StringOperationFilterInput>;
-  stripeFee?: InputMaybe<DecimalOperationFilterInput>;
-  stripePaymentIntentId?: InputMaybe<StringOperationFilterInput>;
-  stripeRefundId?: InputMaybe<StringOperationFilterInput>;
-  stripeTransferId?: InputMaybe<StringOperationFilterInput>;
-  totalAmount?: InputMaybe<DecimalOperationFilterInput>;
-  totalDays?: InputMaybe<IntOperationFilterInput>;
-  totalWithFees?: InputMaybe<DecimalOperationFilterInput>;
-  transferAmount?: InputMaybe<DecimalOperationFilterInput>;
-  transferredAt?: InputMaybe<DateTimeOperationFilterInput>;
-  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  verificationPhotos?: InputMaybe<JsonDocumentFilterInput>;
-  verificationSchedule?: InputMaybe<JsonDocumentFilterInput>;
-};
-
-export enum BookingStatus {
-  Active = 'ACTIVE',
-  Approved = 'APPROVED',
-  AwaitingProof = 'AWAITING_PROOF',
-  Cancelled = 'CANCELLED',
-  Completed = 'COMPLETED',
-  Confirmed = 'CONFIRMED',
-  Disputed = 'DISPUTED',
-  PendingApproval = 'PENDING_APPROVAL',
-  PendingBalance = 'PENDING_BALANCE',
-  Rejected = 'REJECTED'
+/** Defines when a policy shall be executed. */
+export enum ApplyPolicy {
+  /** After the resolver was executed. */
+  AfterResolver = 'AFTER_RESOLVER',
+  /** Before the resolver was executed. */
+  BeforeResolver = 'BEFORE_RESOLVER',
+  /** The policy is applied in the validation step before the execution. */
+  Validation = 'VALIDATION'
 }
-
-export type BookingStatusOperationFilterInput = {
-  eq?: InputMaybe<BookingStatus>;
-  in?: InputMaybe<Array<BookingStatus>>;
-  neq?: InputMaybe<BookingStatus>;
-  nin?: InputMaybe<Array<BookingStatus>>;
-};
 
 export type BooleanOperationFilterInput = {
   eq?: InputMaybe<Scalars['Boolean']['input']>;
   neq?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
-export enum BugCategory {
-  Authentication = 'AUTHENTICATION',
-  Booking = 'BOOKING',
-  Campaign = 'CAMPAIGN',
-  DataIntegrity = 'DATA_INTEGRITY',
-  Messaging = 'MESSAGING',
-  Notifications = 'NOTIFICATIONS',
-  Other = 'OTHER',
-  Payment = 'PAYMENT',
-  Performance = 'PERFORMANCE',
-  SpaceManagement = 'SPACE_MANAGEMENT',
-  UiUx = 'UI_UX'
-}
-
-export type BugCategoryOperationFilterInput = {
-  eq?: InputMaybe<BugCategory>;
-  in?: InputMaybe<Array<BugCategory>>;
-  neq?: InputMaybe<BugCategory>;
-  nin?: InputMaybe<Array<BugCategory>>;
-};
-
-export type BugReport = {
-  __typename: 'BugReport';
-  adminNotes: Maybe<Scalars['String']['output']>;
-  category: BugCategory;
-  createdAt: Scalars['DateTime']['output'];
-  description: Scalars['String']['output'];
-  id: Scalars['String']['output'];
-  linkedBugId: Maybe<Scalars['String']['output']>;
-  pageUrl: Maybe<Scalars['String']['output']>;
-  processedAt: Maybe<Scalars['DateTime']['output']>;
-  processedBy: Maybe<Scalars['String']['output']>;
-  screenshots: Array<Scalars['String']['output']>;
-  severity: BugSeverity;
-  status: BugStatus;
-  title: Scalars['String']['output'];
-  updatedAt: Scalars['DateTime']['output'];
-  user: Maybe<User>;
-  userAgent: Maybe<Scalars['String']['output']>;
-  userId: Maybe<Scalars['String']['output']>;
-};
-
-export type BugReportFilterInput = {
-  adminNotes?: InputMaybe<StringOperationFilterInput>;
-  and?: InputMaybe<Array<BugReportFilterInput>>;
-  category?: InputMaybe<BugCategoryOperationFilterInput>;
-  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
-  description?: InputMaybe<StringOperationFilterInput>;
-  id?: InputMaybe<StringOperationFilterInput>;
-  linkedBugId?: InputMaybe<StringOperationFilterInput>;
-  or?: InputMaybe<Array<BugReportFilterInput>>;
-  pageUrl?: InputMaybe<StringOperationFilterInput>;
-  processedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  processedBy?: InputMaybe<StringOperationFilterInput>;
-  screenshots?: InputMaybe<ListStringOperationFilterInput>;
-  severity?: InputMaybe<BugSeverityOperationFilterInput>;
-  status?: InputMaybe<BugStatusOperationFilterInput>;
-  title?: InputMaybe<StringOperationFilterInput>;
-  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  user?: InputMaybe<UserFilterInput>;
-  userAgent?: InputMaybe<StringOperationFilterInput>;
-  userId?: InputMaybe<StringOperationFilterInput>;
-};
-
-export enum BugSeverity {
-  Critical = 'CRITICAL',
-  High = 'HIGH',
-  Low = 'LOW',
-  Medium = 'MEDIUM'
-}
-
-export type BugSeverityOperationFilterInput = {
-  eq?: InputMaybe<BugSeverity>;
-  in?: InputMaybe<Array<BugSeverity>>;
-  neq?: InputMaybe<BugSeverity>;
-  nin?: InputMaybe<Array<BugSeverity>>;
-};
-
-export enum BugStatus {
-  Confirmed = 'CONFIRMED',
-  Duplicate = 'DUPLICATE',
-  Fixed = 'FIXED',
-  InProgress = 'IN_PROGRESS',
-  New = 'NEW',
-  WontFix = 'WONT_FIX'
-}
-
-export type BugStatusOperationFilterInput = {
-  eq?: InputMaybe<BugStatus>;
-  in?: InputMaybe<Array<BugStatus>>;
-  neq?: InputMaybe<BugStatus>;
-  nin?: InputMaybe<Array<BugStatus>>;
-};
-
 export type Campaign = {
   __typename: 'Campaign';
-  advertiser: User;
-  advertiserId: Scalars['String']['output'];
-  bookings: Array<Booking>;
+  advertiserProfile: AdvertiserProfile;
+  advertiserProfileId: Scalars['UUID']['output'];
   createdAt: Scalars['DateTime']['output'];
   description: Maybe<Scalars['String']['output']>;
   endDate: Maybe<Scalars['DateTime']['output']>;
   goals: Maybe<Scalars['String']['output']>;
-  id: Scalars['String']['output'];
+  id: Scalars['UUID']['output'];
   imageUrl: Scalars['String']['output'];
-  messages: Array<Message>;
   name: Scalars['String']['output'];
   startDate: Maybe<Scalars['DateTime']['output']>;
   status: CampaignStatus;
   targetAudience: Maybe<Scalars['String']['output']>;
   totalBudget: Maybe<Scalars['Decimal']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type CampaignFilterInput = {
-  advertiser?: InputMaybe<UserFilterInput>;
-  advertiserId?: InputMaybe<StringOperationFilterInput>;
+  advertiserProfile?: InputMaybe<AdvertiserProfileFilterInput>;
+  advertiserProfileId?: InputMaybe<UuidOperationFilterInput>;
   and?: InputMaybe<Array<CampaignFilterInput>>;
-  bookings?: InputMaybe<ListFilterInputTypeOfBookingFilterInput>;
   createdAt?: InputMaybe<DateTimeOperationFilterInput>;
   description?: InputMaybe<StringOperationFilterInput>;
   endDate?: InputMaybe<DateTimeOperationFilterInput>;
   goals?: InputMaybe<StringOperationFilterInput>;
-  id?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
   imageUrl?: InputMaybe<StringOperationFilterInput>;
-  messages?: InputMaybe<ListFilterInputTypeOfMessageFilterInput>;
   name?: InputMaybe<StringOperationFilterInput>;
   or?: InputMaybe<Array<CampaignFilterInput>>;
   startDate?: InputMaybe<DateTimeOperationFilterInput>;
   status?: InputMaybe<CampaignStatusOperationFilterInput>;
   targetAudience?: InputMaybe<StringOperationFilterInput>;
   totalBudget?: InputMaybe<DecimalOperationFilterInput>;
-  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type CampaignInput = {
+  advertiserProfile: AdvertiserProfileInput;
+  advertiserProfileId: Scalars['UUID']['input'];
+  createdAt: Scalars['DateTime']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  goals?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['UUID']['input'];
+  imageUrl: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+  status: CampaignStatus;
+  targetAudience?: InputMaybe<Scalars['String']['input']>;
+  totalBudget?: InputMaybe<Scalars['Decimal']['input']>;
+};
+
+export type CampaignSortInput = {
+  advertiserProfile?: InputMaybe<AdvertiserProfileSortInput>;
+  advertiserProfileId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  description?: InputMaybe<SortEnumType>;
+  endDate?: InputMaybe<SortEnumType>;
+  goals?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  imageUrl?: InputMaybe<SortEnumType>;
+  name?: InputMaybe<SortEnumType>;
+  startDate?: InputMaybe<SortEnumType>;
+  status?: InputMaybe<SortEnumType>;
+  targetAudience?: InputMaybe<SortEnumType>;
+  totalBudget?: InputMaybe<SortEnumType>;
 };
 
 export enum CampaignStatus {
@@ -418,6 +192,26 @@ export type CampaignStatusOperationFilterInput = {
   in?: InputMaybe<Array<CampaignStatus>>;
   neq?: InputMaybe<CampaignStatus>;
   nin?: InputMaybe<Array<CampaignStatus>>;
+};
+
+/** A connection to a list of items. */
+export type CampaignsConnection = {
+  __typename: 'CampaignsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<CampaignsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Campaign>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type CampaignsEdge = {
+  __typename: 'CampaignsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Campaign;
 };
 
 export type CreateSpaceInput = {
@@ -488,24 +282,6 @@ export type DeleteSpacePayload = {
   space: Maybe<Space>;
 };
 
-export type DeviceSession = {
-  __typename: 'DeviceSession';
-  current: Scalars['Boolean']['output'];
-  device: Scalars['String']['output'];
-  id: Scalars['String']['output'];
-  lastActive: Scalars['DateTime']['output'];
-  location: Scalars['String']['output'];
-};
-
-export enum DisputeIssueType {
-  DamageToCreative = 'DAMAGE_TO_CREATIVE',
-  MisleadingListing = 'MISLEADING_LISTING',
-  NotVisible = 'NOT_VISIBLE',
-  PoorQuality = 'POOR_QUALITY',
-  SafetyIssue = 'SAFETY_ISSUE',
-  WrongLocation = 'WRONG_LOCATION'
-}
-
 export type FloatOperationFilterInput = {
   eq?: InputMaybe<Scalars['Float']['input']>;
   gt?: InputMaybe<Scalars['Float']['input']>;
@@ -536,81 +312,11 @@ export type IntOperationFilterInput = {
   nlte?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type JsonDocument = {
-  __typename: 'JsonDocument';
-  rootElement: Scalars['JSON']['output'];
-};
-
-export type JsonDocumentFilterInput = {
-  and?: InputMaybe<Array<JsonDocumentFilterInput>>;
-  or?: InputMaybe<Array<JsonDocumentFilterInput>>;
-  rootElement?: InputMaybe<JsonElementFilterInput>;
-};
-
-export type JsonElementFilterInput = {
-  and?: InputMaybe<Array<JsonElementFilterInput>>;
-  or?: InputMaybe<Array<JsonElementFilterInput>>;
-  valueKind?: InputMaybe<JsonValueKindOperationFilterInput>;
-};
-
-export enum JsonValueKind {
-  Array = 'ARRAY',
-  False = 'FALSE',
-  Null = 'NULL',
-  Number = 'NUMBER',
-  Object = 'OBJECT',
-  String = 'STRING',
-  True = 'TRUE',
-  Undefined = 'UNDEFINED'
-}
-
-export type JsonValueKindOperationFilterInput = {
-  eq?: InputMaybe<JsonValueKind>;
-  in?: InputMaybe<Array<JsonValueKind>>;
-  neq?: InputMaybe<JsonValueKind>;
-  nin?: InputMaybe<Array<JsonValueKind>>;
-};
-
-export type ListFilterInputTypeOfBookingFilterInput = {
-  all?: InputMaybe<BookingFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
-  none?: InputMaybe<BookingFilterInput>;
-  some?: InputMaybe<BookingFilterInput>;
-};
-
-export type ListFilterInputTypeOfBugReportFilterInput = {
-  all?: InputMaybe<BugReportFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
-  none?: InputMaybe<BugReportFilterInput>;
-  some?: InputMaybe<BugReportFilterInput>;
-};
-
 export type ListFilterInputTypeOfCampaignFilterInput = {
   all?: InputMaybe<CampaignFilterInput>;
   any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<CampaignFilterInput>;
   some?: InputMaybe<CampaignFilterInput>;
-};
-
-export type ListFilterInputTypeOfMessageFilterInput = {
-  all?: InputMaybe<MessageFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
-  none?: InputMaybe<MessageFilterInput>;
-  some?: InputMaybe<MessageFilterInput>;
-};
-
-export type ListFilterInputTypeOfNotificationFilterInput = {
-  all?: InputMaybe<NotificationFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
-  none?: InputMaybe<NotificationFilterInput>;
-  some?: InputMaybe<NotificationFilterInput>;
-};
-
-export type ListFilterInputTypeOfReviewFilterInput = {
-  all?: InputMaybe<ReviewFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
-  none?: InputMaybe<ReviewFilterInput>;
-  some?: InputMaybe<ReviewFilterInput>;
 };
 
 export type ListFilterInputTypeOfSpaceFilterInput = {
@@ -627,79 +333,11 @@ export type ListStringOperationFilterInput = {
   some?: InputMaybe<StringOperationFilterInput>;
 };
 
-export type Message = {
-  __typename: 'Message';
-  attachments: Array<Scalars['String']['output']>;
-  attemptedResolution: Maybe<Scalars['String']['output']>;
-  autoApprovedAt: Maybe<Scalars['DateTime']['output']>;
-  booking: Maybe<Booking>;
-  bookingId: Maybe<Scalars['String']['output']>;
-  campaign: Campaign;
-  campaignId: Scalars['String']['output'];
-  content: Scalars['String']['output'];
-  correctionDetails: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  disputeReason: Maybe<Scalars['String']['output']>;
-  id: Scalars['String']['output'];
-  isRead: Scalars['Boolean']['output'];
-  issueType: Maybe<DisputeIssueType>;
-  messageType: MessageType;
-  proofApprovedAt: Maybe<Scalars['DateTime']['output']>;
-  proofApprovedBy: Maybe<Scalars['String']['output']>;
-  proofDisputedAt: Maybe<Scalars['DateTime']['output']>;
-  proofStatus: Maybe<ProofStatus>;
-  sender: User;
-  senderId: Scalars['String']['output'];
-};
-
-export type MessageFilterInput = {
-  and?: InputMaybe<Array<MessageFilterInput>>;
-  attachments?: InputMaybe<ListStringOperationFilterInput>;
-  attemptedResolution?: InputMaybe<StringOperationFilterInput>;
-  autoApprovedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  booking?: InputMaybe<BookingFilterInput>;
-  bookingId?: InputMaybe<StringOperationFilterInput>;
-  campaign?: InputMaybe<CampaignFilterInput>;
-  campaignId?: InputMaybe<StringOperationFilterInput>;
-  content?: InputMaybe<StringOperationFilterInput>;
-  correctionDetails?: InputMaybe<StringOperationFilterInput>;
-  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
-  disputeReason?: InputMaybe<StringOperationFilterInput>;
-  id?: InputMaybe<StringOperationFilterInput>;
-  isRead?: InputMaybe<BooleanOperationFilterInput>;
-  issueType?: InputMaybe<NullableOfDisputeIssueTypeOperationFilterInput>;
-  messageType?: InputMaybe<MessageTypeOperationFilterInput>;
-  or?: InputMaybe<Array<MessageFilterInput>>;
-  proofApprovedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  proofApprovedBy?: InputMaybe<StringOperationFilterInput>;
-  proofDisputedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  proofStatus?: InputMaybe<NullableOfProofStatusOperationFilterInput>;
-  sender?: InputMaybe<UserFilterInput>;
-  senderId?: InputMaybe<StringOperationFilterInput>;
-};
-
-export enum MessageType {
-  CorrectionRequest = 'CORRECTION_REQUEST',
-  ProofApproved = 'PROOF_APPROVED',
-  ProofDisputed = 'PROOF_DISPUTED',
-  ProofRejected = 'PROOF_REJECTED',
-  ProofSubmission = 'PROOF_SUBMISSION',
-  QualityConcern = 'QUALITY_CONCERN',
-  System = 'SYSTEM',
-  Text = 'TEXT'
-}
-
-export type MessageTypeOperationFilterInput = {
-  eq?: InputMaybe<MessageType>;
-  in?: InputMaybe<Array<MessageType>>;
-  neq?: InputMaybe<MessageType>;
-  nin?: InputMaybe<Array<MessageType>>;
-};
-
 export type Mutation = {
   __typename: 'Mutation';
   createSpace: CreateSpacePayload;
   deleteSpace: DeleteSpacePayload;
+  updateCurrentUser: UpdateCurrentUserPayload;
 };
 
 
@@ -712,96 +350,9 @@ export type MutationDeleteSpaceArgs = {
   input: DeleteSpaceInput;
 };
 
-export type Notification = {
-  __typename: 'Notification';
-  bookingId: Maybe<Scalars['String']['output']>;
-  campaignId: Maybe<Scalars['String']['output']>;
-  content: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['String']['output'];
-  isRead: Scalars['Boolean']['output'];
-  title: Scalars['String']['output'];
-  type: NotificationType;
-  user: User;
-  userId: Scalars['String']['output'];
-};
 
-export type NotificationFilterInput = {
-  and?: InputMaybe<Array<NotificationFilterInput>>;
-  bookingId?: InputMaybe<StringOperationFilterInput>;
-  campaignId?: InputMaybe<StringOperationFilterInput>;
-  content?: InputMaybe<StringOperationFilterInput>;
-  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
-  id?: InputMaybe<StringOperationFilterInput>;
-  isRead?: InputMaybe<BooleanOperationFilterInput>;
-  or?: InputMaybe<Array<NotificationFilterInput>>;
-  title?: InputMaybe<StringOperationFilterInput>;
-  type?: InputMaybe<NotificationTypeOperationFilterInput>;
-  user?: InputMaybe<UserFilterInput>;
-  userId?: InputMaybe<StringOperationFilterInput>;
-};
-
-export type NotificationSettings = {
-  __typename: 'NotificationSettings';
-  bookingApprovals: Scalars['Boolean']['output'];
-  bookingRequests: Scalars['Boolean']['output'];
-  campaignUpdates: Scalars['Boolean']['output'];
-  emailDigest: Scalars['String']['output'];
-  marketingEmails: Scalars['Boolean']['output'];
-  paymentReceipts: Scalars['Boolean']['output'];
-  systemNotifications: Scalars['Boolean']['output'];
-};
-
-export enum NotificationType {
-  BookingApproved = 'BOOKING_APPROVED',
-  BookingCancelled = 'BOOKING_CANCELLED',
-  BookingRejected = 'BOOKING_REJECTED',
-  BookingRequested = 'BOOKING_REQUESTED',
-  DisputeFiled = 'DISPUTE_FILED',
-  MessageReceived = 'MESSAGE_RECEIVED',
-  PaymentFailed = 'PAYMENT_FAILED',
-  PaymentReceived = 'PAYMENT_RECEIVED',
-  PaymentReminder = 'PAYMENT_REMINDER',
-  PayoutProcessed = 'PAYOUT_PROCESSED',
-  ProofApproved = 'PROOF_APPROVED',
-  ProofDisputed = 'PROOF_DISPUTED',
-  ProofRejected = 'PROOF_REJECTED',
-  ProofUploaded = 'PROOF_UPLOADED',
-  RefundProcessed = 'REFUND_PROCESSED',
-  SessionExpired = 'SESSION_EXPIRED',
-  SpaceApproved = 'SPACE_APPROVED',
-  SpaceReactivated = 'SPACE_REACTIVATED',
-  SpaceRejected = 'SPACE_REJECTED',
-  SpaceSuspended = 'SPACE_SUSPENDED',
-  SystemUpdate = 'SYSTEM_UPDATE'
-}
-
-export type NotificationTypeOperationFilterInput = {
-  eq?: InputMaybe<NotificationType>;
-  in?: InputMaybe<Array<NotificationType>>;
-  neq?: InputMaybe<NotificationType>;
-  nin?: InputMaybe<Array<NotificationType>>;
-};
-
-export type NullableOfDisputeIssueTypeOperationFilterInput = {
-  eq?: InputMaybe<DisputeIssueType>;
-  in?: InputMaybe<Array<InputMaybe<DisputeIssueType>>>;
-  neq?: InputMaybe<DisputeIssueType>;
-  nin?: InputMaybe<Array<InputMaybe<DisputeIssueType>>>;
-};
-
-export type NullableOfPayoutStatusOperationFilterInput = {
-  eq?: InputMaybe<PayoutStatus>;
-  in?: InputMaybe<Array<InputMaybe<PayoutStatus>>>;
-  neq?: InputMaybe<PayoutStatus>;
-  nin?: InputMaybe<Array<InputMaybe<PayoutStatus>>>;
-};
-
-export type NullableOfProofStatusOperationFilterInput = {
-  eq?: InputMaybe<ProofStatus>;
-  in?: InputMaybe<Array<InputMaybe<ProofStatus>>>;
-  neq?: InputMaybe<ProofStatus>;
-  nin?: InputMaybe<Array<InputMaybe<ProofStatus>>>;
+export type MutationUpdateCurrentUserArgs = {
+  input: UpdateCurrentUserInput;
 };
 
 /** Information about pagination in a connection. */
@@ -817,18 +368,6 @@ export type PageInfo = {
   startCursor: Maybe<Scalars['String']['output']>;
 };
 
-export enum PaymentType {
-  Deposit = 'DEPOSIT',
-  Immediate = 'IMMEDIATE'
-}
-
-export type PaymentTypeOperationFilterInput = {
-  eq?: InputMaybe<PaymentType>;
-  in?: InputMaybe<Array<PaymentType>>;
-  neq?: InputMaybe<PaymentType>;
-  nin?: InputMaybe<Array<PaymentType>>;
-};
-
 export enum PayoutSchedule {
   Biweekly = 'BIWEEKLY',
   Monthly = 'MONTHLY',
@@ -842,28 +381,21 @@ export type PayoutScheduleOperationFilterInput = {
   nin?: InputMaybe<Array<PayoutSchedule>>;
 };
 
-export enum PayoutStatus {
-  Completed = 'COMPLETED',
-  Failed = 'FAILED',
-  PartiallyPaid = 'PARTIALLY_PAID',
-  Pending = 'PENDING',
-  Processing = 'PROCESSING'
+export enum ProfileType {
+  Advertiser = 'ADVERTISER',
+  SpaceOwner = 'SPACE_OWNER'
 }
 
-export enum ProofStatus {
-  Approved = 'APPROVED',
-  CorrectionRequested = 'CORRECTION_REQUESTED',
-  Disputed = 'DISPUTED',
-  Pending = 'PENDING',
-  Rejected = 'REJECTED',
-  UnderReview = 'UNDER_REVIEW'
-}
+export type ProfileTypeOperationFilterInput = {
+  eq?: InputMaybe<ProfileType>;
+  in?: InputMaybe<Array<ProfileType>>;
+  neq?: InputMaybe<ProfileType>;
+  nin?: InputMaybe<Array<ProfileType>>;
+};
 
 export type Query = {
   __typename: 'Query';
   currentUser: Maybe<User>;
-  notificationSettings: NotificationSettings;
-  securitySettings: SecuritySettings;
   spaceById: Maybe<Space>;
   spaces: Maybe<SpacesConnection>;
   userById: Maybe<User>;
@@ -900,52 +432,6 @@ export type QueryUsersArgs = {
   where?: InputMaybe<UserFilterInput>;
 };
 
-export type Review = {
-  __typename: 'Review';
-  booking: Booking;
-  bookingId: Scalars['String']['output'];
-  comment: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['String']['output'];
-  rating: Scalars['Int']['output'];
-  reviewerType: ReviewerType;
-  space: Space;
-  spaceId: Scalars['String']['output'];
-};
-
-export type ReviewFilterInput = {
-  and?: InputMaybe<Array<ReviewFilterInput>>;
-  booking?: InputMaybe<BookingFilterInput>;
-  bookingId?: InputMaybe<StringOperationFilterInput>;
-  comment?: InputMaybe<StringOperationFilterInput>;
-  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
-  id?: InputMaybe<StringOperationFilterInput>;
-  or?: InputMaybe<Array<ReviewFilterInput>>;
-  rating?: InputMaybe<IntOperationFilterInput>;
-  reviewerType?: InputMaybe<ReviewerTypeOperationFilterInput>;
-  space?: InputMaybe<SpaceFilterInput>;
-  spaceId?: InputMaybe<StringOperationFilterInput>;
-};
-
-export enum ReviewerType {
-  Advertiser = 'ADVERTISER',
-  SpaceOwner = 'SPACE_OWNER'
-}
-
-export type ReviewerTypeOperationFilterInput = {
-  eq?: InputMaybe<ReviewerType>;
-  in?: InputMaybe<Array<ReviewerType>>;
-  neq?: InputMaybe<ReviewerType>;
-  nin?: InputMaybe<Array<ReviewerType>>;
-};
-
-export type SecuritySettings = {
-  __typename: 'SecuritySettings';
-  deviceSessions: Array<DeviceSession>;
-  loginNotifications: Scalars['Boolean']['output'];
-  twoFactorEnabled: Scalars['Boolean']['output'];
-};
-
 export enum SortEnumType {
   Asc = 'ASC',
   Desc = 'DESC'
@@ -957,27 +443,23 @@ export type Space = {
   availableFrom: Maybe<Scalars['DateTime']['output']>;
   availableTo: Maybe<Scalars['DateTime']['output']>;
   averageRating: Maybe<Scalars['Float']['output']>;
-  bookings: Array<Booking>;
   city: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   description: Maybe<Scalars['String']['output']>;
   dimensions: Maybe<Scalars['String']['output']>;
   dimensionsText: Maybe<Scalars['String']['output']>;
   height: Maybe<Scalars['Float']['output']>;
-  id: Scalars['String']['output'];
+  id: Scalars['UUID']['output'];
   images: Array<Scalars['String']['output']>;
   installationFee: Maybe<Scalars['Decimal']['output']>;
   latitude: Scalars['Float']['output'];
   longitude: Scalars['Float']['output'];
   maxDuration: Maybe<Scalars['Int']['output']>;
   minDuration: Scalars['Int']['output'];
-  owner: User;
-  ownerId: Scalars['String']['output'];
   pricePerDay: Scalars['Decimal']['output'];
-  quadtreeDepth: Maybe<Scalars['Int']['output']>;
-  quadtreeNodeId: Maybe<Scalars['String']['output']>;
   rejectionReason: Maybe<Scalars['String']['output']>;
-  reviews: Array<Review>;
+  spaceOwnerProfile: SpaceOwnerProfile;
+  spaceOwnerProfileId: Scalars['UUID']['output'];
   state: Scalars['String']['output'];
   status: SpaceStatus;
   title: Scalars['String']['output'];
@@ -985,7 +467,6 @@ export type Space = {
   totalRevenue: Scalars['Decimal']['output'];
   traffic: Maybe<Scalars['String']['output']>;
   type: SpaceType;
-  updatedAt: Scalars['DateTime']['output'];
   width: Maybe<Scalars['Float']['output']>;
   zipCode: Maybe<Scalars['String']['output']>;
 };
@@ -996,14 +477,13 @@ export type SpaceFilterInput = {
   availableFrom?: InputMaybe<DateTimeOperationFilterInput>;
   availableTo?: InputMaybe<DateTimeOperationFilterInput>;
   averageRating?: InputMaybe<FloatOperationFilterInput>;
-  bookings?: InputMaybe<ListFilterInputTypeOfBookingFilterInput>;
   city?: InputMaybe<StringOperationFilterInput>;
   createdAt?: InputMaybe<DateTimeOperationFilterInput>;
   description?: InputMaybe<StringOperationFilterInput>;
   dimensions?: InputMaybe<StringOperationFilterInput>;
   dimensionsText?: InputMaybe<StringOperationFilterInput>;
   height?: InputMaybe<FloatOperationFilterInput>;
-  id?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
   images?: InputMaybe<ListStringOperationFilterInput>;
   installationFee?: InputMaybe<DecimalOperationFilterInput>;
   latitude?: InputMaybe<FloatOperationFilterInput>;
@@ -1011,13 +491,10 @@ export type SpaceFilterInput = {
   maxDuration?: InputMaybe<IntOperationFilterInput>;
   minDuration?: InputMaybe<IntOperationFilterInput>;
   or?: InputMaybe<Array<SpaceFilterInput>>;
-  owner?: InputMaybe<UserFilterInput>;
-  ownerId?: InputMaybe<StringOperationFilterInput>;
   pricePerDay?: InputMaybe<DecimalOperationFilterInput>;
-  quadtreeDepth?: InputMaybe<IntOperationFilterInput>;
-  quadtreeNodeId?: InputMaybe<StringOperationFilterInput>;
   rejectionReason?: InputMaybe<StringOperationFilterInput>;
-  reviews?: InputMaybe<ListFilterInputTypeOfReviewFilterInput>;
+  spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileFilterInput>;
+  spaceOwnerProfileId?: InputMaybe<UuidOperationFilterInput>;
   state?: InputMaybe<StringOperationFilterInput>;
   status?: InputMaybe<SpaceStatusOperationFilterInput>;
   title?: InputMaybe<StringOperationFilterInput>;
@@ -1025,61 +502,119 @@ export type SpaceFilterInput = {
   totalRevenue?: InputMaybe<DecimalOperationFilterInput>;
   traffic?: InputMaybe<StringOperationFilterInput>;
   type?: InputMaybe<SpaceTypeOperationFilterInput>;
-  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
   width?: InputMaybe<FloatOperationFilterInput>;
   zipCode?: InputMaybe<StringOperationFilterInput>;
 };
 
+export type SpaceInput = {
+  address: Scalars['String']['input'];
+  availableFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  availableTo?: InputMaybe<Scalars['DateTime']['input']>;
+  averageRating?: InputMaybe<Scalars['Float']['input']>;
+  city: Scalars['String']['input'];
+  createdAt: Scalars['DateTime']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  dimensions?: InputMaybe<Scalars['String']['input']>;
+  dimensionsText?: InputMaybe<Scalars['String']['input']>;
+  height?: InputMaybe<Scalars['Float']['input']>;
+  id: Scalars['UUID']['input'];
+  images: Array<Scalars['String']['input']>;
+  installationFee?: InputMaybe<Scalars['Decimal']['input']>;
+  latitude: Scalars['Float']['input'];
+  longitude: Scalars['Float']['input'];
+  maxDuration?: InputMaybe<Scalars['Int']['input']>;
+  minDuration: Scalars['Int']['input'];
+  pricePerDay: Scalars['Decimal']['input'];
+  rejectionReason?: InputMaybe<Scalars['String']['input']>;
+  spaceOwnerProfile: SpaceOwnerProfileInput;
+  spaceOwnerProfileId: Scalars['UUID']['input'];
+  state: Scalars['String']['input'];
+  status: SpaceStatus;
+  title: Scalars['String']['input'];
+  totalBookings: Scalars['Int']['input'];
+  totalRevenue: Scalars['Decimal']['input'];
+  traffic?: InputMaybe<Scalars['String']['input']>;
+  type: SpaceType;
+  width?: InputMaybe<Scalars['Float']['input']>;
+  zipCode?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type SpaceOwnerProfile = {
   __typename: 'SpaceOwnerProfile';
-  accountDisconnectedAt: Maybe<Scalars['DateTime']['output']>;
-  accountDisconnectedNotifiedAt: Maybe<Scalars['DateTime']['output']>;
   businessName: Maybe<Scalars['String']['output']>;
   businessType: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
-  id: Scalars['String']['output'];
-  lastAccountHealthCheck: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['UUID']['output'];
   onboardingComplete: Scalars['Boolean']['output'];
   payoutSchedule: PayoutSchedule;
+  spaces: Maybe<SpacesConnection>;
+  stripeAccountDisconnectedAt: Maybe<Scalars['DateTime']['output']>;
+  stripeAccountDisconnectedNotifiedAt: Maybe<Scalars['DateTime']['output']>;
   stripeAccountId: Maybe<Scalars['String']['output']>;
   stripeAccountStatus: Maybe<Scalars['String']['output']>;
-  updatedAt: Scalars['DateTime']['output'];
+  stripeLastAccountHealthCheck: Maybe<Scalars['DateTime']['output']>;
   user: User;
-  userId: Scalars['String']['output'];
+  userId: Scalars['UUID']['output'];
+};
+
+
+export type SpaceOwnerProfileSpacesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<SpaceSortInput>>;
+  where?: InputMaybe<SpaceFilterInput>;
 };
 
 export type SpaceOwnerProfileFilterInput = {
-  accountDisconnectedAt?: InputMaybe<DateTimeOperationFilterInput>;
-  accountDisconnectedNotifiedAt?: InputMaybe<DateTimeOperationFilterInput>;
   and?: InputMaybe<Array<SpaceOwnerProfileFilterInput>>;
   businessName?: InputMaybe<StringOperationFilterInput>;
   businessType?: InputMaybe<StringOperationFilterInput>;
   createdAt?: InputMaybe<DateTimeOperationFilterInput>;
-  id?: InputMaybe<StringOperationFilterInput>;
-  lastAccountHealthCheck?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
   onboardingComplete?: InputMaybe<BooleanOperationFilterInput>;
   or?: InputMaybe<Array<SpaceOwnerProfileFilterInput>>;
   payoutSchedule?: InputMaybe<PayoutScheduleOperationFilterInput>;
+  spaces?: InputMaybe<ListFilterInputTypeOfSpaceFilterInput>;
+  stripeAccountDisconnectedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  stripeAccountDisconnectedNotifiedAt?: InputMaybe<DateTimeOperationFilterInput>;
   stripeAccountId?: InputMaybe<StringOperationFilterInput>;
   stripeAccountStatus?: InputMaybe<StringOperationFilterInput>;
-  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  stripeLastAccountHealthCheck?: InputMaybe<DateTimeOperationFilterInput>;
   user?: InputMaybe<UserFilterInput>;
-  userId?: InputMaybe<StringOperationFilterInput>;
+  userId?: InputMaybe<UuidOperationFilterInput>;
+};
+
+export type SpaceOwnerProfileInput = {
+  businessName?: InputMaybe<Scalars['String']['input']>;
+  businessType?: InputMaybe<Scalars['String']['input']>;
+  createdAt: Scalars['DateTime']['input'];
+  id: Scalars['UUID']['input'];
+  onboardingComplete: Scalars['Boolean']['input'];
+  payoutSchedule: PayoutSchedule;
+  spaces: Array<SpaceInput>;
+  stripeAccountDisconnectedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  stripeAccountDisconnectedNotifiedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  stripeAccountId?: InputMaybe<Scalars['String']['input']>;
+  stripeAccountStatus?: InputMaybe<Scalars['String']['input']>;
+  stripeLastAccountHealthCheck?: InputMaybe<Scalars['DateTime']['input']>;
+  user: UserInput;
+  userId: Scalars['UUID']['input'];
 };
 
 export type SpaceOwnerProfileSortInput = {
-  accountDisconnectedAt?: InputMaybe<SortEnumType>;
-  accountDisconnectedNotifiedAt?: InputMaybe<SortEnumType>;
   businessName?: InputMaybe<SortEnumType>;
   businessType?: InputMaybe<SortEnumType>;
   createdAt?: InputMaybe<SortEnumType>;
   id?: InputMaybe<SortEnumType>;
-  lastAccountHealthCheck?: InputMaybe<SortEnumType>;
   onboardingComplete?: InputMaybe<SortEnumType>;
   payoutSchedule?: InputMaybe<SortEnumType>;
+  stripeAccountDisconnectedAt?: InputMaybe<SortEnumType>;
+  stripeAccountDisconnectedNotifiedAt?: InputMaybe<SortEnumType>;
   stripeAccountId?: InputMaybe<SortEnumType>;
   stripeAccountStatus?: InputMaybe<SortEnumType>;
-  updatedAt?: InputMaybe<SortEnumType>;
+  stripeLastAccountHealthCheck?: InputMaybe<SortEnumType>;
   user?: InputMaybe<UserSortInput>;
   userId?: InputMaybe<SortEnumType>;
 };
@@ -1101,12 +636,10 @@ export type SpaceSortInput = {
   longitude?: InputMaybe<SortEnumType>;
   maxDuration?: InputMaybe<SortEnumType>;
   minDuration?: InputMaybe<SortEnumType>;
-  owner?: InputMaybe<UserSortInput>;
-  ownerId?: InputMaybe<SortEnumType>;
   pricePerDay?: InputMaybe<SortEnumType>;
-  quadtreeDepth?: InputMaybe<SortEnumType>;
-  quadtreeNodeId?: InputMaybe<SortEnumType>;
   rejectionReason?: InputMaybe<SortEnumType>;
+  spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileSortInput>;
+  spaceOwnerProfileId?: InputMaybe<SortEnumType>;
   state?: InputMaybe<SortEnumType>;
   status?: InputMaybe<SortEnumType>;
   title?: InputMaybe<SortEnumType>;
@@ -1114,7 +647,6 @@ export type SpaceSortInput = {
   totalRevenue?: InputMaybe<SortEnumType>;
   traffic?: InputMaybe<SortEnumType>;
   type?: InputMaybe<SortEnumType>;
-  updatedAt?: InputMaybe<SortEnumType>;
   width?: InputMaybe<SortEnumType>;
   zipCode?: InputMaybe<SortEnumType>;
 };
@@ -1186,56 +718,70 @@ export type StringOperationFilterInput = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UpdateCurrentUserInput = {
+  updatedUser: UserInput;
+};
+
+export type UpdateCurrentUserPayload = {
+  __typename: 'UpdateCurrentUserPayload';
+  user: Maybe<User>;
+};
+
 export type User = {
   __typename: 'User';
+  activeProfileType: ProfileType;
   advertiserProfile: Maybe<AdvertiserProfile>;
   avatar: Maybe<Scalars['String']['output']>;
-  bugReports: Array<BugReport>;
-  campaigns: Array<Campaign>;
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
-  id: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
   lastLoginAt: Maybe<Scalars['DateTime']['output']>;
-  name: Maybe<Scalars['String']['output']>;
-  notifications: Array<Notification>;
-  ownedSpaces: Array<Space>;
+  name: Scalars['String']['output'];
   password: Scalars['String']['output'];
   phone: Maybe<Scalars['String']['output']>;
   role: UserRole;
-  sentMessages: Array<Message>;
   spaceOwnerProfile: Maybe<SpaceOwnerProfile>;
   status: UserStatus;
-  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type UserFilterInput = {
+  activeProfileType?: InputMaybe<ProfileTypeOperationFilterInput>;
   advertiserProfile?: InputMaybe<AdvertiserProfileFilterInput>;
   and?: InputMaybe<Array<UserFilterInput>>;
   avatar?: InputMaybe<StringOperationFilterInput>;
-  bugReports?: InputMaybe<ListFilterInputTypeOfBugReportFilterInput>;
-  campaigns?: InputMaybe<ListFilterInputTypeOfCampaignFilterInput>;
   createdAt?: InputMaybe<DateTimeOperationFilterInput>;
   email?: InputMaybe<StringOperationFilterInput>;
-  id?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
   lastLoginAt?: InputMaybe<DateTimeOperationFilterInput>;
   name?: InputMaybe<StringOperationFilterInput>;
-  notifications?: InputMaybe<ListFilterInputTypeOfNotificationFilterInput>;
   or?: InputMaybe<Array<UserFilterInput>>;
-  ownedSpaces?: InputMaybe<ListFilterInputTypeOfSpaceFilterInput>;
   password?: InputMaybe<StringOperationFilterInput>;
   phone?: InputMaybe<StringOperationFilterInput>;
   role?: InputMaybe<UserRoleOperationFilterInput>;
-  sentMessages?: InputMaybe<ListFilterInputTypeOfMessageFilterInput>;
   spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileFilterInput>;
   status?: InputMaybe<UserStatusOperationFilterInput>;
-  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type UserInput = {
+  activeProfileType: ProfileType;
+  advertiserProfile?: InputMaybe<AdvertiserProfileInput>;
+  avatar?: InputMaybe<Scalars['String']['input']>;
+  createdAt: Scalars['DateTime']['input'];
+  email: Scalars['String']['input'];
+  id: Scalars['UUID']['input'];
+  lastLoginAt?: InputMaybe<Scalars['DateTime']['input']>;
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
+  role: UserRole;
+  spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileInput>;
+  status: UserStatus;
 };
 
 export enum UserRole {
   Admin = 'ADMIN',
-  Advertiser = 'ADVERTISER',
   Marketing = 'MARKETING',
-  SpaceOwner = 'SPACE_OWNER'
+  User = 'USER'
 }
 
 export type UserRoleOperationFilterInput = {
@@ -1246,6 +792,7 @@ export type UserRoleOperationFilterInput = {
 };
 
 export type UserSortInput = {
+  activeProfileType?: InputMaybe<SortEnumType>;
   advertiserProfile?: InputMaybe<AdvertiserProfileSortInput>;
   avatar?: InputMaybe<SortEnumType>;
   createdAt?: InputMaybe<SortEnumType>;
@@ -1258,7 +805,6 @@ export type UserSortInput = {
   role?: InputMaybe<SortEnumType>;
   spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileSortInput>;
   status?: InputMaybe<SortEnumType>;
-  updatedAt?: InputMaybe<SortEnumType>;
 };
 
 export enum UserStatus {
@@ -1292,4 +838,19 @@ export type UsersEdge = {
   cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: User;
+};
+
+export type UuidOperationFilterInput = {
+  eq?: InputMaybe<Scalars['UUID']['input']>;
+  gt?: InputMaybe<Scalars['UUID']['input']>;
+  gte?: InputMaybe<Scalars['UUID']['input']>;
+  in?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
+  lt?: InputMaybe<Scalars['UUID']['input']>;
+  lte?: InputMaybe<Scalars['UUID']['input']>;
+  neq?: InputMaybe<Scalars['UUID']['input']>;
+  ngt?: InputMaybe<Scalars['UUID']['input']>;
+  ngte?: InputMaybe<Scalars['UUID']['input']>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
+  nlt?: InputMaybe<Scalars['UUID']['input']>;
+  nlte?: InputMaybe<Scalars['UUID']['input']>;
 };

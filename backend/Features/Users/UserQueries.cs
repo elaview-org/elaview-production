@@ -6,7 +6,6 @@ namespace ElaviewBackend.Features.Users;
 
 [QueryType]
 public static partial class UserQueries {
-    [Authorize]
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<User> GetCurrentUser(

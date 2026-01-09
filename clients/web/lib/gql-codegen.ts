@@ -8,19 +8,27 @@ const config: CodegenConfig = {
   overwrite: true,
   schema: `${process.env.NEXT_PUBLIC_API_URL!}/graphql`,
   // This assumes that all your source files are in a top-level `src/` directory - you might need to adjust this to your file structure
-  documents: ["app/**/*.{ts,tsx}", "shared/**/*.{ts,tsx}"],
+  documents: [
+    "app/**/*.{ts,tsx}",
+    "components/**/*.{ts,tsx}",
+    "hooks/**/*.{ts,tsx}",
+    "lib/**/*.{ts,tsx}",
+    "types/**/*.{ts,tsx}",
+    "actions/**/*.{ts,tsx}",
+    "api/**/*.{ts,tsx}",
+  ],
   // Don't exit with non-zero status when there are no documents
   ignoreNoDocuments: true,
   generates: {
     // Download the schema file
-    "./shared/lib/schema.graphql": {
+    "./lib/schema.graphql": {
       plugins: ["schema-ast"],
       config: {
         includeDirectives: true,
       },
     },
     // Generate TypeScript types
-    "./shared/types/graphql.generated.ts": {
+    "./types/graphql.generated.ts": {
       plugins: ["typescript", "typescript-operations"],
       config: {
         avoidOptionals: {

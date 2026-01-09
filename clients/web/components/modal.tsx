@@ -1,42 +1,42 @@
-"use client";
-
-import { ReactNode } from "react";
-import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/dialog";
+import * as React from "react";
+import { ReactNode } from "react";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
-interface ModalProps {
-  title?: ReactNode;
+interface ModalProps extends React.ComponentProps<typeof Dialog> {
+  title?: string;
+  trigger: ReactNode;
   children: ReactNode;
-  footer?: ReactNode;
-  showCloseButton?: boolean;
-  size?: "sm" | "default" | "lg" | "xl" | "full";
+  className?: string;
 }
 
 export default function Modal({
   title,
+  trigger,
   children,
-  footer,
-  showCloseButton = true,
-  size = "default",
+  className,
+  ...dialogProps
 }: ModalProps) {
-  const router = useRouter();
-
   return (
-    <Dialog defaultOpen={true} open={true} onOpenChange={() => router.back()}>
-      <DialogContent showCloseButton={showCloseButton} size={size}>
-        {title && (
-          <DialogHeader>
+    <Dialog {...dialogProps}>
+      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogContent className={className}>
+        <DialogHeader>
+          {title ? (
             <DialogTitle>{title}</DialogTitle>
-          </DialogHeader>
-        )}
+          ) : (
+            <VisuallyHidden>
+              <DialogTitle />
+            </VisuallyHidden>
+          )}
+        </DialogHeader>
         {children}
-        {footer && <DialogFooter>{footer}</DialogFooter>}
       </DialogContent>
     </Dialog>
   );

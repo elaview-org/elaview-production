@@ -1,3 +1,7 @@
 # IDEs
 **/.idea
 **/.vscode
+
+# Environments & Secrets
+**/.env*
+!**/.env.example

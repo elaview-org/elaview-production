@@ -9,8 +9,8 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "gql:codegen": "graphql-codegen --config shared/lib/gql-codegen.ts",
-    "gql:codegen:watch": "graphql-codegen --config shared/lib/gql-codegen.ts --watch"
+    "gql:codegen": "graphql-codegen --config lib/gql-codegen.ts",
+    "gql:codegen:watch": "graphql-codegen --config lib/gql-codegen.ts --watch"
   },
   "dependencies": {
     "@apollo/client": "^4.0.11",

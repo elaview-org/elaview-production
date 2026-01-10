@@ -54,9 +54,9 @@ export default function Content({ gridView, mapView }: ContentProps) {
             <Input placeholder="Search locations..." className="pl-10" />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex">
             <Button
-              className={"cursor-pointer"}
+              className={"cursor-pointer rounded-none"}
               variant={currentView === "map" ? "default" : "outline"}
               onClick={() => setView("map")}
               title={"Map View"}
@@ -64,7 +64,7 @@ export default function Content({ gridView, mapView }: ContentProps) {
               <IconMap className="h-4 w-4" />
             </Button>
             <Button
-              className={"cursor-pointer"}
+              className={"cursor-pointer rounded-none"}
               variant={currentView === "grid" ? "default" : "outline"}
               onClick={() => setView("grid")}
               title={"Grid View"}

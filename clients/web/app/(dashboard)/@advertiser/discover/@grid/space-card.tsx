@@ -3,16 +3,18 @@ import { IconHeart, IconShare } from "@tabler/icons-react";
 import { Badge } from "@/components/badge";
 
 interface SpaceCardProps {
+  id: string;
+  title: string;
   address: string;
   size: string;
-  type: string;
-  monthlyRate: string;
+  dailyRate: string;
   status: string;
+  images: string[];
 }
 
 export default function SpaceCard(props: SpaceCardProps) {
   return (
-    <div className="group bg-muted relative aspect-square cursor-pointer overflow-hidden rounded-sm transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl">
+    <div className="group bg-muted relative aspect-4/3 cursor-pointer overflow-hidden rounded-sm transition-transform duration-300 hover:scale-[1.02] hover:shadow-xl">
       <div className="from-primary/20 via-muted to-primary/10 absolute inset-0 flex items-center justify-center bg-linear-to-br">
         <span className="text-muted-foreground/70 text-3xl font-semibold">
           {props.size}
@@ -56,8 +58,8 @@ export default function SpaceCard(props: SpaceCardProps) {
       <div className="text-foreground absolute right-0 bottom-0 left-0 translate-y-4 p-4 transition-transform duration-300 group-hover:translate-y-0">
         <p className="line-clamp-2 text-sm font-medium">{props.address}</p>
         <div className="mt-1 mb-4 flex items-baseline gap-1">
-          <span className="text-lg font-semibold">{props.monthlyRate}</span>
-          <span className="text-sm opacity-90">/month</span>
+          <span className="text-lg font-semibold">${props.dailyRate}</span>
+          <span className="text-sm opacity-90">/day</span>
         </div>
       </div>
     </div>

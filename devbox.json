@@ -1,0 +1,55 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
+  "packages": {
+    "dotnet-sdk_10": {
+      "version": "latest"
+    },
+    "postgresql": {
+      "version": "latest"
+    },
+    "docker": {
+      "version": "latest"
+    },
+    "nodejs": {
+      "version": "latest"
+    },
+    "pnpm": {
+      "version": "latest"
+    },
+    "bun": {
+      "version": "latest"
+    },
+    "opentofu": {
+      "version": "latest"
+    }
+  },
+  "shell": {
+    "init_hook": [
+      "export ELAVIEW_DEVBOX_ROOT=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"",
+      "alias ev=\"devbox run -q\"",
+      "source \"$ELAVIEW_DEVBOX_ROOT/scripts/init_env.sh\""
+    ],
+    "scripts": {
+      "help":             "cat \"$ELAVIEW_DEVBOX_ROOT/scripts/help.md\" | less",
+      "env:list":         "env | grep \"^ELAVIEW_\"",
+      "env:list:mobile":  "env | grep \"^ELAVIEW_MOBILE_\"",
+      "env:list:web":     "env | grep \"^ELAVIEW_WEB_\"",
+      "env:list:backend": "env | grep \"^ELAVIEW_BACKEND_\"",
+      "backend:start": [
+        "cd \"$ELAVIEW_DEVBOX_ROOT/backend\"",
+        "docker compose up --build -d",
+        "cd -"
+      ],
+      "backend:stop": [
+        "cd \"$ELAVIEW_DEVBOX_ROOT/backend\"",
+        "docker compose down --remove-orphans",
+        "cd -"
+      ],
+      "backend:logs": [
+        "cd \"$ELAVIEW_DEVBOX_ROOT/backend\"",
+        "docker compose logs -f",
+        "cd -"
+      ]
+    }
+  }
+}

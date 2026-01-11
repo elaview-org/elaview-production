@@ -2,9 +2,6 @@ namespace ElaviewBackend.Shared;
 
 public class GlobalSettings {
     public DatabaseSettings Database { get; set; } = new();
-
-    public List<DevelopmentAccountSettings> DevelopmentAccounts { get; set; } =
-        new();
 }
 
 public class DatabaseSettings {
@@ -20,14 +17,4 @@ public class DatabaseSettings {
         return
             $"Host={Host};Port={Port};Database={User};Username={User};Password={Password};Include Error Detail=true";
     }
-}
-
-public class DevelopmentAccountSettings {
-    public string Email { get; set; } = "";
-
-    public string Password { get; set; } = "";
-
-    public string? Name { get; set; }
-
-    public string Role { get; set; } = "Advertiser";
 }

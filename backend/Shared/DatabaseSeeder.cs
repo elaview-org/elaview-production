@@ -1,32 +1,27 @@
 using ElaviewBackend.Shared.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 namespace ElaviewBackend.Shared;
 
-public class DatabaseSeeder {
-    private readonly AppDbContext _db;
-    private readonly IOptions<GlobalSettings> _settings;
-    private readonly ILogger<DatabaseSeeder> _logger;
-
-    public DatabaseSeeder(AppDbContext db, IOptions<GlobalSettings> settings,
-        ILogger<DatabaseSeeder> logger) {
-        _db = db;
-        _settings = settings;
-        _logger = logger;
-    }
-
+public class DatabaseSeeder(
+    AppDbContext db,
+    ILogger<DatabaseSeeder> logger
+) {
     public async Task SeedDevelopmentAccountsAsync(bool development) {
-        var devAccounts = _settings.Value.DevelopmentAccounts;
-        if (!devAccounts.Any()) {
-            _logger.LogInformation(
-                "No development accounts configured in .env");
-            return;
-        }
+        var devAccounts = new[] {
+            (Email: "admin@email.com", Password: "admin123",
+                Name: "Administrator", Role: "Admin"),
+            (Email: "marketing@email.com", Password: "marketing123",
+                Name: "Marketing", Role: "Marketing"),
+            (Email: "user1@email.com", Password: "user123",
+                Name: "User1", Role: "User"),
+            (Email: "user2@email.com", Password: "user123",
+                Name: "User2", Role: "User")
+        };
 
         foreach (var account in devAccounts) {
-            if (await _db.Users.AnyAsync(u => u.Email == account.Email)) {
-                _logger.LogInformation(
+            if (await db.Users.AnyAsync(u => u.Email == account.Email)) {
+                logger.LogInformation(
                     "Development account {Email} already exists",
                     account.Email);
                 continue;
@@ -39,7 +34,7 @@ public class DatabaseSeeder {
                 : UserRole.User;
 
             if (role != parsedRole)
-                _logger.LogWarning(
+                logger.LogWarning(
                     "Invalid role '{Role}' for {Email}, defaulting to User",
                     account.Role, account.Email);
 
@@ -51,8 +46,8 @@ public class DatabaseSeeder {
                 Role = role,
                 Status = UserStatus.Active
             };
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
+            db.Users.Add(user);
+            await db.SaveChangesAsync();
 
             if (role == UserRole.User) {
                 // create AdvertiserProfile
@@ -60,7 +55,7 @@ public class DatabaseSeeder {
                     UserId = user.Id,
                     OnboardingComplete = false
                 };
-                _db.AdvertiserProfiles.Add(advertiserProfile);
+                db.AdvertiserProfiles.Add(advertiserProfile);
 
                 // create SpaceOwnerProfile
                 var spaceOwnerProfile = new SpaceOwnerProfile {
@@ -68,15 +63,15 @@ public class DatabaseSeeder {
                     OnboardingComplete = false,
                     PayoutSchedule = PayoutSchedule.Weekly
                 };
-                _db.SpaceOwnerProfiles.Add(spaceOwnerProfile);
+                db.SpaceOwnerProfiles.Add(spaceOwnerProfile);
 
                 // set user's active profile to advertiser by default
                 user.ActiveProfileType = ProfileType.Advertiser;
 
-                await _db.SaveChangesAsync();
+                await db.SaveChangesAsync();
             }
 
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Created development account: {Email} with role {Role}",
                 account.Email, role);
         }
@@ -86,7 +81,7 @@ public class DatabaseSeeder {
     }
 
     private async Task SeedSpacesAsync() {
-        var users = await _db.Users
+        var users = await db.Users
             .Where(u => u.Role == UserRole.User)
             .Include(u => u.SpaceOwnerProfile)
             .Take(2)
@@ -95,25 +90,25 @@ public class DatabaseSeeder {
         foreach (var user in users) {
             var spaceOwnerProfile = user.SpaceOwnerProfile;
             if (spaceOwnerProfile == null) {
-                _logger.LogWarning(
+                logger.LogWarning(
                     "SpaceOwner profile not found for user {Email}",
                     user.Email);
                 continue;
             }
 
-            var existingSpaces = await _db.Spaces
+            var existingSpaces = await db.Spaces
                 .CountAsync(s => s.SpaceOwnerProfileId == spaceOwnerProfile.Id);
 
             var toCreate = 64 - existingSpaces;
             if (toCreate <= 0) {
-                _logger.LogInformation(
+                logger.LogInformation(
                     "User {Email} already has {Count} spaces", user.Email,
                     existingSpaces);
                 continue;
             }
 
             await CreateSpacesForProfile(spaceOwnerProfile, toCreate);
-            _logger.LogInformation("Created {Count} spaces for user {Email}",
+            logger.LogInformation("Created {Count} spaces for user {Email}",
                 toCreate, user.Email);
         }
     }
@@ -164,8 +159,8 @@ public class DatabaseSeeder {
             });
         }
 
-        _db.Spaces.AddRange(spaces);
-        await _db.SaveChangesAsync();
+        db.Spaces.AddRange(spaces);
+        await db.SaveChangesAsync();
     }
 
     private static string GenerateSpaceTitle(SpaceType type, int index) =>

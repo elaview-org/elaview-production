@@ -9,36 +9,28 @@ public static class Config {
         DotEnv.Load();
         var envVars = Environment.GetEnvironmentVariables();
         var configData = new Dictionary<string, string?> {
-            ["Database:Host"] = envVars["DATABASE_HOST"]?.ToString(),
-            ["Database:Port"] = envVars["DATABASE_PORT"]?.ToString(),
-            ["Database:User"] = envVars["DATABASE_USER"]?.ToString(),
-            ["Database:Password"] = envVars["DATABASE_PASSWORD"]?.ToString()
+            ["Database:Host"] =
+                envVars["DATABASE_HOST"]?.ToString(),
+            ["Database:Port"] =
+                envVars["DATABASE_PORT"]?.ToString(),
+            ["Database:User"] =
+                envVars["DATABASE_USER"]?.ToString(),
+            ["Database:Password"] = envVars["DATABASE_PASSWORD"]
+                ?.ToString()
         };
-
-        var i = 0;
-        var emailKey = $"ACCOUNT_{i}_EMAIL";
-        while (envVars[emailKey] != null) {
-            configData[$"DevelopmentAccounts:{i}:Email"] =
-                envVars[emailKey]?.ToString();
-            configData[$"DevelopmentAccounts:{i}:Password"] =
-                envVars[$"ACCOUNT_{i}_PASSWORD"]?.ToString();
-            configData[$"DevelopmentAccounts:{i}:Name"] =
-                envVars[$"ACCOUNT_{i}_NAME"]?.ToString();
-            configData[$"DevelopmentAccounts:{i}:Role"] =
-                envVars[$"ACCOUNT_{i}_ROLE"]?.ToString();
-            ++i;
-            emailKey = $"ACCOUNT_{i}_EMAIL";
-        }
 
         builder.Configuration.AddInMemoryCollection(configData);
 
-        var certPath = envVars["SERVER_TLS_CERT_PATH"]?.ToString();
-        var certPassword = envVars["SERVER_TLS_CERT_PASSWORD"]?.ToString();
+        var certPath = envVars["SERVER_TLS_CERT_PATH"]
+            ?.ToString();
+        var certPassword = envVars["SERVER_TLS_CERT_PASSWORD"]
+            ?.ToString();
 
         if (builder.Environment.IsDevelopment()) {
             builder.WebHost.ConfigureKestrel((_, serverOptions) => {
                 serverOptions.ListenAnyIP(
-                    int.Parse(envVars["SERVER_PORT"]!.ToString()!),
+                    int.Parse(
+                        envVars["SERVER_PORT"]!.ToString()!),
                     listenOptions => {
                         listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
                     });
@@ -57,7 +49,8 @@ public static class Config {
                 })
                 .ConfigureKestrel((_, serverOptions) => {
                     serverOptions.ListenAnyIP(
-                        int.Parse(envVars["SERVER_PORT"]!.ToString()!),
+                        int.Parse(envVars["SERVER_PORT"]!
+                            .ToString()!),
                         listenOptions => {
                             listenOptions.Protocols =
                                 HttpProtocols.Http1AndHttp2AndHttp3;
@@ -68,27 +61,20 @@ public static class Config {
     }
 
     public static Task ConfigureAsync(this WebApplication app) {
-        if (app.Environment.IsDevelopment())
+        var task = Task.CompletedTask;
+        if (!app.Environment.IsDevelopment()) {
             app.MapOpenApi();
-
-        var developmentAccounts = app.Configuration
-            .GetSection("DevelopmentAccounts").GetChildren();
-
-        var task = developmentAccounts.Any()
-            ? Task.Run(async () => await app.Services.CreateScope()
+            task = Task.Run(async () => await app.Services.CreateScope()
                 .ServiceProvider
                 .GetRequiredService<DatabaseSeeder>()
-                .SeedDevelopmentAccountsAsync(app.Environment.IsDevelopment()))
-            : Task.CompletedTask;
-
-        if (!app.Environment.IsDevelopment())
+                .SeedDevelopmentAccountsAsync(app.Environment.IsDevelopment()));
             app.UseHttpsRedirection();
+        }
 
         app
             .UseCors()
             .UseAuthentication()
             .UseAuthorization();
-
         app.MapControllers();
         app.MapGraphQL("/api/graphql");
 

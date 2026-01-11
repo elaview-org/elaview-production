@@ -48,7 +48,8 @@ public static class Services {
             .AddAuthentication(
                 CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options => {
-                options.Cookie.Name = envVars["AUTH_COOKIE_NAME"]!.ToString()!;
+                options.Cookie.Name =
+                    envVars["AUTH_COOKIE_NAME"]!.ToString()!;
                 options.Cookie.HttpOnly = true;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
                 options.Cookie.SameSite = SameSiteMode.Strict;

@@ -10,6 +10,13 @@ export default async function Page() {
       query {
         spaces (first: 50) {
           nodes {
+            id
+            title
+            width
+            height
+            pricePerDay
+            status
+            images
             address
             city
             state

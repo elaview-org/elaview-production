@@ -4,33 +4,37 @@ services:
   database:
     container_name: elaview-backend-postgres
     image: postgres:latest
-    env_file:
-      - .env
     environment:
-      POSTGRES_USER: ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_USER}
+      POSTGRES_USER: ${ELAVIEW_BACKEND_DATABASE_USER}
+      POSTGRES_PASSWORD: ${ELAVIEW_BACKEND_DATABASE_PASSWORD}
+      POSTGRES_DB: ${ELAVIEW_BACKEND_DATABASE_USER}
     networks: [ elaview-backend ]
-    ports: [ "${DATABASE_PORT}:${DATABASE_PORT}" ]
+    ports: [ "${ELAVIEW_BACKEND_DATABASE_PORT}:${ELAVIEW_BACKEND_DATABASE_PORT}" ]
     volumes:
       - type: volume
         source: elaview-postgres-data
         target: /var/lib/postgresql
-
+        
   server:
     container_name: elaview-backend-server
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       DATABASE_HOST: elaview-backend-postgres
+      DATABASE_PORT: ${ELAVIEW_BACKEND_DATABASE_PORT}
+      DATABASE_USER: ${ELAVIEW_BACKEND_DATABASE_USER}
+      DATABASE_PASSWORD: ${ELAVIEW_BACKEND_DATABASE_PASSWORD}
+      SERVER_PORT: ${ELAVIEW_BACKEND_SERVER_PORT}
+      SERVER_TLS_CERT_PATH: ${ELAVIEW_BACKEND_SERVER_TLS_CERT_PATH}
+      SERVER_TLS_CERT_PASSWORD: ${ELAVIEW_BACKEND_SERVER_TLS_CERT_PASSWORD}
+      AUTH_COOKIE_NAME: ${ELAVIEW_BACKEND_AUTH_COOKIE_NAME}
+      CORS_ORIGINS: ${ELAVIEW_BACKEND_CORS_ORIGINS}
     networks: [ elaview-backend ]
     ports:
-      - "${SERVER_PORT}:${SERVER_PORT}/tcp"
-      - "${SERVER_PORT}:${SERVER_PORT}/udp"
+      - "${ELAVIEW_BACKEND_SERVER_PORT}:${ELAVIEW_BACKEND_SERVER_PORT}/tcp"
+      - "${ELAVIEW_BACKEND_SERVER_PORT}:${ELAVIEW_BACKEND_SERVER_PORT}/udp"
     volumes:
       - type: bind
         source: ./TLS
@@ -44,7 +48,7 @@ services:
 
 networks:
   elaview-backend:
-    name: ${DATABASE_USER}
+    name: ${ELAVIEW_BACKEND_DATABASE_USER}
 
 volumes:
   elaview-postgres-data:

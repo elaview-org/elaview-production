@@ -21,35 +21,79 @@
     },
     "opentofu": {
       "version": "latest"
+    },
+    "scc": {
+      "version": "latest"
+    },
+    "tokei": {
+      "version": "latest"
+    },
+    "onefetch": {
+      "version": "latest"
+    },
+    "git-sizer": {
+      "version": "latest"
+    },
+    "git-fame": {
+      "version": "latest"
+    },
+    "gitleaks": {
+      "version": "latest"
+    },
+    "trufflehog": {
+      "version": "latest"
+    },
+    "delta": {
+      "version": "latest"
+    },
+    "lazygit": {
+      "version": "latest"
+    },
+    "git-quick-stats": {
+      "version": "latest"
+    },
+    "ruby": {
+      "version": "latest"
+    },
+    "github-linguist": {
+      "version": "latest"
     }
   },
   "shell": {
     "init_hook": [
       "export ELAVIEW_DEVBOX_ROOT=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"",
-      "alias ev=\"devbox run -q\"",
-      "source \"$ELAVIEW_DEVBOX_ROOT/scripts/init_env.sh\""
+      "export ELAVIEW_EV_CMD=\"$ELAVIEW_DEVBOX_ROOT/scripts/cmd\"",
+      ". \"$ELAVIEW_DEVBOX_ROOT/scripts/init/env.sh\""
     ],
     "scripts": {
-      "help":             "cat \"$ELAVIEW_DEVBOX_ROOT/scripts/help.md\" | less",
-      "env:list":         "env | grep \"^ELAVIEW_\"",
-      "env:list:mobile":  "env | grep \"^ELAVIEW_MOBILE_\"",
-      "env:list:web":     "env | grep \"^ELAVIEW_WEB_\"",
-      "env:list:backend": "env | grep \"^ELAVIEW_BACKEND_\"",
-      "backend:start": [
-        "cd \"$ELAVIEW_DEVBOX_ROOT/backend\"",
-        "docker compose up --build -d",
-        "cd -"
-      ],
-      "backend:stop": [
-        "cd \"$ELAVIEW_DEVBOX_ROOT/backend\"",
-        "docker compose down --remove-orphans",
-        "cd -"
-      ],
-      "backend:logs": [
-        "cd \"$ELAVIEW_DEVBOX_ROOT/backend\"",
-        "docker compose logs -f",
-        "cd -"
-      ]
+      "help": "sh \"$ELAVIEW_EV_CMD/global.sh\" help",
+      "env:list": "sh \"$ELAVIEW_EV_CMD/env.sh\" list",
+      "env:list:mobile": "sh \"$ELAVIEW_EV_CMD/env.sh\" list:mobile",
+      "env:list:web": "sh \"$ELAVIEW_EV_CMD/env.sh\" list:web",
+      "env:list:backend": "sh \"$ELAVIEW_EV_CMD/env.sh\" list:backend",
+      "backend:start": "sh \"$ELAVIEW_EV_CMD/backend.sh\" start",
+      "backend:stop": "sh \"$ELAVIEW_EV_CMD/backend.sh\" stop",
+      "backend:restart": "sh \"$ELAVIEW_EV_CMD/backend.sh\" restart",
+      "backend:logs": "sh \"$ELAVIEW_EV_CMD/backend.sh\" logs",
+      "backend:status": "sh \"$ELAVIEW_EV_CMD/backend.sh\" status",
+      "infra:init": "sh \"$ELAVIEW_EV_CMD/infra.sh\" init",
+      "infra:plan": "sh \"$ELAVIEW_EV_CMD/infra.sh\" plan",
+      "infra:apply": "sh \"$ELAVIEW_EV_CMD/infra.sh\" apply",
+      "infra:destroy": "sh \"$ELAVIEW_EV_CMD/infra.sh\" destroy",
+      "infra:output": "sh \"$ELAVIEW_EV_CMD/infra.sh\" output",
+      "infra:validate": "sh \"$ELAVIEW_EV_CMD/infra.sh\" validate",
+      "infra:fmt": "sh \"$ELAVIEW_EV_CMD/infra.sh\" fmt",
+      "repo:loc": "sh \"$ELAVIEW_EV_CMD/repo.sh\" loc",
+      "repo:loc:all": "sh \"$ELAVIEW_EV_CMD/repo.sh\" loc:all",
+      "repo:info": "sh \"$ELAVIEW_EV_CMD/repo.sh\" info",
+      "repo:size": "sh \"$ELAVIEW_EV_CMD/repo.sh\" size",
+      "repo:contributors": "sh \"$ELAVIEW_EV_CMD/repo.sh\" contributors",
+      "repo:activity": "sh \"$ELAVIEW_EV_CMD/repo.sh\" activity",
+      "repo:languages": "sh \"$ELAVIEW_EV_CMD/repo.sh\" languages",
+      "repo:ui": "sh \"$ELAVIEW_EV_CMD/repo.sh\" ui",
+      "repo:secrets": "sh \"$ELAVIEW_EV_CMD/repo.sh\" secrets",
+      "repo:secrets:history": "sh \"$ELAVIEW_EV_CMD/repo.sh\" secrets:history",
+      "repo:secrets:deep": "sh \"$ELAVIEW_EV_CMD/repo.sh\" secrets:deep"
     }
   }
 }

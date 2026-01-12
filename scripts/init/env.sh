@@ -15,6 +15,7 @@ ev() {
         backend:*) sh "$ELAVIEW_EV_CMD/backend.sh" "${_ev_group#backend:}" "$@" ;;
         infra:*)   sh "$ELAVIEW_EV_CMD/infra.sh" "${_ev_group#infra:}" "$@" ;;
         repo:*)    sh "$ELAVIEW_EV_CMD/repo.sh" "${_ev_group#repo:}" "$@" ;;
+        secrets:*) sh "$ELAVIEW_EV_CMD/secrets.sh" "${_ev_group#secrets:}" "$@" ;;
         web:*)     sh "$ELAVIEW_EV_CMD/web.sh" "${_ev_group#web:}" "$@" ;;
         mobile:*)  sh "$ELAVIEW_EV_CMD/mobile.sh" "${_ev_group#mobile:}" "$@" ;;
         *)
@@ -35,7 +36,7 @@ if ! _ev_secrets=$(_ev_load_secrets); then
         unset -f _ev_load_secrets
         return 1
     fi
-    doppler setup --project elaview --config development --no-interactive
+    doppler setup --project elaview --config "$ELAVIEW_ENVIRONMENT" --no-interactive
     if ! _ev_secrets=$(_ev_load_secrets); then
         ev_core_log_error "Failed to load Doppler secrets"
         unset _ev_secrets

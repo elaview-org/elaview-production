@@ -47,6 +47,10 @@ Repository (repo:*):
     repo:secrets:history    scan git history for secrets
     repo:secrets:deep       deep scan with verification
 
+Secrets (secrets:*):
+
+    secrets:list            show all secrets
+
 Mobile (mobile:*):
 
     [no commands yet]

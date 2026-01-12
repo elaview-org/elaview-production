@@ -5,3 +5,6 @@
 # Environments & Secrets
 **/.env*
 !**/.env.example
+
+# Devbox
+.devbox

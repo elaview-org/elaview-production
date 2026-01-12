@@ -1,7 +1,10 @@
 #!/bin/sh
 
-_ev_prefix="ELAVIEW_"
-_ev_env_file="$ELAVIEW_DEVBOX_ROOT/.env"
+. "$ELAVIEW_DEVBOX_ROOT/scripts/core/log.sh"
+
+_ev_load_secrets() {
+    doppler secrets download --no-file --format env-no-quotes 2>/dev/null
+}
 
 ev() {
     _ev_group="$1"
@@ -15,28 +18,33 @@ ev() {
         web:*)     sh "$ELAVIEW_EV_CMD/web.sh" "${_ev_group#web:}" "$@" ;;
         mobile:*)  sh "$ELAVIEW_EV_CMD/mobile.sh" "${_ev_group#mobile:}" "$@" ;;
         *)
-            printf "\033[31m✗\033[0m Unknown command group: %s\n" "$_ev_group" >&2
+            ev_core_log_error "Unknown command group: $_ev_group"
             echo "Run 'ev help' for usage."
             return 1
             ;;
     esac
 }
 
-if [ -f "$_ev_env_file" ]; then
-    printf "\033[33mInfo:\033[0m Loading environment variables from .env\n"
-    _ev_count=0
-    while IFS='=' read -r key value; do
-        case "$key" in
-            ''|\#*) continue ;;
-        esac
-        key="${key#"${key%%[![:space:]]*}"}"
-        key="${key%"${key##*[![:space:]]}"}"
-        [ -z "$key" ] && continue
-        export "${_ev_prefix}${key}"="$value"
-        _ev_count=$((_ev_count + 1))
-    done < "$_ev_env_file"
-    printf "\033[32m✓\033[0m Loaded %s variables from .env\n" "$_ev_count"
-    unset _ev_count
+ev_core_log_info "Loading environment variables from Doppler"
+
+if ! _ev_secrets=$(_ev_load_secrets); then
+    ev_core_log_warn "Doppler not configured. Logging in..."
+    if ! doppler login; then
+        ev_core_log_error "Doppler login failed"
+        unset _ev_secrets
+        unset -f _ev_load_secrets
+        return 1
+    fi
+    doppler setup --project elaview --config development --no-interactive
+    if ! _ev_secrets=$(_ev_load_secrets); then
+        ev_core_log_error "Failed to load Doppler secrets"
+        unset _ev_secrets
+        unset -f _ev_load_secrets
+        return 1
+    fi
 fi
 
-unset _ev_prefix _ev_env_file
+eval "$(printf '%s' "$_ev_secrets" | sed 's/^/export ELAVIEW_/')"
+unset _ev_secrets
+unset -f _ev_load_secrets
+ev_core_log_success "Loaded secrets from Doppler"

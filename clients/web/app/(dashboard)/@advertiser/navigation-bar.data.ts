@@ -34,7 +34,7 @@ const advertiserData = {
     },
     {
       title: "Messages",
-      url: "/settings",
+      url: "/messages",
       icon: IconMessage,
     },
     {

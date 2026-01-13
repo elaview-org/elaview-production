@@ -14,14 +14,14 @@ services:
       - type: volume
         source: elaview-postgres-data
         target: /var/lib/postgresql
-        
+  
   server:
     container_name: elaview-backend-server
     build:
       context: .
       dockerfile: Dockerfile
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_ENVIRONMENT: ${ELAVIEW_BACKEND_ASPDOTNETCORE_ENVIRONMENT}
       DATABASE_HOST: elaview-backend-postgres
       DATABASE_PORT: ${ELAVIEW_BACKEND_DATABASE_PORT}
       DATABASE_USER: ${ELAVIEW_BACKEND_DATABASE_USER}

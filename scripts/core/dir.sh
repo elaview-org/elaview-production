@@ -32,12 +32,12 @@ ev_core_in_backend() {
 
 ev_core_in_mobile() {
     ev_core_require_var "ELAVIEW_DEVBOX_ROOT" || return 1
-    ev_core_in_dir "$ELAVIEW_DEVBOX_ROOT/apps/mobile" "$@"
+    ev_core_in_dir "$ELAVIEW_DEVBOX_ROOT/clients/mobile" "$@"
 }
 
 ev_core_in_web() {
     ev_core_require_var "ELAVIEW_DEVBOX_ROOT" || return 1
-    ev_core_in_dir "$ELAVIEW_DEVBOX_ROOT/apps/web" "$@"
+    ev_core_in_dir "$ELAVIEW_DEVBOX_ROOT/clients/web" "$@"
 }
 
 ev_core_in_infra() {

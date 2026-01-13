@@ -14,6 +14,13 @@ Environment (env:*):
     env:list:web            list all Elaview web environment variables
     env:list:backend        list all Elaview backend environment variables
 
+Secrets (secrets:*):
+
+    secrets:list                    show all secrets
+    secrets:get <name>              get a secret value
+    secrets:set <name> <value>      set a secret
+    secrets:notes <name> <note>     set a note on a secret
+
 Backend (backend:*):
 
     backend:start           start backend services via Docker Compose
@@ -46,10 +53,6 @@ Repository (repo:*):
     repo:secrets            scan working directory for secrets
     repo:secrets:history    scan git history for secrets
     repo:secrets:deep       deep scan with verification
-
-Secrets (secrets:*):
-
-    secrets:list            show all secrets
 
 Mobile (mobile:*):
 

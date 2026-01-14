@@ -12,5 +12,5 @@ public sealed class SignupRequest {
     public string Password { get; init; } = null!;
 
     [MaxLength(255)]
-    public string? Name { get; init; }
+    public string Name { get; init; } = null!;
 }

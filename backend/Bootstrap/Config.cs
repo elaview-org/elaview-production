@@ -1,5 +1,5 @@
 using dotenv.net;
-using ElaviewBackend.Shared;
+using ElaviewBackend.Data;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace ElaviewBackend.Bootstrap;
@@ -10,27 +10,27 @@ public static class Config {
         var envVars = Environment.GetEnvironmentVariables();
         var configData = new Dictionary<string, string?> {
             ["Database:Host"] =
-                envVars["DATABASE_HOST"]?.ToString(),
+                envVars["ELAVIEW_BACKEND_DATABASE_HOST"]?.ToString(),
             ["Database:Port"] =
-                envVars["DATABASE_PORT"]?.ToString(),
+                envVars["ELAVIEW_BACKEND_DATABASE_PORT"]?.ToString(),
             ["Database:User"] =
-                envVars["DATABASE_USER"]?.ToString(),
-            ["Database:Password"] = envVars["DATABASE_PASSWORD"]
+                envVars["ELAVIEW_BACKEND_DATABASE_USER"]?.ToString(),
+            ["Database:Password"] = envVars["ELAVIEW_BACKEND_DATABASE_PASSWORD"]
                 ?.ToString()
         };
 
         builder.Configuration.AddInMemoryCollection(configData);
 
-        var certPath = envVars["SERVER_TLS_CERT_PATH"]
+        var certPath = envVars["ELAVIEW_BACKEND_SERVER_TLS_CERT_PATH"]
             ?.ToString();
-        var certPassword = envVars["SERVER_TLS_CERT_PASSWORD"]
+        var certPassword = envVars["ELAVIEW_BACKEND_SERVER_TLS_CERT_PASSWORD"]
             ?.ToString();
 
         if (builder.Environment.IsDevelopment()) {
             builder.WebHost.ConfigureKestrel((_, serverOptions) => {
                 serverOptions.ListenAnyIP(
                     int.Parse(
-                        envVars["SERVER_PORT"]!.ToString()!),
+                        envVars["ELAVIEW_BACKEND_SERVER_PORT"]!.ToString()!),
                     listenOptions => {
                         listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
                     });
@@ -39,7 +39,7 @@ public static class Config {
         else {
             if (string.IsNullOrEmpty(certPath))
                 throw new InvalidOperationException(
-                    "SERVER_TLS_CERT_PATH is required");
+                    "ELAVIEW_BACKEND_SERVER_TLS_CERT_PATH is required");
 
             builder.WebHost
                 .UseQuic(options => {
@@ -49,7 +49,7 @@ public static class Config {
                 })
                 .ConfigureKestrel((_, serverOptions) => {
                     serverOptions.ListenAnyIP(
-                        int.Parse(envVars["SERVER_PORT"]!
+                        int.Parse(envVars["ELAVIEW_BACKEND_SERVER_PORT"]!
                             .ToString()!),
                         listenOptions => {
                             listenOptions.Protocols =

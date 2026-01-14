@@ -1,5 +1,5 @@
-using ElaviewBackend.Shared;
-using ElaviewBackend.Shared.Entities;
+using ElaviewBackend.Data;
+using ElaviewBackend.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.Features.Auth;

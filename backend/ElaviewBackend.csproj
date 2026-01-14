@@ -41,10 +41,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Shared\Migrations\" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Compile Remove="Shared/Legacy/**/*.cs" />
+        <Compile Remove="Data/Legacy/**/*.cs" />
     </ItemGroup>
 </Project>

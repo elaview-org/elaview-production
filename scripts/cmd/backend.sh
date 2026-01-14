@@ -7,7 +7,9 @@ SCRIPTS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 ev_backend_start() {
     ev_core_require_cmd "docker" || return 1
-    ev_core_log_info "Starting backend services..."
+    ev_core_log_info "Applying EF Core database migrations."
+    ev_core_in_backend docker compose up -d database && dotnet ef database update
+    ev_core_log_info "Starting backend services."
     ev_core_in_backend docker compose up --build -d
     ev_backend_exit=$?
     [ $ev_backend_exit -eq 0 ] && ev_core_log_success "Backend services started."

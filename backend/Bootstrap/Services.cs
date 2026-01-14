@@ -1,6 +1,7 @@
+using ElaviewBackend.Data;
 using ElaviewBackend.Features.Auth;
 using ElaviewBackend.Features.Users;
-using ElaviewBackend.Shared;
+using ElaviewBackend.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -16,7 +17,8 @@ public static class Services {
                 var connectionString = sp
                     .GetRequiredService<IOptions<GlobalSettings>>()
                     .Value.Database.GetConnectionString();
-                options.UseNpgsql(connectionString);
+                options.UseNpgsql(connectionString,
+                    o => o.EnableRetryOnFailure());
 
                 if (builder.Environment.IsDevelopment()) {
                     options.LogTo(Console.WriteLine,
@@ -33,7 +35,7 @@ public static class Services {
 
         var envVars = Environment.GetEnvironmentVariables();
         var corsOrigins =
-            envVars["CORS_ORIGINS"]?.ToString()?.Split(',') ??
+            envVars["ELAVIEW_BACKEND_CORS_ORIGINS"]?.ToString()?.Split(',') ??
             throw new InvalidOperationException(
                 "Missing CORS origins"
             );
@@ -49,13 +51,12 @@ public static class Services {
                 CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options => {
                 options.Cookie.Name =
-                    envVars["AUTH_COOKIE_NAME"]!.ToString()!;
+                    envVars["ELAVIEW_BACKEND_AUTH_COOKIE_NAME"]!.ToString()!;
                 options.Cookie.HttpOnly = true;
-                // In development, allow non-HTTPS cookies for local testing
-                options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
-                    ? CookieSecurePolicy.None
-                    : CookieSecurePolicy.Always;
-                // Use Lax for mobile app compatibility (cross-origin requests)
+                options.Cookie.SecurePolicy =
+                    builder.Environment.IsDevelopment()
+                        ? CookieSecurePolicy.None
+                        : CookieSecurePolicy.Always;
                 options.Cookie.SameSite = builder.Environment.IsDevelopment()
                     ? SameSiteMode.Lax
                     : SameSiteMode.Strict;

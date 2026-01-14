@@ -1,4 +1,4 @@
-using ElaviewBackend.Shared.Entities;
+using ElaviewBackend.Data.Entities;
 
 namespace ElaviewBackend.Features.Auth;
 

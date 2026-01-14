@@ -1,5 +1,5 @@
-import UnderConstruction from "@/components/under-construction";
+import BookingsPage from "./bookings";
 
 export default function Page() {
-  return <UnderConstruction />;
+  return <BookingsPage />;
 }

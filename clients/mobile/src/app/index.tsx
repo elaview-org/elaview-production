@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,12 +14,28 @@ import ElaviewLogo from '@/components/features/ElaviewLogo';
 import SlideToStart from '@/components/features/SlideToStartExpoGo';
 import { useRole } from '@/contexts/RoleContext';
 import { colors, spacing } from '@/constants/theme';
+import { useApolloClient } from '@apollo/client/react';
+import { gql } from '@apollo/client';
 
 const { height } = Dimensions.get('window');
 
 export default function WelcomeScreen() {
   const router = useRouter();
   const { role, isLoading } = useRole();
+
+  const client = useApolloClient();
+  client.query({
+    query: gql`
+      query GetSpaces {
+        spaces {
+          nodes {
+            id
+            title
+          }
+        }
+      }
+    `,
+  }).then(result => console.log(result));
 
   useEffect(() => {
     if (!isLoading) {

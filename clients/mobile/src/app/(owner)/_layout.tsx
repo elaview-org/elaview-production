@@ -71,6 +71,13 @@ export default function OwnerLayout() {
             ),
           }}
         />
+        {/* Hidden from tab bar - accessed via FAB button */}
+        <Tabs.Screen
+          name="new-listing"
+          options={{
+            href: null, // Hides from tab bar
+          }}
+        />
       </Tabs>
 
       <DrawerMenu visible={drawerVisible} onClose={() => setDrawerVisible(false)} />

@@ -101,10 +101,11 @@ const styles = StyleSheet.create({
     marginLeft: 24,
   },
   content: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 40,
-  },
+  flex: 1,
+  paddingHorizontal: 24,
+  justifyContent: 'center',
+  marginBottom: 60,
+},
   title: {
     fontSize: 28,
     fontWeight: '700',

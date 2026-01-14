@@ -37,7 +37,14 @@ module.exports = {
     },
     plugins: [
       "expo-router",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Elaview to access your photos to upload images of your advertising spaces.",
+          "cameraPermission": "Allow Elaview to use your camera to take photos of your advertising spaces."
+        }
+      ]
     ],
     experiments: {
       typedRoutes: true

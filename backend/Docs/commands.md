@@ -39,3 +39,20 @@ Or, if you opt into HTTP/3:
 ```bash
 curl https://<your-public-domain>:7106/api/graphql/schema.graphql > "/shared/api"
 ```
+
+### Devbox Help
+
+```bash
+devbox -h
+```
+
+
+### Michael Backend Setup
+1. Run devbox shell
+2. open docker desktop
+3. docker compose up --build (turns on)
+4. docker compose down (turns off)
+
+devbox run m
+
+

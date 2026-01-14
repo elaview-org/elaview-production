@@ -852,6 +852,252 @@ public class NotificationScheduler : BackgroundService
 
 ---
 
+## Mobile Push Notifications (Expo)
+
+### Setup
+
+**Install dependencies:**
+```bash
+pnpm add expo-notifications expo-device
+```
+
+**Configure in app.json:**
+```json
+{
+  "expo": {
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#0088FF",
+          "sounds": ["./assets/notification-sound.wav"]
+        }
+      ]
+    ],
+    "ios": {
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      }
+    },
+    "android": {
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      }
+    }
+  }
+}
+```
+
+### Register for Push Notifications
+
+```typescript
+// src/services/notifications.ts
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import Constants from 'expo-constants';
+
+export async function registerForPushNotifications(): Promise<string | null> {
+  if (!Device.isDevice) {
+    console.warn('Push notifications only work on physical devices');
+    return null;
+  }
+
+  // Check existing permissions
+  const { status: existingStatus } = await Notifications.getPermissionsAsync();
+  let finalStatus = existingStatus;
+
+  // Request permissions if not granted
+  if (existingStatus !== 'granted') {
+    const { status } = await Notifications.requestPermissionsAsync();
+    finalStatus = status;
+  }
+
+  if (finalStatus !== 'granted') {
+    console.warn('Push notification permission denied');
+    return null;
+  }
+
+  // Get Expo push token
+  const tokenData = await Notifications.getExpoPushTokenAsync({
+    projectId: Constants.expoConfig?.extra?.eas?.projectId,
+  });
+
+  // Configure notification behavior
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+
+  return tokenData.data;
+}
+```
+
+### Store Push Token in Backend
+
+```typescript
+// src/hooks/usePushNotifications.ts
+import { useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { registerForPushNotifications } from '@/services/notifications';
+import { api } from '@/services/api';
+
+export function usePushNotifications() {
+  const updateTokenMutation = useMutation({
+    mutationFn: (token: string) =>
+      api.users.updatePushToken({ token }),
+  });
+
+  useEffect(() => {
+    const register = async () => {
+      const token = await registerForPushNotifications();
+      if (token) {
+        await updateTokenMutation.mutateAsync(token);
+      }
+    };
+
+    register();
+  }, []);
+}
+```
+
+### Handle Notifications
+
+```typescript
+// src/app/_layout.tsx additions
+import * as Notifications from 'expo-notifications';
+import { useRouter } from 'expo-router';
+
+export default function RootLayout() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Handle notifications received while app is in foreground
+    const subscription = Notifications.addNotificationReceivedListener(notification => {
+      console.log('Notification received:', notification);
+      // Optionally show in-app banner
+    });
+
+    // Handle notification taps
+    const responseSubscription = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+
+      // Navigate based on notification type
+      if (data.route) {
+        router.push(data.route as any);
+      } else if (data.bookingId) {
+        router.push(`/bookings/${data.bookingId}`);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+      responseSubscription.remove();
+    };
+  }, []);
+
+  // ... rest of layout
+}
+```
+
+### Deep Linking Routes
+
+```typescript
+// src/utils/notificationRoutes.ts
+export function getRouteForNotification(type: NotificationType, data: any): string {
+  switch (type) {
+    case 'BOOKING_REQUEST':
+      return `/(owner)/bookings/${data.bookingId}`;
+
+    case 'BOOKING_ACCEPTED':
+      return `/(advertiser)/bookings/${data.bookingId}`;
+
+    case 'VERIFICATION_SUBMITTED':
+      return `/(advertiser)/bookings/${data.bookingId}/verify`;
+
+    case 'PAYMENT_RECEIVED':
+    case 'PAYOUT_SENT':
+      return `/(owner)/earnings`;
+
+    case 'AUTO_APPROVAL_WARNING':
+      return `/(advertiser)/bookings/${data.bookingId}/verify`;
+
+    default:
+      return '/(app)/alerts';
+  }
+}
+```
+
+### Testing Push Notifications
+
+**Local Testing with Expo Push Tool:**
+```bash
+curl -H "Content-Type: application/json" \
+     -X POST https://exp.host/--/api/v2/push/send \
+     -d '{
+  "to": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]",
+  "title": "New booking request",
+  "body": "John wants to book your Coffee Shop Window",
+  "data": {
+    "type": "BOOKING_REQUEST",
+    "bookingId": "clx123456",
+    "route": "/(owner)/bookings/clx123456"
+  }
+}'
+```
+
+**Using Expo Push Notification Tool:**
+https://expo.dev/notifications
+
+### Badge Management
+
+```typescript
+// src/hooks/useNotificationBadge.ts
+import { useEffect } from 'use';
+import { useQuery } from '@tanstack/react-query';
+import * as Notifications from 'expo-notifications';
+import { api } from '@/services/api';
+
+export function useNotificationBadge() {
+  const { data } = useQuery({
+    queryKey: ['unreadCount'],
+    queryFn: () => api.notifications.getUnreadCount(),
+    refetchInterval: 60000, // Refresh every minute
+  });
+
+  useEffect(() => {
+    if (data?.count !== undefined) {
+      Notifications.setBadgeCountAsync(data.count);
+    }
+  }, [data?.count]);
+
+  return data?.count ?? 0;
+}
+```
+
+### Background Notifications (iOS)
+
+```typescript
+// App registration for background notifications
+Notifications.setNotificationHandler({
+  handleNotification: async (notification) => {
+    // Process notification even when app is backgrounded
+    return {
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    };
+  },
+});
+```
+
+---
+
 ## Related Documentation
 
 - [API Contracts](./API-CONTRACTS.md) - Notification GraphQL operations

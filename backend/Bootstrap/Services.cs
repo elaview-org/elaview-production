@@ -51,8 +51,14 @@ public static class Services {
                 options.Cookie.Name =
                     envVars["AUTH_COOKIE_NAME"]!.ToString()!;
                 options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.SameSite = SameSiteMode.Strict;
+                // In development, allow non-HTTPS cookies for local testing
+                options.Cookie.SecurePolicy = builder.Environment.IsDevelopment()
+                    ? CookieSecurePolicy.None
+                    : CookieSecurePolicy.Always;
+                // Use Lax for mobile app compatibility (cross-origin requests)
+                options.Cookie.SameSite = builder.Environment.IsDevelopment()
+                    ? SameSiteMode.Lax
+                    : SameSiteMode.Strict;
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);
                 options.SlidingExpiration = true;
                 options.LoginPath = "/api/auth/login";

@@ -70,6 +70,7 @@ elaview/
 ✅ Use factories for test data (createMockBooking, etc.)
 ✅ Follow git commit format: `type(scope): description`
 ✅ Include testID props for E2E testing
+✅ **Mobile:** Import config from `@/config` (never use process.env directly)
 
 ### Never
 
@@ -79,6 +80,7 @@ elaview/
 ❌ Commit console.log or debug code
 ❌ Push directly to main, staging, or develop
 ❌ Store secrets in code
+❌ **Mobile:** Never create .env files (use devbox/Doppler instead)
 
 ## Context Files
 
@@ -117,12 +119,30 @@ pnpm format              # Prettier
 pnpm build               # Build all packages
 ```
 
+## Environment Configuration
+
+### Mobile App (clients/mobile)
+- **Environment variables** are managed via Doppler and loaded through `devbox shell`
+- **No .env files needed** - all config comes from `ELAVIEW_MOBILE_*` variables
+- **Import from `@/config`** in your code:
+  ```typescript
+  import { API_URL, GRAPHQL_ENDPOINT, STRIPE_PUBLISHABLE_KEY } from '@/config';
+  ```
+- See `clients/mobile/src/config/README.md` for detailed usage
+- See `clients/mobile/API-INTEGRATION-GUIDE.md` for API integration patterns
+
+### Backend
+- Uses Doppler with `ELAVIEW_BACKEND_*` prefix
+- Loaded via devbox shell
+
 ## Getting Help
 
 - **📍 Start here:** See `START_HERE.md` (comprehensive onboarding & documentation index)
 - **Architecture questions:** See `docs/ARCHITECTURE.md`
 - **API contracts:** See `docs/API-CONTRACTS.md`
 - **Mobile screens:** See `docs/MOBILE-SCREENS.md`
+- **Mobile API integration:** See `clients/mobile/API-INTEGRATION-GUIDE.md`
+- **Mobile env config:** See `clients/mobile/src/config/README.md`
 - **Testing patterns:** See `docs/TESTING.md`
 - **Adding space types:** See `docs/EXTENSIBILITY.md`
 - **Daily workflow:** See `docs/DAILY-WORKFLOW.md`

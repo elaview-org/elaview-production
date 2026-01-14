@@ -51,50 +51,49 @@ graph TD
 
 ```
 clients/mobile/app/
-├── _layout.tsx                    # Root layout (auth check)
+├── _layout.tsx                    # Root layout (ThemeProvider + RoleProvider)
+├── index.tsx                      # Welcome screen with role check
 ├── (auth)/
 │   ├── _layout.tsx                # Auth stack layout
-│   ├── login.tsx
-│   ├── register.tsx
-│   └── forgot-password.tsx
-└── (app)/
-    ├── _layout.tsx                # Main app layout (role switch)
-    ├── (tabs)/
-    │   ├── _layout.tsx            # Tab navigator
-    │   ├── (advertiser)/
-    │   │   ├── _layout.tsx        # Advertiser tabs config
-    │   │   ├── discover.tsx       # Map view
-    │   │   ├── bookings.tsx       # My bookings
-    │   │   ├── notifications.tsx  # Notification center
-    │   │   └── profile.tsx        # Profile
-    │   └── (owner)/
-    │       ├── _layout.tsx        # Owner tabs config
-    │       ├── listings.tsx       # My spaces
-    │       ├── bookings.tsx       # Booking requests
-    │       ├── earnings.tsx       # Earnings dashboard
-    │       └── profile.tsx        # Profile
-    ├── spaces/
-    │   └── [id].tsx               # Space detail
-    ├── book/
-    │   └── [spaceId]/
-    │       ├── index.tsx          # Booking request
-    │       ├── creative.tsx       # Upload creative
-    │       └── payment.tsx        # Payment
-    ├── bookings/
-    │   └── [id]/
-    │       ├── index.tsx          # Booking detail
-    │       ├── verify.tsx         # Review installation (advertiser)
-    │       └── capture.tsx        # Capture verification (owner)
-    ├── listings/
-    │   ├── new.tsx                # Create listing
-    │   └── [id]/
-    │       └── edit.tsx           # Edit listing
-    ├── settings/
-    │   ├── index.tsx              # Settings list
-    │   ├── notifications.tsx      # Notification preferences
-    │   └── payment-methods.tsx    # Saved payment methods
-    └── profile/
-        └── edit.tsx               # Edit profile
+│   ├── login.tsx                  # Email/password login
+│   ├── register.tsx               # Sign up (TODO)
+│   └── role-select.tsx            # Role selection screen
+└── (advertiser)/                  # Advertiser route group (direct tabs)
+│   ├── _layout.tsx                # Bottom tabs + TopNavBar + DrawerMenu
+│   ├── discover.tsx               # Tab 1: Map/search (TODO)
+│   ├── bookings.tsx               # Tab 2: My bookings (TODO)
+│   ├── messages.tsx               # Tab 3: Conversations (TODO)
+│   ├── alerts.tsx                 # Tab 4: Notifications
+│   └── profile.tsx                # Tab 5: Profile (TODO)
+└── (owner)/                       # Owner route group (direct tabs)
+    ├── _layout.tsx                # Bottom tabs + TopNavBar + DrawerMenu
+    ├── listings.tsx               # Tab 1: My spaces (TODO)
+    ├── bookings.tsx               # Tab 2: Requests (TODO)
+    ├── messages.tsx               # Tab 3: Conversations (TODO)
+    ├── earnings.tsx               # Tab 4: Payouts (TODO)
+    └── profile.tsx                # Tab 5: Profile (TODO)
+
+# Future screens (not yet implemented):
+# ├── spaces/
+# │   └── [id].tsx               # Space detail
+# ├── book/
+# │   └── [spaceId]/
+# │       ├── index.tsx          # Booking request
+# │       ├── creative.tsx       # Upload creative
+# │       └── payment.tsx        # Payment
+# ├── bookings/
+# │   └── [id]/
+# │       ├── index.tsx          # Booking detail
+# │       ├── verify.tsx         # Review installation (advertiser)
+# │       └── capture.tsx        # Capture verification (owner)
+# ├── listings/
+# │   ├── new.tsx                # Create listing
+# │   └── [id]/
+# │       └── edit.tsx           # Edit listing
+# └── settings/
+#     ├── index.tsx              # Settings list
+#     ├── notifications.tsx      # Notification preferences
+#     └── payment-methods.tsx    # Saved payment methods
 ```
 
 ---
@@ -120,8 +119,28 @@ graph LR
 
 | User Role | Default Tab | Available Tabs |
 |-----------|-------------|----------------|
-| ADVERTISER | Discover | Discover, Bookings, Notifications, Profile |
-| SPACE_OWNER | Listings | Listings, Bookings, Earnings, Profile |
+| ADVERTISER | Discover | Discover, Bookings, Messages, Alerts, Profile |
+| SPACE_OWNER | Listings | Listings, Bookings, Messages, Earnings, Profile |
+
+#### Tab Icons & Routes
+
+**Advertiser Tabs:**
+| Order | Icon | Label | Route | Status |
+|-------|------|-------|-------|--------|
+| 1 | search | Discover | `/(advertiser)/discover` | Placeholder |
+| 2 | calendar-outline | Bookings | `/(advertiser)/bookings` | Placeholder |
+| 3 | chatbubble-outline | Messages | `/(advertiser)/messages` | Placeholder |
+| 4 | notifications-outline | Alerts | `/(advertiser)/alerts` | ✅ MVP |
+| 5 | person-outline | Profile | `/(advertiser)/profile` | Placeholder |
+
+**Owner Tabs:**
+| Order | Icon | Label | Route | Status |
+|-------|------|-------|-------|--------|
+| 1 | location-outline | Listings | `/(owner)/listings` | Placeholder |
+| 2 | calendar-outline | Bookings | `/(owner)/bookings` | Placeholder |
+| 3 | chatbubble-outline | Messages | `/(owner)/messages` | Placeholder |
+| 4 | wallet-outline | Earnings | `/(owner)/earnings` | Placeholder |
+| 5 | person-outline | Profile | `/(owner)/profile` | Placeholder |
 
 ---
 

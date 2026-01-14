@@ -6,22 +6,56 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  ActivityIndicator,
+  Alert,
 } from 'react-native';
+import { SocialIconBar } from '@/components/features/SocialIconBar';
 import { Link, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAuth } from '@/contexts/AuthContext';
 
 const { width, height } = Dimensions.get('window');
 
 export default function Login() {
   const router = useRouter();
+  const { login, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSignIn = async () => {
-    // TODO: Wire up .NET auth later
-    // For now, navigate to role selection
-    router.replace('/(auth)/role-select');
+    // Clear previous errors
+    setError('');
+
+    // Validate input
+    if (!email.trim()) {
+      setError('Please enter your email');
+      return;
+    }
+
+    if (!password.trim()) {
+      setError('Please enter your password');
+      return;
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      await login(email.trim(), password);
+
+      // After successful login, navigate to role selection
+      // The user will choose whether to use advertiser or owner features
+      router.replace('/(auth)/role-select');
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Login failed. Please try again.';
+      setError(errorMessage);
+      Alert.alert('Login Failed', errorMessage);
+    }
   };
 
   return (
@@ -82,16 +116,8 @@ export default function Login() {
         {/* Social Login */}
         <Text style={styles.orText}>Or continue with</Text>
         <View style={styles.socialContainer}>
-          <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialIcon}>G</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialIcon}>f</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton}>
-            <Text style={styles.socialIcon}></Text>
-          </TouchableOpacity>
-        </View>
+  <SocialIconBar />
+</View>
       </View>
     </View>
   );
@@ -119,10 +145,10 @@ const styles = StyleSheet.create({
     marginLeft: 24,
   },
   formContainer: {
-    flex: 1,
-    paddingHorizontal: 24,
-    paddingTop: 40,
-  },
+  flex: 1,
+  paddingHorizontal: 24,
+  justifyContent: 'center',
+},
   title: {
     fontSize: 28,
     fontWeight: '700',
@@ -183,10 +209,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 16,
-  },
+  alignItems: 'center',
+  justifyContent: 'center',
+},
   socialButton: {
     width: 50,
     height: 50,

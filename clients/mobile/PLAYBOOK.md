@@ -16,10 +16,15 @@
 - [x] Create folder structure: src/screens, src/components, src/hooks, src/services, src/types, src/utils, src/constants
 
 ### Environment & Configuration
-- [ ] Install expo-constants and react-native-dotenv for environment variables
-- [ ] Create .env.example with required variables (API_URL, STRIPE_KEY, CLERK_KEY)
+- [x] Install expo-constants for environment variables
+- [x] Create app.config.js to read ELAVIEW_MOBILE_* variables from devbox/Doppler
+- [x] Create src/config/env.ts for typed environment variable access
+- [x] Create src/config/api.ts for API endpoint configuration
+- [x] Document environment setup in API-INTEGRATION-GUIDE.md and src/config/README.md
 - [ ] Configure EAS Build for iOS and Android
 - [ ] Set up development, staging, and production environment profiles
+
+**Note:** Environment variables are managed via Doppler and loaded through devbox shell. No .env files needed. See `src/config/README.md` for usage.
 
 ### Core Dependencies
 - [x] Navigation: expo-router@6.0.21
@@ -41,12 +46,22 @@
 
 ### Authentication Flow
 - [x] Build Login screen (email/password)
-- [ ] Configure Clerk provider in app root
 - [x] Build Signup screen with role selection
 - [x] Implement "Forgot Password" flow
 - [x] Create authenticated vs unauthenticated navigation stacks
 - [x] Store role securely with expo-secure-store
+- [x] Create auth types (User, LoginRequest, LoginResponse, etc.)
+- [x] Create auth service with REST API integration
+- [x] Create AuthContext for managing user state
+- [x] Add AuthProvider to root layout
+- [x] Update login.tsx to use auth service
+- [x] Update register.tsx to use auth service
+- [x] Add input validation (email format, password length, etc.)
+- [x] Add loading states and error handling
 - [ ] Handle token refresh and session expiration
+- [ ] Implement GraphQL getCurrentUser query
+
+**Note:** Authentication now uses the backend REST API at `/api/auth/login`, `/api/auth/signup`, `/api/auth/logout`. See `AUTHENTICATION.md` for complete documentation.
 
 ### Navigation Structure ✅ COMPLETE
 - [x] Create role-based route groups: (advertiser)/ and (owner)/

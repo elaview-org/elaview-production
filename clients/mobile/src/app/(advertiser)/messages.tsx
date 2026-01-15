@@ -6,6 +6,7 @@ import { mockConversations } from '@/mocks/messages';
 export default function Messages() {
   const { theme } = useTheme();
 
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       <MessagesList conversations={mockConversations} />

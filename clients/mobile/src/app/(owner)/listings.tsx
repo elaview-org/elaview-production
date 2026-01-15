@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -6,7 +6,9 @@ import {
   FlatList,
   TouchableOpacity,
   RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '@/contexts/ThemeContext';
 import SpaceCard from '@/components/features/SpaceCard';
@@ -14,39 +16,82 @@ import EmptyState from '@/components/ui/EmptyState';
 import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
 import { mockSpaces, Space } from '@/mocks/spaces';
 
+const PAGE_SIZE = 10;
+
 export default function Listings() {
   const { theme } = useTheme();
+  const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [displayedSpaces, setDisplayedSpaces] = useState<Space[]>(
+    mockSpaces.slice(0, PAGE_SIZE)
+  );
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(mockSpaces.length > PAGE_SIZE);
 
-  // Filter to show only "owner's" spaces (first 3 for demo)
-  const ownerSpaces = mockSpaces.slice(0, 3);
-
-  const onRefresh = () => {
+  const onRefresh = useCallback(() => {
     setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  };
+    // Simulate API refresh
+    setTimeout(() => {
+      setDisplayedSpaces(mockSpaces.slice(0, PAGE_SIZE));
+      setHasMore(mockSpaces.length > PAGE_SIZE);
+      setRefreshing(false);
+    }, 1000);
+  }, []);
+
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
+
+    setIsLoadingMore(true);
+    // TODO: Replace with HotChocolate GraphQL query using [UsePaging]
+    // Example: useSpacesQuery({ first: PAGE_SIZE, after: cursor })
+    // The backend SpaceQueries.cs already has [UsePaging] configured
+    // See: backend/Features/Spaces/SpaceQueries.cs - GetSpaces query
+    setTimeout(() => {
+      const currentLength = displayedSpaces.length;
+      const nextSpaces = mockSpaces.slice(
+        currentLength,
+        currentLength + PAGE_SIZE
+      );
+      setDisplayedSpaces((prev) => [...prev, ...nextSpaces]);
+      setHasMore(currentLength + nextSpaces.length < mockSpaces.length);
+      setIsLoadingMore(false);
+    }, 500);
+  }, [displayedSpaces.length, isLoadingMore, hasMore]);
 
   const handleAddListing = () => {
-    // TODO: Navigate to create listing flow
+    router.push('/(owner)/new-listing');
   };
 
   const renderSpace = ({ item }: { item: Space }) => (
     <SpaceCard
       space={item}
       compact={viewMode === 'list'}
+      gridMode={viewMode === 'grid'}
       onPress={() => {
         // TODO: Navigate to listing detail/edit
       }}
     />
   );
 
+  const renderFooter = () => {
+    if (!isLoadingMore) return null;
+    return (
+      <View style={styles.loadingFooter}>
+        <ActivityIndicator size="small" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: theme.textMuted }]}>
+          Loading more...
+        </Text>
+      </View>
+    );
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Header with view toggle */}
       <View style={[styles.header, { borderBottomColor: theme.border }]}>
         <Text style={[styles.headerTitle, { color: theme.text }]}>
-          {ownerSpaces.length} {ownerSpaces.length === 1 ? 'Space' : 'Spaces'}
+          {displayedSpaces.length} {displayedSpaces.length === 1 ? 'Space' : 'Spaces'}
         </Text>
         <View style={styles.headerActions}>
           <TouchableOpacity
@@ -80,7 +125,7 @@ export default function Listings() {
 
       {/* Listings */}
       <FlatList
-        data={ownerSpaces}
+        data={displayedSpaces}
         keyExtractor={(item) => item.id}
         renderItem={renderSpace}
         numColumns={viewMode === 'grid' ? 2 : 1}
@@ -88,7 +133,7 @@ export default function Listings() {
         columnWrapperStyle={viewMode === 'grid' ? styles.gridRow : undefined}
         contentContainerStyle={[
           styles.listContainer,
-          ownerSpaces.length === 0 && styles.emptyContainer,
+          displayedSpaces.length === 0 && styles.emptyContainer,
         ]}
         ListEmptyComponent={
           <EmptyState
@@ -99,6 +144,9 @@ export default function Listings() {
             onAction={handleAddListing}
           />
         }
+        ListFooterComponent={renderFooter}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.3}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -110,7 +158,7 @@ export default function Listings() {
       />
 
       {/* FAB for adding new listing */}
-      {ownerSpaces.length > 0 && (
+      {displayedSpaces.length > 0 && (
         <TouchableOpacity
           style={styles.fab}
           onPress={handleAddListing}
@@ -159,21 +207,32 @@ const styles = StyleSheet.create({
   },
   gridRow: {
     justifyContent: 'space-between',
+    gap: spacing.sm,
   },
-  fab: {
-    position: 'absolute',
-    bottom: spacing.lg,
-    right: spacing.lg,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
+  loadingFooter: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
   },
+  loadingText: {
+    fontSize: fontSize.sm,
+  },
+  fab: {
+  position: 'absolute',
+  bottom: spacing.lg,
+  alignSelf: 'center',
+  width: 56,
+  height: 56,
+  borderRadius: 28,
+  backgroundColor: colors.primary,
+  justifyContent: 'center',
+  alignItems: 'center',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.3,
+  shadowRadius: 8,
+  elevation: 5,
+},
 });

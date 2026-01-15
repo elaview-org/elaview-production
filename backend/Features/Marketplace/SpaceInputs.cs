@@ -25,3 +25,16 @@ public record CreateSpaceInput(
     string? DimensionsText,
     string? Traffic
 );
+
+public record UpdateSpaceInput(
+    string? Title,
+    string? Description,
+    decimal? PricePerDay,
+    decimal? InstallationFee,
+    int? MinDuration,
+    int? MaxDuration,
+    List<string>? Images,
+    DateTime? AvailableFrom,
+    DateTime? AvailableTo,
+    string? Traffic
+);

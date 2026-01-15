@@ -26,15 +26,20 @@ public static class Config {
         var certPassword = envVars["ELAVIEW_BACKEND_SERVER_TLS_CERT_PASSWORD"]
             ?.ToString();
 
-        if (builder.Environment.IsDevelopment()) {
-            builder.WebHost.ConfigureKestrel((_, serverOptions) => {
-                serverOptions.ListenAnyIP(
-                    int.Parse(
-                        envVars["ELAVIEW_BACKEND_SERVER_PORT"]!.ToString()!),
-                    listenOptions => {
-                        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
-                    });
-            });
+        var isTestOrDev = builder.Environment.IsDevelopment() ||
+                          builder.Environment.EnvironmentName == "Testing";
+
+        if (isTestOrDev) {
+            var port = envVars["ELAVIEW_BACKEND_SERVER_PORT"]?.ToString();
+            if (!string.IsNullOrEmpty(port)) {
+                builder.WebHost.ConfigureKestrel((_, serverOptions) => {
+                    serverOptions.ListenAnyIP(
+                        int.Parse(port),
+                        listenOptions => {
+                            listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                        });
+                });
+            }
         }
         else {
             if (string.IsNullOrEmpty(certPath))
@@ -62,12 +67,18 @@ public static class Config {
 
     public static Task ConfigureAsync(this WebApplication app) {
         var task = Task.CompletedTask;
-        if (!app.Environment.IsDevelopment()) {
-            app.MapOpenApi();
+        var isTestOrDev = app.Environment.IsDevelopment() ||
+                          app.Environment.EnvironmentName == "Testing";
+
+        if (app.Environment.IsDevelopment()) {
             task = Task.Run(async () => await app.Services.CreateScope()
                 .ServiceProvider
                 .GetRequiredService<DatabaseSeeder>()
-                .SeedDevelopmentAccountsAsync(app.Environment.IsDevelopment()));
+                .SeedDevelopmentAccountsAsync(true));
+        }
+
+        if (!isTestOrDev) {
+            app.MapOpenApi();
             app.UseHttpsRedirection();
         }
 

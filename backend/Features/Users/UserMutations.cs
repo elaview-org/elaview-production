@@ -1,9 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using ElaviewBackend.Data.Entities;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Users;
 
 [MutationType]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static partial class UserMutations {
     [Authorize]
     public static async Task<User> UpdateCurrentUser(
@@ -17,12 +19,14 @@ public static partial class UserMutations {
 
     [Authorize]
     public static async Task<AdvertiserProfile> UpdateAdvertiserProfile(
-        UpdateAdvertiserProfileInput input, IUserService userService, CancellationToken ct
+        UpdateAdvertiserProfileInput input, IUserService userService,
+        CancellationToken ct
     ) => await userService.UpdateAdvertiserProfileAsync(input, ct);
 
     [Authorize]
     public static async Task<SpaceOwnerProfile> UpdateSpaceOwnerProfile(
-        UpdateSpaceOwnerProfileInput input, IUserService userService, CancellationToken ct
+        UpdateSpaceOwnerProfileInput input, IUserService userService,
+        CancellationToken ct
     ) => await userService.UpdateSpaceOwnerProfileAsync(input, ct);
 
     [Authorize]

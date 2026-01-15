@@ -1,30 +1,29 @@
-using System.Diagnostics.CodeAnalysis;
-using ElaviewBackend.Features.Users;
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Marketplace;
 
 [QueryType]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static partial class SpaceQueries {
     [Authorize]
     [UseFirstOrDefault]
     [UseProjection]
-    public static IQueryable<Space?> GetSpaceById(
-        [ID] Guid id, AppDbContext context
-    ) {
-        return context.Spaces.Where(t => t.Id == id);
-    }
+    public static IQueryable<Space> GetSpaceById(
+        [ID] Guid id, ISpaceService spaceService
+    ) => spaceService.GetSpaceByIdQuery(id);
 
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Space> GetSpaces(
-        AppDbContext context, IUserService userService
-    ) => userService.GetCurrentUserIdOrNull() is { } userId
-        ? context.Spaces.Where(s => s.SpaceOwnerProfile.UserId != userId)
-        : context.Spaces;
+    public static IQueryable<Space> GetSpaces(ISpaceService spaceService)
+        => spaceService.GetSpacesExcludingCurrentUserQuery();
+
+    [Authorize]
+    [UsePaging]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public static IQueryable<Space> GetMySpaces(ISpaceService spaceService)
+        => spaceService.GetMySpacesQuery();
 }

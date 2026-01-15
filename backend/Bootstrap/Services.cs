@@ -1,5 +1,6 @@
 using ElaviewBackend.Data;
 using ElaviewBackend.Features.Auth;
+using ElaviewBackend.Features.Marketplace;
 using ElaviewBackend.Features.Users;
 using ElaviewBackend.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -31,6 +32,14 @@ public static class Services {
             .AddScoped<AuthService>()
             .AddScoped<IUserService, UserService>()
             .AddScoped<IUserRepository, UserRepository>()
+            .AddScoped<ISpaceService, SpaceService>()
+            .AddScoped<ISpaceRepository, SpaceRepository>()
+            .AddScoped<ICampaignService, CampaignService>()
+            .AddScoped<ICampaignRepository, CampaignRepository>()
+            .AddScoped<IBookingService, BookingService>()
+            .AddScoped<IBookingRepository, BookingRepository>()
+            .AddScoped<IReviewService, ReviewService>()
+            .AddScoped<IReviewRepository, ReviewRepository>()
             .AddScoped<DatabaseSeeder>()
             .AddControllers();
 
@@ -51,14 +60,15 @@ public static class Services {
             .AddAuthentication(
                 CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options => {
+                var isTestOrDev = builder.Environment.IsDevelopment() ||
+                                  builder.Environment.EnvironmentName == "Testing";
                 options.Cookie.Name =
                     envVars["ELAVIEW_BACKEND_AUTH_COOKIE_NAME"]!.ToString()!;
                 options.Cookie.HttpOnly = true;
-                options.Cookie.SecurePolicy =
-                    builder.Environment.IsDevelopment()
-                        ? CookieSecurePolicy.None
-                        : CookieSecurePolicy.Always;
-                options.Cookie.SameSite = builder.Environment.IsDevelopment()
+                options.Cookie.SecurePolicy = isTestOrDev
+                    ? CookieSecurePolicy.None
+                    : CookieSecurePolicy.Always;
+                options.Cookie.SameSite = isTestOrDev
                     ? SameSiteMode.Lax
                     : SameSiteMode.Strict;
                 options.ExpireTimeSpan = TimeSpan.FromDays(7);

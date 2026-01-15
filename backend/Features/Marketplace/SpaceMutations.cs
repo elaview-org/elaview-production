@@ -1,69 +1,32 @@
-using ElaviewBackend.Features.Users;
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
+using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Marketplace;
 
 [MutationType]
 public static partial class SpaceMutations {
     [Authorize]
-    public static async Task<Space> CreateSpace(
-        CreateSpaceInput input, AppDbContext context,
-        IUserService userService, CancellationToken ct
-    ) {
-        var userId = userService.GetCurrentUserIdOrNull()
-                     ?? throw new GraphQLException("Not authenticated");
-        var user = await context.Users
-                       .FirstOrDefaultAsync(u => u.Id == userId, ct)
-                   ?? throw new GraphQLException("User not found");
-
-        var spaceOwnerProfile =
-            await context.SpaceOwnerProfiles.FirstOrDefaultAsync(p =>
-                p.Id == user.SpaceOwnerProfile!.Id, ct);
-        var space = new Space {
-            SpaceOwnerProfileId = spaceOwnerProfile!.Id,
-            Title = input.Title,
-            Description = input.Description,
-            Type = input.Type,
-            Status = SpaceStatus.Active,
-            Address = input.Address,
-            City = input.City,
-            State = input.State,
-            ZipCode = input.ZipCode,
-            Latitude = input.Latitude,
-            Longitude = input.Longitude,
-            Width = input.Width,
-            Height = input.Height,
-            Dimensions = input.Dimensions,
-            PricePerDay = input.PricePerDay,
-            InstallationFee = input.InstallationFee,
-            MinDuration = input.MinDuration,
-            MaxDuration = input.MaxDuration,
-            Images = input.Images ?? [],
-            AvailableFrom = input.AvailableFrom,
-            AvailableTo = input.AvailableTo,
-            DimensionsText = input.DimensionsText,
-            Traffic = input.Traffic,
-            CreatedAt = DateTime.UtcNow,
-        };
-
-        context.Spaces.Add(space);
-        await context.SaveChangesAsync(ct);
-        return space;
-    }
+    public static async Task<CreateSpacePayload> CreateSpace(
+        CreateSpaceInput input, ISpaceService spaceService, CancellationToken ct
+    ) => new(await spaceService.CreateAsync(input, ct));
 
     [Authorize]
-    public static async Task<Space> DeleteSpace(
-        [ID] Guid id, AppDbContext context, CancellationToken ct
-    ) {
-        var space = await context.Spaces.FirstOrDefaultAsync(
-            s => s.Id == id, ct
-        ) ?? throw new Exception("Space not found");
+    public static async Task<UpdateSpacePayload> UpdateSpace(
+        [ID] Guid id, UpdateSpaceInput input, ISpaceService spaceService, CancellationToken ct
+    ) => new(await spaceService.UpdateAsync(id, input, ct));
 
-        context.Spaces.Remove(space);
-        await context.SaveChangesAsync(ct);
-        return space;
-    }
+    [Authorize]
+    public static async Task<DeleteSpacePayload> DeleteSpace(
+        [ID] Guid id, ISpaceService spaceService, CancellationToken ct
+    ) => new(await spaceService.DeleteAsync(id, ct));
+
+    [Authorize]
+    public static async Task<DeactivateSpacePayload> DeactivateSpace(
+        [ID] Guid id, ISpaceService spaceService, CancellationToken ct
+    ) => new(await spaceService.DeactivateAsync(id, ct));
+
+    [Authorize]
+    public static async Task<ReactivateSpacePayload> ReactivateSpace(
+        [ID] Guid id, ISpaceService spaceService, CancellationToken ct
+    ) => new(await spaceService.ReactivateAsync(id, ct));
 }

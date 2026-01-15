@@ -9,6 +9,7 @@ public interface ICampaignService {
     Guid? GetCurrentUserIdOrNull();
     IQueryable<Campaign> GetCampaignByIdQuery(Guid id);
     IQueryable<Campaign> GetMyCampaignsQuery();
+    IQueryable<Campaign> GetByAdvertiserId(Guid advertiserProfileId);
     Task<Campaign?> GetCampaignByIdAsync(Guid id, CancellationToken ct);
     Task<Campaign> CreateAsync(CreateCampaignInput input, CancellationToken ct);
 
@@ -45,6 +46,9 @@ public sealed class CampaignService(
         return context.Campaigns.Where(c =>
             c.AdvertiserProfile.UserId == userId);
     }
+
+    public IQueryable<Campaign> GetByAdvertiserId(Guid advertiserProfileId)
+        => context.Campaigns.Where(c => c.AdvertiserProfileId == advertiserProfileId);
 
     public async Task<Campaign?> GetCampaignByIdAsync(Guid id,
         CancellationToken ct) {

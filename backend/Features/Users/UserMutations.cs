@@ -10,44 +10,32 @@ public static partial class UserMutations {
     [Authorize]
     public static async Task<User> UpdateCurrentUser(
         UpdateUserInput input, IUserService userService, CancellationToken ct
-    ) {
-        return await userService.UpdateMyInfoAsync(input, ct);
-    }
+    ) => await userService.UpdateMyInfoAsync(input, ct);
 
     [Authorize]
     public static async Task<User> SwitchProfileType(
         ProfileType type, IUserService userService, CancellationToken ct
-    ) {
-        return await userService.SwitchMyProfileTypeAsync(type, ct);
-    }
+    ) => await userService.SwitchMyProfileTypeAsync(type, ct);
 
     [Authorize]
     public static async Task<AdvertiserProfile> UpdateAdvertiserProfile(
         UpdateAdvertiserProfileInput input, IUserService userService,
         CancellationToken ct
-    ) {
-        return await userService.UpdateAdvertiserProfileAsync(input, ct);
-    }
+    ) => await userService.UpdateMyAdvertiserProfileAsync(input, ct);
 
     [Authorize]
     public static async Task<SpaceOwnerProfile> UpdateSpaceOwnerProfile(
         UpdateSpaceOwnerProfileInput input, IUserService userService,
         CancellationToken ct
-    ) {
-        return await userService.UpdateSpaceOwnerProfileAsync(input, ct);
-    }
+    ) => await userService.UpdateMySpaceOwnerProfileAsync(input, ct);
 
     [Authorize]
     public static async Task<User> CompleteOnboarding(
         ProfileType profileType, IUserService userService, CancellationToken ct
-    ) {
-        return await userService.CompleteOnboardingAsync(profileType, ct);
-    }
+    ) => await userService.CompleteOnboardingAsync(profileType, ct);
 
     [Authorize(Roles = ["Admin"])]
     public static async Task<bool> DeleteUser(
         [ID] Guid id, IUserService userService, CancellationToken ct
-    ) {
-        return await userService.DeleteAsync(id, ct);
-    }
+    ) => await userService.DeleteAsync(id, ct);
 }

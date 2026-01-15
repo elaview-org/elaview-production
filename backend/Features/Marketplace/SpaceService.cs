@@ -11,6 +11,7 @@ public interface ISpaceService {
     IQueryable<Space> GetSpacesExcludingCurrentUserQuery();
     IQueryable<Space> GetSpaceByIdQuery(Guid id);
     IQueryable<Space> GetMySpacesQuery();
+    IQueryable<Space> GetByOwnerId(Guid ownerProfileId);
     Task<Space?> GetSpaceByIdAsync(Guid id, CancellationToken ct);
     Task<Space> CreateAsync(CreateSpaceInput input, CancellationToken ct);
 
@@ -58,6 +59,9 @@ public sealed class SpaceService(
         var userId = GetCurrentUserId();
         return context.Spaces.Where(s => s.SpaceOwnerProfile.UserId == userId);
     }
+
+    public IQueryable<Space> GetByOwnerId(Guid ownerProfileId)
+        => context.Spaces.Where(s => s.SpaceOwnerProfileId == ownerProfileId);
 
     public async Task<Space?> GetSpaceByIdAsync(Guid id, CancellationToken ct) {
         return await spaceRepository.GetByIdAsync(id, ct);

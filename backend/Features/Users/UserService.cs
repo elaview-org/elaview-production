@@ -51,17 +51,13 @@ public sealed class UserService(
     public async Task<User> UpdateMyInfoAsync(UpdateUserInput input,
         CancellationToken ct) {
         var user = await GetCurrentUserAsync(ct);
-        if (input.Name is not null) user.Name = input.Name;
-        if (input.Phone is not null) user.Phone = input.Phone;
-        if (input.Avatar is not null) user.Avatar = input.Avatar;
-        return await userRepository.UpdateAsync(user, ct);
+        return await userRepository.UpdateAsync(user, input, ct);
     }
 
     public async Task<User> SwitchMyProfileTypeAsync(ProfileType type,
         CancellationToken ct) {
         var user = await GetCurrentUserAsync(ct);
-        user.ActiveProfileType = type;
-        return await userRepository.UpdateAsync(user, ct);
+        return await userRepository.UpdateProfileTypeAsync(user, type, ct);
     }
 
     public async Task<AdvertiserProfile?> GetAdvertiserProfileByUserIdAsync(
@@ -71,10 +67,7 @@ public sealed class UserService(
     public async Task<AdvertiserProfile> UpdateMyAdvertiserProfileAsync(
         UpdateAdvertiserProfileInput input, CancellationToken ct) {
         var profile = await GetMyAdvertiserProfileAsync(ct);
-        if (input.CompanyName is not null) profile.CompanyName = input.CompanyName;
-        if (input.Industry is not null) profile.Industry = input.Industry;
-        if (input.Website is not null) profile.Website = input.Website;
-        return await userRepository.UpdateAsync(profile, ct);
+        return await userRepository.UpdateAsync(profile, input, ct);
     }
 
     public async Task<SpaceOwnerProfile?> GetSpaceOwnerProfileByUserIdAsync(
@@ -84,11 +77,7 @@ public sealed class UserService(
     public async Task<SpaceOwnerProfile> UpdateMySpaceOwnerProfileAsync(
         UpdateSpaceOwnerProfileInput input, CancellationToken ct) {
         var profile = await GetMySpaceOwnerProfileAsync(ct);
-        if (input.BusinessName is not null) profile.BusinessName = input.BusinessName;
-        if (input.BusinessType is not null) profile.BusinessType = input.BusinessType;
-        if (input.PayoutSchedule is not null)
-            profile.PayoutSchedule = input.PayoutSchedule.Value;
-        return await userRepository.UpdateAsync(profile, ct);
+        return await userRepository.UpdateAsync(profile, input, ct);
     }
 
     public async Task<User> CompleteOnboardingAsync(ProfileType profileType,
@@ -104,26 +93,25 @@ public sealed class UserService(
 
         switch (profileType) {
             case ProfileType.Advertiser when advertiserProfile is not null:
-                advertiserProfile.OnboardingComplete = true;
-                await userRepository.UpdateAsync(advertiserProfile, ct);
+                await userRepository.UpdateOnboardingAsync(advertiserProfile,
+                    true, ct);
                 break;
             case ProfileType.SpaceOwner when spaceOwnerProfile is not null:
-                spaceOwnerProfile.OnboardingComplete = true;
-                await userRepository.UpdateAsync(spaceOwnerProfile, ct);
+                await userRepository.UpdateOnboardingAsync(spaceOwnerProfile,
+                    true, ct);
                 break;
             default:
                 throw new GraphQLException("Profile not found");
         }
 
-        user.ActiveProfileType = profileType;
-        return await userRepository.UpdateAsync(user, ct);
+        return await userRepository.UpdateProfileTypeAsync(user, profileType,
+            ct);
     }
 
     public async Task<bool> DeleteAsync(Guid id, CancellationToken ct) {
         var user = await userRepository.GetUserByIdAsync(id, ct);
         if (user is null) return false;
-        user.Status = UserStatus.Deleted;
-        await userRepository.UpdateAsync(user, ct);
+        await userRepository.UpdateStatusAsync(user, UserStatus.Deleted, ct);
         return true;
     }
 

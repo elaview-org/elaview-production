@@ -1,4 +1,5 @@
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Marketplace;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Users;
@@ -11,8 +12,6 @@ public static class SpaceOwnerExtensions {
     [UseFiltering]
     [UseSorting]
     public static IQueryable<Space> GetSpaces(
-        [Parent] SpaceOwnerProfile spaceOwner, IUserService userService
-    ) {
-        return userService.GetSpacesBySpaceOwnerProfileId(spaceOwner.Id);
-    }
+        [Parent] SpaceOwnerProfile spaceOwner, ISpaceService spaceService
+    ) => spaceService.GetByOwnerId(spaceOwner.Id);
 }

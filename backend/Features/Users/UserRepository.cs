@@ -5,22 +5,22 @@ using Microsoft.EntityFrameworkCore;
 namespace ElaviewBackend.Features.Users;
 
 public interface IUserRepository {
-    Task<User?> GetUserByIdAsync(Guid id, CancellationToken cancellationToken);
+    Task<User?> GetUserByIdAsync(Guid id, CancellationToken ct);
 
     Task<AdvertiserProfile?> GetAdvertiserProfileByUserIdAsync(Guid userId,
-        CancellationToken cancellationToken);
+        CancellationToken ct);
 
     Task<SpaceOwnerProfile?> GetSpaceOwnerProfileByUserIdAsync(Guid userId,
-        CancellationToken cancellationToken);
+        CancellationToken ct);
 
     Task<IReadOnlyList<Space>> GetSpacesBySpaceOwnerProfileIdAsync(
-        Guid spaceOwnerProfileId, CancellationToken cancellationToken);
+        Guid spaceOwnerProfileId, CancellationToken ct);
 
     Task<IReadOnlyList<Campaign>> GetCampaignsByAdvertiserProfileIdAsync(
-        Guid advertiserProfileId, CancellationToken cancellationToken);
+        Guid advertiserProfileId, CancellationToken ct);
 
     Task<IReadOnlyList<Payout>> GetPayoutsBySpaceOwnerProfileIdAsync(
-        Guid spaceOwnerProfileId, CancellationToken cancellationToken);
+        Guid spaceOwnerProfileId, CancellationToken ct);
 }
 
 public class UserRepository(

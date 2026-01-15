@@ -1,4 +1,3 @@
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
 using HotChocolate.Authorization;
 
@@ -9,28 +8,21 @@ public static partial class UserQueries {
     [Authorize]
     [UseFirstOrDefault]
     [UseProjection]
-    public static IQueryable<User> GetCurrentUser(
-        AppDbContext context, IUserService userService
-    ) {
-        var userId = userService.GetCurrentUserIdOrNull();
-        return context.Users.Where(u => u.Id == userId);
-    }
+    public static IQueryable<User> GetCurrentUser(IUserService userService)
+        => userService.GetCurrentUserQuery();
 
     [Authorize(Roles = ["Admin"])]
     [UseFirstOrDefault]
     [UseProjection]
-    public static IQueryable<User?> GetUserById(
-        [ID] Guid id, AppDbContext context
-    ) {
-        return context.Users.Where(u => u.Id == id);
-    }
+    public static IQueryable<User> GetUserById(
+        [ID] Guid id, IUserService userService
+    ) => userService.GetUserByIdQuery(id);
 
     [Authorize(Roles = ["Admin"])]
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<User> GetUsers(AppDbContext context) {
-        return context.Users;
-    }
+    public static IQueryable<User> GetUsers(IUserService userService)
+        => userService.GetUsersQuery();
 }

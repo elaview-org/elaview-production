@@ -6,21 +6,28 @@ namespace ElaviewBackend.Features.Users;
 
 public interface IUserService {
     Guid? GetCurrentUserIdOrNull();
+    IQueryable<User> GetCurrentUserQuery();
+    IQueryable<User> GetUserByIdQuery(Guid id);
+    IQueryable<User> GetUsersQuery();
     Task<User> GetCurrentUserAsync(CancellationToken ct);
     Task<User> UpdateAsync(UpdateUserInput input, CancellationToken ct);
     Task<User> SwitchProfileTypeAsync(ProfileType type, CancellationToken ct);
 
-    Task<AdvertiserProfile> GetAdvertiserProfileAsync(
-        CancellationToken ct);
+    Task<AdvertiserProfile?> GetAdvertiserProfileByUserIdAsync(
+        Guid userId, CancellationToken ct);
 
     Task<AdvertiserProfile> UpdateAdvertiserProfileAsync(
         UpdateAdvertiserProfileInput input, CancellationToken ct);
 
-    Task<SpaceOwnerProfile> GetSpaceOwnerProfileAsync(
-        CancellationToken ct);
+    Task<SpaceOwnerProfile?> GetSpaceOwnerProfileByUserIdAsync(
+        Guid userId, CancellationToken ct);
 
     Task<SpaceOwnerProfile> UpdateSpaceOwnerProfileAsync(
         UpdateSpaceOwnerProfileInput input, CancellationToken ct);
+
+    IQueryable<Space> GetSpacesBySpaceOwnerProfileId(Guid profileId);
+
+    IQueryable<Campaign> GetCampaignsByAdvertiserProfileId(Guid profileId);
 
     Task<User> CompleteOnboardingAsync(ProfileType profileType,
         CancellationToken ct);
@@ -44,6 +51,15 @@ public sealed class UserService(
         return GetCurrentUserIdOrNull()
                ?? throw new GraphQLException("Not authenticated");
     }
+
+    public IQueryable<User> GetCurrentUserQuery()
+        => context.Users.Where(u => u.Id == GetCurrentUserIdOrNull());
+
+    public IQueryable<User> GetUserByIdQuery(Guid id)
+        => context.Users.Where(u => u.Id == id);
+
+    public IQueryable<User> GetUsersQuery()
+        => context.Users;
 
     public async Task<User> GetCurrentUserAsync(CancellationToken ct)
         => await userRepository.GetUserByIdAsync(GetCurrentUserId(), ct) ??
@@ -71,10 +87,13 @@ public sealed class UserService(
         return user;
     }
 
-    public async Task<AdvertiserProfile> GetAdvertiserProfileAsync(
+    public async Task<AdvertiserProfile?> GetAdvertiserProfileByUserIdAsync(
+        Guid userId, CancellationToken ct)
+        => await userRepository.GetAdvertiserProfileByUserIdAsync(userId, ct);
+
+    private async Task<AdvertiserProfile> GetAdvertiserProfileAsync(
         CancellationToken ct) =>
-        await userRepository.GetAdvertiserProfileByUserIdAsync(
-            (await GetCurrentUserAsync(ct)).Id, ct)
+        await GetAdvertiserProfileByUserIdAsync(GetCurrentUserId(), ct)
         ?? throw new GraphQLException("Advertiser profile not found");
 
     public async Task<AdvertiserProfile> UpdateAdvertiserProfileAsync(
@@ -94,10 +113,13 @@ public sealed class UserService(
         return profile;
     }
 
-    public async Task<SpaceOwnerProfile> GetSpaceOwnerProfileAsync(
+    public async Task<SpaceOwnerProfile?> GetSpaceOwnerProfileByUserIdAsync(
+        Guid userId, CancellationToken ct)
+        => await userRepository.GetSpaceOwnerProfileByUserIdAsync(userId, ct);
+
+    private async Task<SpaceOwnerProfile> GetSpaceOwnerProfileAsync(
         CancellationToken ct) =>
-        await userRepository.GetSpaceOwnerProfileByUserIdAsync(
-            (await GetCurrentUserAsync(ct)).Id, ct)
+        await GetSpaceOwnerProfileByUserIdAsync(GetCurrentUserId(), ct)
         ?? throw new GraphQLException("Space owner profile not found");
 
     public async Task<SpaceOwnerProfile> UpdateSpaceOwnerProfileAsync(
@@ -148,6 +170,12 @@ public sealed class UserService(
         await context.SaveChangesAsync(ct);
         return user;
     }
+
+    public IQueryable<Space> GetSpacesBySpaceOwnerProfileId(Guid profileId)
+        => context.Spaces.Where(s => s.SpaceOwnerProfileId == profileId);
+
+    public IQueryable<Campaign> GetCampaignsByAdvertiserProfileId(Guid profileId)
+        => context.Campaigns.Where(c => c.AdvertiserProfileId == profileId);
 
     public async Task<bool> DeleteAsync(Guid id, CancellationToken ct) {
         var user = await userRepository.GetUserByIdAsync(id, ct);

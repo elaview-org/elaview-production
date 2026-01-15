@@ -1,4 +1,3 @@
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
 using HotChocolate.Authorization;
 
@@ -12,7 +11,6 @@ public static class SpaceOwnerExtensions {
     [UseFiltering]
     [UseSorting]
     public static IQueryable<Space> GetSpaces(
-        [Parent] SpaceOwnerProfile spaceOwner, AppDbContext context
-    ) => context.Spaces.Where(s =>
-        s.SpaceOwnerProfileId == spaceOwner.Id);
+        [Parent] SpaceOwnerProfile spaceOwner, IUserService userService
+    ) => userService.GetSpacesBySpaceOwnerProfileId(spaceOwner.Id);
 }

@@ -1,4 +1,3 @@
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
 using HotChocolate.Authorization;
 
@@ -12,9 +11,6 @@ public static class AdvertiserExtensions {
     [UseFiltering]
     [UseSorting]
     public static IQueryable<Campaign> GetCampaigns(
-        [Parent] AdvertiserProfile advertiser, AppDbContext context
-    ) {
-        return context.Campaigns.Where(c =>
-            c.AdvertiserProfileId == advertiser.Id);
-    }
+        [Parent] AdvertiserProfile advertiser, IUserService userService
+    ) => userService.GetCampaignsByAdvertiserProfileId(advertiser.Id);
 }

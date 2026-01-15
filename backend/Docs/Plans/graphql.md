@@ -10,14 +10,14 @@ Complete specification for Elaview's GraphQL API including queries, mutations, s
 
 ```
 Features/
-├── Users/
-│   ├── IUserService.cs          # Service interface
-│   ├── UserService.cs           # Service implementation
+├── Users/                       # Reference implementation
+│   ├── UserService.cs           # IUserService + UserService (same file)
+│   ├── UserRepository.cs        # IUserRepository + UserRepository (same file)
+│   ├── UserDataLoaders.cs       # Batch data loading
 │   ├── UserQueries.cs           # GraphQL queries
 │   ├── UserMutations.cs         # GraphQL mutations
-│   ├── UserDataLoaders.cs       # Batch data loading
 │   ├── UserInputs.cs            # Input types (records)
-│   └── UserExtensions.cs        # Object type extensions
+│   └── *Extensions.cs           # Object type extensions
 ├── Marketplace/
 │   ├── Spaces/
 │   ├── Campaigns/
@@ -29,55 +29,98 @@ Features/
     └── Preferences/
 ```
 
-### Service Layer Pattern
+### Layer Architecture
 
-**Why Interfaces for All Services:**
-- Enables dependency injection and inversion of control
-- Makes unit testing easier with mocks/fakes
-- Follows SOLID principles (Interface Segregation, Dependency Inversion)
-- Allows future flexibility for alternative implementations
-- Consistent pattern across the codebase
+```
+GraphQL Resolver → Service → Repository → DataLoader → Database
+```
+
+| Layer      | Responsibility                                     | Returns                               |
+|------------|----------------------------------------------------|---------------------------------------|
+| Resolver   | Apply HotChocolate middleware, delegate to service | IQueryable or Task<T>                 |
+| Service    | Business logic, authorization, orchestration       | IQueryable (reads) or Task<T> (write) |
+| Repository | Data access, wraps DataLoaders for batching        | Task<T> or IQueryable<T>              |
+| DataLoader | Batch queries, prevent N+1 (internal)              | IReadOnlyDictionary or ILookup        |
+
+**Key Rules**:
+- Resolvers NEVER access Repository or AppDbContext directly
+- All data flows through Service
+- Interface + implementation live in same file (reduces file sprawl)
+- DataLoaders are internal to Repository layer
+
+### Return Type Rules
+
+| Operation Type              | Service Returns | Resolver Returns | Why                                    |
+|-----------------------------|-----------------|------------------|----------------------------------------|
+| Paginated/filtered queries  | IQueryable<T>   | IQueryable<T>    | Preserves HotChocolate middleware      |
+| Single entity by ID         | IQueryable<T>   | IQueryable<T>    | UseFirstOrDefault + UseProjection      |
+| Mutations                   | Task<T>         | Task<T>          | Single entity after write              |
+| Extensions (1:1 relation)   | Task<T?>        | Task<T?>         | DataLoader via service                 |
+| Extensions (1:N relation)   | IQueryable<T>   | IQueryable<T>    | Preserves pagination/filtering         |
+
+### Service Layer Pattern
 
 **Service Responsibilities:**
 - Business logic and validation
-- Database operations via AppDbContext
+- Database operations via Repository (not direct AppDbContext)
 - Cross-cutting concerns (notifications, payments)
 - Authorization checks beyond role-based auth
+
+**Repository Responsibilities:**
+- Wraps DataLoaders for batched fetching
+- Provides IQueryable for filtered/paginated queries
+- CRUD operations via AppDbContext
 
 **Resolver Responsibilities:**
 - Thin wrappers that delegate to services
 - HotChocolate middleware application (Authorize, Paging, Filtering, etc.)
-- Input/output mapping when necessary
+- NEVER access Repository or AppDbContext directly
 
-**Example - Service Interface:**
+**Example - Service Interface + Implementation (same file):**
 
 ```csharp
 public interface ISpaceService {
+    IQueryable<Space> GetSpacesQuery();
+    IQueryable<Space> GetSpaceByIdQuery(Guid id);
     Task<Space> CreateAsync(CreateSpaceInput input, CancellationToken ct);
     Task<Space> UpdateAsync(Guid id, UpdateSpaceInput input, CancellationToken ct);
     Task<bool> DeleteAsync(Guid id, CancellationToken ct);
 }
+
+public sealed class SpaceService(
+    ISpaceRepository repository,
+    IHttpContextAccessor httpContextAccessor
+) : ISpaceService {
+    public IQueryable<Space> GetSpacesQuery() => repository.Query();
+    public IQueryable<Space> GetSpaceByIdQuery(Guid id)
+        => repository.Query().Where(s => s.Id == id);
+
+    public async Task<Space> CreateAsync(CreateSpaceInput input, CancellationToken ct) {
+        var space = new Space { Title = input.Title /* ... */ };
+        return await repository.AddAsync(space, ct);
+    }
+}
 ```
 
-**Example - Service Implementation:**
+**Example - Repository Interface + Implementation (same file):**
 
 ```csharp
-public sealed class SpaceService(
+public interface ISpaceRepository {
+    IQueryable<Space> Query();
+    Task<Space?> GetByIdAsync(Guid id, CancellationToken ct);
+    Task<Space> AddAsync(Space space, CancellationToken ct);
+}
+
+public sealed class SpaceRepository(
     AppDbContext context,
-    INotificationService notificationService,
-    UserService userService
-) : ISpaceService {
-    public async Task<Space> CreateAsync(CreateSpaceInput input, CancellationToken ct) {
-        var userId = Guid.Parse(userService.PrincipalId()!);
-        var profile = await context.SpaceOwnerProfiles
-            .FirstAsync(p => p.UserId == userId, ct);
+    ISpaceByIdDataLoader spaceByIdLoader
+) : ISpaceRepository {
+    public IQueryable<Space> Query() => context.Spaces;
 
-        var space = new Space {
-            SpaceOwnerProfileId = profile.Id,
-            Title = input.Title,
-            // ... map other fields
-        };
+    public async Task<Space?> GetByIdAsync(Guid id, CancellationToken ct)
+        => await spaceByIdLoader.LoadAsync(id, ct);
 
+    public async Task<Space> AddAsync(Space space, CancellationToken ct) {
         context.Spaces.Add(space);
         await context.SaveChangesAsync(ct);
         return space;
@@ -88,9 +131,10 @@ public sealed class SpaceService(
 **Example - DI Registration:**
 
 ```csharp
+services.AddScoped<ISpaceRepository, SpaceRepository>();
 services.AddScoped<ISpaceService, SpaceService>();
+services.AddScoped<IBookingRepository, BookingRepository>();
 services.AddScoped<IBookingService, BookingService>();
-// ... register all services
 ```
 
 ---
@@ -204,7 +248,7 @@ public static class SpaceExtensions {
 - createdAt (range)
 - lastLoginAt (range)
 
-**Example - Simple Query:**
+**Example - Query (delegates to Service):**
 
 ```csharp
 [QueryType]
@@ -212,22 +256,17 @@ public static partial class UserQueries {
     [Authorize]
     [UseFirstOrDefault]
     [UseProjection]
-    public static IQueryable<User> GetCurrentUser(
-        AppDbContext context,
-        UserService userService
-    ) => context.Users.Where(u => u.Id.ToString() == userService.PrincipalId());
+    public static IQueryable<User> GetCurrentUser(IUserService userService)
+        => userService.GetCurrentUserQuery();
+
+    [Authorize(Roles = ["Admin"])]
+    [UsePaging]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public static IQueryable<User> GetUsers(IUserService userService)
+        => userService.GetUsersQuery();
 }
-```
-
-**Example - Paginated Query with Filtering:**
-
-```csharp
-[Authorize(Roles = ["Admin"])]
-[UsePaging]
-[UseProjection]
-[UseFiltering]
-[UseSorting]
-public static IQueryable<User> GetUsers(AppDbContext context) => context.Users;
 ```
 
 **Example - GraphQL Usage:**
@@ -1330,47 +1369,55 @@ public async Task<Booking> ApproveAsync(Guid id, string? ownerNotes, Cancellatio
 
 ### Purpose
 
-Extensions add computed fields and resolve relationships using DataLoaders instead of navigation properties, ensuring efficient batched queries.
+Extensions add computed fields and resolve relationships through Services (which use DataLoaders internally via Repository), ensuring efficient batched queries while maintaining the service abstraction.
 
 ### Extension Points
 
-| Type              | Extended Fields                                             | DataLoader Used                                                                    |
-|-------------------|-------------------------------------------------------------|------------------------------------------------------------------------------------|
-| User              | advertiserProfile, spaceOwnerProfile                        | GetAdvertiserProfileByUserIdAsync, GetSpaceOwnerProfileByUserIdAsync               |
-| AdvertiserProfile | campaigns                                                   | GetCampaignsByAdvertiserProfileIdAsync                                             |
-| SpaceOwnerProfile | spaces, payouts                                             | GetSpacesByOwnerProfileIdAsync, GetPayoutsByOwnerProfileIdAsync                    |
-| Space             | owner, bookings, reviews                                    | GetSpaceOwnerProfileByIdAsync, GetBookingsBySpaceIdAsync, GetReviewsBySpaceIdAsync |
-| Campaign          | bookings                                                    | GetBookingsByCampaignIdAsync                                                       |
-| Booking           | campaign, space, proof, dispute, payments, payouts, reviews | Various DataLoaders                                                                |
-| Payment           | refunds                                                     | GetRefundsByPaymentIdAsync                                                         |
-| Conversation      | participants, messages                                      | GetParticipantsByConversationIdAsync, GetMessagesByConversationIdAsync             |
+| Type              | Extended Fields                                             | Service Method                                                                    |
+|-------------------|-------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| User              | advertiserProfile, spaceOwnerProfile                        | IUserService.GetAdvertiserProfileByUserIdAsync, GetSpaceOwnerProfileByUserIdAsync |
+| AdvertiserProfile | campaigns                                                   | IUserService.GetCampaignsByAdvertiserProfileIdQuery                               |
+| SpaceOwnerProfile | spaces, payouts                                             | IUserService.GetSpacesBySpaceOwnerProfileIdQuery, IPayoutService                  |
+| Space             | owner, bookings, reviews                                    | ISpaceService, IBookingService, IReviewService                                    |
+| Campaign          | bookings                                                    | ICampaignService.GetBookingsByCampaignIdQuery                                     |
+| Booking           | campaign, space, proof, dispute, payments, payouts, reviews | IBookingService (various methods)                                                 |
+| Payment           | refunds                                                     | IPaymentService.GetRefundsByPaymentIdQuery                                        |
+| Conversation      | participants, messages                                      | IMessagingService                                                                 |
 
-**Example - Extension with DataLoader:**
+**Example - Extension with Service (1:1 relationship):**
 
 ```csharp
-[ExtendObjectType<Booking>]
-public static class BookingExtensions {
-    public static async Task<Campaign> GetCampaign(
-        [Parent] Booking booking,
-        ICampaignByIdDataLoader loader
-    ) => (await loader.LoadAsync(booking.CampaignId))!;
+[ExtendObjectType<User>]
+public static class UserExtensions {
+    [Authorize]
+    public static async Task<AdvertiserProfile?> GetAdvertiserProfile(
+        [Parent] User user, IUserService userService, CancellationToken ct
+    ) => await userService.GetAdvertiserProfileByUserIdAsync(user.Id, ct);
 
-    public static async Task<Space> GetSpace(
-        [Parent] Booking booking,
-        ISpaceByIdDataLoader loader
-    ) => (await loader.LoadAsync(booking.SpaceId))!;
-
-    public static async Task<BookingProof?> GetProof(
-        [Parent] Booking booking,
-        IProofByBookingIdDataLoader loader
-    ) => await loader.LoadAsync(booking.Id);
-
-    public static async Task<IEnumerable<Payment>> GetPayments(
-        [Parent] Booking booking,
-        IPaymentsByBookingIdDataLoader loader
-    ) => await loader.LoadAsync(booking.Id);
+    [Authorize]
+    public static async Task<SpaceOwnerProfile?> GetSpaceOwnerProfile(
+        [Parent] User user, IUserService userService, CancellationToken ct
+    ) => await userService.GetSpaceOwnerProfileByUserIdAsync(user.Id, ct);
 }
 ```
+
+**Example - Extension with Service (1:N relationship with pagination):**
+
+```csharp
+[ExtendObjectType<SpaceOwnerProfile>]
+public static class SpaceOwnerExtensions {
+    [Authorize]
+    [UsePaging]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public static IQueryable<Space> GetSpaces(
+        [Parent] SpaceOwnerProfile spaceOwner, IUserService userService
+    ) => userService.GetSpacesBySpaceOwnerProfileId(spaceOwner.Id);
+}
+```
+
+**Key Rule**: Extensions always use `[Parent]` entity's ID, never fetch "current user" implicitly. This ensures proper batching when resolving nested queries.
 
 ---
 

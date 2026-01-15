@@ -1,4 +1,3 @@
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
 using HotChocolate.Authorization;
 
@@ -7,16 +6,12 @@ namespace ElaviewBackend.Features.Users;
 [ExtendObjectType<User>]
 public static class UserExtensions {
     [Authorize]
-    [UseFirstOrDefault]
-    [UseProjection]
-    public static IQueryable<AdvertiserProfile> GetAdvertiserProfile(
-        [Parent] User user, AppDbContext context
-    ) => context.AdvertiserProfiles.Where(p => p.UserId == user.Id);
+    public static async Task<AdvertiserProfile?> GetAdvertiserProfile(
+        [Parent] User user, IUserService userService, CancellationToken ct
+    ) => await userService.GetAdvertiserProfileAsync(ct);
 
     [Authorize]
-    [UseFirstOrDefault]
-    [UseProjection]
-    public static IQueryable<SpaceOwnerProfile> GetSpaceOwnerProfile(
-        [Parent] User user, AppDbContext context
-    ) => context.SpaceOwnerProfiles.Where(p => p.UserId == user.Id);
+    public static async Task<SpaceOwnerProfile?> GetSpaceOwnerProfile(
+        [Parent] User user, IUserService userService, CancellationToken ct
+    ) => await userService.GetSpaceOwnerProfileAsync(ct);
 }

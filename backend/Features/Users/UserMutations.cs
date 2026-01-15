@@ -1,22 +1,37 @@
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
+using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Users;
 
-// todo: admin can delete user
 [MutationType]
 public static partial class UserMutations {
     [Authorize]
     public static async Task<User> UpdateCurrentUser(
-        User updatedUser, AppDbContext dbContext,
-        UserService userService, CancellationToken ct
-    ) {
-        var user = await dbContext.Users
-            .FirstAsync(u => u.Id.ToString() == userService.PrincipalId(), ct);
-        dbContext.Entry(user).CurrentValues.SetValues(updatedUser);
-        await dbContext.SaveChangesAsync(ct);
-        return user;
-    }
+        UpdateUserInput input, IUserService userService, CancellationToken ct
+    ) => await userService.UpdateAsync(input, ct);
+
+    [Authorize]
+    public static async Task<User> SwitchProfileType(
+        ProfileType type, IUserService userService, CancellationToken ct
+    ) => await userService.SwitchProfileTypeAsync(type, ct);
+
+    [Authorize]
+    public static async Task<AdvertiserProfile> UpdateAdvertiserProfile(
+        UpdateAdvertiserProfileInput input, IUserService userService, CancellationToken ct
+    ) => await userService.UpdateAdvertiserProfileAsync(input, ct);
+
+    [Authorize]
+    public static async Task<SpaceOwnerProfile> UpdateSpaceOwnerProfile(
+        UpdateSpaceOwnerProfileInput input, IUserService userService, CancellationToken ct
+    ) => await userService.UpdateSpaceOwnerProfileAsync(input, ct);
+
+    [Authorize]
+    public static async Task<User> CompleteOnboarding(
+        ProfileType profileType, IUserService userService, CancellationToken ct
+    ) => await userService.CompleteOnboardingAsync(profileType, ct);
+
+    [Authorize(Roles = ["Admin"])]
+    public static async Task<bool> DeleteUser(
+        [ID] Guid id, IUserService userService, CancellationToken ct
+    ) => await userService.DeleteAsync(id, ct);
 }

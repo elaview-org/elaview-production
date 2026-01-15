@@ -6,13 +6,14 @@ namespace ElaviewBackend.Features.Users;
 
 [QueryType]
 public static partial class UserQueries {
+    [Authorize]
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<User> GetCurrentUser(
-        AppDbContext context, UserService userService
+        AppDbContext context, IUserService userService
     ) {
-        return context.Users.Where(t =>
-            t.Id.ToString() == userService.PrincipalId());
+        var userId = userService.GetCurrentUserIdOrNull();
+        return context.Users.Where(u => u.Id == userId);
     }
 
     [Authorize(Roles = ["Admin"])]
@@ -21,7 +22,7 @@ public static partial class UserQueries {
     public static IQueryable<User?> GetUserById(
         [ID] Guid id, AppDbContext context
     ) {
-        return context.Users.Where(t => t.Id == id);
+        return context.Users.Where(u => u.Id == id);
     }
 
     [Authorize(Roles = ["Admin"])]

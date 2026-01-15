@@ -23,9 +23,8 @@ public static partial class SpaceQueries {
     [UseFiltering]
     [UseSorting]
     public static IQueryable<Space> GetSpaces(
-        AppDbContext context, UserService userService
-    ) => userService.PrincipalId() is { } userId
-        ? context.Spaces.Where(s =>
-            s.SpaceOwnerProfile.UserId.ToString() != userId)
+        AppDbContext context, IUserService userService
+    ) => userService.GetCurrentUserIdOrNull() is { } userId
+        ? context.Spaces.Where(s => s.SpaceOwnerProfile.UserId != userId)
         : context.Spaces;
 }

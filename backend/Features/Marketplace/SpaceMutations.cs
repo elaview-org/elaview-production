@@ -11,12 +11,13 @@ public static partial class SpaceMutations {
     [Authorize]
     public static async Task<Space> CreateSpace(
         CreateSpaceInput input, AppDbContext context,
-        UserService userService, CancellationToken ct
+        IUserService userService, CancellationToken ct
     ) {
-        var userId = userService.PrincipalId();
+        var userId = userService.GetCurrentUserIdOrNull()
+                     ?? throw new GraphQLException("Not authenticated");
         var user = await context.Users
-                       .FirstOrDefaultAsync(u => u.Id.ToString() == userId, ct)
-                   ?? throw new Exception("User not found");
+                       .FirstOrDefaultAsync(u => u.Id == userId, ct)
+                   ?? throw new GraphQLException("User not found");
 
         var spaceOwnerProfile =
             await context.SpaceOwnerProfiles.FirstOrDefaultAsync(p =>

@@ -29,7 +29,8 @@ public static class Services {
             })
             .AddOpenApi()
             .AddScoped<AuthService>()
-            .AddScoped<UserService>()
+            .AddScoped<IUserService, UserService>()
+            .AddScoped<IUserRepository, UserRepository>()
             .AddScoped<DatabaseSeeder>()
             .AddControllers();
 

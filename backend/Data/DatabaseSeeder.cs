@@ -163,8 +163,8 @@ public class DatabaseSeeder(
         await db.SaveChangesAsync();
     }
 
-    private static string GenerateSpaceTitle(SpaceType type, int index) =>
-        type switch {
+    private static string GenerateSpaceTitle(SpaceType type, int index) {
+        return type switch {
             SpaceType.Billboard => $"Highway Billboard #{index + 1}",
             SpaceType.Storefront => $"Storefront Window Display #{index + 1}",
             SpaceType.Transit => $"Bus Stop Advertising #{index + 1}",
@@ -173,9 +173,10 @@ public class DatabaseSeeder(
             SpaceType.VehicleWrap => $"Vehicle Wrap Space #{index + 1}",
             _ => $"Advertising Space #{index + 1}"
         };
+    }
 
-    private static string GenerateSpaceDescription(SpaceType type) =>
-        type switch {
+    private static string GenerateSpaceDescription(SpaceType type) {
+        return type switch {
             SpaceType.Billboard =>
                 "High-visibility billboard located on major highway with heavy traffic flow.",
             SpaceType.Storefront =>
@@ -190,6 +191,7 @@ public class DatabaseSeeder(
                 "Mobile advertising opportunity through vehicle wrap.",
             _ => "Premium advertising space in excellent location."
         };
+    }
 
     private static string GenerateStreetName(Random random) {
         var streetNames = new[] {

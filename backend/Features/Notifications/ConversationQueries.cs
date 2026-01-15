@@ -12,18 +12,24 @@ public static partial class ConversationQueries {
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Conversation> GetMyConversations(IConversationService conversationService)
-        => conversationService.GetMyConversationsQuery();
+    public static IQueryable<Conversation> GetMyConversations(
+        IConversationService conversationService) {
+        return conversationService.GetMyConversationsQuery();
+    }
 
     [Authorize]
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<Conversation> GetConversationById(
         [ID] Guid id, IConversationService conversationService
-    ) => conversationService.GetConversationByIdQuery(id);
+    ) {
+        return conversationService.GetConversationByIdQuery(id);
+    }
 
     [Authorize]
     public static async Task<int> GetUnreadConversationsCount(
         IConversationService conversationService, CancellationToken ct
-    ) => await conversationService.GetUnreadConversationsCountAsync(ct);
+    ) {
+        return await conversationService.GetUnreadConversationsCountAsync(ct);
+    }
 }

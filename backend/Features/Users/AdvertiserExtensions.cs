@@ -12,5 +12,7 @@ public static class AdvertiserExtensions {
     [UseSorting]
     public static IQueryable<Campaign> GetCampaigns(
         [Parent] AdvertiserProfile advertiser, IUserService userService
-    ) => userService.GetCampaignsByAdvertiserProfileId(advertiser.Id);
+    ) {
+        return userService.GetCampaignsByAdvertiserProfileId(advertiser.Id);
+    }
 }

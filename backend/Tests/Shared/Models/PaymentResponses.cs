@@ -10,7 +10,10 @@ public record PaymentNode(
 
 public record PaymentByIdResponse(PaymentNode? PaymentById);
 
-public record PaymentsConnection(List<PaymentNode> Nodes, PageInfo PageInfo, int? TotalCount = null);
+public record PaymentsConnection(
+    List<PaymentNode> Nodes,
+    PageInfo PageInfo,
+    int? TotalCount = null);
 
 public record PaymentsByBookingResponse(PaymentsConnection PaymentsByBooking);
 
@@ -24,7 +27,10 @@ public record PayoutNode(
 
 public record PayoutByIdResponse(PayoutNode? PayoutById);
 
-public record PayoutsConnection(List<PayoutNode> Nodes, PageInfo PageInfo, int? TotalCount = null);
+public record PayoutsConnection(
+    List<PayoutNode> Nodes,
+    PageInfo PageInfo,
+    int? TotalCount = null);
 
 public record MyPayoutsResponse(PayoutsConnection MyPayouts);
 
@@ -44,11 +50,13 @@ public record CreatePaymentIntentPayloadResponse(
     decimal Amount
 );
 
-public record CreatePaymentIntentResponse(CreatePaymentIntentPayloadResponse CreatePaymentIntent);
+public record CreatePaymentIntentResponse(
+    CreatePaymentIntentPayloadResponse CreatePaymentIntent);
 
 public record ConfirmPaymentPayloadResponse(PaymentNode Payment);
 
-public record ConfirmPaymentResponse(ConfirmPaymentPayloadResponse ConfirmPayment);
+public record ConfirmPaymentResponse(
+    ConfirmPaymentPayloadResponse ConfirmPayment);
 
 public record RefundNode(
     Guid Id,
@@ -65,19 +73,27 @@ public record ProcessPayoutPayloadResponse(PayoutNode Payout);
 
 public record ProcessPayoutResponse(ProcessPayoutPayloadResponse ProcessPayout);
 
-public record ConnectStripeAccountPayloadResponse(string AccountId, string OnboardingUrl);
+public record ConnectStripeAccountPayloadResponse(
+    string AccountId,
+    string OnboardingUrl);
 
-public record ConnectStripeAccountResponse(ConnectStripeAccountPayloadResponse ConnectStripeAccount);
+public record ConnectStripeAccountResponse(
+    ConnectStripeAccountPayloadResponse ConnectStripeAccount);
 
 public record RetryPayoutPayloadResponse(PayoutNode Payout);
 
 public record RetryPayoutResponse(RetryPayoutPayloadResponse RetryPayout);
 
-public record SpaceOwnerProfileNode(Guid Id, string? StripeAccountId, string? StripeAccountStatus);
+public record SpaceOwnerProfileNode(
+    Guid Id,
+    string? StripeAccountId,
+    string? StripeAccountStatus);
 
-public record RefreshStripeAccountPayloadResponse(SpaceOwnerProfileNode Profile);
+public record RefreshStripeAccountPayloadResponse(
+    SpaceOwnerProfileNode Profile);
 
-public record RefreshStripeAccountStatusResponse(RefreshStripeAccountPayloadResponse RefreshStripeAccountStatus);
+public record RefreshStripeAccountStatusResponse(
+    RefreshStripeAccountPayloadResponse RefreshStripeAccountStatus);
 
 public record TransactionNode(
     Guid Id,
@@ -86,6 +102,10 @@ public record TransactionNode(
     string? Description
 );
 
-public record TransactionsConnection(List<TransactionNode> Nodes, PageInfo PageInfo, int? TotalCount = null);
+public record TransactionsConnection(
+    List<TransactionNode> Nodes,
+    PageInfo PageInfo,
+    int? TotalCount = null);
 
-public record TransactionsByBookingResponse(TransactionsConnection TransactionsByBooking);
+public record TransactionsByBookingResponse(
+    TransactionsConnection TransactionsByBooking);

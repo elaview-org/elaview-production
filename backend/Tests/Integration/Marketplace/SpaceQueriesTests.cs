@@ -1,4 +1,3 @@
-using ElaviewBackend.Data.Entities;
 using ElaviewBackend.Tests.Integration.Fixtures;
 using ElaviewBackend.Tests.Shared.Extensions;
 using ElaviewBackend.Tests.Shared.Models;
@@ -8,7 +7,8 @@ using Xunit;
 namespace ElaviewBackend.Tests.Integration.Marketplace;
 
 [Collection("Integration")]
-public sealed class SpaceQueriesTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class SpaceQueriesTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task GetSpaces_Authenticated_ReturnsPaginatedSpaces() {
         await CreateAndLoginUserAsync();
@@ -53,22 +53,22 @@ public sealed class SpaceQueriesTests(IntegrationTestFixture fixture) : Integrat
         var space = await SeedSpaceAsync(ownerProfile.Id);
 
         var response = await Client.QueryAsync<SpaceByIdResponse>("""
-            query($id: ID!) {
-                spaceById(id: $id) {
-                    id
-                    title
-                    description
-                    type
-                    status
-                    address
-                    city
-                    state
-                    pricePerDay
-                    installationFee
-                    minDuration
+                query($id: ID!) {
+                    spaceById(id: $id) {
+                        id
+                        title
+                        description
+                        type
+                        status
+                        address
+                        city
+                        state
+                        pricePerDay
+                        installationFee
+                        minDuration
+                    }
                 }
-            }
-            """,
+                """,
             new { id = space.Id });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -82,12 +82,12 @@ public sealed class SpaceQueriesTests(IntegrationTestFixture fixture) : Integrat
         await CreateAndLoginUserAsync();
 
         var response = await Client.QueryAsync<SpaceByIdResponse>("""
-            query($id: ID!) {
-                spaceById(id: $id) {
-                    id
+                query($id: ID!) {
+                    spaceById(id: $id) {
+                        id
+                    }
                 }
-            }
-            """,
+                """,
             new { id = Guid.NewGuid() });
 
         response.Errors.Should().BeNullOrEmpty();

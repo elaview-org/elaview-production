@@ -36,7 +36,8 @@ public static class UserFactory {
         return user;
     }
 
-    public static List<User> CreateMany(int count, Action<User, int>? customize = null) {
+    public static List<User> CreateMany(int count,
+        Action<User, int>? customize = null) {
         return Enumerable.Range(0, count)
             .Select(i => {
                 var user = Create();

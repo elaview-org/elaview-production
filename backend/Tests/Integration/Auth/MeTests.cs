@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 using ElaviewBackend.Tests.Integration.Fixtures;
 using ElaviewBackend.Tests.Shared.Models;
 using FluentAssertions;
@@ -8,7 +7,8 @@ using Xunit;
 namespace ElaviewBackend.Tests.Integration.Auth;
 
 [Collection("Integration")]
-public sealed class MeTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class MeTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task Me_Authenticated_ReturnsCurrentUser() {
         var user = await CreateAndLoginUserAsync();

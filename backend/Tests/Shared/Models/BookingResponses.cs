@@ -2,7 +2,10 @@ namespace ElaviewBackend.Tests.Shared.Models;
 
 public record BookingsResponse(BookingsConnection Bookings);
 
-public record BookingsConnection(List<BookingNode> Nodes, PageInfo PageInfo, int? TotalCount = null);
+public record BookingsConnection(
+    List<BookingNode> Nodes,
+    PageInfo PageInfo,
+    int? TotalCount = null);
 
 public record BookingNode(
     Guid Id,
@@ -17,7 +20,8 @@ public record BookingNode(
 
 public record BookingByIdResponse(BookingNode? BookingById);
 
-public record MyBookingsAsAdvertiserResponse(BookingsConnection MyBookingsAsAdvertiser);
+public record MyBookingsAsAdvertiserResponse(
+    BookingsConnection MyBookingsAsAdvertiser);
 
 public record MyBookingsAsOwnerResponse(BookingsConnection MyBookingsAsOwner);
 

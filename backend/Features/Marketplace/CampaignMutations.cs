@@ -6,26 +6,43 @@ namespace ElaviewBackend.Features.Marketplace;
 public static partial class CampaignMutations {
     [Authorize]
     public static async Task<CreateCampaignPayload> CreateCampaign(
-        CreateCampaignInput input, ICampaignService campaignService, CancellationToken ct
-    ) => new(await campaignService.CreateAsync(input, ct));
+        CreateCampaignInput input, ICampaignService campaignService,
+        CancellationToken ct
+    ) {
+        return new CreateCampaignPayload(
+            await campaignService.CreateAsync(input, ct));
+    }
 
     [Authorize]
     public static async Task<UpdateCampaignPayload> UpdateCampaign(
-        [ID] Guid id, UpdateCampaignInput input, ICampaignService campaignService, CancellationToken ct
-    ) => new(await campaignService.UpdateAsync(id, input, ct));
+        [ID] Guid id, UpdateCampaignInput input,
+        ICampaignService campaignService, CancellationToken ct
+    ) {
+        return new UpdateCampaignPayload(
+            await campaignService.UpdateAsync(id, input, ct));
+    }
 
     [Authorize]
     public static async Task<DeleteCampaignPayload> DeleteCampaign(
         [ID] Guid id, ICampaignService campaignService, CancellationToken ct
-    ) => new(await campaignService.DeleteAsync(id, ct));
+    ) {
+        return new DeleteCampaignPayload(
+            await campaignService.DeleteAsync(id, ct));
+    }
 
     [Authorize]
     public static async Task<SubmitCampaignPayload> SubmitCampaign(
         [ID] Guid id, ICampaignService campaignService, CancellationToken ct
-    ) => new(await campaignService.SubmitAsync(id, ct));
+    ) {
+        return new SubmitCampaignPayload(
+            await campaignService.SubmitAsync(id, ct));
+    }
 
     [Authorize]
     public static async Task<CancelCampaignPayload> CancelCampaign(
         [ID] Guid id, ICampaignService campaignService, CancellationToken ct
-    ) => new(await campaignService.CancelAsync(id, ct));
+    ) {
+        return new CancelCampaignPayload(
+            await campaignService.CancelAsync(id, ct));
+    }
 }

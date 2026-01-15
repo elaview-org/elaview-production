@@ -14,5 +14,7 @@ public static partial class TransactionQueries {
     [UseSorting]
     public static IQueryable<Transaction> GetTransactionsByBooking(
         [ID] Guid bookingId, ITransactionService transactionService
-    ) => transactionService.GetTransactionsByBookingIdQuery(bookingId);
+    ) {
+        return transactionService.GetTransactionsByBookingIdQuery(bookingId);
+    }
 }

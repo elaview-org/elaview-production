@@ -6,7 +6,8 @@ namespace ElaviewBackend.Tests.Shared.Factories;
 public static class NotificationFactory {
     private static readonly Faker Faker = new();
 
-    public static Notification Create(Guid userId, Action<Notification>? customize = null) {
+    public static Notification Create(Guid userId,
+        Action<Notification>? customize = null) {
         var notification = new Notification {
             Id = Guid.NewGuid(),
             UserId = userId,
@@ -20,12 +21,15 @@ public static class NotificationFactory {
         return notification;
     }
 
-    public static Notification CreateRead(Guid userId) => Create(userId, n => {
-        n.IsRead = true;
-        n.ReadAt = DateTime.UtcNow;
-    });
+    public static Notification CreateRead(Guid userId) {
+        return Create(userId, n => {
+            n.IsRead = true;
+            n.ReadAt = DateTime.UtcNow;
+        });
+    }
 
-    public static Notification CreateWithEntity(Guid userId, string entityType, Guid entityId) {
+    public static Notification CreateWithEntity(Guid userId, string entityType,
+        Guid entityId) {
         return new Notification {
             Id = Guid.NewGuid(),
             UserId = userId,
@@ -39,12 +43,15 @@ public static class NotificationFactory {
         };
     }
 
-    public static List<Notification> CreateMany(Guid userId, int count) =>
-        Enumerable.Range(0, count).Select(_ => Create(userId)).ToList();
+    public static List<Notification> CreateMany(Guid userId, int count) {
+        return Enumerable.Range(0, count).Select(_ => Create(userId)).ToList();
+    }
 }
 
 public static class NotificationPreferenceFactory {
-    public static NotificationPreference Create(Guid userId, NotificationType type, Action<NotificationPreference>? customize = null) {
+    public static NotificationPreference Create(Guid userId,
+        NotificationType type,
+        Action<NotificationPreference>? customize = null) {
         var preference = new NotificationPreference {
             Id = Guid.NewGuid(),
             UserId = userId,
@@ -60,7 +67,8 @@ public static class NotificationPreferenceFactory {
 }
 
 public static class ConversationFactory {
-    public static Conversation Create(Guid? bookingId = null, Action<Conversation>? customize = null) {
+    public static Conversation Create(Guid? bookingId = null,
+        Action<Conversation>? customize = null) {
         var now = DateTime.UtcNow;
         var conversation = new Conversation {
             Id = Guid.NewGuid(),
@@ -76,7 +84,8 @@ public static class ConversationFactory {
 public static class MessageFactory {
     private static readonly Faker Faker = new();
 
-    public static Message Create(Guid conversationId, Guid senderUserId, Action<Message>? customize = null) {
+    public static Message Create(Guid conversationId, Guid senderUserId,
+        Action<Message>? customize = null) {
         var message = new Message {
             Id = Guid.NewGuid(),
             ConversationId = conversationId,
@@ -89,12 +98,16 @@ public static class MessageFactory {
         return message;
     }
 
-    public static List<Message> CreateMany(Guid conversationId, Guid senderUserId, int count) =>
-        Enumerable.Range(0, count).Select(_ => Create(conversationId, senderUserId)).ToList();
+    public static List<Message> CreateMany(Guid conversationId,
+        Guid senderUserId, int count) {
+        return Enumerable.Range(0, count)
+            .Select(_ => Create(conversationId, senderUserId)).ToList();
+    }
 }
 
 public static class ConversationParticipantFactory {
-    public static ConversationParticipant Create(Guid conversationId, Guid userId, Action<ConversationParticipant>? customize = null) {
+    public static ConversationParticipant Create(Guid conversationId,
+        Guid userId, Action<ConversationParticipant>? customize = null) {
         var now = DateTime.UtcNow;
         var participant = new ConversationParticipant {
             Id = Guid.NewGuid(),

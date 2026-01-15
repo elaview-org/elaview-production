@@ -12,5 +12,7 @@ public static class SpaceOwnerExtensions {
     [UseSorting]
     public static IQueryable<Space> GetSpaces(
         [Parent] SpaceOwnerProfile spaceOwner, IUserService userService
-    ) => userService.GetSpacesBySpaceOwnerProfileId(spaceOwner.Id);
+    ) {
+        return userService.GetSpacesBySpaceOwnerProfileId(spaceOwner.Id);
+    }
 }

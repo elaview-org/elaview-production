@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using ElaviewBackend.Tests.Shared.Models;
 
 namespace ElaviewBackend.Tests.Shared.Extensions;
@@ -11,8 +10,10 @@ public static class HttpClientGraphQLExtensions {
         CancellationToken ct = default
     ) {
         var request = new { query, variables };
-        var response = await client.PostAsJsonAsync("/api/graphql", request, ct);
-        var content = await response.Content.ReadFromJsonAsync<GraphQLResponse<T>>(ct);
+        var response =
+            await client.PostAsJsonAsync("/api/graphql", request, ct);
+        var content =
+            await response.Content.ReadFromJsonAsync<GraphQLResponse<T>>(ct);
         return content!;
     }
 
@@ -21,5 +22,7 @@ public static class HttpClientGraphQLExtensions {
         string mutation,
         object? variables = null,
         CancellationToken ct = default
-    ) => await client.QueryAsync<T>(mutation, variables, ct);
+    ) {
+        return await client.QueryAsync<T>(mutation, variables, ct);
+    }
 }

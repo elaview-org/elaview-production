@@ -23,7 +23,7 @@ public static class Startup {
                 );
             });
 
-        if (app.Environment.IsDevelopment()) {
+        if (app.Environment.IsDevelopment())
             await Task.Run(async () => {
                 var dataDir = Path.Combine(
                     Directory.GetCurrentDirectory(), "Data"
@@ -42,7 +42,6 @@ public static class Startup {
                     "Schema downloaded and is stored at Data/schema.graphql"
                 );
             });
-        }
 
         app.RunWithGraphQLCommands(args);
     }

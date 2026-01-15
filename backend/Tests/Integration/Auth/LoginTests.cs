@@ -1,5 +1,4 @@
 using System.Net;
-using System.Net.Http.Json;
 using ElaviewBackend.Tests.Integration.Fixtures;
 using ElaviewBackend.Tests.Shared.Models;
 using FluentAssertions;
@@ -8,7 +7,8 @@ using Xunit;
 namespace ElaviewBackend.Tests.Integration.Auth;
 
 [Collection("Integration")]
-public sealed class LoginTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class LoginTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task Login_ValidCredentials_ReturnsOkWithCookie() {
         await SeedUserAsync("test@example.com", "Password123!");
@@ -81,7 +81,8 @@ public sealed class LoginTests(IntegrationTestFixture fixture) : IntegrationTest
     [InlineData("", "Password123!")]
     [InlineData("valid@email.com", "")]
     [InlineData("", "")]
-    public async Task Login_EmptyCredentials_ReturnsBadRequest(string email, string password) {
+    public async Task Login_EmptyCredentials_ReturnsBadRequest(string email,
+        string password) {
         var response = await Client.PostAsJsonAsync("/api/auth/login", new {
             email,
             password

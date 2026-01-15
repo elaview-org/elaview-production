@@ -7,13 +7,19 @@ namespace ElaviewBackend.Features.Marketplace;
 public static class BookingExtensions {
     [Authorize]
     public static async Task<Campaign?> GetCampaign(
-        [Parent] Booking booking, IBookingService bookingService, CancellationToken ct
-    ) => await bookingService.GetCampaignByBookingIdAsync(booking.Id, ct);
+        [Parent] Booking booking, IBookingService bookingService,
+        CancellationToken ct
+    ) {
+        return await bookingService.GetCampaignByBookingIdAsync(booking.Id, ct);
+    }
 
     [Authorize]
     public static async Task<Space?> GetSpace(
-        [Parent] Booking booking, IBookingService bookingService, CancellationToken ct
-    ) => await bookingService.GetSpaceByBookingIdAsync(booking.Id, ct);
+        [Parent] Booking booking, IBookingService bookingService,
+        CancellationToken ct
+    ) {
+        return await bookingService.GetSpaceByBookingIdAsync(booking.Id, ct);
+    }
 
     [Authorize]
     [UseProjection]
@@ -21,7 +27,9 @@ public static class BookingExtensions {
     [UseSorting]
     public static IQueryable<Review> GetReviews(
         [Parent] Booking booking, IBookingService bookingService
-    ) => bookingService.GetReviewsByBookingId(booking.Id);
+    ) {
+        return bookingService.GetReviewsByBookingId(booking.Id);
+    }
 
     [Authorize]
     [UseProjection]
@@ -29,7 +37,9 @@ public static class BookingExtensions {
     [UseSorting]
     public static IQueryable<Payment> GetPayments(
         [Parent] Booking booking, IBookingService bookingService
-    ) => bookingService.GetPaymentsByBookingId(booking.Id);
+    ) {
+        return bookingService.GetPaymentsByBookingId(booking.Id);
+    }
 
     [Authorize]
     [UseProjection]
@@ -37,5 +47,7 @@ public static class BookingExtensions {
     [UseSorting]
     public static IQueryable<Payout> GetPayouts(
         [Parent] Booking booking, IBookingService bookingService
-    ) => bookingService.GetPayoutsByBookingId(booking.Id);
+    ) {
+        return bookingService.GetPayoutsByBookingId(booking.Id);
+    }
 }

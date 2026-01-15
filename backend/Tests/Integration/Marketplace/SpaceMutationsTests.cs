@@ -8,30 +8,31 @@ using Xunit;
 namespace ElaviewBackend.Tests.Integration.Marketplace;
 
 [Collection("Integration")]
-public sealed class SpaceMutationsTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class SpaceMutationsTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task CreateSpace_AsSpaceOwner_CreatesSpace() {
         var (owner, _) = await SeedSpaceOwnerAsync();
         await LoginAsync(owner.Email, "Test123!");
 
         var response = await Client.MutateAsync<CreateSpaceResponse>("""
-            mutation($input: CreateSpaceInput!) {
-                createSpace(input: $input) {
-                    space {
-                        id
-                        title
-                        description
-                        type
-                        status
-                        address
-                        city
-                        state
-                        pricePerDay
-                        minDuration
+                mutation($input: CreateSpaceInput!) {
+                    createSpace(input: $input) {
+                        space {
+                            id
+                            title
+                            description
+                            type
+                            status
+                            address
+                            city
+                            state
+                            pricePerDay
+                            minDuration
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new {
                 input = new {
                     title = "Test Space",
@@ -56,12 +57,12 @@ public sealed class SpaceMutationsTests(IntegrationTestFixture fixture) : Integr
     [Fact]
     public async Task CreateSpace_Unauthenticated_ReturnsAuthError() {
         var response = await Client.MutateAsync<CreateSpaceResponse>("""
-            mutation($input: CreateSpaceInput!) {
-                createSpace(input: $input) {
-                    space { id }
+                mutation($input: CreateSpaceInput!) {
+                    createSpace(input: $input) {
+                        space { id }
+                    }
                 }
-            }
-            """,
+                """,
             new {
                 input = new {
                     title = "Test Space",
@@ -89,16 +90,16 @@ public sealed class SpaceMutationsTests(IntegrationTestFixture fixture) : Integr
         var space = await SeedSpaceAsync(ownerProfile.Id);
 
         var response = await Client.MutateAsync<UpdateSpaceResponse>("""
-            mutation($id: ID!, $input: UpdateSpaceInput!) {
-                updateSpace(id: $id, input: $input) {
-                    space {
-                        id
-                        title
-                        pricePerDay
+                mutation($id: ID!, $input: UpdateSpaceInput!) {
+                    updateSpace(id: $id, input: $input) {
+                        space {
+                            id
+                            title
+                            pricePerDay
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new {
                 id = space.Id,
                 input = new {
@@ -119,12 +120,12 @@ public sealed class SpaceMutationsTests(IntegrationTestFixture fixture) : Integr
         var space = await SeedSpaceAsync(ownerProfile.Id);
 
         var response = await Client.MutateAsync<DeleteSpaceResponse>("""
-            mutation($input: DeleteSpaceInput!) {
-                deleteSpace(input: $input) {
-                    success
+                mutation($input: DeleteSpaceInput!) {
+                    deleteSpace(input: $input) {
+                        success
+                    }
                 }
-            }
-            """,
+                """,
             new { input = new { id = space.Id } });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -138,15 +139,15 @@ public sealed class SpaceMutationsTests(IntegrationTestFixture fixture) : Integr
         var space = await SeedSpaceAsync(ownerProfile.Id);
 
         var response = await Client.MutateAsync<DeactivateSpaceResponse>("""
-            mutation($input: DeactivateSpaceInput!) {
-                deactivateSpace(input: $input) {
-                    space {
-                        id
-                        status
+                mutation($input: DeactivateSpaceInput!) {
+                    deactivateSpace(input: $input) {
+                        space {
+                            id
+                            status
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new { input = new { id = space.Id } });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -157,18 +158,20 @@ public sealed class SpaceMutationsTests(IntegrationTestFixture fixture) : Integr
     public async Task ReactivateSpace_AsOwner_ReactivatesSpace() {
         var (owner, ownerProfile) = await SeedSpaceOwnerAsync();
         await LoginAsync(owner.Email, "Test123!");
-        var space = await SeedSpaceWithStatusAsync(ownerProfile.Id, SpaceStatus.Inactive);
+        var space =
+            await SeedSpaceWithStatusAsync(ownerProfile.Id,
+                SpaceStatus.Inactive);
 
         var response = await Client.MutateAsync<ReactivateSpaceResponse>("""
-            mutation($input: ReactivateSpaceInput!) {
-                reactivateSpace(input: $input) {
-                    space {
-                        id
-                        status
+                mutation($input: ReactivateSpaceInput!) {
+                    reactivateSpace(input: $input) {
+                        space {
+                            id
+                            status
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new { input = new { id = space.Id } });
 
         response.Errors.Should().BeNullOrEmpty();

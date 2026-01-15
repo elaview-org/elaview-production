@@ -12,11 +12,17 @@ public static class ConversationExtensions {
     [UseSorting]
     public static IQueryable<Message> GetMessages(
         [Parent] Conversation conversation, IMessageService messageService
-    ) => messageService.GetMessagesByConversationIdQuery(conversation.Id);
+    ) {
+        return messageService.GetMessagesByConversationIdQuery(conversation.Id);
+    }
 
     [Authorize]
     [UseProjection]
     public static IQueryable<ConversationParticipant> GetParticipants(
-        [Parent] Conversation conversation, IConversationService conversationService
-    ) => conversationService.GetParticipantsByConversationIdQuery(conversation.Id);
+        [Parent] Conversation conversation,
+        IConversationService conversationService
+    ) {
+        return conversationService.GetParticipantsByConversationIdQuery(
+            conversation.Id);
+    }
 }

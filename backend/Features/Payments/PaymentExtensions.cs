@@ -12,5 +12,7 @@ public static class PaymentExtensions {
     [UseSorting]
     public static IQueryable<Refund> GetRefunds(
         [Parent] Payment payment, IRefundService refundService
-    ) => refundService.GetRefundsByPaymentIdQuery(payment.Id);
+    ) {
+        return refundService.GetRefundsByPaymentIdQuery(payment.Id);
+    }
 }

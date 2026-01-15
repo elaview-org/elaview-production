@@ -15,5 +15,9 @@ public static partial class MessageMutations {
         List<string>? attachments,
         IMessageService messageService,
         CancellationToken ct
-    ) => new(await messageService.SendMessageAsync(conversationId, content, type ?? MessageType.Text, attachments, ct));
+    ) {
+        return new SendMessagePayload(await messageService.SendMessageAsync(
+            conversationId,
+            content, type ?? MessageType.Text, attachments, ct));
+    }
 }

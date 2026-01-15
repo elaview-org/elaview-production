@@ -12,18 +12,24 @@ public static partial class PayoutQueries {
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Payout> GetMyPayouts(IPayoutService payoutService)
-        => payoutService.GetMyPayoutsQuery();
+    public static IQueryable<Payout>
+        GetMyPayouts(IPayoutService payoutService) {
+        return payoutService.GetMyPayoutsQuery();
+    }
 
     [Authorize]
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<Payout> GetPayoutById(
         [ID] Guid id, IPayoutService payoutService
-    ) => payoutService.GetPayoutByIdQuery(id);
+    ) {
+        return payoutService.GetPayoutByIdQuery(id);
+    }
 
     [Authorize]
     public static async Task<EarningsSummary> GetEarningsSummary(
         IPayoutService payoutService, CancellationToken ct
-    ) => await payoutService.GetEarningsSummaryAsync(ct);
+    ) {
+        return await payoutService.GetEarningsSummaryAsync(ct);
+    }
 }

@@ -31,15 +31,15 @@ public static class Config {
 
         if (isTestOrDev) {
             var port = envVars["ELAVIEW_BACKEND_SERVER_PORT"]?.ToString();
-            if (!string.IsNullOrEmpty(port)) {
+            if (!string.IsNullOrEmpty(port))
                 builder.WebHost.ConfigureKestrel((_, serverOptions) => {
                     serverOptions.ListenAnyIP(
                         int.Parse(port),
                         listenOptions => {
-                            listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+                            listenOptions.Protocols =
+                                HttpProtocols.Http1AndHttp2;
                         });
                 });
-            }
         }
         else {
             if (string.IsNullOrEmpty(certPath))
@@ -70,12 +70,11 @@ public static class Config {
         var isTestOrDev = app.Environment.IsDevelopment() ||
                           app.Environment.EnvironmentName == "Testing";
 
-        if (app.Environment.IsDevelopment()) {
+        if (app.Environment.IsDevelopment())
             task = Task.Run(async () => await app.Services.CreateScope()
                 .ServiceProvider
                 .GetRequiredService<DatabaseSeeder>()
                 .SeedDevelopmentAccountsAsync(true));
-        }
 
         if (!isTestOrDev) {
             app.MapOpenApi();

@@ -13,7 +13,10 @@ public record NotificationNode(
 
 public record NotificationByIdResponse(NotificationNode? NotificationById);
 
-public record NotificationsConnection(List<NotificationNode> Nodes, PageInfo PageInfo, int? TotalCount = null);
+public record NotificationsConnection(
+    List<NotificationNode> Nodes,
+    PageInfo PageInfo,
+    int? TotalCount = null);
 
 public record MyNotificationsResponse(NotificationsConnection MyNotifications);
 
@@ -27,23 +30,30 @@ public record NotificationPreferenceNode(
     bool InAppEnabled
 );
 
-public record MyNotificationPreferencesResponse(List<NotificationPreferenceNode> MyNotificationPreferences);
+public record MyNotificationPreferencesResponse(
+    List<NotificationPreferenceNode> MyNotificationPreferences);
 
-public record MarkNotificationReadPayloadResponse(NotificationNode Notification);
+public record MarkNotificationReadPayloadResponse(
+    NotificationNode Notification);
 
-public record MarkNotificationReadResponse(MarkNotificationReadPayloadResponse MarkNotificationRead);
+public record MarkNotificationReadResponse(
+    MarkNotificationReadPayloadResponse MarkNotificationRead);
 
 public record MarkAllNotificationsReadPayloadResponse(int Count);
 
-public record MarkAllNotificationsReadResponse(MarkAllNotificationsReadPayloadResponse MarkAllNotificationsRead);
+public record MarkAllNotificationsReadResponse(
+    MarkAllNotificationsReadPayloadResponse MarkAllNotificationsRead);
 
 public record DeleteNotificationPayloadResponse(bool Success);
 
-public record DeleteNotificationResponse(DeleteNotificationPayloadResponse DeleteNotification);
+public record DeleteNotificationResponse(
+    DeleteNotificationPayloadResponse DeleteNotification);
 
-public record UpdateNotificationPreferencePayloadResponse(NotificationPreferenceNode Preference);
+public record UpdateNotificationPreferencePayloadResponse(
+    NotificationPreferenceNode Preference);
 
-public record UpdateNotificationPreferenceResponse(UpdateNotificationPreferencePayloadResponse UpdateNotificationPreference);
+public record UpdateNotificationPreferenceResponse(
+    UpdateNotificationPreferencePayloadResponse UpdateNotificationPreference);
 
 public record ConversationNode(
     Guid Id,
@@ -53,7 +63,10 @@ public record ConversationNode(
 
 public record ConversationByIdResponse(ConversationNode? ConversationById);
 
-public record ConversationsConnection(List<ConversationNode> Nodes, PageInfo PageInfo, int? TotalCount = null);
+public record ConversationsConnection(
+    List<ConversationNode> Nodes,
+    PageInfo PageInfo,
+    int? TotalCount = null);
 
 public record MyConversationsResponse(ConversationsConnection MyConversations);
 
@@ -64,15 +77,20 @@ public record MessageNode(
     Guid SenderUserId
 );
 
-public record MessagesConnection(List<MessageNode> Nodes, PageInfo PageInfo, int? TotalCount = null);
+public record MessagesConnection(
+    List<MessageNode> Nodes,
+    PageInfo PageInfo,
+    int? TotalCount = null);
 
-public record MessagesByConversationResponse(MessagesConnection MessagesByConversation);
+public record MessagesByConversationResponse(
+    MessagesConnection MessagesByConversation);
 
 public record UnreadConversationsCountResponse(int UnreadConversationsCount);
 
 public record CreateConversationPayloadResponse(ConversationNode Conversation);
 
-public record CreateBookingConversationResponse(CreateConversationPayloadResponse CreateBookingConversation);
+public record CreateBookingConversationResponse(
+    CreateConversationPayloadResponse CreateBookingConversation);
 
 public record SendMessagePayloadResponse(MessageNode Message);
 
@@ -84,6 +102,8 @@ public record ConversationParticipantNode(
     DateTime? LastReadAt
 );
 
-public record MarkConversationReadPayloadResponse(ConversationParticipantNode Participant);
+public record MarkConversationReadPayloadResponse(
+    ConversationParticipantNode Participant);
 
-public record MarkConversationReadResponse(MarkConversationReadPayloadResponse MarkConversationRead);
+public record MarkConversationReadResponse(
+    MarkConversationReadPayloadResponse MarkConversationRead);

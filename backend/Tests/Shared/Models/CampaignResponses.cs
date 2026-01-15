@@ -2,7 +2,10 @@ namespace ElaviewBackend.Tests.Shared.Models;
 
 public record CampaignsResponse(CampaignsConnection Campaigns);
 
-public record CampaignsConnection(List<CampaignNode> Nodes, PageInfo PageInfo, int? TotalCount = null);
+public record CampaignsConnection(
+    List<CampaignNode> Nodes,
+    PageInfo PageInfo,
+    int? TotalCount = null);
 
 public record CampaignNode(
     Guid Id,

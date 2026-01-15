@@ -5,60 +5,71 @@ using Microsoft.EntityFrameworkCore;
 namespace ElaviewBackend.Features.Users;
 
 public interface IUserRepository {
+    IQueryable<User> GetUserById(Guid id);
+    IQueryable<User> GetAllUsers();
     Task<User?> GetUserByIdAsync(Guid id, CancellationToken ct);
+    Task<User> UpdateAsync(User user, CancellationToken ct);
 
     Task<AdvertiserProfile?> GetAdvertiserProfileByUserIdAsync(Guid userId,
+        CancellationToken ct);
+
+    Task<AdvertiserProfile> UpdateAsync(AdvertiserProfile profile,
         CancellationToken ct);
 
     Task<SpaceOwnerProfile?> GetSpaceOwnerProfileByUserIdAsync(Guid userId,
         CancellationToken ct);
 
-    Task<IReadOnlyList<Space>> GetSpacesBySpaceOwnerProfileIdAsync(
-        Guid spaceOwnerProfileId, CancellationToken ct);
-
-    Task<IReadOnlyList<Campaign>> GetCampaignsByAdvertiserProfileIdAsync(
-        Guid advertiserProfileId, CancellationToken ct);
+    Task<SpaceOwnerProfile> UpdateAsync(SpaceOwnerProfile profile,
+        CancellationToken ct);
 
     Task<IReadOnlyList<Payout>> GetPayoutsBySpaceOwnerProfileIdAsync(
         Guid spaceOwnerProfileId, CancellationToken ct);
 }
 
 public class UserRepository(
+    AppDbContext context,
     IUserByIdDataLoader userById,
     IAdvertiserProfileByUserIdDataLoader advertiserProfileByUserId,
     ISpaceOwnerProfileByUserIdDataLoader spaceOwnerProfileByUserId,
-    ISpacesBySpaceOwnerProfileIdDataLoader spacesBySpaceOwnerProfileId,
-    ICampaignsByAdvertiserProfileIdDataLoader
-        campaignsByAdvertiserProfileId,
     IPayoutsBySpaceOwnerProfileIdDataLoader payoutsBySpaceOwnerProfileId
 ) : IUserRepository {
+    public IQueryable<User> GetUserById(Guid id)
+        => context.Users.Where(u => u.Id == id);
+
+    public IQueryable<User> GetAllUsers() => context.Users;
+
     public async Task<User?> GetUserByIdAsync(Guid id, CancellationToken ct)
         => await userById.LoadAsync(id, ct);
+
+    public async Task<User> UpdateAsync(User user, CancellationToken ct) {
+        await context.SaveChangesAsync(ct);
+        return user;
+    }
 
     public async Task<AdvertiserProfile?> GetAdvertiserProfileByUserIdAsync(
         Guid userId, CancellationToken ct)
         => await advertiserProfileByUserId.LoadAsync(userId, ct);
 
+    public async Task<AdvertiserProfile> UpdateAsync(AdvertiserProfile profile,
+        CancellationToken ct) {
+        await context.SaveChangesAsync(ct);
+        return profile;
+    }
+
     public async Task<SpaceOwnerProfile?> GetSpaceOwnerProfileByUserIdAsync(
         Guid userId, CancellationToken ct)
         => await spaceOwnerProfileByUserId.LoadAsync(userId, ct);
 
-    public async Task<IReadOnlyList<Space>> GetSpacesBySpaceOwnerProfileIdAsync(
+    public async Task<SpaceOwnerProfile> UpdateAsync(SpaceOwnerProfile profile,
+        CancellationToken ct) {
+        await context.SaveChangesAsync(ct);
+        return profile;
+    }
+
+    public async Task<IReadOnlyList<Payout>> GetPayoutsBySpaceOwnerProfileIdAsync(
         Guid spaceOwnerProfileId, CancellationToken ct)
-        => await spacesBySpaceOwnerProfileId.LoadAsync(spaceOwnerProfileId,
-            ct) ?? [];
-
-    public async Task<IReadOnlyList<Campaign>>
-        GetCampaignsByAdvertiserProfileIdAsync(
-            Guid advertiserProfileId, CancellationToken ct)
-        => await campaignsByAdvertiserProfileId.LoadAsync(advertiserProfileId,
-            ct) ?? [];
-
-    public async Task<IReadOnlyList<Payout>>
-        GetPayoutsBySpaceOwnerProfileIdAsync(
-            Guid spaceOwnerProfileId, CancellationToken ct)
-        => await payoutsBySpaceOwnerProfileId.LoadAsync(spaceOwnerProfileId,
-            ct) ?? [];
+        => await payoutsBySpaceOwnerProfileId.LoadAsync(spaceOwnerProfileId, ct)
+           ?? [];
 }
 
 internal static class UserDataLoader {
@@ -86,24 +97,6 @@ internal static class UserDataLoader {
         ) => await context.SpaceOwnerProfiles
         .Where(p => userIds.Contains(p.UserId))
         .ToDictionaryAsync(p => p.UserId, ct);
-
-    [DataLoader]
-    public static async Task<ILookup<Guid, Space>>
-        GetSpacesBySpaceOwnerProfileId(
-            IReadOnlyList<Guid> ownerProfileIds, AppDbContext context,
-            CancellationToken ct
-        ) => (await context.Spaces
-        .Where(s => ownerProfileIds.Contains(s.SpaceOwnerProfileId))
-        .ToListAsync(ct)).ToLookup(s => s.SpaceOwnerProfileId);
-
-    [DataLoader]
-    public static async Task<ILookup<Guid, Campaign>>
-        GetCampaignsByAdvertiserProfileId(
-            IReadOnlyList<Guid> advertiserProfileIds, AppDbContext context,
-            CancellationToken ct
-        ) => (await context.Campaigns
-        .Where(c => advertiserProfileIds.Contains(c.AdvertiserProfileId))
-        .ToListAsync(ct)).ToLookup(c => c.AdvertiserProfileId);
 
     [DataLoader]
     public static async Task<ILookup<Guid, Payout>>

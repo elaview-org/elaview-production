@@ -12,12 +12,14 @@ public sealed class Conversation : EntityBase {
 
     public DateTime UpdatedAt { get; set; }
 
-    public ICollection<ConversationParticipant> Participants { get; init; } = [];
+    public ICollection<ConversationParticipant> Participants { get; init; } =
+        [];
 
     public ICollection<Message> Messages { get; init; } = [];
 }
 
-public sealed class ConversationConfig : IEntityTypeConfiguration<Conversation> {
+public sealed class
+    ConversationConfig : IEntityTypeConfiguration<Conversation> {
     public void Configure(EntityTypeBuilder<Conversation> builder) {
         builder.HasIndex(e => e.BookingId);
         builder.HasIndex(e => e.UpdatedAt);

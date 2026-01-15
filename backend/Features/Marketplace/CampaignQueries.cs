@@ -10,13 +10,17 @@ public static partial class CampaignQueries {
     [UseProjection]
     public static IQueryable<Campaign> GetCampaignById(
         [ID] Guid id, ICampaignService campaignService
-    ) => campaignService.GetCampaignByIdQuery(id);
+    ) {
+        return campaignService.GetCampaignByIdQuery(id);
+    }
 
     [Authorize]
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Campaign> GetMyCampaigns(ICampaignService campaignService)
-        => campaignService.GetMyCampaignsQuery();
+    public static IQueryable<Campaign> GetMyCampaigns(
+        ICampaignService campaignService) {
+        return campaignService.GetMyCampaignsQuery();
+    }
 }

@@ -13,7 +13,9 @@ public static partial class NotificationSubscriptions {
     public static Notification OnNotification(
         [ID] Guid userId,
         [EventMessage] Notification notification
-    ) => notification;
+    ) {
+        return notification;
+    }
 
     [Authorize]
     [Subscribe]
@@ -21,7 +23,9 @@ public static partial class NotificationSubscriptions {
     public static Message OnMessage(
         [ID] Guid conversationId,
         [EventMessage] Message message
-    ) => message;
+    ) {
+        return message;
+    }
 
     [Authorize]
     [Subscribe]
@@ -29,7 +33,9 @@ public static partial class NotificationSubscriptions {
     public static Booking OnBookingUpdate(
         [ID] Guid bookingId,
         [EventMessage] Booking booking
-    ) => booking;
+    ) {
+        return booking;
+    }
 
     [Authorize]
     [Subscribe]
@@ -37,5 +43,7 @@ public static partial class NotificationSubscriptions {
     public static BookingProof OnProofUpdate(
         [ID] Guid bookingId,
         [EventMessage] BookingProof proof
-    ) => proof;
+    ) {
+        return proof;
+    }
 }

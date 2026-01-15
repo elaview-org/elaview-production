@@ -8,21 +8,38 @@ namespace ElaviewBackend.Features.Notifications;
 public static partial class NotificationMutations {
     [Authorize]
     public static async Task<MarkNotificationReadPayload> MarkNotificationRead(
-        [ID] Guid id, INotificationService notificationService, CancellationToken ct
-    ) => new(await notificationService.MarkAsReadAsync(id, ct));
+        [ID] Guid id, INotificationService notificationService,
+        CancellationToken ct
+    ) {
+        return new MarkNotificationReadPayload(
+            await notificationService.MarkAsReadAsync(id, ct));
+    }
 
     [Authorize]
-    public static async Task<MarkAllNotificationsReadPayload> MarkAllNotificationsRead(
-        INotificationService notificationService, CancellationToken ct
-    ) => new(await notificationService.MarkAllAsReadAsync(ct));
+    public static async Task<MarkAllNotificationsReadPayload>
+        MarkAllNotificationsRead(
+            INotificationService notificationService, CancellationToken ct
+        ) {
+        return new MarkAllNotificationsReadPayload(
+            await notificationService.MarkAllAsReadAsync(ct));
+    }
 
     [Authorize]
     public static async Task<DeleteNotificationPayload> DeleteNotification(
-        [ID] Guid id, INotificationService notificationService, CancellationToken ct
-    ) => new(await notificationService.DeleteNotificationAsync(id, ct));
+        [ID] Guid id, INotificationService notificationService,
+        CancellationToken ct
+    ) {
+        return new DeleteNotificationPayload(
+            await notificationService.DeleteNotificationAsync(id, ct));
+    }
 
     [Authorize]
-    public static async Task<UpdateNotificationPreferencePayload> UpdateNotificationPreference(
-        UpdateNotificationPreferenceInput input, INotificationService notificationService, CancellationToken ct
-    ) => new(await notificationService.UpdatePreferenceAsync(input, ct));
+    public static async Task<UpdateNotificationPreferencePayload>
+        UpdateNotificationPreference(
+            UpdateNotificationPreferenceInput input,
+            INotificationService notificationService, CancellationToken ct
+        ) {
+        return new UpdateNotificationPreferencePayload(
+            await notificationService.UpdatePreferenceAsync(input, ct));
+    }
 }

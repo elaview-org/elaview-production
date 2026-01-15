@@ -5,13 +5,13 @@ using ElaviewBackend.Tests.Shared.Extensions;
 using ElaviewBackend.Tests.Shared.Factories;
 using ElaviewBackend.Tests.Shared.Models;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace ElaviewBackend.Tests.Integration.Notifications;
 
 [Collection("Integration")]
-public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class NotificationQueriesTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task GetMyNotifications_ReturnsNotifications() {
         var user = await CreateAndLoginUserAsync();
@@ -64,11 +64,12 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
             n.ReadAt = DateTime.UtcNow;
         });
 
-        var response = await Client.QueryAsync<UnreadNotificationsCountResponse>("""
-            query {
-                unreadNotificationsCount
-            }
-            """);
+        var response =
+            await Client.QueryAsync<UnreadNotificationsCountResponse>("""
+                query {
+                    unreadNotificationsCount
+                }
+                """);
 
         response.Errors.Should().BeNullOrEmpty();
         response.Data!.UnreadNotificationsCount.Should().Be(2);
@@ -80,16 +81,16 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
         var notification = await SeedNotificationAsync(user.Id);
 
         var response = await Client.QueryAsync<NotificationByIdResponse>("""
-            query($id: ID!) {
-                notificationById(id: $id) {
-                    id
-                    type
-                    title
-                    body
-                    isRead
+                query($id: ID!) {
+                    notificationById(id: $id) {
+                        id
+                        type
+                        title
+                        body
+                        isRead
+                    }
                 }
-            }
-            """,
+                """,
             new { id = notification.Id });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -104,12 +105,12 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
         var notification = await SeedNotificationAsync(otherUser.Id);
 
         var response = await Client.QueryAsync<NotificationByIdResponse>("""
-            query($id: ID!) {
-                notificationById(id: $id) {
-                    id
+                query($id: ID!) {
+                    notificationById(id: $id) {
+                        id
+                    }
                 }
-            }
-            """,
+                """,
             new { id = notification.Id });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -121,12 +122,12 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
         var user = await CreateAndLoginUserAsync();
 
         var response = await Client.QueryAsync<NotificationByIdResponse>("""
-            query($id: ID!) {
-                notificationById(id: $id) {
-                    id
+                query($id: ID!) {
+                    notificationById(id: $id) {
+                        id
+                    }
                 }
-            }
-            """,
+                """,
             new { id = Guid.NewGuid() });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -136,20 +137,23 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
     [Fact]
     public async Task GetMyNotificationPreferences_ReturnsPreferences() {
         var user = await CreateAndLoginUserAsync();
-        await SeedNotificationPreferenceAsync(user.Id, NotificationType.BookingRequested);
-        await SeedNotificationPreferenceAsync(user.Id, NotificationType.PaymentReceived);
+        await SeedNotificationPreferenceAsync(user.Id,
+            NotificationType.BookingRequested);
+        await SeedNotificationPreferenceAsync(user.Id,
+            NotificationType.PaymentReceived);
 
-        var response = await Client.QueryAsync<MyNotificationPreferencesResponse>("""
-            query {
-                myNotificationPreferences {
-                    id
-                    notificationType
-                    emailEnabled
-                    pushEnabled
-                    inAppEnabled
+        var response =
+            await Client.QueryAsync<MyNotificationPreferencesResponse>("""
+                query {
+                    myNotificationPreferences {
+                        id
+                        notificationType
+                        emailEnabled
+                        pushEnabled
+                        inAppEnabled
+                    }
                 }
-            }
-            """);
+                """);
 
         response.Errors.Should().BeNullOrEmpty();
         response.Data!.MyNotificationPreferences.Should().HaveCount(2);
@@ -159,7 +163,9 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
     public async Task GetMyConversations_ReturnsConversations() {
         var user = await CreateAndLoginUserAsync();
         var (otherUser, _) = await SeedAdvertiserAsync();
-        var conversation = await SeedConversationWithParticipantsAsync(null, user.Id, otherUser.Id);
+        var conversation =
+            await SeedConversationWithParticipantsAsync(null, user.Id,
+                otherUser.Id);
 
         var response = await Client.QueryAsync<MyConversationsResponse>("""
             query {
@@ -175,7 +181,8 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
 
         response.Errors.Should().BeNullOrEmpty();
         response.Data!.MyConversations.Nodes.Should().HaveCount(1);
-        response.Data!.MyConversations.Nodes.First().Id.Should().Be(conversation.Id);
+        response.Data!.MyConversations.Nodes.First().Id.Should()
+            .Be(conversation.Id);
     }
 
     [Fact]
@@ -243,20 +250,24 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
     public async Task GetUnreadConversationsCount_ReturnsCorrectCount() {
         var user = await CreateAndLoginUserAsync();
         var (otherUser, _) = await SeedAdvertiserAsync();
-        var conversation = await SeedConversationWithParticipantsAsync(null, user.Id, otherUser.Id);
+        var conversation =
+            await SeedConversationWithParticipantsAsync(null, user.Id,
+                otherUser.Id);
         await SeedMessageAsync(conversation.Id, otherUser.Id);
 
-        var response = await Client.QueryAsync<UnreadConversationsCountResponse>("""
-            query {
-                unreadConversationsCount
-            }
-            """);
+        var response =
+            await Client.QueryAsync<UnreadConversationsCountResponse>("""
+                query {
+                    unreadConversationsCount
+                }
+                """);
 
         response.Errors.Should().BeNullOrEmpty();
         response.Data!.UnreadConversationsCount.Should().Be(1);
     }
 
-    private async Task<Notification> SeedNotificationAsync(Guid userId, Action<Notification>? customize = null) {
+    private async Task<Notification> SeedNotificationAsync(Guid userId,
+        Action<Notification>? customize = null) {
         var notification = NotificationFactory.Create(userId, customize);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -265,7 +276,8 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
         return notification;
     }
 
-    private async Task<Conversation> SeedConversationWithParticipantsAsync(Guid? bookingId, params Guid[] userIds) {
+    private async Task<Conversation> SeedConversationWithParticipantsAsync(
+        Guid? bookingId, params Guid[] userIds) {
         var conversation = ConversationFactory.Create(bookingId);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -273,15 +285,18 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
         await context.SaveChangesAsync();
 
         foreach (var userId in userIds) {
-            var participant = ConversationParticipantFactory.Create(conversation.Id, userId);
+            var participant =
+                ConversationParticipantFactory.Create(conversation.Id, userId);
             context.ConversationParticipants.Add(participant);
         }
+
         await context.SaveChangesAsync();
 
         return conversation;
     }
 
-    private async Task<Message> SeedMessageAsync(Guid conversationId, Guid senderUserId) {
+    private async Task<Message> SeedMessageAsync(Guid conversationId,
+        Guid senderUserId) {
         var message = MessageFactory.Create(conversationId, senderUserId);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -290,8 +305,10 @@ public sealed class NotificationQueriesTests(IntegrationTestFixture fixture) : I
         return message;
     }
 
-    private async Task<NotificationPreference> SeedNotificationPreferenceAsync(Guid userId, NotificationType notificationType) {
-        var preference = NotificationPreferenceFactory.Create(userId, notificationType);
+    private async Task<NotificationPreference> SeedNotificationPreferenceAsync(
+        Guid userId, NotificationType notificationType) {
+        var preference =
+            NotificationPreferenceFactory.Create(userId, notificationType);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         context.NotificationPreferences.Add(preference);

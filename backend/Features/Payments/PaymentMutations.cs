@@ -8,14 +8,21 @@ namespace ElaviewBackend.Features.Payments;
 public static partial class PaymentMutations {
     [Authorize]
     public static async Task<CreatePaymentIntentPayload> CreatePaymentIntent(
-        [ID] Guid bookingId, IPaymentService paymentService, CancellationToken ct
+        [ID] Guid bookingId, IPaymentService paymentService,
+        CancellationToken ct
     ) {
-        var result = await paymentService.CreatePaymentIntentAsync(bookingId, ct);
-        return new CreatePaymentIntentPayload(result.ClientSecret, result.PaymentIntentId, result.Amount);
+        var result =
+            await paymentService.CreatePaymentIntentAsync(bookingId, ct);
+        return new CreatePaymentIntentPayload(result.ClientSecret,
+            result.PaymentIntentId, result.Amount);
     }
 
     [Authorize]
     public static async Task<ConfirmPaymentPayload> ConfirmPayment(
-        string paymentIntentId, IPaymentService paymentService, CancellationToken ct
-    ) => new(await paymentService.ConfirmPaymentAsync(paymentIntentId, ct));
+        string paymentIntentId, IPaymentService paymentService,
+        CancellationToken ct
+    ) {
+        return new ConfirmPaymentPayload(
+            await paymentService.ConfirmPaymentAsync(paymentIntentId, ct));
+    }
 }

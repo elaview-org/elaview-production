@@ -23,12 +23,11 @@ public static class Services {
                 options.UseNpgsql(connectionString,
                     o => o.EnableRetryOnFailure());
 
-                if (builder.Environment.IsDevelopment()) {
+                if (builder.Environment.IsDevelopment())
                     options.LogTo(Console.WriteLine,
                             [DbLoggerCategory.Database.Command.Name],
                             LogLevel.Information)
                         .EnableSensitiveDataLogging();
-                }
             })
             .AddOpenApi()
             .AddScoped<AuthService>()
@@ -53,7 +52,8 @@ public static class Services {
             .AddScoped<IStripeConnectService, StripeConnectService>()
             .AddScoped<INotificationService, NotificationService>()
             .AddScoped<INotificationRepository, NotificationRepository>()
-            .AddScoped<INotificationPreferenceRepository, NotificationPreferenceRepository>()
+            .AddScoped<INotificationPreferenceRepository,
+                NotificationPreferenceRepository>()
             .AddScoped<IConversationService, ConversationService>()
             .AddScoped<IConversationRepository, ConversationRepository>()
             .AddScoped<IMessageService, MessageService>()
@@ -79,7 +79,8 @@ public static class Services {
                 CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options => {
                 var isTestOrDev = builder.Environment.IsDevelopment() ||
-                                  builder.Environment.EnvironmentName == "Testing";
+                                  builder.Environment.EnvironmentName ==
+                                  "Testing";
                 options.Cookie.Name =
                     envVars["ELAVIEW_BACKEND_AUTH_COOKIE_NAME"]!.ToString()!;
                 options.Cookie.HttpOnly = true;

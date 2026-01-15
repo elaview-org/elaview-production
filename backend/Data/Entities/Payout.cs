@@ -30,7 +30,7 @@ public sealed class Payout : EntityBase {
     [MaxLength(500)]
     public string? FailureReason { get; set; }
 
-    public int AttemptCount { get; set; } = 0;
+    public int AttemptCount { get; set; }
 
     public DateTime? LastAttemptAt { get; set; }
 }

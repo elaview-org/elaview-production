@@ -6,7 +6,8 @@ namespace ElaviewBackend.Tests.Shared.Factories;
 public static class SpaceOwnerProfileFactory {
     private static readonly Faker Faker = new();
 
-    public static SpaceOwnerProfile Create(Guid userId, Action<SpaceOwnerProfile>? customize = null) {
+    public static SpaceOwnerProfile Create(Guid userId,
+        Action<SpaceOwnerProfile>? customize = null) {
         var profile = new SpaceOwnerProfile {
             Id = Guid.NewGuid(),
             UserId = userId,

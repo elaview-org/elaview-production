@@ -37,7 +37,8 @@ public sealed class BookingDispute : EntityBase {
     public string? ResolutionNotes { get; set; }
 }
 
-public sealed class BookingDisputeConfig : IEntityTypeConfiguration<BookingDispute> {
+public sealed class
+    BookingDisputeConfig : IEntityTypeConfiguration<BookingDispute> {
     public void Configure(EntityTypeBuilder<BookingDispute> builder) {
         builder.HasIndex(e => e.BookingId).IsUnique();
         builder.HasIndex(e => e.DisputedByUserId);

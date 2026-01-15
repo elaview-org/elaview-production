@@ -1,33 +1,27 @@
 using System.Security.Claims;
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
 
 namespace ElaviewBackend.Features.Users;
 
 public interface IUserService {
-    Guid? GetCurrentUserIdOrNull();
-    IQueryable<User> GetCurrentUserQuery();
-    IQueryable<User> GetUserByIdQuery(Guid id);
-    IQueryable<User> GetUsersQuery();
+    IQueryable<User> GetCurrentUser();
+    IQueryable<User> GetUserById(Guid id);
+    IQueryable<User> GetAllUsers();
     Task<User> GetCurrentUserAsync(CancellationToken ct);
-    Task<User> UpdateAsync(UpdateUserInput input, CancellationToken ct);
-    Task<User> SwitchProfileTypeAsync(ProfileType type, CancellationToken ct);
+    Task<User> UpdateMyInfoAsync(UpdateUserInput input, CancellationToken ct);
+    Task<User> SwitchMyProfileTypeAsync(ProfileType type, CancellationToken ct);
 
     Task<AdvertiserProfile?> GetAdvertiserProfileByUserIdAsync(
         Guid userId, CancellationToken ct);
 
-    Task<AdvertiserProfile> UpdateAdvertiserProfileAsync(
+    Task<AdvertiserProfile> UpdateMyAdvertiserProfileAsync(
         UpdateAdvertiserProfileInput input, CancellationToken ct);
 
     Task<SpaceOwnerProfile?> GetSpaceOwnerProfileByUserIdAsync(
         Guid userId, CancellationToken ct);
 
-    Task<SpaceOwnerProfile> UpdateSpaceOwnerProfileAsync(
+    Task<SpaceOwnerProfile> UpdateMySpaceOwnerProfileAsync(
         UpdateSpaceOwnerProfileInput input, CancellationToken ct);
-
-    IQueryable<Space> GetSpacesBySpaceOwnerProfileId(Guid profileId);
-
-    IQueryable<Campaign> GetCampaignsByAdvertiserProfileId(Guid profileId);
 
     Task<User> CompleteOnboardingAsync(ProfileType profileType,
         CancellationToken ct);
@@ -37,109 +31,64 @@ public interface IUserService {
 
 public sealed class UserService(
     IHttpContextAccessor httpContextAccessor,
-    AppDbContext context,
     IUserRepository userRepository
 ) : IUserService {
-    public Guid? GetCurrentUserIdOrNull() {
-        var principalId = httpContextAccessor.HttpContext?.User.FindFirstValue(
-            ClaimTypes.NameIdentifier
-        );
-        return principalId is null ? null : Guid.Parse(principalId);
-    }
+    public IQueryable<User> GetCurrentUser()
+        => GetPrincipalIdOrNull() is { } userId
+            ? userRepository.GetUserById(userId)
+            : throw new GraphQLException("Not authenticated");
 
-    private Guid GetCurrentUserId() {
-        return GetCurrentUserIdOrNull()
-               ?? throw new GraphQLException("Not authenticated");
-    }
+    public IQueryable<User> GetUserById(Guid id)
+        => userRepository.GetUserById(id);
 
-    public IQueryable<User> GetCurrentUserQuery()
-        => context.Users.Where(u => u.Id == GetCurrentUserIdOrNull());
-
-    public IQueryable<User> GetUserByIdQuery(Guid id)
-        => context.Users.Where(u => u.Id == id);
-
-    public IQueryable<User> GetUsersQuery()
-        => context.Users;
+    public IQueryable<User> GetAllUsers()
+        => userRepository.GetAllUsers();
 
     public async Task<User> GetCurrentUserAsync(CancellationToken ct)
-        => await userRepository.GetUserByIdAsync(GetCurrentUserId(), ct) ??
-           throw new GraphQLException("Current user not found");
+        => await userRepository.GetUserByIdAsync(GetPrincipalId(), ct)
+           ?? throw new GraphQLException("User not found");
 
-    public async Task<User> UpdateAsync(UpdateUserInput input,
+    public async Task<User> UpdateMyInfoAsync(UpdateUserInput input,
         CancellationToken ct) {
         var user = await GetCurrentUserAsync(ct);
-        var entry = context.Entry(user);
-        if (input.Name is not null)
-            entry.Property(u => u.Name).CurrentValue = input.Name;
-        if (input.Phone is not null)
-            entry.Property(u => u.Phone).CurrentValue = input.Phone;
-        if (input.Avatar is not null)
-            entry.Property(u => u.Avatar).CurrentValue = input.Avatar;
-        await context.SaveChangesAsync(ct);
-        return user;
+        if (input.Name is not null) user.Name = input.Name;
+        if (input.Phone is not null) user.Phone = input.Phone;
+        if (input.Avatar is not null) user.Avatar = input.Avatar;
+        return await userRepository.UpdateAsync(user, ct);
     }
 
-    public async Task<User> SwitchProfileTypeAsync(ProfileType type,
+    public async Task<User> SwitchMyProfileTypeAsync(ProfileType type,
         CancellationToken ct) {
         var user = await GetCurrentUserAsync(ct);
         user.ActiveProfileType = type;
-        await context.SaveChangesAsync(ct);
-        return user;
+        return await userRepository.UpdateAsync(user, ct);
     }
 
     public async Task<AdvertiserProfile?> GetAdvertiserProfileByUserIdAsync(
         Guid userId, CancellationToken ct)
         => await userRepository.GetAdvertiserProfileByUserIdAsync(userId, ct);
 
-    private async Task<AdvertiserProfile> GetAdvertiserProfileAsync(
-        CancellationToken ct) =>
-        await GetAdvertiserProfileByUserIdAsync(GetCurrentUserId(), ct)
-        ?? throw new GraphQLException("Advertiser profile not found");
-
-    public async Task<AdvertiserProfile> UpdateAdvertiserProfileAsync(
-        UpdateAdvertiserProfileInput input, CancellationToken ct
-    ) {
-        var profile = await GetAdvertiserProfileAsync(ct);
-
-        var entry = context.Entry(profile);
-        if (input.CompanyName is not null)
-            entry.Property(p => p.CompanyName).CurrentValue = input.CompanyName;
-        if (input.Industry is not null)
-            entry.Property(p => p.Industry).CurrentValue = input.Industry;
-        if (input.Website is not null)
-            entry.Property(p => p.Website).CurrentValue = input.Website;
-
-        await context.SaveChangesAsync(ct);
-        return profile;
+    public async Task<AdvertiserProfile> UpdateMyAdvertiserProfileAsync(
+        UpdateAdvertiserProfileInput input, CancellationToken ct) {
+        var profile = await GetMyAdvertiserProfileAsync(ct);
+        if (input.CompanyName is not null) profile.CompanyName = input.CompanyName;
+        if (input.Industry is not null) profile.Industry = input.Industry;
+        if (input.Website is not null) profile.Website = input.Website;
+        return await userRepository.UpdateAsync(profile, ct);
     }
 
     public async Task<SpaceOwnerProfile?> GetSpaceOwnerProfileByUserIdAsync(
         Guid userId, CancellationToken ct)
         => await userRepository.GetSpaceOwnerProfileByUserIdAsync(userId, ct);
 
-    private async Task<SpaceOwnerProfile> GetSpaceOwnerProfileAsync(
-        CancellationToken ct) =>
-        await GetSpaceOwnerProfileByUserIdAsync(GetCurrentUserId(), ct)
-        ?? throw new GraphQLException("Space owner profile not found");
-
-    public async Task<SpaceOwnerProfile> UpdateSpaceOwnerProfileAsync(
-        UpdateSpaceOwnerProfileInput input, CancellationToken ct
-    ) {
-        var profile = await GetSpaceOwnerProfileAsync(ct);
-
-        var entry = context.Entry(profile);
-        if (input.BusinessName is not null)
-            entry.Property(p => p.BusinessName).CurrentValue =
-                input.BusinessName;
-        if (input.BusinessType is not null)
-            entry.Property(p => p.BusinessType).CurrentValue =
-                input.BusinessType;
+    public async Task<SpaceOwnerProfile> UpdateMySpaceOwnerProfileAsync(
+        UpdateSpaceOwnerProfileInput input, CancellationToken ct) {
+        var profile = await GetMySpaceOwnerProfileAsync(ct);
+        if (input.BusinessName is not null) profile.BusinessName = input.BusinessName;
+        if (input.BusinessType is not null) profile.BusinessType = input.BusinessType;
         if (input.PayoutSchedule is not null)
-            entry.Property(p => p.PayoutSchedule).CurrentValue =
-                input.PayoutSchedule.Value;
-
-        await context.SaveChangesAsync(ct);
-        return profile;
+            profile.PayoutSchedule = input.PayoutSchedule.Value;
+        return await userRepository.UpdateAsync(profile, ct);
     }
 
     public async Task<User> CompleteOnboardingAsync(ProfileType profileType,
@@ -153,38 +102,48 @@ public sealed class UserService(
         var advertiserProfile = await advertiserProfileTask;
         var spaceOwnerProfile = await spaceOwnerProfileTask;
 
-        if (profileType == ProfileType.Advertiser &&
-            advertiserProfile is not null) {
-            var advEntry = context.Entry(advertiserProfile);
-            advEntry.Property(p => p.OnboardingComplete).CurrentValue = true;
-        }
-        else if (profileType == ProfileType.SpaceOwner &&
-                 spaceOwnerProfile is not null) {
-            var ownerEntry = context.Entry(spaceOwnerProfile);
-            ownerEntry.Property(p => p.OnboardingComplete).CurrentValue = true;
+        switch (profileType) {
+            case ProfileType.Advertiser when advertiserProfile is not null:
+                advertiserProfile.OnboardingComplete = true;
+                await userRepository.UpdateAsync(advertiserProfile, ct);
+                break;
+            case ProfileType.SpaceOwner when spaceOwnerProfile is not null:
+                spaceOwnerProfile.OnboardingComplete = true;
+                await userRepository.UpdateAsync(spaceOwnerProfile, ct);
+                break;
+            default:
+                throw new GraphQLException("Profile not found");
         }
 
-        var userEntry = context.Entry(user);
-        userEntry.Property(u => u.ActiveProfileType).CurrentValue = profileType;
-
-        await context.SaveChangesAsync(ct);
-        return user;
+        user.ActiveProfileType = profileType;
+        return await userRepository.UpdateAsync(user, ct);
     }
-
-    public IQueryable<Space> GetSpacesBySpaceOwnerProfileId(Guid profileId)
-        => context.Spaces.Where(s => s.SpaceOwnerProfileId == profileId);
-
-    public IQueryable<Campaign> GetCampaignsByAdvertiserProfileId(Guid profileId)
-        => context.Campaigns.Where(c => c.AdvertiserProfileId == profileId);
 
     public async Task<bool> DeleteAsync(Guid id, CancellationToken ct) {
         var user = await userRepository.GetUserByIdAsync(id, ct);
         if (user is null) return false;
-
-        var entry = context.Entry(user);
-        entry.Property(u => u.Status).CurrentValue = UserStatus.Deleted;
-
-        await context.SaveChangesAsync(ct);
+        user.Status = UserStatus.Deleted;
+        await userRepository.UpdateAsync(user, ct);
         return true;
     }
+
+    private Guid? GetPrincipalIdOrNull()
+        => httpContextAccessor.HttpContext?.User.FindFirstValue(
+            ClaimTypes.NameIdentifier) is { } id
+            ? Guid.Parse(id)
+            : null;
+
+    private Guid GetPrincipalId()
+        => GetPrincipalIdOrNull()
+           ?? throw new GraphQLException("Not authenticated");
+
+    private async Task<AdvertiserProfile> GetMyAdvertiserProfileAsync(
+        CancellationToken ct)
+        => await GetAdvertiserProfileByUserIdAsync(GetPrincipalId(), ct)
+           ?? throw new GraphQLException("Advertiser profile not found");
+
+    private async Task<SpaceOwnerProfile> GetMySpaceOwnerProfileAsync(
+        CancellationToken ct)
+        => await GetSpaceOwnerProfileByUserIdAsync(GetPrincipalId(), ct)
+           ?? throw new GraphQLException("Space owner profile not found");
 }

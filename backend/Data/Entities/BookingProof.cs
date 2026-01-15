@@ -29,7 +29,8 @@ public sealed class BookingProof : EntityBase {
     public string? RejectionReason { get; set; }
 }
 
-public sealed class BookingProofConfig : IEntityTypeConfiguration<BookingProof> {
+public sealed class
+    BookingProofConfig : IEntityTypeConfiguration<BookingProof> {
     public void Configure(EntityTypeBuilder<BookingProof> builder) {
         builder.HasIndex(e => e.BookingId).IsUnique();
         builder.HasIndex(e => e.Status);

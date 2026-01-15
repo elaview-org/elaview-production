@@ -10,21 +10,25 @@ public static partial class UserQueries {
     [Authorize]
     [UseFirstOrDefault]
     [UseProjection]
-    public static IQueryable<User> GetCurrentUser(IUserService userService)
-        => userService.GetCurrentUserQuery();
+    public static IQueryable<User> GetCurrentUser(IUserService userService) {
+        return userService.GetCurrentUser();
+    }
 
     [Authorize(Roles = ["Admin"])]
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<User> GetUserById(
         [ID] Guid id, IUserService userService
-    ) => userService.GetUserByIdQuery(id);
+    ) {
+        return userService.GetUserById(id);
+    }
 
     [Authorize(Roles = ["Admin"])]
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<User> GetUsers(IUserService userService)
-        => userService.GetUsersQuery();
+    public static IQueryable<User> GetUsers(IUserService userService) {
+        return userService.GetAllUsers();
+    }
 }

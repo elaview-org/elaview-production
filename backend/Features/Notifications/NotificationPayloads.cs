@@ -8,4 +8,5 @@ public record MarkAllNotificationsReadPayload(int Count);
 
 public record DeleteNotificationPayload(bool Success);
 
-public record UpdateNotificationPreferencePayload(NotificationPreference Preference);
+public record UpdateNotificationPreferencePayload(
+    NotificationPreference Preference);

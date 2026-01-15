@@ -1,6 +1,7 @@
 # GraphQL API Specification
 
-Complete specification for Elaview's GraphQL API including queries, mutations, subscriptions, service layer architecture, and DataLoaders.
+Complete specification for Elaview's GraphQL API including queries, mutations, subscriptions, service layer
+architecture, and DataLoaders.
 
 ---
 
@@ -43,6 +44,7 @@ GraphQL Resolver → Service → Repository → DataLoader → Database
 | DataLoader | Batch queries, prevent N+1 (internal)              | IReadOnlyDictionary or ILookup        |
 
 **Key Rules**:
+
 - Resolvers NEVER access Repository or AppDbContext directly
 - All data flows through Service
 - Interface + implementation live in same file (reduces file sprawl)
@@ -50,28 +52,31 @@ GraphQL Resolver → Service → Repository → DataLoader → Database
 
 ### Return Type Rules
 
-| Operation Type              | Service Returns | Resolver Returns | Why                                    |
-|-----------------------------|-----------------|------------------|----------------------------------------|
-| Paginated/filtered queries  | IQueryable<T>   | IQueryable<T>    | Preserves HotChocolate middleware      |
-| Single entity by ID         | IQueryable<T>   | IQueryable<T>    | UseFirstOrDefault + UseProjection      |
-| Mutations                   | Task<T>         | Task<T>          | Single entity after write              |
-| Extensions (1:1 relation)   | Task<T?>        | Task<T?>         | DataLoader via service                 |
-| Extensions (1:N relation)   | IQueryable<T>   | IQueryable<T>    | Preserves pagination/filtering         |
+| Operation Type             | Service Returns | Resolver Returns | Why                               |
+|----------------------------|-----------------|------------------|-----------------------------------|
+| Paginated/filtered queries | IQueryable<T>   | IQueryable<T>    | Preserves HotChocolate middleware |
+| Single entity by ID        | IQueryable<T>   | IQueryable<T>    | UseFirstOrDefault + UseProjection |
+| Mutations                  | Task<T>         | Task<T>          | Single entity after write         |
+| Extensions (1:1 relation)  | Task<T?>        | Task<T?>         | DataLoader via service            |
+| Extensions (1:N relation)  | IQueryable<T>   | IQueryable<T>    | Preserves pagination/filtering    |
 
 ### Service Layer Pattern
 
 **Service Responsibilities:**
+
 - Business logic and validation
 - Database operations via Repository (not direct AppDbContext)
 - Cross-cutting concerns (notifications, payments)
 - Authorization checks beyond role-based auth
 
 **Repository Responsibilities:**
+
 - Wraps DataLoaders for batched fetching
 - Provides IQueryable for filtered/paginated queries
 - CRUD operations via AppDbContext
 
 **Resolver Responsibilities:**
+
 - Thin wrappers that delegate to services
 - HotChocolate middleware application (Authorize, Paging, Filtering, etc.)
 - NEVER access Repository or AppDbContext directly
@@ -143,7 +148,8 @@ services.AddScoped<IBookingService, BookingService>();
 
 ### Purpose
 
-DataLoaders solve the N+1 query problem by batching multiple individual requests into a single database query. They are request-scoped, meaning all requests within a single GraphQL operation are batched together.
+DataLoaders solve the N+1 query problem by batching multiple individual requests into a single database query. They are
+request-scoped, meaning all requests within a single GraphQL operation are batched together.
 
 ### Complete DataLoader Inventory
 
@@ -241,6 +247,7 @@ public static class SpaceExtensions {
 | `users`        | Admin    | Yes        | Yes       | Yes     | List all users with full filtering   |
 
 **Filters for `users`:**
+
 - email (contains, equals)
 - name (contains, equals)
 - role (equals, in)
@@ -306,6 +313,7 @@ query {
 | `mySpaces`               | Required | Yes        | Yes       | Yes     | Space owner's listings                 |
 
 **Filters for `spaces`:**
+
 - type (equals, in)
 - status (equals, in)
 - city (equals, contains)
@@ -317,6 +325,7 @@ query {
 - averageRating (range)
 
 **Geographic Query `spacesInBounds`:**
+
 - Input: `{ northEast: { latitude, longitude }, southWest: { latitude, longitude } }`
 - Returns spaces where coordinates fall within bounding box
 - Used for map-based discovery
@@ -388,6 +397,7 @@ query {
 | `myCampaigns`      | Required | Yes        | Yes       | Yes     | Advertiser's campaigns  |
 
 **Filters for `myCampaigns`:**
+
 - status (equals, in)
 - name (contains)
 - createdAt (range)
@@ -422,6 +432,7 @@ query {
 | `bookingsRequiringAction` | Required | Yes        | No        | No      | Bookings needing user action |
 
 **Filters for booking queries:**
+
 - status (equals, in)
 - startDate (range)
 - endDate (range)
@@ -429,6 +440,7 @@ query {
 - totalAmount (range)
 
 **`bookingsRequiringAction` logic:**
+
 - For Advertisers: Bookings with status `Verified` (need proof review)
 - For Space Owners: Bookings with status `PendingApproval`, `Paid`, `FileDownloaded`, or `Installed`
 
@@ -485,6 +497,7 @@ query {
 | `transactionsByBooking(bookingId)` | Admin    | No         | No        | No      | Transaction ledger for booking  |
 
 **`earningsSummary` returns:**
+
 - totalEarnings: Sum of completed payouts
 - pendingPayouts: Sum of pending/processing payouts
 - availableBalance: Available for withdrawal
@@ -492,6 +505,7 @@ query {
 - lastMonthEarnings: Previous month completed
 
 **Filters for `myPayouts`:**
+
 - status (equals, in)
 - stage (equals)
 - processedAt (range)
@@ -556,6 +570,7 @@ query {
 | `myNotificationPreferences` | Required | No         | No        | No      | Notification settings         |
 
 **Filters for `myNotifications`:**
+
 - type (equals, in)
 - isRead (equals)
 - createdAt (range)
@@ -859,6 +874,7 @@ mutation {
 | `deleteReview(id)`               | Admin    | Remove review | Recalculates space averageRating                         |
 
 **Review Rules:**
+
 - Only one review per booking per reviewer type
 - Booking must be Completed status
 - Rating: 1-5 integer
@@ -961,6 +977,7 @@ mutation {
 ```
 
 Examples:
+
 - `{userId}:notifications` - User's notification stream
 - `{conversationId}:messages` - Conversation message stream
 - `{bookingId}:updates` - Booking status updates
@@ -1369,7 +1386,8 @@ public async Task<Booking> ApproveAsync(Guid id, string? ownerNotes, Cancellatio
 
 ### Purpose
 
-Extensions add computed fields and resolve relationships through Services (which use DataLoaders internally via Repository), ensuring efficient batched queries while maintaining the service abstraction.
+Extensions add computed fields and resolve relationships through Services (which use DataLoaders internally via
+Repository), ensuring efficient batched queries while maintaining the service abstraction.
 
 ### Extension Points
 
@@ -1417,7 +1435,8 @@ public static class SpaceOwnerExtensions {
 }
 ```
 
-**Key Rule**: Extensions always use `[Parent]` entity's ID, never fetch "current user" implicitly. This ensures proper batching when resolving nested queries.
+**Key Rule**: Extensions always use `[Parent]` entity's ID, never fetch "current user" implicitly. This ensures proper
+batching when resolving nested queries.
 
 ---
 

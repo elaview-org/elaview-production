@@ -16,7 +16,7 @@ public sealed class StripeWebhookEvent : EntityBase {
     [Column(TypeName = "text")]
     public string? Payload { get; init; }
 
-    public bool Processed { get; set; } = false;
+    public bool Processed { get; set; }
 
     public DateTime? ProcessedAt { get; set; }
 
@@ -24,7 +24,8 @@ public sealed class StripeWebhookEvent : EntityBase {
     public string? ProcessingError { get; set; }
 }
 
-public sealed class StripeWebhookEventConfig : IEntityTypeConfiguration<StripeWebhookEvent> {
+public sealed class
+    StripeWebhookEventConfig : IEntityTypeConfiguration<StripeWebhookEvent> {
     public void Configure(EntityTypeBuilder<StripeWebhookEvent> builder) {
         builder.HasIndex(e => e.StripeEventId).IsUnique();
         builder.HasIndex(e => e.EventType);

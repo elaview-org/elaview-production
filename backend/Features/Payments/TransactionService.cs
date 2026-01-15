@@ -9,6 +9,9 @@ public interface ITransactionService {
 public sealed class TransactionService(
     ITransactionRepository transactionRepository
 ) : ITransactionService {
-    public IQueryable<Transaction> GetTransactionsByBookingIdQuery(Guid bookingId) =>
-        transactionRepository.Query().Where(t => t.BookingId == bookingId);
+    public IQueryable<Transaction> GetTransactionsByBookingIdQuery(
+        Guid bookingId) {
+        return transactionRepository.Query()
+            .Where(t => t.BookingId == bookingId);
+    }
 }

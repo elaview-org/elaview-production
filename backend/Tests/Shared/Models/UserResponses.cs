@@ -14,21 +14,35 @@ public record CurrentUserData(
 
 public record UsersResponse(UsersConnection Users);
 
-public record UsersConnection(List<UserNode> Nodes, PageInfo PageInfo, int? TotalCount = null);
+public record UsersConnection(
+    List<UserNode> Nodes,
+    PageInfo PageInfo,
+    int? TotalCount = null);
 
-public record UserNode(Guid Id, string Email, string? Name, string Role, string Status);
+public record UserNode(
+    Guid Id,
+    string Email,
+    string? Name,
+    string Role,
+    string Status);
 
-public record PageInfo(bool HasNextPage, bool HasPreviousPage, string? StartCursor, string? EndCursor);
+public record PageInfo(
+    bool HasNextPage,
+    bool HasPreviousPage,
+    string? StartCursor,
+    string? EndCursor);
 
 public record UserByIdResponse(UserNode? UserById);
 
-public record UpdateCurrentUserResponse(UpdateCurrentUserPayload UpdateCurrentUser);
+public record UpdateCurrentUserResponse(
+    UpdateCurrentUserPayload UpdateCurrentUser);
 
 public record UpdateCurrentUserPayload(UpdatedUserData User);
 
 public record UpdatedUserData(Guid Id, string? Name, string? Phone);
 
-public record SwitchProfileTypeResponse(SwitchProfileTypePayload SwitchProfileType);
+public record SwitchProfileTypeResponse(
+    SwitchProfileTypePayload SwitchProfileType);
 
 public record SwitchProfileTypePayload(SwitchProfileData User);
 

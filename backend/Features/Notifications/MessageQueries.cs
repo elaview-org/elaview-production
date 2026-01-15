@@ -14,5 +14,7 @@ public static partial class MessageQueries {
     [UseSorting]
     public static IQueryable<Message> GetMessagesByConversation(
         [ID] Guid conversationId, IMessageService messageService
-    ) => messageService.GetMessagesByConversationIdQuery(conversationId);
+    ) {
+        return messageService.GetMessagesByConversationIdQuery(conversationId);
+    }
 }

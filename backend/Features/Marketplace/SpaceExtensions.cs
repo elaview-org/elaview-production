@@ -8,7 +8,9 @@ public static class SpaceExtensions {
     [Authorize]
     public static async Task<SpaceOwnerProfile?> GetOwner(
         [Parent] Space space, ISpaceService spaceService, CancellationToken ct
-    ) => await spaceService.GetSpaceOwnerBySpaceIdAsync(space.Id, ct);
+    ) {
+        return await spaceService.GetSpaceOwnerBySpaceIdAsync(space.Id, ct);
+    }
 
     [UsePaging]
     [UseProjection]
@@ -16,7 +18,9 @@ public static class SpaceExtensions {
     [UseSorting]
     public static IQueryable<Booking> GetBookings(
         [Parent] Space space, ISpaceService spaceService
-    ) => spaceService.GetBookingsBySpaceId(space.Id);
+    ) {
+        return spaceService.GetBookingsBySpaceId(space.Id);
+    }
 
     [UsePaging]
     [UseProjection]
@@ -24,5 +28,7 @@ public static class SpaceExtensions {
     [UseSorting]
     public static IQueryable<Review> GetReviews(
         [Parent] Space space, ISpaceService spaceService
-    ) => spaceService.GetReviewsBySpaceId(space.Id);
+    ) {
+        return spaceService.GetReviewsBySpaceId(space.Id);
+    }
 }

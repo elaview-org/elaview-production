@@ -1,6 +1,7 @@
 # Error Handling Specification
 
-Complete specification for Elaview backend error handling using HotChocolate v15 mutation conventions and domain exceptions.
+Complete specification for Elaview backend error handling using HotChocolate v15 mutation conventions and domain
+exceptions.
 
 ---
 
@@ -8,20 +9,22 @@ Complete specification for Elaview backend error handling using HotChocolate v15
 
 ### Error Handling Philosophy
 
-**Domain Exceptions for Business Errors**: Services throw typed exceptions for business rule violations. HotChocolate middleware catches and transforms them into structured GraphQL errors.
+**Domain Exceptions for Business Errors**: Services throw typed exceptions for business rule violations. HotChocolate
+middleware catches and transforms them into structured GraphQL errors.
 
-**Schema-Exposed Errors**: Mutation errors are part of the GraphQL schema via union types. Clients can pattern-match on specific error types.
+**Schema-Exposed Errors**: Mutation errors are part of the GraphQL schema via union types. Clients can pattern-match on
+specific error types.
 
 **Clean Resolvers**: No try/catch in resolvers. Exception-based flow keeps resolver code focused on delegation.
 
 ### Error Categories
 
-| Category | Handling | Schema Exposure | Examples |
-|----------|----------|-----------------|----------|
-| Domain Errors | Typed exceptions + `[Error]` | Yes (union type) | NotFound, InvalidTransition, Forbidden |
-| Validation Errors | HotChocolate input validation | Yes (errors field) | Missing required fields, format errors |
-| Auth Errors | `[Authorize]` middleware | Yes (extensions) | Unauthenticated, unauthorized |
-| System Errors | Error filter | No (generic message) | Database failures, external API errors |
+| Category          | Handling                      | Schema Exposure      | Examples                               |
+|-------------------|-------------------------------|----------------------|----------------------------------------|
+| Domain Errors     | Typed exceptions + `[Error]`  | Yes (union type)     | NotFound, InvalidTransition, Forbidden |
+| Validation Errors | HotChocolate input validation | Yes (errors field)   | Missing required fields, format errors |
+| Auth Errors       | `[Authorize]` middleware      | Yes (extensions)     | Unauthenticated, unauthorized          |
+| System Errors     | Error filter                  | No (generic message) | Database failures, external API errors |
 
 ### Directory Structure
 
@@ -58,15 +61,15 @@ public abstract class DomainException : Exception {
 
 ### Exception Inventory
 
-| Exception | Code | HTTP Equivalent | Usage |
-|-----------|------|-----------------|-------|
-| NotFoundException | NOT_FOUND | 404 | Entity does not exist |
-| ForbiddenException | FORBIDDEN | 403 | User lacks permission |
-| InvalidStatusTransitionException | INVALID_STATUS_TRANSITION | 400 | Booking status rules violated |
-| ValidationException | VALIDATION_FAILED | 400 | Business validation failed |
-| ConflictException | CONFLICT | 409 | Duplicate resource, concurrent update |
-| PaymentException | PAYMENT_FAILED | 400 | Stripe operation failed |
-| PayoutException | PAYOUT_FAILED | 400 | Stripe transfer failed |
+| Exception                        | Code                      | HTTP Equivalent | Usage                                 |
+|----------------------------------|---------------------------|-----------------|---------------------------------------|
+| NotFoundException                | NOT_FOUND                 | 404             | Entity does not exist                 |
+| ForbiddenException               | FORBIDDEN                 | 403             | User lacks permission                 |
+| InvalidStatusTransitionException | INVALID_STATUS_TRANSITION | 400             | Booking status rules violated         |
+| ValidationException              | VALIDATION_FAILED         | 400             | Business validation failed            |
+| ConflictException                | CONFLICT                  | 409             | Duplicate resource, concurrent update |
+| PaymentException                 | PAYMENT_FAILED            | 400             | Stripe operation failed               |
+| PayoutException                  | PAYOUT_FAILED             | 400             | Stripe transfer failed                |
 
 ### Exception Definitions
 
@@ -194,14 +197,14 @@ union ApproveBookingError =
 
 Exceptions map to error types automatically. "Exception" suffix replaced with "Error":
 
-| Exception Class | GraphQL Error Type |
-|----------------|-------------------|
-| NotFoundException | NotFoundError |
-| ForbiddenException | ForbiddenError |
+| Exception Class                  | GraphQL Error Type           |
+|----------------------------------|------------------------------|
+| NotFoundException                | NotFoundError                |
+| ForbiddenException               | ForbiddenError               |
 | InvalidStatusTransitionException | InvalidStatusTransitionError |
-| ValidationException | ValidationFailedError |
-| ConflictException | ConflictError |
-| PaymentException | PaymentFailedError |
+| ValidationException              | ValidationFailedError        |
+| ConflictException                | ConflictError                |
+| PaymentException                 | PaymentFailedError           |
 
 ---
 
@@ -244,27 +247,27 @@ public sealed class BookingService(
 
 ### Error Scenarios by Feature
 
-| Feature | Operation | Possible Errors |
-|---------|-----------|-----------------|
-| **Users** | updateCurrentUser | ValidationException |
-| | switchProfileType | ValidationException |
-| **Spaces** | createSpace | ValidationException |
-| | updateSpace | NotFoundException, ForbiddenException |
-| | deleteSpace | NotFoundException, ForbiddenException, ConflictException |
-| **Campaigns** | createCampaign | ValidationException |
-| | updateCampaign | NotFoundException, ForbiddenException, InvalidStatusTransitionException |
-| | deleteCampaign | NotFoundException, ForbiddenException, ConflictException |
-| **Bookings** | createBooking | NotFoundException, ValidationException, ConflictException |
-| | approveBooking | NotFoundException, ForbiddenException, InvalidStatusTransitionException |
-| | rejectBooking | NotFoundException, ForbiddenException, InvalidStatusTransitionException |
-| | cancelBooking | NotFoundException, ForbiddenException, InvalidStatusTransitionException |
-| | submitProof | NotFoundException, ForbiddenException, InvalidStatusTransitionException, ValidationException |
-| | approveProof | NotFoundException, ForbiddenException, InvalidStatusTransitionException |
-| | disputeProof | NotFoundException, ForbiddenException, InvalidStatusTransitionException |
-| **Payments** | createPaymentIntent | NotFoundException, ForbiddenException, PaymentException |
-| | confirmPayment | PaymentException |
-| | requestRefund | NotFoundException, PaymentException |
-| **Reviews** | createReview | NotFoundException, ForbiddenException, ConflictException, InvalidStatusTransitionException |
+| Feature       | Operation           | Possible Errors                                                                              |
+|---------------|---------------------|----------------------------------------------------------------------------------------------|
+| **Users**     | updateCurrentUser   | ValidationException                                                                          |
+|               | switchProfileType   | ValidationException                                                                          |
+| **Spaces**    | createSpace         | ValidationException                                                                          |
+|               | updateSpace         | NotFoundException, ForbiddenException                                                        |
+|               | deleteSpace         | NotFoundException, ForbiddenException, ConflictException                                     |
+| **Campaigns** | createCampaign      | ValidationException                                                                          |
+|               | updateCampaign      | NotFoundException, ForbiddenException, InvalidStatusTransitionException                      |
+|               | deleteCampaign      | NotFoundException, ForbiddenException, ConflictException                                     |
+| **Bookings**  | createBooking       | NotFoundException, ValidationException, ConflictException                                    |
+|               | approveBooking      | NotFoundException, ForbiddenException, InvalidStatusTransitionException                      |
+|               | rejectBooking       | NotFoundException, ForbiddenException, InvalidStatusTransitionException                      |
+|               | cancelBooking       | NotFoundException, ForbiddenException, InvalidStatusTransitionException                      |
+|               | submitProof         | NotFoundException, ForbiddenException, InvalidStatusTransitionException, ValidationException |
+|               | approveProof        | NotFoundException, ForbiddenException, InvalidStatusTransitionException                      |
+|               | disputeProof        | NotFoundException, ForbiddenException, InvalidStatusTransitionException                      |
+| **Payments**  | createPaymentIntent | NotFoundException, ForbiddenException, PaymentException                                      |
+|               | confirmPayment      | PaymentException                                                                             |
+|               | requestRefund       | NotFoundException, PaymentException                                                          |
+| **Reviews**   | createReview        | NotFoundException, ForbiddenException, ConflictException, InvalidStatusTransitionException   |
 
 ---
 
@@ -306,10 +309,10 @@ public static partial class UserQueries {
 
 ### Query Error Codes
 
-| Code | Scenario |
-|------|----------|
-| AUTH_NOT_AUTHENTICATED | No valid session/token |
-| AUTH_NOT_AUTHORIZED | User lacks required role |
+| Code                   | Scenario                 |
+|------------------------|--------------------------|
+| AUTH_NOT_AUTHENTICATED | No valid session/token   |
+| AUTH_NOT_AUTHORIZED    | User lacks required role |
 
 ---
 
@@ -332,7 +335,8 @@ public static partial class NotificationSubscriptions {
 
 ### Connection Errors
 
-WebSocket subscriptions handle errors at connection level. Unauthorized connections are rejected before establishing the stream.
+WebSocket subscriptions handle errors at connection level. Unauthorized connections are rejected before establishing the
+stream.
 
 ---
 
@@ -428,14 +432,14 @@ public sealed class AuthController(AuthService authService) : ControllerBase {
 
 ### REST Error Codes
 
-| Endpoint | Status | Code | Scenario |
-|----------|--------|------|----------|
-| POST /login | 401 | INVALID_CREDENTIALS | Wrong email/password |
-| POST /login | 400 | VALIDATION_FAILED | Missing fields |
-| POST /signup | 409 | EMAIL_TAKEN | Duplicate email |
-| POST /signup | 400 | VALIDATION_FAILED | Weak password, invalid email |
-| POST /logout | 401 | NOT_AUTHENTICATED | No active session |
-| GET /me | 401 | NOT_AUTHENTICATED | No active session |
+| Endpoint     | Status | Code                | Scenario                     |
+|--------------|--------|---------------------|------------------------------|
+| POST /login  | 401    | INVALID_CREDENTIALS | Wrong email/password         |
+| POST /login  | 400    | VALIDATION_FAILED   | Missing fields               |
+| POST /signup | 409    | EMAIL_TAKEN         | Duplicate email              |
+| POST /signup | 400    | VALIDATION_FAILED   | Weak password, invalid email |
+| POST /logout | 401    | NOT_AUTHENTICATED   | No active session            |
+| GET /me      | 401    | NOT_AUTHENTICATED   | No active session            |
 
 ---
 
@@ -543,17 +547,17 @@ public record InvalidStatusTransitionError(string Message, string FromStatus, st
 
 ### Error Test Coverage Matrix
 
-| Mutation | NotFound | Forbidden | InvalidTransition | Validation | Conflict | Payment |
-|----------|----------|-----------|-------------------|------------|----------|---------|
-| approveBooking | ✓ | ✓ | ✓ | | | |
-| rejectBooking | ✓ | ✓ | ✓ | | | |
-| cancelBooking | ✓ | ✓ | ✓ | | | |
-| createBooking | ✓ | | | ✓ | ✓ | |
-| submitProof | ✓ | ✓ | ✓ | ✓ | | |
-| createPaymentIntent | ✓ | ✓ | | | | ✓ |
-| createReview | ✓ | ✓ | ✓ | | ✓ | |
-| updateSpace | ✓ | ✓ | | ✓ | | |
-| deleteSpace | ✓ | ✓ | | | ✓ | |
+| Mutation            | NotFound | Forbidden | InvalidTransition | Validation | Conflict | Payment |
+|---------------------|----------|-----------|-------------------|------------|----------|---------|
+| approveBooking      | ✓        | ✓         | ✓                 |            |          |         |
+| rejectBooking       | ✓        | ✓         | ✓                 |            |          |         |
+| cancelBooking       | ✓        | ✓         | ✓                 |            |          |         |
+| createBooking       | ✓        |           |                   | ✓          | ✓        |         |
+| submitProof         | ✓        | ✓         | ✓                 | ✓          |          |         |
+| createPaymentIntent | ✓        | ✓         |                   |            |          | ✓       |
+| createReview        | ✓        | ✓         | ✓                 |            | ✓        |         |
+| updateSpace         | ✓        | ✓         |                   | ✓          |          |         |
+| deleteSpace         | ✓        | ✓         |                   |            | ✓        |         |
 
 ---
 
@@ -611,14 +615,14 @@ const { mutate } = useMutation({
 
 ## Best Practices
 
-| Practice | Rationale |
-|----------|-----------|
-| Throw from services, not resolvers | Keeps resolvers thin, logic testable |
-| Use typed exceptions | Enables schema generation, client type safety |
-| Include context in exceptions | entityType, entityId, fromStatus help debugging |
-| Test all error paths | Each `[Error<T>]` annotation needs a test |
-| Hide system errors in production | Security: don't leak implementation details |
-| Use error codes consistently | Clients can switch on codes for i18n |
+| Practice                           | Rationale                                       |
+|------------------------------------|-------------------------------------------------|
+| Throw from services, not resolvers | Keeps resolvers thin, logic testable            |
+| Use typed exceptions               | Enables schema generation, client type safety   |
+| Include context in exceptions      | entityType, entityId, fromStatus help debugging |
+| Test all error paths               | Each `[Error<T>]` annotation needs a test       |
+| Hide system errors in production   | Security: don't leak implementation details     |
+| Use error codes consistently       | Clients can switch on codes for i18n            |
 
 ---
 
@@ -642,12 +646,14 @@ public static GraphQLException NotFound(string entity, Guid id) =>
 throw new NotFoundException("Booking", id);
 ```
 
-The mutation convention middleware transforms NotFoundException into a union error type automatically. No manual exception creation or dictionary building required.
+The mutation convention middleware transforms NotFoundException into a union error type automatically. No manual
+exception creation or dictionary building required.
 
 ---
 
 **Last Updated**: 2026-01-14
 
 Sources:
+
 - [HotChocolate v15 Mutations](https://chillicream.com/docs/hotchocolate/v15/defining-a-schema/mutations/)
 - [HotChocolate v15 Errors API](https://chillicream.com/docs/hotchocolate/v15/api-reference/errors/)

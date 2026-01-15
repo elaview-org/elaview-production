@@ -24,12 +24,13 @@ public sealed class Notification : EntityBase {
 
     public Guid? EntityId { get; init; }
 
-    public bool IsRead { get; set; } = false;
+    public bool IsRead { get; set; }
 
     public DateTime? ReadAt { get; set; }
 }
 
-public sealed class NotificationConfig : IEntityTypeConfiguration<Notification> {
+public sealed class
+    NotificationConfig : IEntityTypeConfiguration<Notification> {
     public void Configure(EntityTypeBuilder<Notification> builder) {
         builder.HasIndex(e => e.UserId);
         builder.HasIndex(e => e.Type);

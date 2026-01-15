@@ -1,14 +1,13 @@
-using System.Net.Http.Json;
 using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
 using ElaviewBackend.Tests.Shared.Factories;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace ElaviewBackend.Tests.Integration.Fixtures;
 
 [Collection("Integration")]
-public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsyncLifetime {
+public abstract class IntegrationTestBase(IntegrationTestFixture fixture)
+    : IAsyncLifetime {
     protected readonly IntegrationTestFixture Fixture = fixture;
     protected HttpClient Client { get; private set; } = null!;
 
@@ -21,7 +20,8 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsy
         await Fixture.ResetDatabaseAsync();
     }
 
-    protected async Task<User> CreateAndLoginUserAsync(Action<User>? customize = null) {
+    protected async Task<User> CreateAndLoginUserAsync(
+        Action<User>? customize = null) {
         var user = UserFactory.Create(customize);
         await SeedUserAsync(user);
         await LoginAsync(user.Email, "Test123!");
@@ -80,7 +80,8 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsy
         return users;
     }
 
-    protected async Task<Space> SeedSpaceAsync(Guid spaceOwnerProfileId, Action<Space>? customize = null) {
+    protected async Task<Space> SeedSpaceAsync(Guid spaceOwnerProfileId,
+        Action<Space>? customize = null) {
         var space = SpaceFactory.Create(spaceOwnerProfileId, customize);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -89,8 +90,11 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsy
         return space;
     }
 
-    protected async Task<Space> SeedSpaceWithPricingAsync(Guid spaceOwnerProfileId, decimal pricePerDay, decimal? installationFee) {
-        var space = SpaceFactory.CreateWithPricing(spaceOwnerProfileId, pricePerDay, installationFee);
+    protected async Task<Space> SeedSpaceWithPricingAsync(
+        Guid spaceOwnerProfileId, decimal pricePerDay,
+        decimal? installationFee) {
+        var space = SpaceFactory.CreateWithPricing(spaceOwnerProfileId,
+            pricePerDay, installationFee);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         context.Spaces.Add(space);
@@ -98,7 +102,8 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsy
         return space;
     }
 
-    protected async Task<Space> SeedSpaceWithStatusAsync(Guid spaceOwnerProfileId, SpaceStatus status) {
+    protected async Task<Space> SeedSpaceWithStatusAsync(
+        Guid spaceOwnerProfileId, SpaceStatus status) {
         var space = SpaceFactory.CreateWithStatus(spaceOwnerProfileId, status);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -107,7 +112,8 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsy
         return space;
     }
 
-    protected async Task<List<Space>> SeedSpacesAsync(Guid spaceOwnerProfileId, int count) {
+    protected async Task<List<Space>> SeedSpacesAsync(Guid spaceOwnerProfileId,
+        int count) {
         var spaces = SpaceFactory.CreateMany(spaceOwnerProfileId, count);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -116,7 +122,8 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsy
         return spaces;
     }
 
-    protected async Task<Campaign> SeedCampaignAsync(Guid advertiserProfileId, Action<Campaign>? customize = null) {
+    protected async Task<Campaign> SeedCampaignAsync(Guid advertiserProfileId,
+        Action<Campaign>? customize = null) {
         var campaign = CampaignFactory.Create(advertiserProfileId, customize);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -125,7 +132,8 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsy
         return campaign;
     }
 
-    protected async Task<Booking> SeedBookingAsync(Guid campaignId, Guid spaceId, Action<Booking>? customize = null) {
+    protected async Task<Booking> SeedBookingAsync(Guid campaignId,
+        Guid spaceId, Action<Booking>? customize = null) {
         var booking = BookingFactory.Create(campaignId, spaceId, customize);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -134,8 +142,10 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsy
         return booking;
     }
 
-    protected async Task<Booking> SeedBookingWithStatusAsync(Guid campaignId, Guid spaceId, BookingStatus status) {
-        var booking = BookingFactory.CreateWithStatus(campaignId, spaceId, status);
+    protected async Task<Booking> SeedBookingWithStatusAsync(Guid campaignId,
+        Guid spaceId, BookingStatus status) {
+        var booking =
+            BookingFactory.CreateWithStatus(campaignId, spaceId, status);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         context.Bookings.Add(booking);
@@ -143,7 +153,8 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsy
         return booking;
     }
 
-    protected async Task<(User User, SpaceOwnerProfile Profile)> SeedSpaceOwnerAsync(Action<User>? customizeUser = null) {
+    protected async Task<(User User, SpaceOwnerProfile Profile)>
+        SeedSpaceOwnerAsync(Action<User>? customizeUser = null) {
         var user = UserFactory.Create(u => {
             u.ActiveProfileType = ProfileType.SpaceOwner;
             customizeUser?.Invoke(u);
@@ -159,7 +170,8 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture) : IAsy
         return (user, profile);
     }
 
-    protected async Task<(User User, AdvertiserProfile Profile)> SeedAdvertiserAsync(Action<User>? customizeUser = null) {
+    protected async Task<(User User, AdvertiserProfile Profile)>
+        SeedAdvertiserAsync(Action<User>? customizeUser = null) {
         var user = UserFactory.Create(u => {
             u.ActiveProfileType = ProfileType.Advertiser;
             customizeUser?.Invoke(u);

@@ -9,8 +9,12 @@ namespace ElaviewBackend.Features.Payments;
 
 public interface IRefundService {
     IQueryable<EntityRefund> GetRefundsByPaymentIdQuery(Guid paymentId);
-    Task<IReadOnlyList<EntityRefund>> GetRefundsByPaymentIdAsync(Guid paymentId, CancellationToken ct);
-    Task<EntityRefund> RequestRefundAsync(Guid paymentId, decimal amount, string reason, CancellationToken ct);
+
+    Task<IReadOnlyList<EntityRefund>> GetRefundsByPaymentIdAsync(Guid paymentId,
+        CancellationToken ct);
+
+    Task<EntityRefund> RequestRefundAsync(Guid paymentId, decimal amount,
+        string reason, CancellationToken ct);
 }
 
 public sealed class RefundService(
@@ -19,25 +23,31 @@ public sealed class RefundService(
     IRefundRepository refundRepository,
     ITransactionRepository transactionRepository
 ) : IRefundService {
-    public IQueryable<EntityRefund> GetRefundsByPaymentIdQuery(Guid paymentId) =>
-        context.Refunds.Where(r => r.PaymentId == paymentId);
+    public IQueryable<EntityRefund> GetRefundsByPaymentIdQuery(Guid paymentId) {
+        return context.Refunds.Where(r => r.PaymentId == paymentId);
+    }
 
-    public async Task<IReadOnlyList<EntityRefund>> GetRefundsByPaymentIdAsync(Guid paymentId, CancellationToken ct) =>
-        await refundRepository.GetByPaymentIdAsync(paymentId, ct);
+    public async Task<IReadOnlyList<EntityRefund>> GetRefundsByPaymentIdAsync(
+        Guid paymentId, CancellationToken ct) {
+        return await refundRepository.GetByPaymentIdAsync(paymentId, ct);
+    }
 
-    public async Task<EntityRefund> RequestRefundAsync(Guid paymentId, decimal amount, string reason, CancellationToken ct) {
+    public async Task<EntityRefund> RequestRefundAsync(Guid paymentId,
+        decimal amount, string reason, CancellationToken ct) {
         var payment = await paymentRepository.GetByIdAsync(paymentId, ct)
-            ?? throw new GraphQLException("Payment not found");
+                      ?? throw new GraphQLException("Payment not found");
 
         if (payment.Status != PaymentStatus.Succeeded)
             throw new GraphQLException("Can only refund succeeded payments");
 
         var existingRefunds = await context.Refunds
-            .Where(r => r.PaymentId == paymentId && r.Status == RefundStatus.Succeeded)
+            .Where(r =>
+                r.PaymentId == paymentId && r.Status == RefundStatus.Succeeded)
             .SumAsync(r => r.Amount, ct);
 
         if (existingRefunds + amount > payment.Amount)
-            throw new GraphQLException("Refund amount exceeds available amount");
+            throw new GraphQLException(
+                "Refund amount exceeds available amount");
 
         var options = new RefundCreateOptions {
             PaymentIntent = payment.StripePaymentIntentId,
@@ -46,7 +56,8 @@ public sealed class RefundService(
         };
 
         var service = new StripeRefundService();
-        var stripeRefund = await service.CreateAsync(options, cancellationToken: ct);
+        var stripeRefund =
+            await service.CreateAsync(options, cancellationToken: ct);
 
         var refund = new EntityRefund {
             PaymentId = paymentId,
@@ -54,8 +65,12 @@ public sealed class RefundService(
             Amount = amount,
             Reason = reason,
             StripeRefundId = stripeRefund.Id,
-            Status = stripeRefund.Status == "succeeded" ? RefundStatus.Succeeded : RefundStatus.Pending,
-            ProcessedAt = stripeRefund.Status == "succeeded" ? DateTime.UtcNow : null,
+            Status = stripeRefund.Status == "succeeded"
+                ? RefundStatus.Succeeded
+                : RefundStatus.Pending,
+            ProcessedAt = stripeRefund.Status == "succeeded"
+                ? DateTime.UtcNow
+                : null,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -75,7 +90,9 @@ public sealed class RefundService(
             var totalRefunded = existingRefunds + amount;
             var paymentEntry = context.Entry(payment);
             paymentEntry.Property(p => p.Status).CurrentValue =
-                totalRefunded >= payment.Amount ? PaymentStatus.Refunded : PaymentStatus.PartiallyRefunded;
+                totalRefunded >= payment.Amount
+                    ? PaymentStatus.Refunded
+                    : PaymentStatus.PartiallyRefunded;
 
             await context.SaveChangesAsync(ct);
         }

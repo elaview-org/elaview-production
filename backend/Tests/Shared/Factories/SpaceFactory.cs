@@ -6,7 +6,8 @@ namespace ElaviewBackend.Tests.Shared.Factories;
 public static class SpaceFactory {
     private static readonly Faker Faker = new();
 
-    public static Space Create(Guid spaceOwnerProfileId, Action<Space>? customize = null) {
+    public static Space Create(Guid spaceOwnerProfileId,
+        Action<Space>? customize = null) {
         var space = new Space {
             Id = Guid.NewGuid(),
             SpaceOwnerProfileId = spaceOwnerProfileId,
@@ -29,7 +30,8 @@ public static class SpaceFactory {
         return space;
     }
 
-    public static List<Space> CreateMany(Guid spaceOwnerProfileId, int count, Action<Space, int>? customize = null) {
+    public static List<Space> CreateMany(Guid spaceOwnerProfileId, int count,
+        Action<Space, int>? customize = null) {
         return Enumerable.Range(0, count)
             .Select(i => {
                 var space = Create(spaceOwnerProfileId);
@@ -39,7 +41,8 @@ public static class SpaceFactory {
             .ToList();
     }
 
-    public static Space CreateWithPricing(Guid spaceOwnerProfileId, decimal pricePerDay, decimal? installationFee) {
+    public static Space CreateWithPricing(Guid spaceOwnerProfileId,
+        decimal pricePerDay, decimal? installationFee) {
         return new Space {
             Id = Guid.NewGuid(),
             SpaceOwnerProfileId = spaceOwnerProfileId,
@@ -60,7 +63,8 @@ public static class SpaceFactory {
         };
     }
 
-    public static Space CreateWithStatus(Guid spaceOwnerProfileId, SpaceStatus status) {
+    public static Space CreateWithStatus(Guid spaceOwnerProfileId,
+        SpaceStatus status) {
         return new Space {
             Id = Guid.NewGuid(),
             SpaceOwnerProfileId = spaceOwnerProfileId,

@@ -1,6 +1,7 @@
 # Database Seeding Specification
 
-Complete specification for Elaview backend database seeding using custom seeder pattern with Bogus for fake data generation.
+Complete specification for Elaview backend database seeding using custom seeder pattern with Bogus for fake data
+generation.
 
 ---
 
@@ -8,20 +9,25 @@ Complete specification for Elaview backend database seeding using custom seeder 
 
 ### Seeding Philosophy
 
-**Custom Seeder Pattern over EF Core HasData**: EF Core's `HasData()` is limited to static reference data and captures data in migration snapshots (leading to huge files). Custom seeders offer environment-specific execution, individual tracking, and support for dynamic/generated data.
+**Custom Seeder Pattern over EF Core HasData**: EF Core's `HasData()` is limited to static reference data and captures
+data in migration snapshots (leading to huge files). Custom seeders offer environment-specific execution, individual
+tracking, and support for dynamic/generated data.
 
-**EF Core 9+ UseSeeding Alternative**: While EF Core 9+ introduced `UseSeeding`/`UseAsyncSeeding`, the custom `ISeeder` pattern provides finer control: per-seeder history tracking, dev-only seeders, and clear separation between production bootstrap data and development fake data.
+**EF Core 9+ UseSeeding Alternative**: While EF Core 9+ introduced `UseSeeding`/`UseAsyncSeeding`, the custom `ISeeder`
+pattern provides finer control: per-seeder history tracking, dev-only seeders, and clear separation between production
+bootstrap data and development fake data.
 
-**Bogus for Realistic Data**: Development environments use Bogus to generate realistic fake data. Deterministic seeds ensure reproducible datasets across team members.
+**Bogus for Realistic Data**: Development environments use Bogus to generate realistic fake data. Deterministic seeds
+ensure reproducible datasets across team members.
 
 ### Seeding Categories
 
-| Category | Environment | Tracking | Examples |
-|----------|-------------|----------|----------|
-| Bootstrap | Production + Development | `__SeedHistory` table | Admin users, space categories, system config |
-| Reference | Production + Development | `__SeedHistory` table | Lookup tables, enum mappings |
-| Development | Development only | `__SeedHistory` table | Fake users, spaces, bookings via Bogus |
-| Migration | Production + Development | `__SeedHistory` table | Data fixes, backfills after schema changes |
+| Category    | Environment              | Tracking              | Examples                                     |
+|-------------|--------------------------|-----------------------|----------------------------------------------|
+| Bootstrap   | Production + Development | `__SeedHistory` table | Admin users, space categories, system config |
+| Reference   | Production + Development | `__SeedHistory` table | Lookup tables, enum mappings                 |
+| Development | Development only         | `__SeedHistory` table | Fake users, spaces, bookings via Bogus       |
+| Migration   | Production + Development | `__SeedHistory` table | Data fixes, backfills after schema changes   |
 
 ### Directory Structure
 
@@ -59,11 +65,11 @@ public interface ISeeder {
 }
 ```
 
-| Property | Purpose |
-|----------|---------|
-| Order | Execution order (gaps recommended: 1, 2, 3... 100, 101) |
-| Name | Unique identifier stored in `__SeedHistory` |
-| RunInProduction | `false` for dev-only seeders |
+| Property        | Purpose                                                 |
+|-----------------|---------------------------------------------------------|
+| Order           | Execution order (gaps recommended: 1, 2, 3... 100, 101) |
+| Name            | Unique identifier stored in `__SeedHistory`             |
+| RunInProduction | `false` for dev-only seeders                            |
 
 ### SeedHistory Entity
 
@@ -426,12 +432,12 @@ public sealed class BackfillSpaceRatingsSeeder(AppDbContext context) : ISeeder {
 
 ### Migration Seeder Use Cases
 
-| Scenario | Example |
-|----------|---------|
-| New required column with default | Backfill existing rows with calculated value |
-| Enum value additions | Seed new notification types, space categories |
-| Data normalization | Split full names into first/last |
-| Soft delete cleanup | Mark orphaned records as deleted |
+| Scenario                         | Example                                       |
+|----------------------------------|-----------------------------------------------|
+| New required column with default | Backfill existing rows with calculated value  |
+| Enum value additions             | Seed new notification types, space categories |
+| Data normalization               | Split full names into first/last              |
+| Soft delete cleanup              | Mark orphaned records as deleted              |
 
 ---
 
@@ -487,11 +493,11 @@ public static class UserFactory {
 
 ### Deterministic vs Random
 
-| Context | Seed | Rationale |
-|---------|------|-----------|
+| Context            | Seed            | Rationale                                     |
+|--------------------|-----------------|-----------------------------------------------|
 | Development seeder | Fixed (8675309) | Same data across team, reproducible debugging |
-| Test factories | None (random) | Unique data per test prevents false positives |
-| Snapshot tests | Fixed | Deterministic output comparison |
+| Test factories     | None (random)   | Unique data per test prevents false positives |
+| Snapshot tests     | Fixed           | Deterministic output comparison               |
 
 ---
 
@@ -538,22 +544,23 @@ optionsBuilder
 
 ## Best Practices
 
-| Practice | Rationale |
-|----------|-----------|
-| Production seeders must be idempotent | Safe re-run if history lost |
-| Environment variables for secrets | Never hardcode passwords |
-| Order numbers with gaps (1, 2, 3... 100, 101) | Room for insertion |
-| Fixed seeds for development data | Reproducible across team |
-| Random seeds for tests | Avoid false positives |
-| Transactions per seeder | Atomic execution, clean rollback |
-| UTC for all DateTime values | PostgreSQL timestamptz requirement |
-| Separate generators from seeders | Reusable for tests and seeders |
+| Practice                                      | Rationale                          |
+|-----------------------------------------------|------------------------------------|
+| Production seeders must be idempotent         | Safe re-run if history lost        |
+| Environment variables for secrets             | Never hardcode passwords           |
+| Order numbers with gaps (1, 2, 3... 100, 101) | Room for insertion                 |
+| Fixed seeds for development data              | Reproducible across team           |
+| Random seeds for tests                        | Avoid false positives              |
+| Transactions per seeder                       | Atomic execution, clean rollback   |
+| UTC for all DateTime values                   | PostgreSQL timestamptz requirement |
+| Separate generators from seeders              | Reusable for tests and seeders     |
 
 ---
 
 **Last Updated**: 2026-01-15
 
 Sources:
+
 - [EF Core Data Seeding](https://learn.microsoft.com/en-us/ef/core/modeling/data-seeding)
 - [Bogus GitHub Repository](https://github.com/bchavez/Bogus)
 - [EF Core Data Seeding with Bogus](https://learn.microsoft.com/en-us/shows/on-dotnet/on-dotnet-live-next-level-ef-core-data-seeding-with-bogus)

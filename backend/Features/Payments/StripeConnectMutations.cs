@@ -11,11 +11,16 @@ public static partial class StripeConnectMutations {
         IStripeConnectService stripeConnectService, CancellationToken ct
     ) {
         var result = await stripeConnectService.CreateConnectAccountAsync(ct);
-        return new ConnectStripeAccountPayload(result.AccountId, result.OnboardingUrl);
+        return new ConnectStripeAccountPayload(result.AccountId,
+            result.OnboardingUrl);
     }
 
     [Authorize]
-    public static async Task<RefreshStripeAccountStatusPayload> RefreshStripeAccountStatus(
-        IStripeConnectService stripeConnectService, CancellationToken ct
-    ) => new(await stripeConnectService.RefreshAccountStatusAsync(ct));
+    public static async Task<RefreshStripeAccountStatusPayload>
+        RefreshStripeAccountStatus(
+            IStripeConnectService stripeConnectService, CancellationToken ct
+        ) {
+        return new RefreshStripeAccountStatusPayload(
+            await stripeConnectService.RefreshAccountStatusAsync(ct));
+    }
 }

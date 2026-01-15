@@ -7,8 +7,12 @@ namespace ElaviewBackend.Features.Marketplace;
 public static class CampaignExtensions {
     [Authorize]
     public static async Task<AdvertiserProfile?> GetAdvertiser(
-        [Parent] Campaign campaign, ICampaignService campaignService, CancellationToken ct
-    ) => await campaignService.GetAdvertiserByCampaignIdAsync(campaign.Id, ct);
+        [Parent] Campaign campaign, ICampaignService campaignService,
+        CancellationToken ct
+    ) {
+        return await campaignService.GetAdvertiserByCampaignIdAsync(campaign.Id,
+            ct);
+    }
 
     [Authorize]
     [UsePaging]
@@ -17,5 +21,7 @@ public static class CampaignExtensions {
     [UseSorting]
     public static IQueryable<Booking> GetBookings(
         [Parent] Campaign campaign, ICampaignService campaignService
-    ) => campaignService.GetBookingsByCampaignId(campaign.Id);
+    ) {
+        return campaignService.GetBookingsByCampaignId(campaign.Id);
+    }
 }

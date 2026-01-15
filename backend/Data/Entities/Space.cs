@@ -63,9 +63,9 @@ public sealed class Space : EntityBase {
 
     public DateTime? AvailableTo { get; init; }
 
-    public int TotalBookings { get; set; } = 0;
+    public int TotalBookings { get; set; }
 
-    public decimal TotalRevenue { get; set; } = 0;
+    public decimal TotalRevenue { get; set; }
 
     public double? AverageRating { get; set; }
 

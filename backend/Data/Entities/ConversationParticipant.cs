@@ -19,7 +19,9 @@ public sealed class ConversationParticipant : EntityBase {
     public DateTime? LastReadAt { get; set; }
 }
 
-public sealed class ConversationParticipantConfig : IEntityTypeConfiguration<ConversationParticipant> {
+public sealed class
+    ConversationParticipantConfig : IEntityTypeConfiguration<
+    ConversationParticipant> {
     public void Configure(EntityTypeBuilder<ConversationParticipant> builder) {
         builder.HasIndex(e => new { e.ConversationId, e.UserId }).IsUnique();
         builder.HasIndex(e => e.UserId);

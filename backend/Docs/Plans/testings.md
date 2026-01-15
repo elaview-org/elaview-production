@@ -1,6 +1,7 @@
 # Testing Specification
 
-Complete specification for Elaview backend testing including unit tests, integration tests, fixtures, factories, and best practices.
+Complete specification for Elaview backend testing including unit tests, integration tests, fixtures, factories, and
+best practices.
 
 ---
 
@@ -8,9 +9,11 @@ Complete specification for Elaview backend testing including unit tests, integra
 
 ### Testing Philosophy
 
-**No Mocks for Infrastructure**: Use real databases, real services, real GraphQL execution. Mocks hide bugs that only appear in production (mapping errors, migration issues, query translation failures).
+**No Mocks for Infrastructure**: Use real databases, real services, real GraphQL execution. Mocks hide bugs that only
+appear in production (mapping errors, migration issues, query translation failures).
 
-**Test Isolation**: Each test runs against a clean database state. Respawn resets data between tests without recreating schema.
+**Test Isolation**: Each test runs against a clean database state. Respawn resets data between tests without recreating
+schema.
 
 **Shared Factories**: Same factories used for seeding and testing ensures consistency.
 
@@ -36,11 +39,11 @@ Tests/
 
 ### Test Categories
 
-| Category    | Scope                          | Database | Speed  | When to Use                            |
-|-------------|--------------------------------|----------|--------|----------------------------------------|
-| Unit        | Single class/method            | No       | Fast   | Pure business logic, calculations      |
-| Integration | Multiple components + DB       | Real     | Medium | Service layer, repositories, GraphQL   |
-| E2E         | Full system + external APIs    | Real     | Slow   | Critical user flows, payment scenarios |
+| Category    | Scope                       | Database | Speed  | When to Use                            |
+|-------------|-----------------------------|----------|--------|----------------------------------------|
+| Unit        | Single class/method         | No       | Fast   | Pure business logic, calculations      |
+| Integration | Multiple components + DB    | Real     | Medium | Service layer, repositories, GraphQL   |
+| E2E         | Full system + external APIs | Real     | Slow   | Critical user flows, payment scenarios |
 
 ---
 
@@ -56,14 +59,14 @@ Tests/
 <PackageReference Include="Respawn" Version="6.*" />
 ```
 
-| Package                              | Purpose                                      |
-|--------------------------------------|----------------------------------------------|
-| xUnit                                | Test framework with per-test instantiation   |
-| FluentAssertions                     | Readable assertion syntax                    |
-| Bogus                                | Fake data generation                         |
-| Microsoft.AspNetCore.Mvc.Testing     | WebApplicationFactory for in-memory hosting  |
-| Testcontainers.PostgreSql            | Real PostgreSQL in Docker                    |
-| Respawn                              | Fast database cleanup between tests          |
+| Package                          | Purpose                                     |
+|----------------------------------|---------------------------------------------|
+| xUnit                            | Test framework with per-test instantiation  |
+| FluentAssertions                 | Readable assertion syntax                   |
+| Bogus                            | Fake data generation                        |
+| Microsoft.AspNetCore.Mvc.Testing | WebApplicationFactory for in-memory hosting |
+| Testcontainers.PostgreSql        | Real PostgreSQL in Docker                   |
+| Respawn                          | Fast database cleanup between tests         |
 
 ---
 
@@ -751,17 +754,18 @@ public record UserData(Guid Id, string Email, string Name);
 
 ### Test Categories by Feature
 
-| Feature       | Unit Tests                        | Integration Tests                     |
-|---------------|-----------------------------------|---------------------------------------|
-| Users         | Service calculations              | Queries, Mutations, Auth flows        |
-| Spaces        | Availability calculations         | CRUD operations, filtering            |
-| Bookings      | Amount calculations, transitions  | Full lifecycle, status changes        |
-| Payments      | Fee calculations, payout stages   | Stripe integration (mocked)           |
-| Notifications | Trigger logic                     | Delivery, preferences                 |
+| Feature       | Unit Tests                       | Integration Tests              |
+|---------------|----------------------------------|--------------------------------|
+| Users         | Service calculations             | Queries, Mutations, Auth flows |
+| Spaces        | Availability calculations        | CRUD operations, filtering     |
+| Bookings      | Amount calculations, transitions | Full lifecycle, status changes |
+| Payments      | Fee calculations, payout stages  | Stripe integration (mocked)    |
+| Notifications | Trigger logic                    | Delivery, preferences          |
 
 ### What to Test
 
 **Always Test**:
+
 - All HTTP status codes returned by endpoint
 - All GraphQL error codes
 - All booking status transitions (valid and invalid)
@@ -771,6 +775,7 @@ public record UserData(Guid Id, string Email, string Name);
 - Input validation failures
 
 **Never Test**:
+
 - Framework behavior (EF Core, HotChocolate)
 - Third-party library internals
 - Private methods directly

@@ -1,26 +1,32 @@
-using ElaviewBackend.Data.Entities;
-
 namespace ElaviewBackend.Features.Payments;
 
 [ExtendObjectType(typeof(EarningsSummary))]
 public static class EarningsSummaryExtensions {
     [GraphQLType(typeof(DecimalType))]
-    public static decimal GetTotalEarnings([Parent] EarningsSummary summary)
-        => summary.TotalEarnings;
+    public static decimal GetTotalEarnings([Parent] EarningsSummary summary) {
+        return summary.TotalEarnings;
+    }
 
     [GraphQLType(typeof(DecimalType))]
-    public static decimal GetPendingPayouts([Parent] EarningsSummary summary)
-        => summary.PendingPayouts;
+    public static decimal GetPendingPayouts([Parent] EarningsSummary summary) {
+        return summary.PendingPayouts;
+    }
 
     [GraphQLType(typeof(DecimalType))]
-    public static decimal GetAvailableBalance([Parent] EarningsSummary summary)
-        => summary.AvailableBalance;
+    public static decimal
+        GetAvailableBalance([Parent] EarningsSummary summary) {
+        return summary.AvailableBalance;
+    }
 
     [GraphQLType(typeof(DecimalType))]
-    public static decimal GetThisMonthEarnings([Parent] EarningsSummary summary)
-        => summary.ThisMonthEarnings;
+    public static decimal
+        GetThisMonthEarnings([Parent] EarningsSummary summary) {
+        return summary.ThisMonthEarnings;
+    }
 
     [GraphQLType(typeof(DecimalType))]
-    public static decimal GetLastMonthEarnings([Parent] EarningsSummary summary)
-        => summary.LastMonthEarnings;
+    public static decimal
+        GetLastMonthEarnings([Parent] EarningsSummary summary) {
+        return summary.LastMonthEarnings;
+    }
 }

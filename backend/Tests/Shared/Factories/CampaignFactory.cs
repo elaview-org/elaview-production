@@ -6,7 +6,8 @@ namespace ElaviewBackend.Tests.Shared.Factories;
 public static class CampaignFactory {
     private static readonly Faker Faker = new();
 
-    public static Campaign Create(Guid advertiserProfileId, Action<Campaign>? customize = null) {
+    public static Campaign Create(Guid advertiserProfileId,
+        Action<Campaign>? customize = null) {
         var campaign = new Campaign {
             Id = Guid.NewGuid(),
             AdvertiserProfileId = advertiserProfileId,
@@ -17,15 +18,18 @@ public static class CampaignFactory {
             Goals = "Brand Awareness",
             TotalBudget = Faker.Random.Decimal(1000, 10000),
             Status = CampaignStatus.Draft,
-            StartDate = DateTime.SpecifyKind(Faker.Date.Future(), DateTimeKind.Utc),
-            EndDate = DateTime.SpecifyKind(Faker.Date.Future(2), DateTimeKind.Utc),
+            StartDate =
+                DateTime.SpecifyKind(Faker.Date.Future(), DateTimeKind.Utc),
+            EndDate =
+                DateTime.SpecifyKind(Faker.Date.Future(2), DateTimeKind.Utc),
             CreatedAt = DateTime.UtcNow
         };
         customize?.Invoke(campaign);
         return campaign;
     }
 
-    public static List<Campaign> CreateMany(Guid advertiserProfileId, int count, Action<Campaign, int>? customize = null) {
+    public static List<Campaign> CreateMany(Guid advertiserProfileId, int count,
+        Action<Campaign, int>? customize = null) {
         return Enumerable.Range(0, count)
             .Select(i => {
                 var campaign = Create(advertiserProfileId);

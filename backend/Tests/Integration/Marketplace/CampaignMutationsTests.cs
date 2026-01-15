@@ -7,25 +7,26 @@ using Xunit;
 namespace ElaviewBackend.Tests.Integration.Marketplace;
 
 [Collection("Integration")]
-public sealed class CampaignMutationsTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class CampaignMutationsTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task CreateCampaign_AsAdvertiser_CreatesCampaign() {
         var (advertiser, _) = await SeedAdvertiserAsync();
         await LoginAsync(advertiser.Email, "Test123!");
 
         var response = await Client.MutateAsync<CreateCampaignResponse>("""
-            mutation($input: CreateCampaignInput!) {
-                createCampaign(input: $input) {
-                    campaign {
-                        id
-                        name
-                        description
-                        imageUrl
-                        status
+                mutation($input: CreateCampaignInput!) {
+                    createCampaign(input: $input) {
+                        campaign {
+                            id
+                            name
+                            description
+                            imageUrl
+                            status
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new {
                 input = new {
                     name = "Test Campaign",
@@ -35,19 +36,20 @@ public sealed class CampaignMutationsTests(IntegrationTestFixture fixture) : Int
             });
 
         response.Errors.Should().BeNullOrEmpty();
-        response.Data!.CreateCampaign.Campaign.Name.Should().Be("Test Campaign");
+        response.Data!.CreateCampaign.Campaign.Name.Should()
+            .Be("Test Campaign");
         response.Data!.CreateCampaign.Campaign.Status.Should().Be("DRAFT");
     }
 
     [Fact]
     public async Task CreateCampaign_Unauthenticated_ReturnsAuthError() {
         var response = await Client.MutateAsync<CreateCampaignResponse>("""
-            mutation($input: CreateCampaignInput!) {
-                createCampaign(input: $input) {
-                    campaign { id }
+                mutation($input: CreateCampaignInput!) {
+                    createCampaign(input: $input) {
+                        campaign { id }
+                    }
                 }
-            }
-            """,
+                """,
             new {
                 input = new {
                     name = "Test Campaign",
@@ -68,16 +70,16 @@ public sealed class CampaignMutationsTests(IntegrationTestFixture fixture) : Int
         var campaign = await SeedCampaignAsync(advertiserProfile.Id);
 
         var response = await Client.MutateAsync<UpdateCampaignResponse>("""
-            mutation($id: ID!, $input: UpdateCampaignInput!) {
-                updateCampaign(id: $id, input: $input) {
-                    campaign {
-                        id
-                        name
-                        description
+                mutation($id: ID!, $input: UpdateCampaignInput!) {
+                    updateCampaign(id: $id, input: $input) {
+                        campaign {
+                            id
+                            name
+                            description
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new {
                 id = campaign.Id,
                 input = new {
@@ -87,7 +89,8 @@ public sealed class CampaignMutationsTests(IntegrationTestFixture fixture) : Int
             });
 
         response.Errors.Should().BeNullOrEmpty();
-        response.Data!.UpdateCampaign.Campaign.Name.Should().Be("Updated Campaign");
+        response.Data!.UpdateCampaign.Campaign.Name.Should()
+            .Be("Updated Campaign");
     }
 
     [Fact]
@@ -97,12 +100,12 @@ public sealed class CampaignMutationsTests(IntegrationTestFixture fixture) : Int
         var campaign = await SeedCampaignAsync(advertiserProfile.Id);
 
         var response = await Client.MutateAsync<DeleteCampaignResponse>("""
-            mutation($input: DeleteCampaignInput!) {
-                deleteCampaign(input: $input) {
-                    success
+                mutation($input: DeleteCampaignInput!) {
+                    deleteCampaign(input: $input) {
+                        success
+                    }
                 }
-            }
-            """,
+                """,
             new { input = new { id = campaign.Id } });
 
         response.Errors.Should().BeNullOrEmpty();

@@ -19,7 +19,9 @@ public sealed class NotificationPreference : EntityBase {
     public bool InAppEnabled { get; set; } = true;
 }
 
-public sealed class NotificationPreferenceConfig : IEntityTypeConfiguration<NotificationPreference> {
+public sealed class
+    NotificationPreferenceConfig : IEntityTypeConfiguration<
+    NotificationPreference> {
     public void Configure(EntityTypeBuilder<NotificationPreference> builder) {
         builder.HasIndex(e => new { e.UserId, e.NotificationType }).IsUnique();
 

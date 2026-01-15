@@ -2,7 +2,10 @@ namespace ElaviewBackend.Tests.Shared.Models;
 
 public record SpacesResponse(SpacesConnection Spaces);
 
-public record SpacesConnection(List<SpaceNode> Nodes, PageInfo PageInfo, int? TotalCount = null);
+public record SpacesConnection(
+    List<SpaceNode> Nodes,
+    PageInfo PageInfo,
+    int? TotalCount = null);
 
 public record SpaceNode(
     Guid Id,

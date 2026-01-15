@@ -13,13 +13,21 @@ public interface IBookingService {
     IQueryable<Booking> GetIncomingBookingRequestsQuery();
     IQueryable<Booking> GetBookingsRequiringActionQuery();
     Task<Booking?> GetBookingByIdAsync(Guid id, CancellationToken ct);
-    Task<Booking> CreateAsync(Guid campaignId, CreateBookingInput input, CancellationToken ct);
-    Task<Booking> ApproveAsync(Guid id, string? ownerNotes, CancellationToken ct);
+
+    Task<Booking> CreateAsync(Guid campaignId, CreateBookingInput input,
+        CancellationToken ct);
+
+    Task<Booking> ApproveAsync(Guid id, string? ownerNotes,
+        CancellationToken ct);
+
     Task<Booking> RejectAsync(Guid id, string reason, CancellationToken ct);
     Task<Booking> CancelAsync(Guid id, string reason, CancellationToken ct);
     Task<Booking> MarkFileDownloadedAsync(Guid id, CancellationToken ct);
     Task<Booking> MarkInstalledAsync(Guid id, CancellationToken ct);
-    Task<Campaign?> GetCampaignByBookingIdAsync(Guid bookingId, CancellationToken ct);
+
+    Task<Campaign?> GetCampaignByBookingIdAsync(Guid bookingId,
+        CancellationToken ct);
+
     Task<Space?> GetSpaceByBookingIdAsync(Guid bookingId, CancellationToken ct);
     IQueryable<Review> GetReviewsByBookingId(Guid bookingId);
     IQueryable<Payment> GetPaymentsByBookingId(Guid bookingId);
@@ -40,20 +48,20 @@ public sealed class BookingService(
         return principalId is null ? null : Guid.Parse(principalId);
     }
 
-    private Guid GetCurrentUserId() =>
-        GetCurrentUserIdOrNull() ?? throw new GraphQLException("Not authenticated");
-
-    public IQueryable<Booking> GetBookingByIdQuery(Guid id) =>
-        context.Bookings.Where(b => b.Id == id);
+    public IQueryable<Booking> GetBookingByIdQuery(Guid id) {
+        return context.Bookings.Where(b => b.Id == id);
+    }
 
     public IQueryable<Booking> GetMyBookingsAsAdvertiserQuery() {
         var userId = GetCurrentUserId();
-        return context.Bookings.Where(b => b.Campaign.AdvertiserProfile.UserId == userId);
+        return context.Bookings.Where(b =>
+            b.Campaign.AdvertiserProfile.UserId == userId);
     }
 
     public IQueryable<Booking> GetMyBookingsAsOwnerQuery() {
         var userId = GetCurrentUserId();
-        return context.Bookings.Where(b => b.Space.SpaceOwnerProfile.UserId == userId);
+        return context.Bookings.Where(b =>
+            b.Space.SpaceOwnerProfile.UserId == userId);
     }
 
     public IQueryable<Booking> GetIncomingBookingRequestsQuery() {
@@ -75,23 +83,32 @@ public sealed class BookingService(
               b.Status == BookingStatus.Installed)));
     }
 
-    public async Task<Booking?> GetBookingByIdAsync(Guid id, CancellationToken ct) =>
-        await bookingRepository.GetByIdAsync(id, ct);
+    public async Task<Booking?> GetBookingByIdAsync(Guid id,
+        CancellationToken ct) {
+        return await bookingRepository.GetByIdAsync(id, ct);
+    }
 
-    public async Task<Booking> CreateAsync(Guid campaignId, CreateBookingInput input, CancellationToken ct) {
+    public async Task<Booking> CreateAsync(Guid campaignId,
+        CreateBookingInput input, CancellationToken ct) {
         var userId = GetCurrentUserId();
 
         var campaign = await context.Campaigns
-            .Where(c => c.Id == campaignId && c.AdvertiserProfile.UserId == userId)
-            .Select(c => new { c.Id })
-            .FirstOrDefaultAsync(ct)
-            ?? throw new GraphQLException("Campaign not found");
+                           .Where(c =>
+                               c.Id == campaignId &&
+                               c.AdvertiserProfile.UserId == userId)
+                           .Select(c => new { c.Id })
+                           .FirstOrDefaultAsync(ct)
+                       ?? throw new GraphQLException("Campaign not found");
 
         var space = await context.Spaces
-            .Where(s => s.Id == input.SpaceId && s.Status == SpaceStatus.Active)
-            .Select(s => new { s.Id, s.PricePerDay, s.InstallationFee })
-            .FirstOrDefaultAsync(ct)
-            ?? throw new GraphQLException("Space not found or not available");
+                        .Where(s =>
+                            s.Id == input.SpaceId &&
+                            s.Status == SpaceStatus.Active)
+                        .Select(s => new
+                            { s.Id, s.PricePerDay, s.InstallationFee })
+                        .FirstOrDefaultAsync(ct)
+                    ?? throw new GraphQLException(
+                        "Space not found or not available");
 
         var totalDays = (input.EndDate - input.StartDate).Days;
         if (totalDays <= 0)
@@ -125,11 +142,15 @@ public sealed class BookingService(
         return booking;
     }
 
-    public async Task<Booking> ApproveAsync(Guid id, string? ownerNotes, CancellationToken ct) {
+    public async Task<Booking> ApproveAsync(Guid id, string? ownerNotes,
+        CancellationToken ct) {
         var userId = GetCurrentUserId();
         var booking = await context.Bookings
-            .FirstOrDefaultAsync(b => b.Id == id && b.Space.SpaceOwnerProfile.UserId == userId, ct)
-            ?? throw new GraphQLException("Booking not found");
+                          .FirstOrDefaultAsync(
+                              b => b.Id == id &&
+                                   b.Space.SpaceOwnerProfile.UserId == userId,
+                              ct)
+                      ?? throw new GraphQLException("Booking not found");
 
         if (booking.Status != BookingStatus.PendingApproval)
             throw new GraphQLException("Only pending bookings can be approved");
@@ -143,11 +164,15 @@ public sealed class BookingService(
         return booking;
     }
 
-    public async Task<Booking> RejectAsync(Guid id, string reason, CancellationToken ct) {
+    public async Task<Booking> RejectAsync(Guid id, string reason,
+        CancellationToken ct) {
         var userId = GetCurrentUserId();
         var booking = await context.Bookings
-            .FirstOrDefaultAsync(b => b.Id == id && b.Space.SpaceOwnerProfile.UserId == userId, ct)
-            ?? throw new GraphQLException("Booking not found");
+                          .FirstOrDefaultAsync(
+                              b => b.Id == id &&
+                                   b.Space.SpaceOwnerProfile.UserId == userId,
+                              ct)
+                      ?? throw new GraphQLException("Booking not found");
 
         if (booking.Status != BookingStatus.PendingApproval)
             throw new GraphQLException("Only pending bookings can be rejected");
@@ -162,13 +187,19 @@ public sealed class BookingService(
         return booking;
     }
 
-    public async Task<Booking> CancelAsync(Guid id, string reason, CancellationToken ct) {
+    public async Task<Booking> CancelAsync(Guid id, string reason,
+        CancellationToken ct) {
         var userId = GetCurrentUserId();
         var booking = await context.Bookings
-            .FirstOrDefaultAsync(b => b.Id == id &&
-                (b.Campaign.AdvertiserProfile.UserId == userId ||
-                 b.Space.SpaceOwnerProfile.UserId == userId), ct)
-            ?? throw new GraphQLException("Booking not found");
+                          .FirstOrDefaultAsync(b => b.Id == id &&
+                                                    (b.Campaign
+                                                            .AdvertiserProfile
+                                                            .UserId == userId ||
+                                                        b.Space
+                                                            .SpaceOwnerProfile
+                                                            .UserId == userId),
+                              ct)
+                      ?? throw new GraphQLException("Booking not found");
 
         var cancellableStatuses = new[] {
             BookingStatus.PendingApproval,
@@ -177,7 +208,8 @@ public sealed class BookingService(
         };
 
         if (!cancellableStatuses.Contains(booking.Status))
-            throw new GraphQLException("Booking cannot be cancelled in current status");
+            throw new GraphQLException(
+                "Booking cannot be cancelled in current status");
 
         var entry = context.Entry(booking);
         entry.Property(b => b.Status).CurrentValue = BookingStatus.Cancelled;
@@ -190,17 +222,23 @@ public sealed class BookingService(
         return booking;
     }
 
-    public async Task<Booking> MarkFileDownloadedAsync(Guid id, CancellationToken ct) {
+    public async Task<Booking> MarkFileDownloadedAsync(Guid id,
+        CancellationToken ct) {
         var userId = GetCurrentUserId();
         var booking = await context.Bookings
-            .FirstOrDefaultAsync(b => b.Id == id && b.Space.SpaceOwnerProfile.UserId == userId, ct)
-            ?? throw new GraphQLException("Booking not found");
+                          .FirstOrDefaultAsync(
+                              b => b.Id == id &&
+                                   b.Space.SpaceOwnerProfile.UserId == userId,
+                              ct)
+                      ?? throw new GraphQLException("Booking not found");
 
         if (booking.Status != BookingStatus.Paid)
-            throw new GraphQLException("Only paid bookings can be marked as file downloaded");
+            throw new GraphQLException(
+                "Only paid bookings can be marked as file downloaded");
 
         var entry = context.Entry(booking);
-        entry.Property(b => b.Status).CurrentValue = BookingStatus.FileDownloaded;
+        entry.Property(b => b.Status).CurrentValue =
+            BookingStatus.FileDownloaded;
         entry.Property(b => b.FileDownloadedAt).CurrentValue = DateTime.UtcNow;
         entry.Property(b => b.UpdatedAt).CurrentValue = DateTime.UtcNow;
 
@@ -208,14 +246,19 @@ public sealed class BookingService(
         return booking;
     }
 
-    public async Task<Booking> MarkInstalledAsync(Guid id, CancellationToken ct) {
+    public async Task<Booking>
+        MarkInstalledAsync(Guid id, CancellationToken ct) {
         var userId = GetCurrentUserId();
         var booking = await context.Bookings
-            .FirstOrDefaultAsync(b => b.Id == id && b.Space.SpaceOwnerProfile.UserId == userId, ct)
-            ?? throw new GraphQLException("Booking not found");
+                          .FirstOrDefaultAsync(
+                              b => b.Id == id &&
+                                   b.Space.SpaceOwnerProfile.UserId == userId,
+                              ct)
+                      ?? throw new GraphQLException("Booking not found");
 
         if (booking.Status != BookingStatus.FileDownloaded)
-            throw new GraphQLException("Only file downloaded bookings can be marked as installed");
+            throw new GraphQLException(
+                "Only file downloaded bookings can be marked as installed");
 
         var entry = context.Entry(booking);
         entry.Property(b => b.Status).CurrentValue = BookingStatus.Installed;
@@ -225,18 +268,31 @@ public sealed class BookingService(
         return booking;
     }
 
-    public async Task<Campaign?> GetCampaignByBookingIdAsync(Guid bookingId, CancellationToken ct) =>
-        await bookingRepository.GetCampaignByBookingIdAsync(bookingId, ct);
+    public async Task<Campaign?> GetCampaignByBookingIdAsync(Guid bookingId,
+        CancellationToken ct) {
+        return await bookingRepository.GetCampaignByBookingIdAsync(bookingId,
+            ct);
+    }
 
-    public async Task<Space?> GetSpaceByBookingIdAsync(Guid bookingId, CancellationToken ct) =>
-        await bookingRepository.GetSpaceByBookingIdAsync(bookingId, ct);
+    public async Task<Space?> GetSpaceByBookingIdAsync(Guid bookingId,
+        CancellationToken ct) {
+        return await bookingRepository.GetSpaceByBookingIdAsync(bookingId, ct);
+    }
 
-    public IQueryable<Review> GetReviewsByBookingId(Guid bookingId) =>
-        context.Reviews.Where(r => r.BookingId == bookingId);
+    public IQueryable<Review> GetReviewsByBookingId(Guid bookingId) {
+        return context.Reviews.Where(r => r.BookingId == bookingId);
+    }
 
-    public IQueryable<Payment> GetPaymentsByBookingId(Guid bookingId) =>
-        context.Payments.Where(p => p.BookingId == bookingId);
+    public IQueryable<Payment> GetPaymentsByBookingId(Guid bookingId) {
+        return context.Payments.Where(p => p.BookingId == bookingId);
+    }
 
-    public IQueryable<Payout> GetPayoutsByBookingId(Guid bookingId) =>
-        context.Payouts.Where(p => p.BookingId == bookingId);
+    public IQueryable<Payout> GetPayoutsByBookingId(Guid bookingId) {
+        return context.Payouts.Where(p => p.BookingId == bookingId);
+    }
+
+    private Guid GetCurrentUserId() {
+        return GetCurrentUserIdOrNull() ??
+               throw new GraphQLException("Not authenticated");
+    }
 }

@@ -5,13 +5,13 @@ using ElaviewBackend.Tests.Shared.Extensions;
 using ElaviewBackend.Tests.Shared.Factories;
 using ElaviewBackend.Tests.Shared.Models;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace ElaviewBackend.Tests.Integration.Payments;
 
 [Collection("Integration")]
-public sealed class PaymentQueriesTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class PaymentQueriesTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task GetPaymentById_AsOwner_ReturnsPayment() {
         var (owner, ownerProfile) = await SeedSpaceOwnerAsync();
@@ -24,15 +24,15 @@ public sealed class PaymentQueriesTests(IntegrationTestFixture fixture) : Integr
         var payment = await SeedPaymentAsync(booking.Id);
 
         var response = await Client.QueryAsync<PaymentByIdResponse>("""
-            query($id: ID!) {
-                paymentById(id: $id) {
-                    id
-                    status
-                    amount
-                    stripePaymentIntentId
+                query($id: ID!) {
+                    paymentById(id: $id) {
+                        id
+                        status
+                        amount
+                        stripePaymentIntentId
+                    }
                 }
-            }
-            """,
+                """,
             new { id = payment.Id });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -44,12 +44,12 @@ public sealed class PaymentQueriesTests(IntegrationTestFixture fixture) : Integr
     [Fact]
     public async Task GetPaymentById_Unauthenticated_ReturnsAuthError() {
         var response = await Client.QueryAsync<PaymentByIdResponse>("""
-            query($id: ID!) {
-                paymentById(id: $id) {
-                    id
+                query($id: ID!) {
+                    paymentById(id: $id) {
+                        id
+                    }
                 }
-            }
-            """,
+                """,
             new { id = Guid.NewGuid() });
 
         response.Errors.Should().NotBeNullOrEmpty();
@@ -71,16 +71,16 @@ public sealed class PaymentQueriesTests(IntegrationTestFixture fixture) : Integr
         await SeedPaymentAsync(booking.Id);
 
         var response = await Client.QueryAsync<PaymentsByBookingResponse>("""
-            query($bookingId: ID!) {
-                paymentsByBooking(bookingId: $bookingId) {
-                    nodes {
-                        id
-                        status
-                        amount
+                query($bookingId: ID!) {
+                    paymentsByBooking(bookingId: $bookingId) {
+                        nodes {
+                            id
+                            status
+                            amount
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new { bookingId = booking.Id });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -125,7 +125,8 @@ public sealed class PaymentQueriesTests(IntegrationTestFixture fixture) : Integr
         var campaign = await SeedCampaignAsync(advertiserProfile.Id);
         var space = await SeedSpaceAsync(ownerProfile.Id);
         var booking = await SeedBookingAsync(campaign.Id, space.Id);
-        await SeedPayoutAsync(booking.Id, ownerProfile.Id, PayoutStage.Stage1, PayoutStatus.Completed);
+        await SeedPayoutAsync(booking.Id, ownerProfile.Id, PayoutStage.Stage1,
+            PayoutStatus.Completed);
 
         var response = await Client.QueryAsync<GetEarningsSummaryResponse>("""
             query {
@@ -144,7 +145,8 @@ public sealed class PaymentQueriesTests(IntegrationTestFixture fixture) : Integr
         response.Data!.EarningsSummary.TotalEarnings.Should().BeGreaterThan(0);
     }
 
-    private async Task<Payment> SeedPaymentAsync(Guid bookingId, Action<Payment>? customize = null) {
+    private async Task<Payment> SeedPaymentAsync(Guid bookingId,
+        Action<Payment>? customize = null) {
         var payment = PaymentFactory.Create(bookingId, customize);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -153,7 +155,9 @@ public sealed class PaymentQueriesTests(IntegrationTestFixture fixture) : Integr
         return payment;
     }
 
-    private async Task<Payout> SeedPayoutAsync(Guid bookingId, Guid spaceOwnerProfileId, PayoutStage stage, PayoutStatus status = PayoutStatus.Pending) {
+    private async Task<Payout> SeedPayoutAsync(Guid bookingId,
+        Guid spaceOwnerProfileId, PayoutStage stage,
+        PayoutStatus status = PayoutStatus.Pending) {
         var payout = new Payout {
             Id = Guid.NewGuid(),
             BookingId = bookingId,
@@ -161,7 +165,9 @@ public sealed class PaymentQueriesTests(IntegrationTestFixture fixture) : Integr
             Stage = stage,
             Amount = 100m,
             Status = status,
-            ProcessedAt = status == PayoutStatus.Completed ? DateTime.UtcNow : null,
+            ProcessedAt = status == PayoutStatus.Completed
+                ? DateTime.UtcNow
+                : null,
             CreatedAt = DateTime.UtcNow
         };
         using var scope = Fixture.Services.CreateScope();

@@ -4,20 +4,21 @@ using ElaviewBackend.Tests.Shared.Extensions;
 using ElaviewBackend.Tests.Shared.Factories;
 using ElaviewBackend.Tests.Shared.Models;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace ElaviewBackend.Tests.Integration.Marketplace;
 
 [Collection("Integration")]
-public sealed class CampaignQueriesTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class CampaignQueriesTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task GetMyCampaigns_AsAdvertiser_ReturnsOwnCampaigns() {
         var (advertiser, advertiserProfile) = await SeedAdvertiserAsync();
         await LoginAsync(advertiser.Email, "Test123!");
 
         using (var scope = Fixture.Services.CreateScope()) {
-            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var context =
+                scope.ServiceProvider.GetRequiredService<AppDbContext>();
             var campaigns = CampaignFactory.CreateMany(advertiserProfile.Id, 5);
             context.Campaigns.AddRange(campaigns);
             await context.SaveChangesAsync();
@@ -58,16 +59,16 @@ public sealed class CampaignQueriesTests(IntegrationTestFixture fixture) : Integ
         var campaign = await SeedCampaignAsync(advertiserProfile.Id);
 
         var response = await Client.QueryAsync<CampaignByIdResponse>("""
-            query($id: ID!) {
-                campaignById(id: $id) {
-                    id
-                    name
-                    description
-                    imageUrl
-                    status
+                query($id: ID!) {
+                    campaignById(id: $id) {
+                        id
+                        name
+                        description
+                        imageUrl
+                        status
+                    }
                 }
-            }
-            """,
+                """,
             new { id = campaign.Id });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -81,12 +82,12 @@ public sealed class CampaignQueriesTests(IntegrationTestFixture fixture) : Integ
         await LoginAsync(advertiser.Email, "Test123!");
 
         var response = await Client.QueryAsync<CampaignByIdResponse>("""
-            query($id: ID!) {
-                campaignById(id: $id) {
-                    id
+                query($id: ID!) {
+                    campaignById(id: $id) {
+                        id
+                    }
                 }
-            }
-            """,
+                """,
             new { id = Guid.NewGuid() });
 
         response.Errors.Should().BeNullOrEmpty();

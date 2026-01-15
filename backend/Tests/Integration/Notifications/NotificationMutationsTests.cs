@@ -5,19 +5,20 @@ using ElaviewBackend.Tests.Shared.Extensions;
 using ElaviewBackend.Tests.Shared.Factories;
 using ElaviewBackend.Tests.Shared.Models;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace ElaviewBackend.Tests.Integration.Notifications;
 
 [Collection("Integration")]
-public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class NotificationMutationsTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task MarkNotificationRead_MarksAsRead() {
         var user = await CreateAndLoginUserAsync();
         var notification = await SeedNotificationAsync(user.Id);
 
-        var response = await Client.MutateAsync<MarkNotificationReadResponse>("""
+        var response = await Client.MutateAsync<MarkNotificationReadResponse>(
+            """
             mutation($input: MarkNotificationReadInput!) {
                 markNotificationRead(input: $input) {
                     notification {
@@ -31,17 +32,21 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) :
             new { input = new { id = notification.Id } });
 
         response.Errors.Should().BeNullOrEmpty();
-        response.Data!.MarkNotificationRead.Notification.IsRead.Should().BeTrue();
-        response.Data!.MarkNotificationRead.Notification.ReadAt.Should().NotBeNull();
+        response.Data!.MarkNotificationRead.Notification.IsRead.Should()
+            .BeTrue();
+        response.Data!.MarkNotificationRead.Notification.ReadAt.Should()
+            .NotBeNull();
     }
 
     [Fact]
-    public async Task MarkNotificationRead_OtherUserNotification_ReturnsError() {
+    public async Task
+        MarkNotificationRead_OtherUserNotification_ReturnsError() {
         var user = await CreateAndLoginUserAsync();
         var (otherUser, _) = await SeedAdvertiserAsync();
         var notification = await SeedNotificationAsync(otherUser.Id);
 
-        var response = await Client.MutateAsync<MarkNotificationReadResponse>("""
+        var response = await Client.MutateAsync<MarkNotificationReadResponse>(
+            """
             mutation($input: MarkNotificationReadInput!) {
                 markNotificationRead(input: $input) {
                     notification {
@@ -62,13 +67,14 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) :
         await SeedNotificationAsync(user.Id);
         await SeedNotificationAsync(user.Id);
 
-        var response = await Client.MutateAsync<MarkAllNotificationsReadResponse>("""
-            mutation {
-                markAllNotificationsRead {
-                    count
+        var response =
+            await Client.MutateAsync<MarkAllNotificationsReadResponse>("""
+                mutation {
+                    markAllNotificationsRead {
+                        count
+                    }
                 }
-            }
-            """);
+                """);
 
         response.Errors.Should().BeNullOrEmpty();
         response.Data!.MarkAllNotificationsRead.Count.Should().Be(3);
@@ -80,12 +86,12 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) :
         var notification = await SeedNotificationAsync(user.Id);
 
         var response = await Client.MutateAsync<DeleteNotificationResponse>("""
-            mutation($input: DeleteNotificationInput!) {
-                deleteNotification(input: $input) {
-                    success
+                mutation($input: DeleteNotificationInput!) {
+                    deleteNotification(input: $input) {
+                        success
+                    }
                 }
-            }
-            """,
+                """,
             new { input = new { id = notification.Id } });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -96,51 +102,56 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) :
     public async Task UpdateNotificationPreference_CreatesPreference() {
         var user = await CreateAndLoginUserAsync();
 
-        var response = await Client.MutateAsync<UpdateNotificationPreferenceResponse>("""
-            mutation($input: UpdateNotificationPreferenceInput!) {
-                updateNotificationPreference(input: $input) {
-                    preference {
-                        id
-                        notificationType
-                        emailEnabled
-                        pushEnabled
-                        inAppEnabled
+        var response =
+            await Client.MutateAsync<UpdateNotificationPreferenceResponse>("""
+                    mutation($input: UpdateNotificationPreferenceInput!) {
+                        updateNotificationPreference(input: $input) {
+                            preference {
+                                id
+                                notificationType
+                                emailEnabled
+                                pushEnabled
+                                inAppEnabled
+                            }
+                        }
                     }
-                }
-            }
-            """,
-            new {
-                input = new {
-                    notificationType = "BOOKING_REQUESTED",
-                    emailEnabled = false,
-                    pushEnabled = true,
-                    inAppEnabled = true
-                }
-            });
+                    """,
+                new {
+                    input = new {
+                        notificationType = "BOOKING_REQUESTED",
+                        emailEnabled = false,
+                        pushEnabled = true,
+                        inAppEnabled = true
+                    }
+                });
 
         response.Errors.Should().BeNullOrEmpty();
-        response.Data!.UpdateNotificationPreference.Preference.EmailEnabled.Should().BeFalse();
-        response.Data!.UpdateNotificationPreference.Preference.PushEnabled.Should().BeTrue();
+        response.Data!.UpdateNotificationPreference.Preference.EmailEnabled
+            .Should().BeFalse();
+        response.Data!.UpdateNotificationPreference.Preference.PushEnabled
+            .Should().BeTrue();
     }
 
     [Fact]
     public async Task SendMessage_SendsMessage() {
         var user = await CreateAndLoginUserAsync();
         var (otherUser, _) = await SeedAdvertiserAsync();
-        var conversation = await SeedConversationWithParticipantsAsync(null, user.Id, otherUser.Id);
+        var conversation =
+            await SeedConversationWithParticipantsAsync(null, user.Id,
+                otherUser.Id);
 
         var response = await Client.MutateAsync<SendMessageResponse>("""
-            mutation($input: SendMessageInput!) {
-                sendMessage(input: $input) {
-                    message {
-                        id
-                        type
-                        content
-                        senderUserId
+                mutation($input: SendMessageInput!) {
+                    sendMessage(input: $input) {
+                        message {
+                            id
+                            type
+                            content
+                            senderUserId
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new {
                 input = new {
                     conversationId = conversation.Id,
@@ -149,7 +160,8 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) :
             });
 
         response.Errors.Should().BeNullOrEmpty();
-        response.Data!.SendMessage.Message.Content.Should().Be("Hello, this is a test message");
+        response.Data!.SendMessage.Message.Content.Should()
+            .Be("Hello, this is a test message");
         response.Data!.SendMessage.Message.SenderUserId.Should().Be(user.Id);
     }
 
@@ -158,17 +170,19 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) :
         var user = await CreateAndLoginUserAsync();
         var (otherUser1, _) = await SeedAdvertiserAsync();
         var (otherUser2, _) = await SeedSpaceOwnerAsync();
-        var conversation = await SeedConversationWithParticipantsAsync(null, otherUser1.Id, otherUser2.Id);
+        var conversation =
+            await SeedConversationWithParticipantsAsync(null, otherUser1.Id,
+                otherUser2.Id);
 
         var response = await Client.MutateAsync<SendMessageResponse>("""
-            mutation($input: SendMessageInput!) {
-                sendMessage(input: $input) {
-                    message {
-                        id
+                mutation($input: SendMessageInput!) {
+                    sendMessage(input: $input) {
+                        message {
+                            id
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new {
                 input = new {
                     conversationId = conversation.Id,
@@ -183,9 +197,12 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) :
     public async Task MarkConversationRead_UpdatesLastReadAt() {
         var user = await CreateAndLoginUserAsync();
         var (otherUser, _) = await SeedAdvertiserAsync();
-        var conversation = await SeedConversationWithParticipantsAsync(null, user.Id, otherUser.Id);
+        var conversation =
+            await SeedConversationWithParticipantsAsync(null, user.Id,
+                otherUser.Id);
 
-        var response = await Client.MutateAsync<MarkConversationReadResponse>("""
+        var response = await Client.MutateAsync<MarkConversationReadResponse>(
+            """
             mutation($input: MarkConversationReadInput!) {
                 markConversationRead(input: $input) {
                     participant {
@@ -199,11 +216,14 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) :
             new { input = new { conversationId = conversation.Id } });
 
         response.Errors.Should().BeNullOrEmpty();
-        response.Data!.MarkConversationRead.Participant.LastReadAt.Should().NotBeNull();
-        response.Data!.MarkConversationRead.Participant.UserId.Should().Be(user.Id);
+        response.Data!.MarkConversationRead.Participant.LastReadAt.Should()
+            .NotBeNull();
+        response.Data!.MarkConversationRead.Participant.UserId.Should()
+            .Be(user.Id);
     }
 
-    private async Task<Notification> SeedNotificationAsync(Guid userId, Action<Notification>? customize = null) {
+    private async Task<Notification> SeedNotificationAsync(Guid userId,
+        Action<Notification>? customize = null) {
         var notification = NotificationFactory.Create(userId, customize);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -212,7 +232,8 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) :
         return notification;
     }
 
-    private async Task<Conversation> SeedConversationWithParticipantsAsync(Guid? bookingId, params Guid[] userIds) {
+    private async Task<Conversation> SeedConversationWithParticipantsAsync(
+        Guid? bookingId, params Guid[] userIds) {
         var conversation = ConversationFactory.Create(bookingId);
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -220,9 +241,11 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture) :
         await context.SaveChangesAsync();
 
         foreach (var userId in userIds) {
-            var participant = ConversationParticipantFactory.Create(conversation.Id, userId);
+            var participant =
+                ConversationParticipantFactory.Create(conversation.Id, userId);
             context.ConversationParticipants.Add(participant);
         }
+
         await context.SaveChangesAsync();
 
         return conversation;

@@ -6,7 +6,8 @@ namespace ElaviewBackend.Tests.Shared.Factories;
 public static class AdvertiserProfileFactory {
     private static readonly Faker Faker = new();
 
-    public static AdvertiserProfile Create(Guid userId, Action<AdvertiserProfile>? customize = null) {
+    public static AdvertiserProfile Create(Guid userId,
+        Action<AdvertiserProfile>? customize = null) {
         var profile = new AdvertiserProfile {
             Id = Guid.NewGuid(),
             UserId = userId,

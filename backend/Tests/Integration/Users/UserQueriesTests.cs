@@ -7,7 +7,8 @@ using Xunit;
 namespace ElaviewBackend.Tests.Integration.Users;
 
 [Collection("Integration")]
-public sealed class UserQueriesTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class UserQueriesTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task GetCurrentUser_Authenticated_ReturnsUser() {
         var user = await CreateAndLoginUserAsync();
@@ -91,14 +92,14 @@ public sealed class UserQueriesTests(IntegrationTestFixture fixture) : Integrati
         var user = await SeedUserAsync();
 
         var response = await Client.QueryAsync<UserByIdResponse>("""
-            query($id: ID!) {
-                userById(id: $id) {
-                    id
-                    email
-                    name
+                query($id: ID!) {
+                    userById(id: $id) {
+                        id
+                        email
+                        name
+                    }
                 }
-            }
-            """,
+                """,
             new { id = user.Id });
 
         response.Errors.Should().BeNullOrEmpty();
@@ -112,12 +113,12 @@ public sealed class UserQueriesTests(IntegrationTestFixture fixture) : Integrati
         var otherUser = await SeedUserAsync();
 
         var response = await Client.QueryAsync<UserByIdResponse>("""
-            query($id: ID!) {
-                userById(id: $id) {
-                    id
+                query($id: ID!) {
+                    userById(id: $id) {
+                        id
+                    }
                 }
-            }
-            """,
+                """,
             new { id = otherUser.Id });
 
         response.Errors.Should().NotBeNullOrEmpty();
@@ -131,12 +132,12 @@ public sealed class UserQueriesTests(IntegrationTestFixture fixture) : Integrati
         await LoginAsAdminAsync();
 
         var response = await Client.QueryAsync<UserByIdResponse>("""
-            query($id: ID!) {
-                userById(id: $id) {
-                    id
+                query($id: ID!) {
+                    userById(id: $id) {
+                        id
+                    }
                 }
-            }
-            """,
+                """,
             new { id = Guid.NewGuid() });
 
         response.Errors.Should().BeNullOrEmpty();

@@ -12,23 +12,32 @@ public static partial class NotificationQueries {
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Notification> GetMyNotifications(INotificationService notificationService)
-        => notificationService.GetMyNotificationsQuery();
+    public static IQueryable<Notification> GetMyNotifications(
+        INotificationService notificationService) {
+        return notificationService.GetMyNotificationsQuery();
+    }
 
     [Authorize]
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<Notification> GetNotificationById(
         [ID] Guid id, INotificationService notificationService
-    ) => notificationService.GetNotificationByIdQuery(id);
+    ) {
+        return notificationService.GetNotificationByIdQuery(id);
+    }
 
     [Authorize]
     public static async Task<int> GetUnreadNotificationsCount(
         INotificationService notificationService, CancellationToken ct
-    ) => await notificationService.GetUnreadCountAsync(ct);
+    ) {
+        return await notificationService.GetUnreadCountAsync(ct);
+    }
 
     [Authorize]
-    public static async Task<IReadOnlyList<NotificationPreference>> GetMyNotificationPreferences(
-        INotificationService notificationService, CancellationToken ct
-    ) => await notificationService.GetMyPreferencesAsync(ct);
+    public static async Task<IReadOnlyList<NotificationPreference>>
+        GetMyNotificationPreferences(
+            INotificationService notificationService, CancellationToken ct
+        ) {
+        return await notificationService.GetMyPreferencesAsync(ct);
+    }
 }

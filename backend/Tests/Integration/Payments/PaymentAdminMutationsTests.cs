@@ -5,28 +5,30 @@ using ElaviewBackend.Tests.Shared.Extensions;
 using ElaviewBackend.Tests.Shared.Factories;
 using ElaviewBackend.Tests.Shared.Models;
 using FluentAssertions;
-using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace ElaviewBackend.Tests.Integration.Payments;
 
 [Collection("Integration")]
-public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) : IntegrationTestBase(fixture) {
+public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture)
+    : IntegrationTestBase(fixture) {
     [Fact]
     public async Task ProcessPayout_AsAdmin_WithInvalidBooking_ReturnsError() {
         await LoginAsAdminAsync();
 
         var response = await Client.MutateAsync<ProcessPayoutResponse>("""
-            mutation($input: ProcessPayoutInput!) {
-                processPayout(input: $input) {
-                    payout {
-                        id
-                        status
+                mutation($input: ProcessPayoutInput!) {
+                    processPayout(input: $input) {
+                        payout {
+                            id
+                            status
+                        }
                     }
                 }
-            }
-            """,
-            new { input = new { bookingId = Guid.NewGuid(), stage = "STAGE1" } });
+                """,
+            new {
+                input = new { bookingId = Guid.NewGuid(), stage = "STAGE1" }
+            });
 
         response.Errors.Should().NotBeNullOrEmpty();
         response.Errors!.First().Message.Should().Contain("not found");
@@ -43,41 +45,44 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
         var booking = await SeedBookingAsync(campaign.Id, space.Id);
 
         var response = await Client.MutateAsync<ProcessPayoutResponse>("""
-            mutation($input: ProcessPayoutInput!) {
-                processPayout(input: $input) {
-                    payout {
-                        id
-                        status
+                mutation($input: ProcessPayoutInput!) {
+                    processPayout(input: $input) {
+                        payout {
+                            id
+                            status
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new { input = new { bookingId = booking.Id, stage = "STAGE1" } });
 
         response.Errors.Should().NotBeNullOrEmpty();
     }
 
     [Fact]
-    public async Task ProcessPayout_AsAdmin_Stage1AlreadyProcessed_ReturnsError() {
+    public async Task
+        ProcessPayout_AsAdmin_Stage1AlreadyProcessed_ReturnsError() {
         await LoginAsAdminAsync();
         var (_, advertiserProfile) = await SeedAdvertiserAsync();
         var (_, ownerProfile) = await SeedSpaceOwnerAsync();
 
         var campaign = await SeedCampaignAsync(advertiserProfile.Id);
         var space = await SeedSpaceAsync(ownerProfile.Id);
-        var booking = await SeedBookingWithStatusAsync(campaign.Id, space.Id, BookingStatus.Paid);
-        await SeedPayoutAsync(booking.Id, ownerProfile.Id, PayoutStage.Stage1, PayoutStatus.Completed);
+        var booking = await SeedBookingWithStatusAsync(campaign.Id, space.Id,
+            BookingStatus.Paid);
+        await SeedPayoutAsync(booking.Id, ownerProfile.Id, PayoutStage.Stage1,
+            PayoutStatus.Completed);
 
         var response = await Client.MutateAsync<ProcessPayoutResponse>("""
-            mutation($input: ProcessPayoutInput!) {
-                processPayout(input: $input) {
-                    payout {
-                        id
-                        status
+                mutation($input: ProcessPayoutInput!) {
+                    processPayout(input: $input) {
+                        payout {
+                            id
+                            status
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new { input = new { bookingId = booking.Id, stage = "STAGE1" } });
 
         response.Errors.Should().NotBeNullOrEmpty();
@@ -88,15 +93,15 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
         await LoginAsAdminAsync();
 
         var response = await Client.MutateAsync<RetryPayoutResponse>("""
-            mutation($input: RetryPayoutInput!) {
-                retryPayout(input: $input) {
-                    payout {
-                        id
-                        status
+                mutation($input: RetryPayoutInput!) {
+                    retryPayout(input: $input) {
+                        payout {
+                            id
+                            status
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new { input = new { payoutId = Guid.NewGuid() } });
 
         response.Errors.Should().NotBeNullOrEmpty();
@@ -111,19 +116,21 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
 
         var campaign = await SeedCampaignAsync(advertiserProfile.Id);
         var space = await SeedSpaceAsync(ownerProfile.Id);
-        var booking = await SeedBookingWithStatusAsync(campaign.Id, space.Id, BookingStatus.Paid);
-        var payout = await SeedPayoutAsync(booking.Id, ownerProfile.Id, PayoutStage.Stage1, PayoutStatus.Pending);
+        var booking = await SeedBookingWithStatusAsync(campaign.Id, space.Id,
+            BookingStatus.Paid);
+        var payout = await SeedPayoutAsync(booking.Id, ownerProfile.Id,
+            PayoutStage.Stage1, PayoutStatus.Pending);
 
         var response = await Client.MutateAsync<RetryPayoutResponse>("""
-            mutation($input: RetryPayoutInput!) {
-                retryPayout(input: $input) {
-                    payout {
-                        id
-                        status
+                mutation($input: RetryPayoutInput!) {
+                    retryPayout(input: $input) {
+                        payout {
+                            id
+                            status
+                        }
                     }
                 }
-            }
-            """,
+                """,
             new { input = new { payoutId = payout.Id } });
 
         response.Errors.Should().NotBeNullOrEmpty();
@@ -135,16 +142,21 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
         await LoginAsAdminAsync();
 
         var response = await Client.MutateAsync<RequestRefundResponse>("""
-            mutation($input: RequestRefundInput!) {
-                requestRefund(input: $input) {
-                    refund {
-                        id
-                        status
+                mutation($input: RequestRefundInput!) {
+                    requestRefund(input: $input) {
+                        refund {
+                            id
+                            status
+                        }
                     }
                 }
-            }
-            """,
-            new { input = new { paymentId = Guid.NewGuid(), amount = 100.00m, reason = "Test refund" } });
+                """,
+            new {
+                input = new {
+                    paymentId = Guid.NewGuid(), amount = 100.00m,
+                    reason = "Test refund"
+                }
+            });
 
         response.Errors.Should().NotBeNullOrEmpty();
         response.Errors!.First().Message.Should().Contain("not found");
@@ -162,23 +174,29 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
         var payment = await SeedPaymentAsync(booking.Id, PaymentStatus.Pending);
 
         var response = await Client.MutateAsync<RequestRefundResponse>("""
-            mutation($input: RequestRefundInput!) {
-                requestRefund(input: $input) {
-                    refund {
-                        id
-                        status
+                mutation($input: RequestRefundInput!) {
+                    requestRefund(input: $input) {
+                        refund {
+                            id
+                            status
+                        }
                     }
                 }
-            }
-            """,
-            new { input = new { paymentId = payment.Id, amount = 50.00m, reason = "Test refund" } });
+                """,
+            new {
+                input = new {
+                    paymentId = payment.Id, amount = 50.00m,
+                    reason = "Test refund"
+                }
+            });
 
         response.Errors.Should().NotBeNullOrEmpty();
         response.Errors!.First().Message.Should().Contain("succeeded");
     }
 
     [Fact]
-    public async Task RequestRefund_AsAdmin_ExceedsPaymentAmount_ReturnsError() {
+    public async Task
+        RequestRefund_AsAdmin_ExceedsPaymentAmount_ReturnsError() {
         await LoginAsAdminAsync();
         var (_, advertiserProfile) = await SeedAdvertiserAsync();
         var (_, ownerProfile) = await SeedSpaceOwnerAsync();
@@ -186,19 +204,25 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
         var campaign = await SeedCampaignAsync(advertiserProfile.Id);
         var space = await SeedSpaceAsync(ownerProfile.Id);
         var booking = await SeedBookingAsync(campaign.Id, space.Id);
-        var payment = await SeedPaymentAsync(booking.Id, PaymentStatus.Succeeded, 100m);
+        var payment =
+            await SeedPaymentAsync(booking.Id, PaymentStatus.Succeeded, 100m);
 
         var response = await Client.MutateAsync<RequestRefundResponse>("""
-            mutation($input: RequestRefundInput!) {
-                requestRefund(input: $input) {
-                    refund {
-                        id
-                        status
+                mutation($input: RequestRefundInput!) {
+                    requestRefund(input: $input) {
+                        refund {
+                            id
+                            status
+                        }
                     }
                 }
-            }
-            """,
-            new { input = new { paymentId = payment.Id, amount = 150.00m, reason = "Test refund" } });
+                """,
+            new {
+                input = new {
+                    paymentId = payment.Id, amount = 150.00m,
+                    reason = "Test refund"
+                }
+            });
 
         response.Errors.Should().NotBeNullOrEmpty();
         response.Errors!.First().Message.Should().Contain("exceeds");
@@ -216,7 +240,8 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
         await SeedTransactionAsync(booking.Id);
         await SeedTransactionAsync(booking.Id);
 
-        var response = await Client.QueryAsync<TransactionsByBookingResponse>("""
+        var response = await Client.QueryAsync<TransactionsByBookingResponse>(
+            """
             query($bookingId: ID!) {
                 transactionsByBooking(bookingId: $bookingId) {
                     nodes {
@@ -244,7 +269,8 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
         var space = await SeedSpaceAsync(ownerProfile.Id);
         var booking = await SeedBookingAsync(campaign.Id, space.Id);
 
-        var response = await Client.QueryAsync<TransactionsByBookingResponse>("""
+        var response = await Client.QueryAsync<TransactionsByBookingResponse>(
+            """
             query($bookingId: ID!) {
                 transactionsByBooking(bookingId: $bookingId) {
                     nodes {
@@ -258,7 +284,8 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
         response.Errors.Should().NotBeNullOrEmpty();
     }
 
-    private async Task<Payment> SeedPaymentAsync(Guid bookingId, PaymentStatus status, decimal? amount = null) {
+    private async Task<Payment> SeedPaymentAsync(Guid bookingId,
+        PaymentStatus status, decimal? amount = null) {
         var payment = new Payment {
             Id = Guid.NewGuid(),
             BookingId = bookingId,
@@ -267,7 +294,9 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
             StripePaymentIntentId = $"pi_test_{Guid.NewGuid():N}",
             Status = status,
             PaidAt = status == PaymentStatus.Succeeded ? DateTime.UtcNow : null,
-            StripeChargeId = status == PaymentStatus.Succeeded ? $"ch_test_{Guid.NewGuid():N}" : null,
+            StripeChargeId = status == PaymentStatus.Succeeded
+                ? $"ch_test_{Guid.NewGuid():N}"
+                : null,
             CreatedAt = DateTime.UtcNow
         };
         using var scope = Fixture.Services.CreateScope();
@@ -277,7 +306,8 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
         return payment;
     }
 
-    private async Task<Payout> SeedPayoutAsync(Guid bookingId, Guid spaceOwnerProfileId, PayoutStage stage, PayoutStatus status) {
+    private async Task<Payout> SeedPayoutAsync(Guid bookingId,
+        Guid spaceOwnerProfileId, PayoutStage stage, PayoutStatus status) {
         var payout = new Payout {
             Id = Guid.NewGuid(),
             BookingId = bookingId,
@@ -285,8 +315,12 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture) :
             Stage = stage,
             Amount = 100m,
             Status = status,
-            ProcessedAt = status == PayoutStatus.Completed ? DateTime.UtcNow : null,
-            StripeTransferId = status == PayoutStatus.Completed ? $"tr_test_{Guid.NewGuid():N}" : null,
+            ProcessedAt = status == PayoutStatus.Completed
+                ? DateTime.UtcNow
+                : null,
+            StripeTransferId = status == PayoutStatus.Completed
+                ? $"tr_test_{Guid.NewGuid():N}"
+                : null,
             CreatedAt = DateTime.UtcNow
         };
         using var scope = Fixture.Services.CreateScope();

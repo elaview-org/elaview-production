@@ -2,7 +2,10 @@ namespace ElaviewBackend.Tests.Shared.Models;
 
 public record ReviewsResponse(ReviewsConnection Reviews);
 
-public record ReviewsConnection(List<ReviewNode> Nodes, PageInfo PageInfo, int TotalCount);
+public record ReviewsConnection(
+    List<ReviewNode> Nodes,
+    PageInfo PageInfo,
+    int TotalCount);
 
 public record ReviewNode(
     Guid Id,

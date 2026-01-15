@@ -10,20 +10,24 @@ public static partial class SpaceQueries {
     [UseProjection]
     public static IQueryable<Space> GetSpaceById(
         [ID] Guid id, ISpaceService spaceService
-    ) => spaceService.GetSpaceByIdQuery(id);
+    ) {
+        return spaceService.GetSpaceByIdQuery(id);
+    }
 
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Space> GetSpaces(ISpaceService spaceService)
-        => spaceService.GetSpacesExcludingCurrentUserQuery();
+    public static IQueryable<Space> GetSpaces(ISpaceService spaceService) {
+        return spaceService.GetSpacesExcludingCurrentUserQuery();
+    }
 
     [Authorize]
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Space> GetMySpaces(ISpaceService spaceService)
-        => spaceService.GetMySpacesQuery();
+    public static IQueryable<Space> GetMySpaces(ISpaceService spaceService) {
+        return spaceService.GetMySpacesQuery();
+    }
 }

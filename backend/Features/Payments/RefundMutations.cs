@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using ElaviewBackend.Data.Entities;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Payments;
@@ -14,5 +13,9 @@ public static partial class RefundMutations {
         string reason,
         IRefundService refundService,
         CancellationToken ct
-    ) => new(await refundService.RequestRefundAsync(paymentId, amount, reason, ct));
+    ) {
+        return new RequestRefundPayload(
+            await refundService.RequestRefundAsync(paymentId, amount, reason,
+                ct));
+    }
 }

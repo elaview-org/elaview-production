@@ -5,17 +5,13 @@ namespace ElaviewBackend.Features.Users;
 
 [ExtendObjectType<User>]
 public static class UserExtensions {
-    [Authorize]
-    public static async Task<AdvertiserProfile?> GetAdvertiserProfile(
-        [Parent] User user, IUserService userService, CancellationToken ct
-    ) {
-        return await userService.GetAdvertiserProfileByUserIdAsync(user.Id, ct);
-    }
-
-    [Authorize]
-    public static async Task<SpaceOwnerProfile?> GetSpaceOwnerProfile(
-        [Parent] User user, IUserService userService, CancellationToken ct
-    ) {
-        return await userService.GetSpaceOwnerProfileByUserIdAsync(user.Id, ct);
-    }
+    // [Authorize]
+    // [BindMember(nameof(User.AdvertiserProfile))]
+    // public static AdvertiserProfile? GetAdvertiserProfile([Parent] User user)
+    //     => user.AdvertiserProfile;
+    //
+    // [Authorize]
+    // [BindMember(nameof(User.SpaceOwnerProfile))]
+    // public static SpaceOwnerProfile? GetSpaceOwnerProfile([Parent] User user)
+    //     => user.SpaceOwnerProfile;
 }

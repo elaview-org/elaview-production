@@ -61,7 +61,9 @@ public sealed class SpaceService(
     }
 
     public IQueryable<Space> GetByOwnerId(Guid ownerProfileId)
-        => context.Spaces.Where(s => s.SpaceOwnerProfileId == ownerProfileId);
+        => context.Spaces
+            .Where(s => s.SpaceOwnerProfileId == ownerProfileId)
+            .OrderByDescending(s => s.CreatedAt);
 
     public async Task<Space?> GetSpaceByIdAsync(Guid id, CancellationToken ct) {
         return await spaceRepository.GetByIdAsync(id, ct);

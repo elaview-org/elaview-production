@@ -3,6 +3,7 @@ using ElaviewBackend.Features.Auth;
 using ElaviewBackend.Features.Marketplace;
 using ElaviewBackend.Features.Notifications;
 using ElaviewBackend.Features.Payments;
+using ElaviewBackend.Features.Shared.Errors;
 using ElaviewBackend.Features.Users;
 using ElaviewBackend.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -24,10 +25,7 @@ public static class Services {
                     o => o.EnableRetryOnFailure());
 
                 if (builder.Environment.IsDevelopment())
-                    options.LogTo(Console.WriteLine,
-                            [DbLoggerCategory.Database.Command.Name],
-                            LogLevel.Information)
-                        .EnableSensitiveDataLogging();
+                    options.EnableSensitiveDataLogging();
             })
             .AddOpenApi()
             .AddScoped<AuthService>()
@@ -110,6 +108,7 @@ public static class Services {
             .AddFiltering()
             .AddSorting()
             .AddMutationConventions()
-            .AddInMemorySubscriptions();
+            .AddInMemorySubscriptions()
+            .AddErrorFilter<ErrorFilter>();
     }
 }

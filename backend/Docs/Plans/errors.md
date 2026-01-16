@@ -29,19 +29,20 @@ specific error types.
 ### Directory Structure
 
 ```
-Data/
-├── Exceptions/
-│   ├── DomainException.cs        # Base class
-│   ├── NotFoundException.cs
-│   ├── ForbiddenException.cs
-│   ├── InvalidStatusTransitionException.cs
-│   ├── ValidationException.cs
-│   ├── ConflictException.cs
-│   └── PaymentException.cs
-└── Errors/
-    ├── ErrorFilter.cs            # IErrorFilter implementation
-    └── ErrorCodes.cs             # Constants
+Features/
+└── Shared/
+    └── Errors/
+        ├── DomainException.cs
+        ├── NotFoundException.cs
+        ├── ForbiddenException.cs
+        ├── InvalidStatusTransitionException.cs
+        ├── ValidationException.cs
+        ├── ConflictException.cs
+        ├── PaymentException.cs
+        └── ErrorFilter.cs
 ```
+
+**Namespace**: `ElaviewBackend.Features.Shared.Errors`
 
 ---
 
@@ -651,7 +652,7 @@ exception creation or dictionary building required.
 
 ---
 
-**Last Updated**: 2026-01-14
+**Last Updated**: 2026-01-16
 
 Sources:
 

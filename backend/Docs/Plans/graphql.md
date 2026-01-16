@@ -33,22 +33,26 @@ Features/
 ### Layer Architecture
 
 ```
-GraphQL Resolver → Service → Repository → DataLoader → Database
+Resolver → Service → Repository → Database
+                 ↓
+            DataLoader (mutations only)
 ```
 
-| Layer      | Responsibility                                     | Returns                               |
-|------------|----------------------------------------------------|---------------------------------------|
-| Resolver   | Apply HotChocolate middleware, delegate to service | IQueryable or Task<T>                 |
-| Service    | Business logic, authorization, orchestration       | IQueryable (reads) or Task<T> (write) |
-| Repository | Data access, wraps DataLoaders for batching        | Task<T> or IQueryable<T>              |
-| DataLoader | Batch queries, prevent N+1 (internal)              | IReadOnlyDictionary or ILookup        |
+| Layer      | Responsibility                                  | Returns                                |
+|------------|-------------------------------------------------|----------------------------------------|
+| Resolver   | HotChocolate middleware, delegate to Service    | `IQueryable<T>` or `Task<T>`           |
+| Service    | Business logic, authorization, orchestration    | `IQueryable<T>` (reads), `Task<T>` (writes) |
+| Repository | Data access via `IQueryable`, DataLoaders       | `IQueryable<T>` or `Task<T>`           |
+| DataLoader | Batch fetching for mutation scenarios           | `IReadOnlyDictionary` or `ILookup`     |
 
 **Key Rules**:
 
 - Resolvers NEVER access Repository or AppDbContext directly
 - All data flows through Service
 - Interface + implementation live in same file (reduces file sprawl)
-- DataLoaders are internal to Repository layer
+- DataLoaders used only for fetching entities in mutations (not for query extensions)
+- Only `UserService` has `GetPrincipalId()` - other services receive IDs as parameters
+- "My*" queries handled via extensions on User's profile types (not top-level queries)
 
 ### Return Type Rules
 
@@ -57,7 +61,7 @@ GraphQL Resolver → Service → Repository → DataLoader → Database
 | Paginated/filtered queries | IQueryable<T>   | IQueryable<T>    | Preserves HotChocolate middleware |
 | Single entity by ID        | IQueryable<T>   | IQueryable<T>    | UseFirstOrDefault + UseProjection |
 | Mutations                  | Task<T>         | Task<T>          | Single entity after write         |
-| Extensions (1:1 relation)  | Task<T?>        | Task<T?>         | DataLoader via service            |
+| Extensions (1:1 relation)  | -               | T?               | [BindMember] + navigation prop    |
 | Extensions (1:N relation)  | IQueryable<T>   | IQueryable<T>    | Preserves pagination/filtering    |
 
 ### Service Layer Pattern
@@ -242,7 +246,7 @@ public static class SpaceExtensions {
 
 | Query          | Auth     | Pagination | Filtering | Sorting | Description                          |
 |----------------|----------|------------|-----------|---------|--------------------------------------|
-| `currentUser`  | Required | No         | No        | No      | Returns authenticated user's profile |
+| `me`           | Required | No         | No        | No      | Returns authenticated user's profile |
 | `userById(id)` | Admin    | No         | No        | No      | Get any user by ID                   |
 | `users`        | Admin    | Yes        | Yes       | Yes     | List all users with full filtering   |
 
@@ -261,18 +265,19 @@ public static class SpaceExtensions {
 [QueryType]
 public static partial class UserQueries {
     [Authorize]
+    [GraphQLName("me")]
     [UseFirstOrDefault]
     [UseProjection]
-    public static IQueryable<User> GetCurrentUser(IUserService userService)
-        => userService.GetCurrentUserQuery();
+    public static IQueryable<User> Me(IUserService userService)
+        => userService.GetCurrentUser();
 
     [Authorize(Roles = ["Admin"])]
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<User> GetUsers(IUserService userService)
-        => userService.GetUsersQuery();
+    public static IQueryable<User> Users(IUserService userService)
+        => userService.GetAll();
 }
 ```
 
@@ -280,7 +285,7 @@ public static partial class UserQueries {
 
 ```graphql
 query {
-  currentUser {
+  me {
     id
     email
     name
@@ -1386,40 +1391,46 @@ public async Task<Booking> ApproveAsync(Guid id, string? ownerNotes, Cancellatio
 
 ### Purpose
 
-Extensions add computed fields and resolve relationships through Services (which use DataLoaders internally via
-Repository), ensuring efficient batched queries while maintaining the service abstraction.
+Extensions add authorization to navigation properties and resolve computed fields through Services, optimizing for
+minimal database queries.
+
+### Query Optimization Patterns
+
+| Relationship | Pattern | DB Queries | Example |
+|--------------|---------|------------|---------|
+| 1:1 | `[BindMember]` + navigation property | 1 (projection) | User → Profile |
+| 1:N paginated | Explicit resolver + `IQueryable` | 2 (required) | Profile → Spaces |
+| 1:N non-paginated | `[BindMember]` + navigation property | 1 (projection) | - |
 
 ### Extension Points
 
-| Type              | Extended Fields                                             | Service Method                                                                    |
-|-------------------|-------------------------------------------------------------|-----------------------------------------------------------------------------------|
-| User              | advertiserProfile, spaceOwnerProfile                        | IUserService.GetAdvertiserProfileByUserIdAsync, GetSpaceOwnerProfileByUserIdAsync |
-| AdvertiserProfile | campaigns                                                   | IUserService.GetCampaignsByAdvertiserProfileIdQuery                               |
-| SpaceOwnerProfile | spaces, payouts                                             | IUserService.GetSpacesBySpaceOwnerProfileIdQuery, IPayoutService                  |
-| Space             | owner, bookings, reviews                                    | ISpaceService, IBookingService, IReviewService                                    |
-| Campaign          | bookings                                                    | ICampaignService.GetBookingsByCampaignIdQuery                                     |
-| Booking           | campaign, space, proof, dispute, payments, payouts, reviews | IBookingService (various methods)                                                 |
-| Payment           | refunds                                                     | IPaymentService.GetRefundsByPaymentIdQuery                                        |
-| Conversation      | participants, messages                                      | IMessagingService                                                                 |
+| Type              | Extended Fields                    | Pattern | Notes |
+|-------------------|------------------------------------|---------|-------|
+| User              | advertiserProfile, spaceOwnerProfile | BindMember | 1:1, projection |
+| AdvertiserProfile | campaigns, bookings                | IQueryable | 1:N, paginated |
+| SpaceOwnerProfile | spaces, payouts                    | IQueryable | 1:N, paginated |
+| Space             | bookings, reviews                  | IQueryable | 1:N, paginated |
+| Campaign          | bookings                           | IQueryable | 1:N, paginated |
+| Booking           | proof, dispute                     | BindMember | 1:1, projection |
 
-**Example - Extension with Service (1:1 relationship):**
+**Example - 1:1 Extension (projection through navigation):**
 
 ```csharp
 [ExtendObjectType<User>]
 public static class UserExtensions {
     [Authorize]
-    public static async Task<AdvertiserProfile?> GetAdvertiserProfile(
-        [Parent] User user, IUserService userService, CancellationToken ct
-    ) => await userService.GetAdvertiserProfileByUserIdAsync(user.Id, ct);
+    [BindMember(nameof(User.AdvertiserProfile))]
+    public static AdvertiserProfile? AdvertiserProfile([Parent] User user)
+        => user.AdvertiserProfile;
 
     [Authorize]
-    public static async Task<SpaceOwnerProfile?> GetSpaceOwnerProfile(
-        [Parent] User user, IUserService userService, CancellationToken ct
-    ) => await userService.GetSpaceOwnerProfileByUserIdAsync(user.Id, ct);
+    [BindMember(nameof(User.SpaceOwnerProfile))]
+    public static SpaceOwnerProfile? SpaceOwnerProfile([Parent] User user)
+        => user.SpaceOwnerProfile;
 }
 ```
 
-**Example - Extension with Service (1:N relationship with pagination):**
+**Example - 1:N Extension (paginated, separate query):**
 
 ```csharp
 [ExtendObjectType<SpaceOwnerProfile>]
@@ -1429,14 +1440,16 @@ public static class SpaceOwnerExtensions {
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Space> GetSpaces(
-        [Parent] SpaceOwnerProfile spaceOwner, IUserService userService
-    ) => userService.GetSpacesBySpaceOwnerProfileId(spaceOwner.Id);
+    public static IQueryable<Space> Spaces(
+        [Parent] SpaceOwnerProfile owner, ISpaceService service
+    ) => service.GetByOwnerId(owner.Id);
 }
 ```
 
-**Key Rule**: Extensions always use `[Parent]` entity's ID, never fetch "current user" implicitly. This ensures proper
-batching when resolving nested queries.
+**Key Rules**:
+- 1:1 relationships: Use `[BindMember]` + return navigation property (enables projection in parent query)
+- 1:N with pagination: Explicit resolver returning `IQueryable` from Service (separate query required)
+- Extensions never fetch "current user" - always use `[Parent]` entity's ID
 
 ---
 
@@ -1476,4 +1489,4 @@ public static class Startup {
 
 ---
 
-**Last Updated**: 2026-01-14
+**Last Updated**: 2026-01-16

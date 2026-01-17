@@ -12,17 +12,13 @@ import type { User } from "@/types/graphql.generated";
 import { Separator } from "@/components/separator";
 
 interface AccountSettingsFormProps {
-  user: NonNullable<Query["currentUser"]>;
+  user: User;
 }
 
-type Query = {
-  currentUser: User | null;
-};
-
 export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
-  const formatDate = (dateString: string | null | undefined) => {
+  const formatDate = (dateString: string | null | undefined | unknown) => {
     if (!dateString) return "Never";
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString as string).toLocaleDateString("en-US", {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -69,8 +65,8 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
         <Field>
           <FieldLabel>Change Password</FieldLabel>
           <FieldDescription>
-            Update your password to keep your account secure. Make sure it's at
-            least 8 characters long.
+            Update your password to keep your account secure. Make sure
+            it&apos;s at least 8 characters long.
           </FieldDescription>
           <div className="mt-4 space-y-4">
             <Field>

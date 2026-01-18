@@ -1,4 +1,5 @@
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Marketplace;
@@ -9,25 +10,26 @@ public static partial class SpaceQueries {
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<Space> GetSpaceById(
-        [ID] Guid id, ISpaceService spaceService
-    ) {
-        return spaceService.GetSpaceByIdQuery(id);
-    }
+        [ID] Guid id,
+        ISpaceService spaceService
+    ) => spaceService.GetById(id);
 
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Space> GetSpaces(ISpaceService spaceService) {
-        return spaceService.GetSpacesExcludingCurrentUserQuery();
-    }
+    public static IQueryable<Space> GetSpaces(
+        IUserService userService,
+        ISpaceService spaceService
+    ) => spaceService.GetAllExcludingUser(userService.GetPrincipalIdOrNull());
 
     [Authorize]
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Space> GetMySpaces(ISpaceService spaceService) {
-        return spaceService.GetMySpacesQuery();
-    }
+    public static IQueryable<Space> GetMySpaces(
+        IUserService userService,
+        ISpaceService spaceService
+    ) => spaceService.GetByUserId(userService.GetPrincipalId());
 }

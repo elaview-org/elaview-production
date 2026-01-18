@@ -5,12 +5,10 @@ using Microsoft.EntityFrameworkCore;
 namespace ElaviewBackend.Features.Payments;
 
 public interface IRefundRepository {
-    IQueryable<Refund> Query();
+    IQueryable<Refund> GetByPaymentId(Guid paymentId);
     Task<Refund?> GetByIdAsync(Guid id, CancellationToken ct);
-
-    Task<IReadOnlyList<Refund>> GetByPaymentIdAsync(Guid paymentId,
-        CancellationToken ct);
-
+    Task<IReadOnlyList<Refund>> GetByPaymentIdAsync(Guid paymentId, CancellationToken ct);
+    Task<decimal> GetSucceededRefundsSumByPaymentIdAsync(Guid paymentId, CancellationToken ct);
     Task<Refund> AddAsync(Refund refund, CancellationToken ct);
     Task SaveChangesAsync(CancellationToken ct);
 }
@@ -20,18 +18,19 @@ public sealed class RefundRepository(
     IRefundByIdDataLoader refundById,
     IRefundsByPaymentIdDataLoader refundsByPaymentId
 ) : IRefundRepository {
-    public IQueryable<Refund> Query() {
-        return context.Refunds;
-    }
+    public IQueryable<Refund> GetByPaymentId(Guid paymentId)
+        => context.Refunds.Where(r => r.PaymentId == paymentId);
 
-    public async Task<Refund?> GetByIdAsync(Guid id, CancellationToken ct) {
-        return await refundById.LoadAsync(id, ct);
-    }
+    public async Task<Refund?> GetByIdAsync(Guid id, CancellationToken ct)
+        => await refundById.LoadAsync(id, ct);
 
-    public async Task<IReadOnlyList<Refund>> GetByPaymentIdAsync(Guid paymentId,
-        CancellationToken ct) {
-        return await refundsByPaymentId.LoadAsync(paymentId, ct) ?? [];
-    }
+    public async Task<IReadOnlyList<Refund>> GetByPaymentIdAsync(Guid paymentId, CancellationToken ct)
+        => await refundsByPaymentId.LoadAsync(paymentId, ct) ?? [];
+
+    public async Task<decimal> GetSucceededRefundsSumByPaymentIdAsync(Guid paymentId, CancellationToken ct)
+        => await context.Refunds
+            .Where(r => r.PaymentId == paymentId && r.Status == RefundStatus.Succeeded)
+            .SumAsync(r => r.Amount, ct);
 
     public async Task<Refund> AddAsync(Refund refund, CancellationToken ct) {
         context.Refunds.Add(refund);
@@ -39,9 +38,8 @@ public sealed class RefundRepository(
         return refund;
     }
 
-    public async Task SaveChangesAsync(CancellationToken ct) {
-        await context.SaveChangesAsync(ct);
-    }
+    public async Task SaveChangesAsync(CancellationToken ct)
+        => await context.SaveChangesAsync(ct);
 }
 
 internal static class RefundDataLoaders {

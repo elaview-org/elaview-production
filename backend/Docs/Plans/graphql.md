@@ -14,11 +14,9 @@ Features/
 ├── Users/                       # Reference implementation
 │   ├── UserService.cs           # IUserService + UserService (same file)
 │   ├── UserRepository.cs        # IUserRepository + UserRepository (same file)
-│   ├── UserDataLoaders.cs       # Batch data loading
 │   ├── UserQueries.cs           # GraphQL queries
-│   ├── UserMutations.cs         # GraphQL mutations
-│   ├── UserInputs.cs            # Input types (records)
-│   └── *Extensions.cs           # Object type extensions
+│   ├── UserExtensions.cs        # Profile extensions (SpaceOwnerProfileExtensions, AdvertiserExtensions)
+│   └── *Mutations.cs            # GraphQL mutations (when needed)
 ├── Marketplace/
 │   ├── Spaces/
 │   ├── Campaigns/
@@ -34,25 +32,48 @@ Features/
 
 ```
 Resolver → Service → Repository → Database
-                 ↓
-            DataLoader (mutations only)
+                         ↓
+                    DataLoader (mutations only)
 ```
 
-| Layer      | Responsibility                                  | Returns                                |
-|------------|-------------------------------------------------|----------------------------------------|
-| Resolver   | HotChocolate middleware, delegate to Service    | `IQueryable<T>` or `Task<T>`           |
-| Service    | Business logic, authorization, orchestration    | `IQueryable<T>` (reads), `Task<T>` (writes) |
-| Repository | Data access via `IQueryable`, DataLoaders       | `IQueryable<T>` or `Task<T>`           |
-| DataLoader | Batch fetching for mutation scenarios           | `IReadOnlyDictionary` or `ILookup`     |
+| Layer      | Responsibility                                  | Returns                                    |
+|------------|-------------------------------------------------|--------------------------------------------|
+| Resolver   | HotChocolate middleware, delegate to Service    | `IQueryable<T>` or `Task<T>`               |
+| Service    | Business logic, authorization, orchestration    | `IQueryable<T>` (reads), `Task<T>` (writes)|
+| Repository | Data access via `IQueryable`, DataLoaders       | `IQueryable<T>` or `Task<T>`               |
+| DataLoader | Batch fetching for mutation scenarios           | `IReadOnlyDictionary` or `ILookup`         |
 
 **Key Rules**:
 
-- Resolvers NEVER access Repository or AppDbContext directly
-- All data flows through Service
+- **Resolvers**:
+  - NEVER access Repository or AppDbContext directly
+  - Resolvers are thin wrappers that delegate to services
+  - Resolvers select which services they need and call their methods
+  - For mutations: inject `IUserService` to get userId, pass it to domain service
+  - Extensions inject the service that owns the RETURNED type
+  - NEVER handle exceptions in resolvers - services throw domain exceptions
+
+- **Services**:
+  - NEVER inject `AppDbContext` - all data access through Repository only
+  - Only `IUserService` has `GetPrincipalId()` and `GetPrincipalIdOrNull()`
+  - Domain services receive `userId` as a parameter when authorization checks are needed
+  - Throw domain exceptions (`NotFoundException`, `ForbiddenException`, etc.) - NEVER `GraphQLException`
+  - Return `IQueryable<T>` for reads, `Task<T>` for writes
+  - Services do NOT duplicate `IHttpContextAccessor` logic
+
+- **Repositories**:
+  - Only layer that injects `AppDbContext`
+  - Provide `IQueryable<T>` for projection-based queries
+  - DataLoaders used only for fetching entities in mutations
+  - Never throw business exceptions (return null or empty)
+
+- **Principal Extraction**:
+  - Centralized in `IUserService.GetPrincipalId()` and `GetPrincipalIdOrNull()`
+  - Resolvers call `userService.GetPrincipalId()` and pass userId to domain services
+  - Domain services receive userId as a method parameter, not via IHttpContextAccessor
+  - "My*" queries handled via extensions on User's profile types (not top-level queries)
+
 - Interface + implementation live in same file (reduces file sprawl)
-- DataLoaders used only for fetching entities in mutations (not for query extensions)
-- Only `UserService` has `GetPrincipalId()` - other services receive IDs as parameters
-- "My*" queries handled via extensions on User's profile types (not top-level queries)
 
 ### Return Type Rules
 
@@ -66,65 +87,165 @@ Resolver → Service → Repository → Database
 
 ### Service Layer Pattern
 
-**Service Responsibilities:**
+**UserService Responsibilities (THE ONLY service with principal access):**
+
+- Extracts current user ID from `IHttpContextAccessor`
+- Provides `GetPrincipalId()` and `GetPrincipalIdOrNull()` methods
+- Returns user queries via repository
+
+**Domain Service Responsibilities:**
 
 - Business logic and validation
-- Database operations via Repository (not direct AppDbContext)
+- Database operations via Repository only (NEVER inject AppDbContext)
+- Receives `userId` as a parameter when authorization checks are needed
+- Throws domain exceptions (`NotFoundException`, `ForbiddenException`, etc.) - NEVER `GraphQLException`
 - Cross-cutting concerns (notifications, payments)
-- Authorization checks beyond role-based auth
 
 **Repository Responsibilities:**
 
+- Only layer that injects `AppDbContext`
 - Wraps DataLoaders for batched fetching
 - Provides IQueryable for filtered/paginated queries
 - CRUD operations via AppDbContext
+- Never throws business exceptions (return null or empty)
 
 **Resolver Responsibilities:**
 
 - Thin wrappers that delegate to services
+- For mutations: inject `IUserService` to get userId, pass it to domain service
+- Declare `[Error<T>]` attributes for each domain exception the service might throw
 - HotChocolate middleware application (Authorize, Paging, Filtering, etc.)
 - NEVER access Repository or AppDbContext directly
+- NEVER handle exceptions - let services throw domain exceptions
 
-**Example - Service Interface + Implementation (same file):**
+**Example - UserService (owns principal extraction):**
+
+```csharp
+public interface IUserService {
+    Guid GetPrincipalId();
+    Guid? GetPrincipalIdOrNull();
+    IQueryable<User> GetCurrentUser();
+}
+
+public sealed class UserService(
+    IUserRepository repository,
+    IHttpContextAccessor httpContextAccessor
+) : IUserService {
+    public Guid GetPrincipalId()
+        => GetPrincipalIdOrNull()
+           ?? throw new ForbiddenException("access this resource");
+
+    public Guid? GetPrincipalIdOrNull()
+        => httpContextAccessor.HttpContext?.User
+            .FindFirstValue(ClaimTypes.NameIdentifier) is { } id
+            ? Guid.Parse(id) : null;
+
+    public IQueryable<User> GetCurrentUser()
+        => repository.GetById(GetPrincipalId());
+}
+```
+
+**Example - Domain Service (receives userId as parameter, NO AppDbContext):**
 
 ```csharp
 public interface ISpaceService {
-    IQueryable<Space> GetSpacesQuery();
-    IQueryable<Space> GetSpaceByIdQuery(Guid id);
-    Task<Space> CreateAsync(CreateSpaceInput input, CancellationToken ct);
-    Task<Space> UpdateAsync(Guid id, UpdateSpaceInput input, CancellationToken ct);
-    Task<bool> DeleteAsync(Guid id, CancellationToken ct);
+    IQueryable<Space> GetAll();
+    IQueryable<Space> GetById(Guid id);
+    IQueryable<Space> GetByOwnerId(Guid ownerProfileId);
+    Task<Space> CreateAsync(Guid userId, CreateSpaceInput input, CancellationToken ct);
+    Task<Space> UpdateAsync(Guid userId, Guid id, UpdateSpaceInput input, CancellationToken ct);
+    Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct);
 }
 
-public sealed class SpaceService(
-    ISpaceRepository repository,
-    IHttpContextAccessor httpContextAccessor
-) : ISpaceService {
-    public IQueryable<Space> GetSpacesQuery() => repository.Query();
-    public IQueryable<Space> GetSpaceByIdQuery(Guid id)
-        => repository.Query().Where(s => s.Id == id);
+public sealed class SpaceService(ISpaceRepository repository) : ISpaceService {
+    public IQueryable<Space> GetAll()
+        => repository.GetAll();
 
-    public async Task<Space> CreateAsync(CreateSpaceInput input, CancellationToken ct) {
-        var space = new Space { Title = input.Title /* ... */ };
+    public IQueryable<Space> GetById(Guid id)
+        => repository.GetById(id);
+
+    public async Task<Space> CreateAsync(
+        Guid userId, CreateSpaceInput input, CancellationToken ct
+    ) {
+        var profile = await repository.GetSpaceOwnerProfileByUserIdAsync(userId, ct)
+            ?? throw new NotFoundException("SpaceOwnerProfile", userId);
+
+        var space = new Space {
+            SpaceOwnerProfileId = profile.Id,
+            Title = input.Title,
+            ...
+        };
+
         return await repository.AddAsync(space, ct);
+    }
+
+    public async Task<Space> UpdateAsync(
+        Guid userId, Guid id, UpdateSpaceInput input, CancellationToken ct
+    ) {
+        var space = await repository.GetByIdAsync(id, ct)
+            ?? throw new NotFoundException("Space", id);
+
+        if (space.SpaceOwnerProfile.UserId != userId)
+            throw new ForbiddenException("update this space");
+
+        return await repository.UpdateAsync(space, input, ct);
     }
 }
 ```
 
-**Example - Repository Interface + Implementation (same file):**
+**Example - Mutation Resolver (passes userId from UserService to domain service):**
+
+```csharp
+[MutationType]
+public static class SpaceMutations {
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
+    public static async Task<Space> CreateSpace(
+        CreateSpaceInput input,
+        IUserService userService,
+        ISpaceService spaceService,
+        CancellationToken ct
+    ) => await spaceService.CreateAsync(userService.GetPrincipalId(), input, ct);
+
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
+    public static async Task<Space> UpdateSpace(
+        [ID] Guid id,
+        UpdateSpaceInput input,
+        IUserService userService,
+        ISpaceService spaceService,
+        CancellationToken ct
+    ) => await spaceService.UpdateAsync(userService.GetPrincipalId(), id, input, ct);
+}
+```
+
+**Example - Repository (only layer with AppDbContext):**
 
 ```csharp
 public interface ISpaceRepository {
-    IQueryable<Space> Query();
+    IQueryable<Space> GetAll();
+    IQueryable<Space> GetById(Guid id);
+    IQueryable<Space> GetByOwnerId(Guid ownerProfileId);
     Task<Space?> GetByIdAsync(Guid id, CancellationToken ct);
+    Task<SpaceOwnerProfile?> GetSpaceOwnerProfileByUserIdAsync(Guid userId, CancellationToken ct);
     Task<Space> AddAsync(Space space, CancellationToken ct);
+    Task<Space> UpdateAsync(Space space, UpdateSpaceInput input, CancellationToken ct);
 }
 
 public sealed class SpaceRepository(
     AppDbContext context,
     ISpaceByIdDataLoader spaceByIdLoader
 ) : ISpaceRepository {
-    public IQueryable<Space> Query() => context.Spaces;
+    public IQueryable<Space> GetAll()
+        => context.Spaces;
+
+    public IQueryable<Space> GetById(Guid id)
+        => context.Spaces.Where(s => s.Id == id);
+
+    public IQueryable<Space> GetByOwnerId(Guid ownerProfileId)
+        => context.Spaces.Where(s => s.SpaceOwnerProfileId == ownerProfileId);
 
     public async Task<Space?> GetByIdAsync(Guid id, CancellationToken ct)
         => await spaceByIdLoader.LoadAsync(id, ct);
@@ -137,9 +258,13 @@ public sealed class SpaceRepository(
 }
 ```
 
+**Key Rule**: Repositories NEVER expose a raw `Query()` method. Instead, provide specific filtered IQueryable methods like `GetById()`, `GetByOwnerId()`, etc. This maintains encapsulation and prevents services from building arbitrary queries.
+
 **Example - DI Registration:**
 
 ```csharp
+services.AddScoped<IUserRepository, UserRepository>();
+services.AddScoped<IUserService, UserService>();
 services.AddScoped<ISpaceRepository, SpaceRepository>();
 services.AddScoped<ISpaceService, SpaceService>();
 services.AddScoped<IBookingRepository, BookingRepository>();
@@ -244,42 +369,9 @@ public static class SpaceExtensions {
 
 ### Users Feature
 
-| Query          | Auth     | Pagination | Filtering | Sorting | Description                          |
-|----------------|----------|------------|-----------|---------|--------------------------------------|
-| `me`           | Required | No         | No        | No      | Returns authenticated user's profile |
-| `userById(id)` | Admin    | No         | No        | No      | Get any user by ID                   |
-| `users`        | Admin    | Yes        | Yes       | Yes     | List all users with full filtering   |
-
-**Filters for `users`:**
-
-- email (contains, equals)
-- name (contains, equals)
-- role (equals, in)
-- status (equals, in)
-- createdAt (range)
-- lastLoginAt (range)
-
-**Example - Query (delegates to Service):**
-
-```csharp
-[QueryType]
-public static partial class UserQueries {
-    [Authorize]
-    [GraphQLName("me")]
-    [UseFirstOrDefault]
-    [UseProjection]
-    public static IQueryable<User> Me(IUserService userService)
-        => userService.GetCurrentUser();
-
-    [Authorize(Roles = ["Admin"])]
-    [UsePaging]
-    [UseProjection]
-    [UseFiltering]
-    [UseSorting]
-    public static IQueryable<User> Users(IUserService userService)
-        => userService.GetAll();
-}
-```
+| Query | Auth     | Pagination | Filtering | Sorting | Status | File |
+|-------|----------|------------|-----------|---------|--------|------|
+| `me`  | Required | No         | No        | No      | ✅ Implemented | UserQueries.cs |
 
 **Example - GraphQL Usage:**
 
@@ -291,18 +383,11 @@ query {
     name
     advertiserProfile {
       companyName
+      campaigns { nodes { name } }
     }
-  }
-}
-
-query {
-  users(first: 10, where: { role: { eq: USER } }, order: { createdAt: DESC }) {
-    nodes {
-      id
-      email
-    }
-    pageInfo {
-      hasNextPage
+    spaceOwnerProfile {
+      businessName
+      spaces { nodes { title } }
     }
   }
 }
@@ -310,104 +395,37 @@ query {
 
 ### Spaces Feature
 
-| Query                    | Auth     | Pagination | Filtering | Sorting | Description                            |
-|--------------------------|----------|------------|-----------|---------|----------------------------------------|
-| `spaceById(id)`          | Required | No         | No        | No      | Get space details                      |
-| `spaces`                 | Optional | Yes        | Yes       | Yes     | Browse available spaces (excludes own) |
-| `spacesInBounds(bounds)` | Optional | Yes        | Yes       | No      | Spaces within geographic rectangle     |
-| `mySpaces`               | Required | Yes        | Yes       | Yes     | Space owner's listings                 |
+| Query              | Auth     | Pagination | Filtering | Sorting | Status | File |
+|--------------------|----------|------------|-----------|---------|--------|------|
+| `spaceById(id)`    | Required | No         | No        | No      | ✅ Implemented | SpaceQueries.cs |
+| `spaces`           | None     | Yes        | Yes       | Yes     | ✅ Implemented | SpaceQueries.cs |
+| `mySpaces`         | Required | Yes        | Yes       | Yes     | ✅ Implemented | SpaceQueries.cs |
 
-**Filters for `spaces`:**
-
-- type (equals, in)
-- status (equals, in)
-- city (equals, contains)
-- state (equals)
-- pricePerDay (range)
-- minDuration (range)
-- availableFrom (range)
-- availableTo (range)
-- averageRating (range)
-
-**Geographic Query `spacesInBounds`:**
-
-- Input: `{ northEast: { latitude, longitude }, southWest: { latitude, longitude } }`
-- Returns spaces where coordinates fall within bounding box
-- Used for map-based discovery
-
-**Example - Query with Geographic Filter:**
-
-```csharp
-[UsePaging]
-[UseProjection]
-[UseFiltering]
-public static IQueryable<Space> GetSpacesInBounds(
-    GeoBoundsInput bounds,
-    AppDbContext context,
-    UserService userService
-) {
-    var query = context.Spaces
-        .Where(s => s.Status == SpaceStatus.Active)
-        .Where(s => s.Latitude >= bounds.SouthWest.Latitude)
-        .Where(s => s.Latitude <= bounds.NorthEast.Latitude)
-        .Where(s => s.Longitude >= bounds.SouthWest.Longitude)
-        .Where(s => s.Longitude <= bounds.NorthEast.Longitude);
-
-    if (userService.PrincipalId() is { } userId)
-        query = query.Where(s => s.SpaceOwnerProfile.UserId.ToString() != userId);
-
-    return query;
-}
-```
+**Note:** `spaces` excludes current user's own spaces (via `GetSpacesExcludingCurrentUserQuery`).
 
 **Example - GraphQL Usage:**
 
 ```graphql
 query {
-  spaces(
-    first: 20
-    where: { type: { eq: STOREFRONT }, pricePerDay: { lte: 50 } }
-    order: { averageRating: DESC }
-  ) {
-    nodes {
-      id
-      title
-      pricePerDay
-      averageRating
-    }
+  spaces(first: 20, where: { type: { eq: STOREFRONT } }, order: { createdAt: DESC }) {
+    nodes { id title pricePerDay }
+    pageInfo { hasNextPage }
   }
 }
 
 query {
-  spacesInBounds(
-    bounds: {
-      northEast: { latitude: 34.1, longitude: -117.8 }
-      southWest: { latitude: 33.7, longitude: -118.4 }
-    }
-  ) {
-    nodes {
-      id
-      latitude
-      longitude
-    }
+  mySpaces(first: 10) {
+    nodes { id title status }
   }
 }
 ```
 
 ### Campaigns Feature
 
-| Query              | Auth     | Pagination | Filtering | Sorting | Description             |
-|--------------------|----------|------------|-----------|---------|-------------------------|
-| `campaignById(id)` | Required | No         | No        | No      | Get campaign (own only) |
-| `myCampaigns`      | Required | Yes        | Yes       | Yes     | Advertiser's campaigns  |
-
-**Filters for `myCampaigns`:**
-
-- status (equals, in)
-- name (contains)
-- createdAt (range)
-- startDate (range)
-- endDate (range)
+| Query              | Auth     | Pagination | Filtering | Sorting | Status | File |
+|--------------------|----------|------------|-----------|---------|--------|------|
+| `campaignById(id)` | Required | No         | No        | No      | ✅ Implemented | CampaignQueries.cs |
+| `myCampaigns`      | Required | Yes        | Yes       | Yes     | ✅ Implemented | CampaignQueries.cs |
 
 **Example - GraphQL Usage:**
 
@@ -418,9 +436,7 @@ query {
       id
       name
       status
-      bookings {
-        totalCount
-      }
+      bookings { totalCount }
     }
   }
 }
@@ -428,64 +444,24 @@ query {
 
 ### Bookings Feature
 
-| Query                     | Auth     | Pagination | Filtering | Sorting | Description                  |
-|---------------------------|----------|------------|-----------|---------|------------------------------|
-| `bookingById(id)`         | Required | No         | No        | No      | Get booking (own only)       |
-| `myBookingsAsAdvertiser`  | Required | Yes        | Yes       | Yes     | Bookings via owned campaigns |
-| `myBookingsAsOwner`       | Required | Yes        | Yes       | Yes     | Bookings on owned spaces     |
-| `incomingBookingRequests` | Required | Yes        | No        | Yes     | Pending approval requests    |
-| `bookingsRequiringAction` | Required | Yes        | No        | No      | Bookings needing user action |
-
-**Filters for booking queries:**
-
-- status (equals, in)
-- startDate (range)
-- endDate (range)
-- createdAt (range)
-- totalAmount (range)
-
-**`bookingsRequiringAction` logic:**
-
-- For Advertisers: Bookings with status `Verified` (need proof review)
-- For Space Owners: Bookings with status `PendingApproval`, `Paid`, `FileDownloaded`, or `Installed`
-
-**Example - Query Implementation:**
-
-```csharp
-[Authorize]
-[UsePaging]
-[UseProjection]
-public static IQueryable<Booking> GetBookingsRequiringAction(
-    AppDbContext context,
-    UserService userService
-) {
-    var userId = userService.PrincipalId();
-    return context.Bookings.Where(b =>
-        (b.Campaign.AdvertiserProfile.UserId.ToString() == userId &&
-         b.Status == BookingStatus.Verified) ||
-        (b.Space.SpaceOwnerProfile.UserId.ToString() == userId &&
-         (b.Status == BookingStatus.PendingApproval ||
-          b.Status == BookingStatus.Paid ||
-          b.Status == BookingStatus.FileDownloaded ||
-          b.Status == BookingStatus.Installed)));
-}
-```
+| Query                     | Auth     | Pagination | Filtering | Sorting | Status | File |
+|---------------------------|----------|------------|-----------|---------|--------|------|
+| `bookingById(id)`         | Required | No         | No        | No      | ✅ Implemented | BookingQueries.cs |
+| `myBookingsAsAdvertiser`  | Required | Yes        | Yes       | Yes     | ✅ Implemented | BookingQueries.cs |
+| `myBookingsAsOwner`       | Required | Yes        | Yes       | Yes     | ✅ Implemented | BookingQueries.cs |
+| `incomingBookingRequests` | Required | Yes        | No        | Yes     | ✅ Implemented | BookingQueries.cs |
+| `bookingsRequiringAction` | Required | Yes        | No        | No      | ✅ Implemented | BookingQueries.cs |
 
 **Example - GraphQL Usage:**
 
 ```graphql
 query {
-  myBookingsAsAdvertiser(
-    where: { status: { in: [PAID, VERIFIED] } }
-    order: { startDate: ASC }
-  ) {
+  myBookingsAsAdvertiser(where: { status: { in: [PAID, VERIFIED] } }, order: { startDate: ASC }) {
     nodes {
       id
       status
       totalAmount
-      space {
-        title
-      }
+      space { title }
     }
   }
 }
@@ -493,28 +469,14 @@ query {
 
 ### Payments Feature
 
-| Query                              | Auth     | Pagination | Filtering | Sorting | Description                     |
-|------------------------------------|----------|------------|-----------|---------|---------------------------------|
-| `paymentById(id)`                  | Required | No         | No        | No      | Get payment (own bookings only) |
-| `paymentsByBooking(bookingId)`     | Required | No         | No        | No      | All payments for a booking      |
-| `myPayouts`                        | Required | Yes        | Yes       | Yes     | Space owner's payout history    |
-| `earningsSummary`                  | Required | No         | No        | No      | Aggregated earnings data        |
-| `transactionsByBooking(bookingId)` | Admin    | No         | No        | No      | Transaction ledger for booking  |
-
-**`earningsSummary` returns:**
-
-- totalEarnings: Sum of completed payouts
-- pendingPayouts: Sum of pending/processing payouts
-- availableBalance: Available for withdrawal
-- thisMonthEarnings: Current month completed
-- lastMonthEarnings: Previous month completed
-
-**Filters for `myPayouts`:**
-
-- status (equals, in)
-- stage (equals)
-- processedAt (range)
-- amount (range)
+| Query                              | Auth     | Pagination | Filtering | Sorting | Status | File |
+|------------------------------------|----------|------------|-----------|---------|--------|------|
+| `paymentById(id)`                  | Required | No         | No        | No      | ✅ Implemented | PaymentQueries.cs |
+| `paymentsByBooking(bookingId)`     | Required | Yes        | Yes       | Yes     | ✅ Implemented | PaymentQueries.cs |
+| `myPayouts`                        | Required | Yes        | Yes       | Yes     | ✅ Implemented | PayoutQueries.cs |
+| `payoutById(id)`                   | Required | No         | No        | No      | ✅ Implemented | PayoutQueries.cs |
+| `earningsSummary`                  | Required | No         | No        | No      | ✅ Implemented | PayoutQueries.cs |
+| `transactionsByBooking(bookingId)` | Admin    | Yes        | Yes       | Yes     | ✅ Implemented | TransactionQueries.cs |
 
 **Example - GraphQL Usage:**
 
@@ -529,84 +491,57 @@ query {
 
 query {
   myPayouts(first: 10, order: { processedAt: DESC }) {
-    nodes {
-      id
-      amount
-      stage
-      status
-      booking {
-        space {
-          title
-        }
-      }
-    }
+    nodes { id amount stage status }
   }
 }
 ```
 
 ### Reviews Feature
 
-| Query                                      | Auth     | Pagination | Filtering | Sorting | Description                     |
-|--------------------------------------------|----------|------------|-----------|---------|---------------------------------|
-| `reviewsBySpace(spaceId)`                  | None     | Yes        | No        | Yes     | Public reviews for a space      |
-| `reviewByBooking(bookingId, reviewerType)` | Required | No         | No        | No      | Specific review for booking     |
-| `myReviews`                                | Required | Yes        | No        | Yes     | Reviews written by current user |
+| Query                                      | Auth     | Pagination | Filtering | Sorting | Status | File |
+|--------------------------------------------|----------|------------|-----------|---------|--------|------|
+| `reviewsBySpace(spaceId)`                  | None     | Yes        | No        | Yes     | ✅ Implemented | ReviewQueries.cs |
+| `reviewByBooking(bookingId, reviewerType)` | Required | No         | No        | No      | ✅ Implemented | ReviewQueries.cs |
+| `myReviews`                                | Required | Yes        | No        | Yes     | ✅ Implemented | ReviewQueries.cs |
 
 **Example - GraphQL Usage:**
 
 ```graphql
 query {
   reviewsBySpace(spaceId: "xxx", first: 5, order: { createdAt: DESC }) {
-    nodes {
-      rating
-      comment
-      createdAt
-    }
+    nodes { rating comment createdAt }
   }
 }
 ```
 
 ### Notifications Feature
 
-| Query                       | Auth     | Pagination | Filtering | Sorting | Description                   |
-|-----------------------------|----------|------------|-----------|---------|-------------------------------|
-| `myNotifications`           | Required | Yes        | Yes       | Yes     | User's notifications          |
-| `unreadNotificationCount`   | Required | No         | No        | No      | Count of unread notifications |
-| `myNotificationPreferences` | Required | No         | No        | No      | Notification settings         |
-
-**Filters for `myNotifications`:**
-
-- type (equals, in)
-- isRead (equals)
-- createdAt (range)
-- entityType (equals)
+| Query                        | Auth     | Pagination | Filtering | Sorting | Status | File |
+|------------------------------|----------|------------|-----------|---------|--------|------|
+| `myNotifications`            | Required | Yes        | Yes       | Yes     | ✅ Implemented | NotificationQueries.cs |
+| `notificationById(id)`       | Required | No         | No        | No      | ✅ Implemented | NotificationQueries.cs |
+| `unreadNotificationsCount`   | Required | No         | No        | No      | ✅ Implemented | NotificationQueries.cs |
+| `myNotificationPreferences`  | Required | No         | No        | No      | ✅ Implemented | NotificationQueries.cs |
 
 **Example - GraphQL Usage:**
 
 ```graphql
 query {
   myNotifications(where: { isRead: { eq: false } }, first: 10) {
-    nodes {
-      id
-      type
-      title
-      body
-      createdAt
-    }
+    nodes { id type title body createdAt }
   }
-  unreadNotificationCount
+  unreadNotificationsCount
 }
 ```
 
 ### Messaging Feature
 
-| Query                                    | Auth     | Pagination | Filtering | Sorting | Description                         |
-|------------------------------------------|----------|------------|-----------|---------|-------------------------------------|
-| `conversationById(id)`                   | Required | No         | No        | No      | Get conversation (participant only) |
-| `myConversations`                        | Required | Yes        | No        | Yes     | User's conversations                |
-| `conversationByBooking(bookingId)`       | Required | No         | No        | No      | Conversation for specific booking   |
-| `messagesByConversation(conversationId)` | Required | Yes        | No        | No      | Messages in conversation            |
-| `unreadMessageCount`                     | Required | No         | No        | No      | Total unread messages               |
+| Query                                    | Auth     | Pagination | Filtering | Sorting | Status | File |
+|------------------------------------------|----------|------------|-----------|---------|--------|------|
+| `conversationById(id)`                   | Required | No         | No        | No      | ✅ Implemented | ConversationQueries.cs |
+| `myConversations`                        | Required | Yes        | Yes       | Yes     | ✅ Implemented | ConversationQueries.cs |
+| `unreadConversationsCount`               | Required | No         | No        | No      | ✅ Implemented | ConversationQueries.cs |
+| `messagesByConversation(conversationId)` | Required | Yes        | Yes       | Yes     | ✅ Implemented | MessageQueries.cs |
 
 **Example - GraphQL Usage:**
 
@@ -616,16 +551,8 @@ query {
     nodes {
       id
       updatedAt
-      participants {
-        user {
-          name
-        }
-      }
-      messages(first: 1) {
-        nodes {
-          content
-        }
-      }
+      participants { user { name } }
+      messages(first: 1) { nodes { content } }
     }
   }
 }
@@ -637,129 +564,59 @@ query {
 
 ### Users Feature
 
-| Mutation                          | Auth     | Description                           | Side Effects               |
-|-----------------------------------|----------|---------------------------------------|----------------------------|
-| `updateCurrentUser(input)`        | Required | Update name, phone, avatar            | None                       |
-| `switchProfileType(type)`         | Required | Switch between Advertiser/SpaceOwner  | None                       |
-| `updateAdvertiserProfile(input)`  | Required | Update company info                   | None                       |
-| `updateSpaceOwnerProfile(input)`  | Required | Update business info, payout schedule | None                       |
-| `completeOnboarding(profileType)` | Required | Mark onboarding complete              | Creates profile if missing |
-| `deleteUser(id)`                  | Admin    | Soft delete user                      | Cascades to profiles       |
+| Mutation | Auth | Status | File |
+|----------|------|--------|------|
+| *(all commented out)* | - | ❌ Not implemented | UserMutations.cs |
 
-**Example - Mutation with Service:**
-
-```csharp
-[MutationType]
-public static partial class UserMutations {
-    [Authorize]
-    public static async Task<User> UpdateCurrentUser(
-        UpdateUserInput input,
-        IUserService userService,
-        CancellationToken ct
-    ) => await userService.UpdateAsync(input, ct);
-}
-```
-
-**Example - GraphQL Usage:**
-
-```graphql
-mutation {
-  updateCurrentUser(input: { name: "New Name", phone: "+1234567890" }) {
-    id
-    name
-    phone
-  }
-}
-
-mutation {
-  switchProfileType(type: SPACE_OWNER) {
-    id
-    activeProfileType
-  }
-}
-```
+**Planned mutations (from spec):**
+- `updateCurrentUser(input)` - Update name, phone, avatar
+- `switchProfileType(type)` - Switch between Advertiser/SpaceOwner
+- `updateAdvertiserProfile(input)` - Update company info
+- `updateSpaceOwnerProfile(input)` - Update business info, payout schedule
+- `completeOnboarding(profileType)` - Mark onboarding complete
+- `deleteUser(id)` - Admin: Soft delete user
 
 ### Spaces Feature
 
-| Mutation                   | Auth     | Description             | Side Effects                                              |
-|----------------------------|----------|-------------------------|-----------------------------------------------------------|
-| `createSpace(input)`       | Required | Create new listing      | Status: PendingApproval (if moderation enabled) or Active |
-| `updateSpace(id, input)`   | Required | Update own listing      | None                                                      |
-| `deleteSpace(id)`          | Required | Hard delete listing     | Fails if active bookings                                  |
-| `deactivateSpace(id)`      | Required | Soft delete (Inactive)  | None                                                      |
-| `reactivateSpace(id)`      | Required | Restore from Inactive   | Status: Active                                            |
-| `approveSpace(id)`         | Admin    | Approve pending listing | Status: Active, Notification to owner                     |
-| `rejectSpace(id, reason)`  | Admin    | Reject listing          | Status: Rejected, Notification to owner                   |
-| `suspendSpace(id, reason)` | Admin    | Suspend active listing  | Status: Suspended, Notification to owner                  |
+| Mutation                 | Auth     | Status | File |
+|--------------------------|----------|--------|------|
+| `createSpace(input)`     | Required | ✅ Implemented | SpaceMutations.cs |
+| `updateSpace(id, input)` | Required | ✅ Implemented | SpaceMutations.cs |
+| `deleteSpace(id)`        | Required | ✅ Implemented | SpaceMutations.cs |
+| `deactivateSpace(id)`    | Required | ✅ Implemented | SpaceMutations.cs |
+| `reactivateSpace(id)`    | Required | ✅ Implemented | SpaceMutations.cs |
 
-**Example - GraphQL Usage:**
-
-```graphql
-mutation {
-  createSpace(
-    input: {
-      title: "Downtown Window Display"
-      type: WINDOW_DISPLAY
-      address: "123 Main St"
-      city: "Los Angeles"
-      state: "CA"
-      latitude: 34.0522
-      longitude: -118.2437
-      pricePerDay: 25.00
-      minDuration: 7
-      images: ["https://..."]
-    }
-  ) {
-    id
-    title
-    status
-  }
-}
-```
+**Planned mutations (not yet implemented):**
+- `approveSpace(id)` - Admin: Approve pending listing
+- `rejectSpace(id, reason)` - Admin: Reject listing
+- `suspendSpace(id, reason)` - Admin: Suspend active listing
 
 ### Campaigns Feature
 
-| Mutation                    | Auth     | Description           | Side Effects                                     |
-|-----------------------------|----------|-----------------------|--------------------------------------------------|
-| `createCampaign(input)`     | Required | Create draft campaign | Status: Draft                                    |
-| `updateCampaign(id, input)` | Required | Update own campaign   | Only if Draft/Submitted                          |
-| `deleteCampaign(id)`        | Required | Delete campaign       | Only if no active bookings                       |
-| `submitCampaign(id)`        | Required | Submit for booking    | Status: Submitted                                |
-| `cancelCampaign(id)`        | Required | Cancel campaign       | Status: Cancelled, cascade booking cancellations |
-
-**Example - GraphQL Usage:**
-
-```graphql
-mutation {
-  createCampaign(
-    input: {
-      name: "Summer Sale 2026"
-      imageUrl: "https://cdn.example.com/creative.png"
-      targetAudience: "Local shoppers"
-      goals: "Drive foot traffic"
-    }
-  ) {
-    id
-    name
-    status
-  }
-}
-```
+| Mutation                    | Auth     | Status | File |
+|-----------------------------|----------|--------|------|
+| `createCampaign(input)`     | Required | ✅ Implemented | CampaignMutations.cs |
+| `updateCampaign(id, input)` | Required | ✅ Implemented | CampaignMutations.cs |
+| `deleteCampaign(id)`        | Required | ✅ Implemented | CampaignMutations.cs |
+| `submitCampaign(id)`        | Required | ✅ Implemented | CampaignMutations.cs |
+| `cancelCampaign(id)`        | Required | ✅ Implemented | CampaignMutations.cs |
 
 ### Bookings Feature
 
-| Mutation                           | Auth     | Description                | Side Effects                                            |
-|------------------------------------|----------|----------------------------|---------------------------------------------------------|
-| `createBooking(campaignId, input)` | Required | Request booking            | Status: PendingApproval, Notification to owner          |
-| `approveBooking(id, ownerNotes?)`  | Required | Accept request             | Status: Approved, Notification to advertiser            |
-| `rejectBooking(id, reason)`        | Required | Decline request            | Status: Rejected, Notification to advertiser            |
-| `cancelBooking(id, reason)`        | Required | Cancel booking             | Status: Cancelled, Refund if paid, Notifications        |
-| `markFileDownloaded(id)`           | Required | Owner downloaded creative  | Status: FileDownloaded, Stage 1 Payout triggered        |
-| `markInstalled(id)`                | Required | Owner installed ad         | Status: Installed                                       |
-| `submitProof(id, input)`           | Required | Upload verification photos | Status: Verified, 48hr auto-approve timer, Notification |
-| `approveProof(id)`                 | Required | Advertiser approves        | Status: Completed, Stage 2 Payout triggered             |
-| `disputeProof(id, input)`          | Required | Advertiser disputes        | Status: Disputed, Notification to owner + admin         |
-| `resolveDispute(id, input)`        | Admin    | Resolve dispute            | Status: Completed/Cancelled, Refund if applicable       |
+| Mutation                           | Auth     | Status | File |
+|------------------------------------|----------|--------|------|
+| `createBooking(campaignId, input)` | Required | ✅ Implemented | BookingMutations.cs |
+| `approveBooking(id, ownerNotes?)`  | Required | ✅ Implemented | BookingMutations.cs |
+| `rejectBooking(id, reason)`        | Required | ✅ Implemented | BookingMutations.cs |
+| `cancelBooking(id, reason)`        | Required | ✅ Implemented | BookingMutations.cs |
+| `markFileDownloaded(id)`           | Required | ✅ Implemented | BookingMutations.cs |
+| `markInstalled(id)`                | Required | ✅ Implemented | BookingMutations.cs |
+
+**Planned mutations (not yet implemented):**
+- `submitProof(id, input)` - Upload verification photos
+- `approveProof(id)` - Advertiser approves proof
+- `disputeProof(id, input)` - Advertiser disputes proof
+- `resolveDispute(id, input)` - Admin: Resolve dispute
 
 **Booking Status Transition Rules:**
 
@@ -838,15 +695,15 @@ mutation {
 
 ### Payments Feature
 
-| Mutation                                   | Auth     | Description                     | Side Effects                              |
-|--------------------------------------------|----------|---------------------------------|-------------------------------------------|
-| `createPaymentIntent(bookingId)`           | Required | Create Stripe PaymentIntent     | Returns clientSecret for frontend         |
-| `confirmPayment(paymentIntentId)`          | Required | Confirm after Stripe success    | Status: Paid, Transaction record          |
-| `requestRefund(paymentId, amount, reason)` | Admin    | Process refund                  | Refund record, Stripe refund, Transaction |
-| `processManualPayout(payoutId)`            | Admin    | Force payout processing         | Stripe transfer                           |
-| `retryPayout(payoutId)`                    | Admin    | Retry failed payout             | Reset attempt count, retry transfer       |
-| `connectStripeAccount`                     | Required | Start Stripe Connect onboarding | Returns onboarding URL                    |
-| `refreshStripeAccountStatus`               | Required | Check Stripe account health     | Updates profile status                    |
+| Mutation                                   | Auth     | Status | File |
+|--------------------------------------------|----------|--------|------|
+| `createPaymentIntent(bookingId)`           | Required | ✅ Implemented | PaymentMutations.cs |
+| `confirmPayment(paymentIntentId)`          | Required | ✅ Implemented | PaymentMutations.cs |
+| `requestRefund(paymentId, amount, reason)` | Admin    | ✅ Implemented | RefundMutations.cs |
+| `processPayout(bookingId, stage)`          | Admin    | ✅ Implemented | PayoutMutations.cs |
+| `retryPayout(payoutId)`                    | Admin    | ✅ Implemented | PayoutMutations.cs |
+| `connectStripeAccount`                     | Required | ✅ Implemented | StripeConnectMutations.cs |
+| `refreshStripeAccountStatus`               | Required | ✅ Implemented | StripeConnectMutations.cs |
 
 **Example - Payment Flow:**
 
@@ -872,11 +729,11 @@ mutation {
 
 ### Reviews Feature
 
-| Mutation                         | Auth     | Description   | Side Effects                                             |
-|----------------------------------|----------|---------------|----------------------------------------------------------|
-| `createReview(bookingId, input)` | Required | Create review | Only for Completed bookings, Updates space averageRating |
-| `updateReview(id, input)`        | Required | Edit review   | Within 24hr edit window                                  |
-| `deleteReview(id)`               | Admin    | Remove review | Recalculates space averageRating                         |
+| Mutation                         | Auth     | Status | File |
+|----------------------------------|----------|--------|------|
+| `createReview(bookingId, input)` | Required | ✅ Implemented | ReviewMutations.cs |
+| `updateReview(id, input)`        | Required | ✅ Implemented | ReviewMutations.cs |
+| `deleteReview(id)`               | Admin    | ✅ Implemented | ReviewMutations.cs |
 
 **Review Rules:**
 
@@ -902,14 +759,16 @@ mutation {
 
 ### Notifications Feature
 
-| Mutation                                    | Auth     | Description             | Side Effects           |
-|---------------------------------------------|----------|-------------------------|------------------------|
-| `markNotificationRead(id)`                  | Required | Mark single as read     | Updates isRead, readAt |
-| `markAllNotificationsRead`                  | Required | Mark all as read        | Returns count updated  |
-| `deleteNotification(id)`                    | Required | Delete notification     | Hard delete            |
-| `updateNotificationPreference(type, input)` | Required | Update channel settings | Creates if not exists  |
-| `registerDeviceToken(token, platform)`      | Required | Register for push       | Stores device token    |
-| `unregisterDeviceToken(token)`              | Required | Remove device           | Deletes token          |
+| Mutation                                    | Auth     | Status | File |
+|---------------------------------------------|----------|--------|------|
+| `markNotificationRead(id)`                  | Required | ✅ Implemented | NotificationMutations.cs |
+| `markAllNotificationsRead`                  | Required | ✅ Implemented | NotificationMutations.cs |
+| `deleteNotification(id)`                    | Required | ✅ Implemented | NotificationMutations.cs |
+| `updateNotificationPreference(type, input)` | Required | ✅ Implemented | NotificationMutations.cs |
+
+**Planned mutations (not yet implemented):**
+- `registerDeviceToken(token, platform)` - Register for push notifications
+- `unregisterDeviceToken(token)` - Remove device from push
 
 **Example - GraphQL Usage:**
 
@@ -932,11 +791,11 @@ mutation {
 
 ### Messaging Feature
 
-| Mutation                             | Auth     | Description                | Side Effects                                                       |
-|--------------------------------------|----------|----------------------------|--------------------------------------------------------------------|
-| `createConversation(bookingId)`      | Required | Get or create conversation | Creates participants if new                                        |
-| `sendMessage(conversationId, input)` | Required | Send message               | Updates conversation.updatedAt, Notification to other participants |
-| `markConversationRead(id)`           | Required | Update last read timestamp | Updates participant.lastReadAt                                     |
+| Mutation                                  | Auth     | Status | File |
+|-------------------------------------------|----------|--------|------|
+| `createBookingConversation(bookingId)`    | Required | ✅ Implemented | ConversationMutations.cs |
+| `sendMessage(conversationId, content, type?, attachments?)` | Required | ✅ Implemented | MessageMutations.cs |
+| `markConversationRead(id)`                | Required | ✅ Implemented | ConversationMutations.cs |
 
 **Example - GraphQL Usage:**
 
@@ -965,15 +824,17 @@ mutation {
 
 ### All Subscriptions
 
-| Subscription      | Parameters     | Payload      | Description                          |
-|-------------------|----------------|--------------|--------------------------------------|
-| `onNotification`  | userId         | Notification | New notification for user            |
-| `onMessage`       | conversationId | Message      | New message in conversation          |
-| `onBookingUpdate` | bookingId      | Booking      | Booking status changed               |
-| `onProofUpdate`   | bookingId      | BookingProof | Proof submitted/reviewed             |
-| `onPaymentUpdate` | paymentId      | Payment      | Payment status changed               |
-| `onPayoutUpdate`  | payoutId       | Payout       | Payout status changed                |
-| `onSpaceUpdate`   | spaceId        | Space        | Space status changed (admin actions) |
+| Subscription      | Parameters     | Payload      | Status | File |
+|-------------------|----------------|--------------|--------|------|
+| `onNotification`  | userId         | Notification | ✅ Implemented | NotificationSubscriptions.cs |
+| `onMessage`       | conversationId | Message      | ✅ Implemented | NotificationSubscriptions.cs |
+| `onBookingUpdate` | bookingId      | Booking      | ✅ Implemented | NotificationSubscriptions.cs |
+| `onProofUpdate`   | bookingId      | BookingProof | ✅ Implemented | NotificationSubscriptions.cs |
+
+**Planned subscriptions (not yet implemented):**
+- `onPaymentUpdate(paymentId)` - Payment status changed
+- `onPayoutUpdate(payoutId)` - Payout status changed
+- `onSpaceUpdate(spaceId)` - Space status changed (admin actions)
 
 ### Topic Naming Convention
 
@@ -1313,75 +1174,137 @@ public record DisputeProofInput(
 
 ## Error Handling
 
-### Error Codes
+### Domain Exceptions (Preferred)
 
-| Code                      | HTTP Equivalent | Description                                |
-|---------------------------|-----------------|--------------------------------------------|
-| NOT_FOUND                 | 404             | Entity does not exist                      |
-| UNAUTHORIZED              | 401             | Not authenticated                          |
-| FORBIDDEN                 | 403             | Not authorized for action                  |
-| VALIDATION_FAILED         | 400             | Input validation failed                    |
-| INVALID_STATUS_TRANSITION | 400             | Booking status transition not allowed      |
-| PAYMENT_FAILED            | 400             | Stripe payment error                       |
-| PAYOUT_FAILED             | 400             | Stripe transfer error                      |
-| CONFLICT                  | 409             | Resource conflict (e.g., duplicate review) |
+Services throw domain exceptions from `Features/Shared/Errors/`. These are converted to GraphQL errors by `ErrorFilter`.
 
-### Error Response Structure
+| Exception                          | Code                      | Description                           |
+|------------------------------------|---------------------------|---------------------------------------|
+| `NotFoundException`                | NOT_FOUND                 | Entity does not exist                 |
+| `ForbiddenException`               | FORBIDDEN                 | Not authorized for action             |
+| `ValidationException`              | VALIDATION_FAILED         | Input validation failed               |
+| `InvalidStatusTransitionException` | INVALID_STATUS_TRANSITION | Booking status transition not allowed |
+| `PaymentException`                 | PAYMENT_FAILED            | Stripe payment error                  |
+| `ConflictException`                | CONFLICT                  | Resource conflict                     |
 
-```json
-{
-  "errors": [
-    {
-      "message": "Booking with ID xxx not found",
-      "extensions": {
-        "code": "NOT_FOUND",
-        "entity": "Booking",
-        "id": "xxx"
-      }
-    }
-  ]
+### Domain Exception Classes
+
+```csharp
+public abstract class DomainException(string code, string message)
+    : Exception(message) {
+    public string Code { get; } = code;
+}
+
+public sealed class NotFoundException(string entityType, Guid entityId)
+    : DomainException("NOT_FOUND", $"{entityType} with ID {entityId} not found") {
+    public string EntityType { get; } = entityType;
+    public Guid EntityId { get; } = entityId;
+}
+
+public sealed class ForbiddenException(string action)
+    : DomainException("FORBIDDEN", $"Not authorized to {action}") {
+    public string Action { get; } = action;
+}
+
+public sealed class InvalidStatusTransitionException(string from, string to)
+    : DomainException("INVALID_STATUS_TRANSITION", $"Cannot transition from {from} to {to}") {
+    public string FromStatus { get; } = from;
+    public string ToStatus { get; } = to;
+}
+
+public sealed class ConflictException(string entityType, string reason)
+    : DomainException("CONFLICT", $"{entityType}: {reason}") {
+    public string EntityType { get; } = entityType;
+    public string Reason { get; } = reason;
 }
 ```
 
-**Example - Error Helper Class:**
+### Usage in Service (domain exceptions)
+
+Services throw domain exceptions - NEVER `GraphQLException`:
 
 ```csharp
-public static class GraphQLErrors {
-    public static GraphQLException NotFound(string entity, Guid id) =>
-        new($"{entity} with ID {id} not found",
-            new Dictionary<string, object?> {
-                ["code"] = "NOT_FOUND",
-                ["entity"] = entity,
-                ["id"] = id
-            });
+public async Task<Booking> ApproveAsync(
+    Guid userId, Guid id, string? ownerNotes, CancellationToken ct
+) {
+    var booking = await repository.GetByIdAsync(id, ct)
+        ?? throw new NotFoundException("Booking", id);
 
-    public static GraphQLException Unauthorized(string message = "Not authorized") =>
-        new(message, new Dictionary<string, object?> { ["code"] = "UNAUTHORIZED" });
-
-    public static GraphQLException InvalidStatusTransition(BookingStatus from, BookingStatus to) =>
-        new($"Cannot transition from {from} to {to}",
-            new Dictionary<string, object?> {
-                ["code"] = "INVALID_STATUS_TRANSITION",
-                ["from"] = from.ToString(),
-                ["to"] = to.ToString()
-            });
-}
-```
-
-**Example - Usage in Service:**
-
-```csharp
-public async Task<Booking> ApproveAsync(Guid id, string? ownerNotes, CancellationToken ct) {
-    var booking = await context.Bookings.FindAsync([id], ct)
-        ?? throw GraphQLErrors.NotFound("Booking", id);
+    var space = await spaceRepository.GetByIdAsync(booking.SpaceId, ct)!;
+    if (space.SpaceOwnerProfile.UserId != userId)
+        throw new ForbiddenException("approve this booking");
 
     if (booking.Status != BookingStatus.PendingApproval)
-        throw GraphQLErrors.InvalidStatusTransition(booking.Status, BookingStatus.Approved);
+        throw new InvalidStatusTransitionException(
+            booking.Status.ToString(),
+            BookingStatus.Approved.ToString());
 
     booking.Status = BookingStatus.Approved;
     booking.OwnerNotes = ownerNotes;
-    await context.SaveChangesAsync(ct);
-    return booking;
+    return await repository.UpdateAsync(booking, ct);
+}
+```
+
+### Mutation Resolver (declares errors)
+
+Mutation resolvers declare `[Error<T>]` attributes for each domain exception the service might throw:
+
+```csharp
+[MutationType]
+public static class BookingMutations {
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
+    [Error<InvalidStatusTransitionException>]
+    public static async Task<Booking> ApproveBooking(
+        [ID] Guid id,
+        string? ownerNotes,
+        IUserService userService,
+        IBookingService bookingService,
+        CancellationToken ct
+    ) => await bookingService.ApproveAsync(userService.GetPrincipalId(), id, ownerNotes, ct);
+}
+```
+
+### Generated GraphQL Schema
+
+HotChocolate generates typed error unions for mutations:
+
+```graphql
+type Mutation {
+  approveBooking(input: ApproveBookingInput!): ApproveBookingPayload!
+}
+
+type ApproveBookingPayload {
+  booking: Booking
+  errors: [ApproveBookingError!]
+}
+
+union ApproveBookingError = NotFoundError | ForbiddenError | InvalidStatusTransitionError
+```
+
+### Error Filter
+
+The `ErrorFilter` converts domain exceptions to GraphQL errors:
+
+```csharp
+public sealed class ErrorFilter(IWebHostEnvironment env) : IErrorFilter {
+    public IError OnError(IError error) {
+        if (error.Exception is DomainException domain)
+            return ErrorBuilder.FromError(error)
+                .SetMessage(domain.Message)
+                .SetCode(domain.Code)
+                .RemoveException()
+                .Build();
+
+        if (env.IsDevelopment()) return error;
+
+        return ErrorBuilder.FromError(error)
+            .SetMessage("An unexpected error occurred.")
+            .SetCode("INTERNAL_ERROR")
+            .RemoveException()
+            .Build();
+    }
 }
 ```
 
@@ -1394,13 +1317,116 @@ public async Task<Booking> ApproveAsync(Guid id, string? ownerNotes, Cancellatio
 Extensions add authorization to navigation properties and resolve computed fields through Services, optimizing for
 minimal database queries.
 
+### How `[UseProjection]` Works
+
+When a resolver returns `IQueryable<T>` with `[UseProjection]`, HotChocolate:
+
+1. Inspects the GraphQL selection set (requested fields)
+2. Generates an EF Core `.Select()` expression projecting only those fields
+3. Navigation properties in the selection become JOINs in a single query
+
+The repository returns plain `IQueryable` without `.Include()`:
+
+```csharp
+public IQueryable<User> GetUserById(Guid id)
+    => context.Users.Where(u => u.Id == id);
+```
+
 ### Query Optimization Patterns
 
 | Relationship | Pattern | DB Queries | Example |
 |--------------|---------|------------|---------|
-| 1:1 | `[BindMember]` + navigation property | 1 (projection) | User → Profile |
+| 1:1 | Navigation property + `[UseProjection]` | 1 (projection) | User → Profile |
+| 1:N unpaginated | Navigation property + `[UseProjection]` | 1 (projection) | Small collections |
 | 1:N paginated | Explicit resolver + `IQueryable` | 2 (required) | Profile → Spaces |
-| 1:N non-paginated | `[BindMember]` + navigation property | 1 (projection) | - |
+| 1:N paginated (optimized) | `ToBatchPageAsync` + DataLoader | 1 | Single-query nested pagination |
+
+### 1:1 Projection (Single Query via LEFT JOIN)
+
+For `User` → `AdvertiserProfile` / `SpaceOwnerProfile`, HotChocolate projects through navigation properties:
+
+```graphql
+query {
+  me {
+    name
+    advertiserProfile { companyName }
+    spaceOwnerProfile { businessName }
+  }
+}
+```
+
+Generated SQL (single query with LEFT JOINs):
+
+```sql
+SELECT u."Name", a."CompanyName", s."BusinessName"
+FROM users u
+LEFT JOIN advertiser_profiles a ON u."Id" = a."UserId"
+LEFT JOIN space_owner_profiles s ON u."Id" = s."UserId"
+WHERE u."Id" = @id
+LIMIT 1
+```
+
+No explicit extensions needed - `[UseProjection]` handles 1:1 navigation properties automatically.
+
+### 1:N Unpaginated (Single Query)
+
+Small collections without pagination work via LEFT JOIN:
+
+```graphql
+query {
+  me {
+    spaceOwnerProfile {
+      spaces { address city }
+    }
+  }
+}
+```
+
+EF Core fetches all items via LEFT JOIN, materializing into `ICollection<T>`.
+
+**Caveat:** If 1000 items exist, all 1000 are fetched. Use pagination for large collections.
+
+### 1:N Paginated (Two Queries - Standard Approach)
+
+Paginated collections require explicit resolvers returning `IQueryable<T>`:
+
+```csharp
+[ExtendObjectType<SpaceOwnerProfile>]
+public static class SpaceOwnerProfileExtensions {
+    [UsePaging]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public static IQueryable<Space> GetSpaces(
+        [Parent] SpaceOwnerProfile owner,
+        ISpaceService spaceService)
+        => spaceService.GetByOwnerId(owner.Id);
+}
+```
+
+This results in 2 queries: one for parent entity, one for paginated children.
+
+### 1:N Paginated Single Query (ToBatchPageAsync)
+
+HotChocolate 14+ supports single-query nested pagination via `ToBatchPageAsync`:
+
+```csharp
+[DataLoader]
+public static async Task<Dictionary<Guid, Page<Space>>> SpacesByOwnerIdAsync(
+    IReadOnlyList<Guid> ownerIds,
+    PagingArguments pagingArguments,
+    AppDbContext context,
+    CancellationToken ct)
+    => await context.Spaces
+        .AsNoTracking()
+        .Where(s => ownerIds.Contains(s.SpaceOwnerProfileId))
+        .OrderByDescending(s => s.CreatedAt).ThenBy(s => s.Id)
+        .ToBatchPageAsync(s => s.SpaceOwnerProfileId, pagingArguments, ct);
+```
+
+**Requirements:**
+- `GreenDonut.Data.EntityFramework` package
+- Stable ordering with unique key at end (`.ThenBy(s => s.Id)`)
 
 ### Extension Points
 
@@ -1434,21 +1460,21 @@ public static class UserExtensions {
 
 ```csharp
 [ExtendObjectType<SpaceOwnerProfile>]
-public static class SpaceOwnerExtensions {
-    [Authorize]
+public static class SpaceOwnerProfileExtensions {
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Space> Spaces(
-        [Parent] SpaceOwnerProfile owner, ISpaceService service
-    ) => service.GetByOwnerId(owner.Id);
+    public static IQueryable<Space> GetSpaces(
+        [Parent] SpaceOwnerProfile owner, ISpaceService spaceService
+    ) => spaceService.GetByOwnerId(owner.Id);
 }
 ```
 
 **Key Rules**:
 - 1:1 relationships: Use `[BindMember]` + return navigation property (enables projection in parent query)
 - 1:N with pagination: Explicit resolver returning `IQueryable` from Service (separate query required)
+- Extensions inject the service that owns the **returned type** (e.g., `ISpaceService` for `Space`, `ICampaignService` for `Campaign`)
 - Extensions never fetch "current user" - always use `[Parent]` entity's ID
 
 ---
@@ -1489,4 +1515,4 @@ public static class Startup {
 
 ---
 
-**Last Updated**: 2026-01-16
+**Last Updated**: 2026-01-18

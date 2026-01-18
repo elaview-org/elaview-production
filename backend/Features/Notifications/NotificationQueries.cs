@@ -1,11 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Notifications;
 
 [QueryType]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static partial class NotificationQueries {
     [Authorize]
     [UsePaging]
@@ -13,31 +12,21 @@ public static partial class NotificationQueries {
     [UseFiltering]
     [UseSorting]
     public static IQueryable<Notification> GetMyNotifications(
-        INotificationService notificationService) {
-        return notificationService.GetMyNotificationsQuery();
-    }
-
-    [Authorize]
-    [UseFirstOrDefault]
-    [UseProjection]
-    public static IQueryable<Notification> GetNotificationById(
-        [ID] Guid id, INotificationService notificationService
-    ) {
-        return notificationService.GetNotificationByIdQuery(id);
-    }
+        IUserService userService,
+        INotificationService notificationService
+    ) => notificationService.GetByUserId(userService.GetPrincipalId());
 
     [Authorize]
     public static async Task<int> GetUnreadNotificationsCount(
-        INotificationService notificationService, CancellationToken ct
-    ) {
-        return await notificationService.GetUnreadCountAsync(ct);
-    }
+        IUserService userService,
+        INotificationService notificationService,
+        CancellationToken ct
+    ) => await notificationService.GetUnreadCountAsync(userService.GetPrincipalId(), ct);
 
     [Authorize]
-    public static async Task<IReadOnlyList<NotificationPreference>>
-        GetMyNotificationPreferences(
-            INotificationService notificationService, CancellationToken ct
-        ) {
-        return await notificationService.GetMyPreferencesAsync(ct);
-    }
+    public static async Task<IReadOnlyList<NotificationPreference>> GetMyNotificationPreferences(
+        IUserService userService,
+        INotificationService notificationService,
+        CancellationToken ct
+    ) => await notificationService.GetPreferencesByUserIdAsync(userService.GetPrincipalId(), ct);
 }

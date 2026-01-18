@@ -1,3 +1,5 @@
+using ElaviewBackend.Features.Shared.Errors;
+using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Marketplace;
@@ -5,42 +7,68 @@ namespace ElaviewBackend.Features.Marketplace;
 [MutationType]
 public static partial class SpaceMutations {
     [Authorize]
+    [Error<NotFoundException>]
     public static async Task<CreateSpacePayload> CreateSpace(
-        CreateSpaceInput input, ISpaceService spaceService, CancellationToken ct
-    ) {
-        return new CreateSpacePayload(
-            await spaceService.CreateAsync(input, ct));
-    }
-
-    [Authorize]
-    public static async Task<UpdateSpacePayload> UpdateSpace(
-        [ID] Guid id, UpdateSpaceInput input, ISpaceService spaceService,
+        CreateSpaceInput input,
+        IUserService userService,
+        ISpaceService spaceService,
         CancellationToken ct
     ) {
-        return new UpdateSpacePayload(
-            await spaceService.UpdateAsync(id, input, ct));
+        var space = await spaceService.CreateAsync(userService.GetPrincipalId(), input, ct);
+        return new CreateSpacePayload(space);
     }
 
     [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
+    public static async Task<UpdateSpacePayload> UpdateSpace(
+        [ID] Guid id,
+        UpdateSpaceInput input,
+        IUserService userService,
+        ISpaceService spaceService,
+        CancellationToken ct
+    ) {
+        var space = await spaceService.UpdateAsync(userService.GetPrincipalId(), id, input, ct);
+        return new UpdateSpacePayload(space);
+    }
+
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
+    [Error<ConflictException>]
     public static async Task<DeleteSpacePayload> DeleteSpace(
-        [ID] Guid id, ISpaceService spaceService, CancellationToken ct
+        [ID] Guid id,
+        IUserService userService,
+        ISpaceService spaceService,
+        CancellationToken ct
     ) {
-        return new DeleteSpacePayload(await spaceService.DeleteAsync(id, ct));
+        var success = await spaceService.DeleteAsync(userService.GetPrincipalId(), id, ct);
+        return new DeleteSpacePayload(success);
     }
 
     [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
     public static async Task<DeactivateSpacePayload> DeactivateSpace(
-        [ID] Guid id, ISpaceService spaceService, CancellationToken ct
+        [ID] Guid id,
+        IUserService userService,
+        ISpaceService spaceService,
+        CancellationToken ct
     ) {
-        return new DeactivateSpacePayload(
-            await spaceService.DeactivateAsync(id, ct));
+        var space = await spaceService.DeactivateAsync(userService.GetPrincipalId(), id, ct);
+        return new DeactivateSpacePayload(space);
     }
 
     [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
     public static async Task<ReactivateSpacePayload> ReactivateSpace(
-        [ID] Guid id, ISpaceService spaceService, CancellationToken ct
+        [ID] Guid id,
+        IUserService userService,
+        ISpaceService spaceService,
+        CancellationToken ct
     ) {
-        return new ReactivateSpacePayload(
-            await spaceService.ReactivateAsync(id, ct));
+        var space = await spaceService.ReactivateAsync(userService.GetPrincipalId(), id, ct);
+        return new ReactivateSpacePayload(space);
     }
 }

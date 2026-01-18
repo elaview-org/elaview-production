@@ -1,11 +1,10 @@
-using System.Diagnostics.CodeAnalysis;
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Notifications;
 
 [QueryType]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static partial class ConversationQueries {
     [Authorize]
     [UsePaging]
@@ -13,23 +12,14 @@ public static partial class ConversationQueries {
     [UseFiltering]
     [UseSorting]
     public static IQueryable<Conversation> GetMyConversations(
-        IConversationService conversationService) {
-        return conversationService.GetMyConversationsQuery();
-    }
-
-    [Authorize]
-    [UseFirstOrDefault]
-    [UseProjection]
-    public static IQueryable<Conversation> GetConversationById(
-        [ID] Guid id, IConversationService conversationService
-    ) {
-        return conversationService.GetConversationByIdQuery(id);
-    }
+        IUserService userService,
+        IConversationService conversationService
+    ) => conversationService.GetByUserId(userService.GetPrincipalId());
 
     [Authorize]
     public static async Task<int> GetUnreadConversationsCount(
-        IConversationService conversationService, CancellationToken ct
-    ) {
-        return await conversationService.GetUnreadConversationsCountAsync(ct);
-    }
+        IUserService userService,
+        IConversationService conversationService,
+        CancellationToken ct
+    ) => await conversationService.GetUnreadCountAsync(userService.GetPrincipalId(), ct);
 }

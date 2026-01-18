@@ -1,6 +1,5 @@
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
-using Microsoft.EntityFrameworkCore;
+using ElaviewBackend.Features.Shared.Errors;
 using Stripe;
 using EntityRefund = ElaviewBackend.Data.Entities.Refund;
 using StripeRefundService = Stripe.RefundService;
@@ -8,46 +7,35 @@ using StripeRefundService = Stripe.RefundService;
 namespace ElaviewBackend.Features.Payments;
 
 public interface IRefundService {
-    IQueryable<EntityRefund> GetRefundsByPaymentIdQuery(Guid paymentId);
-
-    Task<IReadOnlyList<EntityRefund>> GetRefundsByPaymentIdAsync(Guid paymentId,
-        CancellationToken ct);
-
-    Task<EntityRefund> RequestRefundAsync(Guid paymentId, decimal amount,
-        string reason, CancellationToken ct);
+    IQueryable<EntityRefund> GetByPaymentId(Guid paymentId);
+    Task<IReadOnlyList<EntityRefund>> GetByPaymentIdAsync(Guid paymentId, CancellationToken ct);
+    Task<EntityRefund> RequestRefundAsync(Guid paymentId, decimal amount, string reason, CancellationToken ct);
 }
 
 public sealed class RefundService(
-    AppDbContext context,
     IPaymentRepository paymentRepository,
     IRefundRepository refundRepository,
     ITransactionRepository transactionRepository
 ) : IRefundService {
-    public IQueryable<EntityRefund> GetRefundsByPaymentIdQuery(Guid paymentId) {
-        return context.Refunds.Where(r => r.PaymentId == paymentId);
-    }
+    public IQueryable<EntityRefund> GetByPaymentId(Guid paymentId)
+        => refundRepository.GetByPaymentId(paymentId);
 
-    public async Task<IReadOnlyList<EntityRefund>> GetRefundsByPaymentIdAsync(
-        Guid paymentId, CancellationToken ct) {
-        return await refundRepository.GetByPaymentIdAsync(paymentId, ct);
-    }
+    public async Task<IReadOnlyList<EntityRefund>> GetByPaymentIdAsync(Guid paymentId, CancellationToken ct)
+        => await refundRepository.GetByPaymentIdAsync(paymentId, ct);
 
-    public async Task<EntityRefund> RequestRefundAsync(Guid paymentId,
-        decimal amount, string reason, CancellationToken ct) {
+    public async Task<EntityRefund> RequestRefundAsync(
+        Guid paymentId, decimal amount, string reason, CancellationToken ct
+    ) {
         var payment = await paymentRepository.GetByIdAsync(paymentId, ct)
-                      ?? throw new GraphQLException("Payment not found");
+            ?? throw new NotFoundException("Payment", paymentId);
 
         if (payment.Status != PaymentStatus.Succeeded)
-            throw new GraphQLException("Can only refund succeeded payments");
+            throw new InvalidStatusTransitionException(payment.Status.ToString(), "Refund");
 
-        var existingRefunds = await context.Refunds
-            .Where(r =>
-                r.PaymentId == paymentId && r.Status == RefundStatus.Succeeded)
-            .SumAsync(r => r.Amount, ct);
+        var existingRefundsSum = await refundRepository.GetSucceededRefundsSumByPaymentIdAsync(paymentId, ct);
 
-        if (existingRefunds + amount > payment.Amount)
-            throw new GraphQLException(
-                "Refund amount exceeds available amount");
+        if (existingRefundsSum + amount > payment.Amount)
+            throw new ValidationException("Amount", "Refund amount exceeds available amount");
 
         var options = new RefundCreateOptions {
             PaymentIntent = payment.StripePaymentIntentId,
@@ -55,9 +43,14 @@ public sealed class RefundService(
             Reason = RefundReasons.RequestedByCustomer
         };
 
-        var service = new StripeRefundService();
-        var stripeRefund =
-            await service.CreateAsync(options, cancellationToken: ct);
+        StripeRefundService service = new();
+        Stripe.Refund stripeRefund;
+        try {
+            stripeRefund = await service.CreateAsync(options, cancellationToken: ct);
+        }
+        catch (StripeException ex) {
+            throw new PaymentException("refund", ex.Message);
+        }
 
         var refund = new EntityRefund {
             PaymentId = paymentId,
@@ -65,12 +58,8 @@ public sealed class RefundService(
             Amount = amount,
             Reason = reason,
             StripeRefundId = stripeRefund.Id,
-            Status = stripeRefund.Status == "succeeded"
-                ? RefundStatus.Succeeded
-                : RefundStatus.Pending,
-            ProcessedAt = stripeRefund.Status == "succeeded"
-                ? DateTime.UtcNow
-                : null,
+            Status = stripeRefund.Status == "succeeded" ? RefundStatus.Succeeded : RefundStatus.Pending,
+            ProcessedAt = stripeRefund.Status == "succeeded" ? DateTime.UtcNow : null,
             CreatedAt = DateTime.UtcNow
         };
 
@@ -87,14 +76,12 @@ public sealed class RefundService(
                 CreatedAt = DateTime.UtcNow
             }, ct);
 
-            var totalRefunded = existingRefunds + amount;
-            var paymentEntry = context.Entry(payment);
-            paymentEntry.Property(p => p.Status).CurrentValue =
-                totalRefunded >= payment.Amount
-                    ? PaymentStatus.Refunded
-                    : PaymentStatus.PartiallyRefunded;
+            var totalRefunded = existingRefundsSum + amount;
+            var newStatus = totalRefunded >= payment.Amount
+                ? PaymentStatus.Refunded
+                : PaymentStatus.PartiallyRefunded;
 
-            await context.SaveChangesAsync(ct);
+            await paymentRepository.UpdateRefundStatusAsync(payment, newStatus, ct);
         }
 
         return refund;

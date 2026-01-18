@@ -1,35 +1,32 @@
-using System.Diagnostics.CodeAnalysis;
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Payments;
 
 [QueryType]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static partial class PayoutQueries {
     [Authorize]
     [UsePaging]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
-    public static IQueryable<Payout>
-        GetMyPayouts(IPayoutService payoutService) {
-        return payoutService.GetMyPayoutsQuery();
-    }
+    public static IQueryable<Payout> GetMyPayouts(
+        IUserService userService,
+        IPayoutService payoutService
+    ) => payoutService.GetByUserId(userService.GetPrincipalId());
 
     [Authorize]
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<Payout> GetPayoutById(
         [ID] Guid id, IPayoutService payoutService
-    ) {
-        return payoutService.GetPayoutByIdQuery(id);
-    }
+    ) => payoutService.GetById(id);
 
     [Authorize]
     public static async Task<EarningsSummary> GetEarningsSummary(
-        IPayoutService payoutService, CancellationToken ct
-    ) {
-        return await payoutService.GetEarningsSummaryAsync(ct);
-    }
+        IUserService userService,
+        IPayoutService payoutService,
+        CancellationToken ct
+    ) => await payoutService.GetEarningsSummaryAsync(userService.GetPrincipalId(), ct);
 }

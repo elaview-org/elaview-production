@@ -5,7 +5,8 @@ namespace ElaviewBackend.Features.Users;
 public record UpdateUserInput(
     string? Name,
     string? Phone,
-    string? Avatar
+    string? Avatar,
+    ProfileType? ActiveProfileType
 );
 
 public record UpdateAdvertiserProfileInput(

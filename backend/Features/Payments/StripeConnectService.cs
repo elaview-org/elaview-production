@@ -1,28 +1,18 @@
-using System.Security.Claims;
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
-using Microsoft.EntityFrameworkCore;
+using ElaviewBackend.Features.Shared.Errors;
 using Stripe;
 
 namespace ElaviewBackend.Features.Payments;
 
 public interface IStripeConnectService {
-    Task<StripeConnectResult> CreateConnectAccountAsync(CancellationToken ct);
-    Task<SpaceOwnerProfile> RefreshAccountStatusAsync(CancellationToken ct);
+    Task<StripeConnectResult> CreateConnectAccountAsync(Guid userId, CancellationToken ct);
+    Task<SpaceOwnerProfile> RefreshAccountStatusAsync(Guid userId, CancellationToken ct);
 }
 
-public sealed class StripeConnectService(
-    IHttpContextAccessor httpContextAccessor,
-    AppDbContext context
-) : IStripeConnectService {
-    public async Task<StripeConnectResult> CreateConnectAccountAsync(
-        CancellationToken ct) {
-        var userId = GetCurrentUserId();
-
-        var profile = await context.SpaceOwnerProfiles
-                          .FirstOrDefaultAsync(p => p.UserId == userId, ct)
-                      ?? throw new GraphQLException(
-                          "Space owner profile not found");
+public sealed class StripeConnectService(IStripeConnectRepository repository) : IStripeConnectService {
+    public async Task<StripeConnectResult> CreateConnectAccountAsync(Guid userId, CancellationToken ct) {
+        var profile = await repository.GetSpaceOwnerProfileByUserIdAsync(userId, ct)
+            ?? throw new NotFoundException("SpaceOwnerProfile", userId);
 
         if (!string.IsNullOrEmpty(profile.StripeAccountId)) {
             var linkOptions = new AccountLinkCreateOptions {
@@ -31,30 +21,35 @@ public sealed class StripeConnectService(
                 ReturnUrl = GetStripeReturnUrl(),
                 Type = "account_onboarding"
             };
-            var linkService = new AccountLinkService();
-            var existingLink =
-                await linkService.CreateAsync(linkOptions,
-                    cancellationToken: ct);
-            return new StripeConnectResult(profile.StripeAccountId,
-                existingLink.Url);
+            AccountLinkService linkService = new();
+            AccountLink existingLink;
+            try {
+                existingLink = await linkService.CreateAsync(linkOptions, cancellationToken: ct);
+            }
+            catch (StripeException ex) {
+                throw new PaymentException("account link", ex.Message);
+            }
+            return new StripeConnectResult(profile.StripeAccountId, existingLink.Url);
         }
 
         var options = new AccountCreateOptions {
             Type = "express",
             Country = "US",
             Capabilities = new AccountCapabilitiesOptions {
-                Transfers = new AccountCapabilitiesTransfersOptions
-                    { Requested = true }
+                Transfers = new AccountCapabilitiesTransfersOptions { Requested = true }
             }
         };
 
-        var accountService = new AccountService();
-        var account =
-            await accountService.CreateAsync(options, cancellationToken: ct);
+        AccountService accountService = new();
+        Account account;
+        try {
+            account = await accountService.CreateAsync(options, cancellationToken: ct);
+        }
+        catch (StripeException ex) {
+            throw new PaymentException("account creation", ex.Message);
+        }
 
-        var entry = context.Entry(profile);
-        entry.Property(p => p.StripeAccountId).CurrentValue = account.Id;
-        await context.SaveChangesAsync(ct);
+        await repository.UpdateStripeAccountIdAsync(profile, account.Id, ct);
 
         var accountLinkOptions = new AccountLinkCreateOptions {
             Account = account.Id,
@@ -63,64 +58,47 @@ public sealed class StripeConnectService(
             Type = "account_onboarding"
         };
 
-        var accountLinkService = new AccountLinkService();
-        var accountLink =
-            await accountLinkService.CreateAsync(accountLinkOptions,
-                cancellationToken: ct);
+        AccountLinkService accountLinkService = new();
+        AccountLink accountLink;
+        try {
+            accountLink = await accountLinkService.CreateAsync(accountLinkOptions, cancellationToken: ct);
+        }
+        catch (StripeException ex) {
+            throw new PaymentException("account link", ex.Message);
+        }
 
         return new StripeConnectResult(account.Id, accountLink.Url);
     }
 
-    public async Task<SpaceOwnerProfile> RefreshAccountStatusAsync(
-        CancellationToken ct) {
-        var userId = GetCurrentUserId();
-
-        var profile = await context.SpaceOwnerProfiles
-                          .FirstOrDefaultAsync(p => p.UserId == userId, ct)
-                      ?? throw new GraphQLException(
-                          "Space owner profile not found");
+    public async Task<SpaceOwnerProfile> RefreshAccountStatusAsync(Guid userId, CancellationToken ct) {
+        var profile = await repository.GetSpaceOwnerProfileByUserIdAsync(userId, ct)
+            ?? throw new NotFoundException("SpaceOwnerProfile", userId);
 
         if (string.IsNullOrEmpty(profile.StripeAccountId))
-            throw new GraphQLException("No Stripe account connected");
+            throw new ValidationException("StripeAccountId", "No Stripe account connected");
 
-        var service = new AccountService();
-        var account = await service.GetAsync(profile.StripeAccountId,
-            cancellationToken: ct);
+        AccountService service = new();
+        Account account;
+        try {
+            account = await service.GetAsync(profile.StripeAccountId, cancellationToken: ct);
+        }
+        catch (StripeException ex) {
+            throw new PaymentException("account status refresh", ex.Message);
+        }
 
-        var entry = context.Entry(profile);
-        entry.Property(p => p.StripeAccountStatus).CurrentValue =
-            account.ChargesEnabled ? "active" :
+        var status = account.ChargesEnabled ? "active" :
             account.DetailsSubmitted ? "pending" : "incomplete";
-        entry.Property(p => p.StripeLastAccountHealthCheck).CurrentValue =
-            DateTime.UtcNow;
 
-        await context.SaveChangesAsync(ct);
-        return profile;
+        return await repository.UpdateStripeAccountStatusAsync(profile, status, ct);
     }
 
-    private Guid GetCurrentUserId() {
-        var principalId = httpContextAccessor.HttpContext?.User.FindFirstValue(
-            ClaimTypes.NameIdentifier
-        );
-        return principalId is null
-            ? throw new GraphQLException("Not authenticated")
-            : Guid.Parse(principalId);
-    }
+    private static string GetStripeRefreshUrl()
+        => Environment.GetEnvironmentVariable("ELAVIEW_STRIPE_CONNECT_REFRESH_URL")
+           ?? "http://localhost:3000/settings/payments/refresh";
 
-    private static string GetStripeRefreshUrl() {
-        return Environment.GetEnvironmentVariable(
-                   "ELAVIEW_STRIPE_CONNECT_REFRESH_URL")
-               ?? "http://localhost:3000/settings/payments/refresh";
-    }
-
-    private static string GetStripeReturnUrl() {
-        return Environment.GetEnvironmentVariable(
-                   "ELAVIEW_STRIPE_CONNECT_RETURN_URL")
-               ?? "http://localhost:3000/settings/payments/complete";
-    }
+    private static string GetStripeReturnUrl()
+        => Environment.GetEnvironmentVariable("ELAVIEW_STRIPE_CONNECT_RETURN_URL")
+           ?? "http://localhost:3000/settings/payments/complete";
 }
 
-public record StripeConnectResult(
-    string AccountId,
-    string OnboardingUrl
-);
+public record StripeConnectResult(string AccountId, string OnboardingUrl);

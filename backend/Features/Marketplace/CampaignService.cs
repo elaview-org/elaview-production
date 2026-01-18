@@ -1,69 +1,40 @@
-using System.Security.Claims;
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
-using Microsoft.EntityFrameworkCore;
+using ElaviewBackend.Features.Shared.Errors;
 
 namespace ElaviewBackend.Features.Marketplace;
 
 public interface ICampaignService {
-    Guid? GetCurrentUserIdOrNull();
-    IQueryable<Campaign> GetCampaignByIdQuery(Guid id);
-    IQueryable<Campaign> GetMyCampaignsQuery();
+    IQueryable<Campaign> GetById(Guid id);
+    IQueryable<Campaign> GetByUserId(Guid userId);
     IQueryable<Campaign> GetByAdvertiserId(Guid advertiserProfileId);
-    Task<Campaign?> GetCampaignByIdAsync(Guid id, CancellationToken ct);
-    Task<Campaign> CreateAsync(CreateCampaignInput input, CancellationToken ct);
-
-    Task<Campaign> UpdateAsync(Guid id, UpdateCampaignInput input,
-        CancellationToken ct);
-
-    Task<bool> DeleteAsync(Guid id, CancellationToken ct);
-    Task<Campaign> SubmitAsync(Guid id, CancellationToken ct);
-    Task<Campaign> CancelAsync(Guid id, CancellationToken ct);
     IQueryable<Booking> GetBookingsByCampaignId(Guid campaignId);
-
-    Task<AdvertiserProfile?> GetAdvertiserByCampaignIdAsync(Guid campaignId,
-        CancellationToken ct);
+    Task<AdvertiserProfile?> GetAdvertiserByCampaignIdAsync(Guid campaignId, CancellationToken ct);
+    Task<Campaign> CreateAsync(Guid userId, CreateCampaignInput input, CancellationToken ct);
+    Task<Campaign> UpdateAsync(Guid userId, Guid id, UpdateCampaignInput input, CancellationToken ct);
+    Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct);
+    Task<Campaign> SubmitAsync(Guid userId, Guid id, CancellationToken ct);
+    Task<Campaign> CancelAsync(Guid userId, Guid id, CancellationToken ct);
 }
 
-public sealed class CampaignService(
-    IHttpContextAccessor httpContextAccessor,
-    AppDbContext context,
-    ICampaignRepository campaignRepository
-) : ICampaignService {
-    public Guid? GetCurrentUserIdOrNull() {
-        var principalId = httpContextAccessor.HttpContext?.User.FindFirstValue(
-            ClaimTypes.NameIdentifier
-        );
-        return principalId is null ? null : Guid.Parse(principalId);
-    }
+public sealed class CampaignService(ICampaignRepository repository) : ICampaignService {
+    public IQueryable<Campaign> GetById(Guid id)
+        => repository.Query().Where(c => c.Id == id);
 
-    public IQueryable<Campaign> GetCampaignByIdQuery(Guid id) {
-        return context.Campaigns.Where(c => c.Id == id);
-    }
+    public IQueryable<Campaign> GetByUserId(Guid userId)
+        => repository.GetByUserId(userId);
 
-    public IQueryable<Campaign> GetMyCampaignsQuery() {
-        var userId = GetCurrentUserId();
-        return context.Campaigns.Where(c =>
-            c.AdvertiserProfile.UserId == userId);
-    }
+    public IQueryable<Campaign> GetByAdvertiserId(Guid advertiserId)
+        => repository.GetByAdvertiserId(advertiserId);
 
-    public IQueryable<Campaign> GetByAdvertiserId(Guid advertiserProfileId)
-        => context.Campaigns.Where(c => c.AdvertiserProfileId == advertiserProfileId);
+    public IQueryable<Booking> GetBookingsByCampaignId(Guid campaignId)
+        => repository.GetBookingsByCampaignId(campaignId);
 
-    public async Task<Campaign?> GetCampaignByIdAsync(Guid id,
-        CancellationToken ct) {
-        return await campaignRepository.GetByIdAsync(id, ct);
-    }
+    public async Task<AdvertiserProfile?> GetAdvertiserByCampaignIdAsync(Guid campaignId, CancellationToken ct)
+        => await repository.GetAdvertiserByCampaignIdAsync(campaignId, ct);
 
-    public async Task<Campaign> CreateAsync(CreateCampaignInput input,
-        CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var profile = await context.AdvertiserProfiles
-                          .Where(p => p.UserId == userId)
-                          .Select(p => new { p.Id })
-                          .FirstOrDefaultAsync(ct)
-                      ?? throw new GraphQLException(
-                          "Advertiser profile not found");
+    public async Task<Campaign> CreateAsync(Guid userId, CreateCampaignInput input, CancellationToken ct) {
+        var profile = await repository.GetAdvertiserProfileByUserIdAsync(userId, ct)
+            ?? throw new NotFoundException("AdvertiserProfile", userId);
 
         var campaign = new Campaign {
             AdvertiserProfileId = profile.Id,
@@ -79,114 +50,55 @@ public sealed class CampaignService(
             CreatedAt = DateTime.UtcNow
         };
 
-        context.Campaigns.Add(campaign);
-        await context.SaveChangesAsync(ct);
-        return campaign;
+        return await repository.AddAsync(campaign, ct);
     }
 
-    public async Task<Campaign> UpdateAsync(Guid id, UpdateCampaignInput input,
-        CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var campaign = await context.Campaigns
-                           .FirstOrDefaultAsync(
-                               c => c.Id == id && c.AdvertiserProfile.UserId ==
-                                   userId, ct)
-                       ?? throw new GraphQLException("Campaign not found");
+    public async Task<Campaign> UpdateAsync(Guid userId, Guid id, UpdateCampaignInput input, CancellationToken ct) {
+        var campaign = await repository.GetByIdWithOwnerAsync(id, ct)
+            ?? throw new NotFoundException("Campaign", id);
 
-        if (campaign.Status != CampaignStatus.Draft &&
-            campaign.Status != CampaignStatus.Submitted)
-            throw new GraphQLException(
-                "Cannot update campaign in current status");
+        if (campaign.AdvertiserProfile.UserId != userId)
+            throw new ForbiddenException("update this campaign");
 
-        var entry = context.Entry(campaign);
-        if (input.Name is not null)
-            entry.Property(c => c.Name).CurrentValue = input.Name;
-        if (input.Description is not null)
-            entry.Property(c => c.Description).CurrentValue = input.Description;
-        if (input.ImageUrl is not null)
-            entry.Property(c => c.ImageUrl).CurrentValue = input.ImageUrl;
-        if (input.TargetAudience is not null)
-            entry.Property(c => c.TargetAudience).CurrentValue =
-                input.TargetAudience;
-        if (input.Goals is not null)
-            entry.Property(c => c.Goals).CurrentValue = input.Goals;
-        if (input.TotalBudget is not null)
-            entry.Property(c => c.TotalBudget).CurrentValue = input.TotalBudget;
-        if (input.StartDate is not null)
-            entry.Property(c => c.StartDate).CurrentValue = input.StartDate;
-        if (input.EndDate is not null)
-            entry.Property(c => c.EndDate).CurrentValue = input.EndDate;
+        if (campaign.Status != CampaignStatus.Draft && campaign.Status != CampaignStatus.Submitted)
+            throw new InvalidStatusTransitionException(campaign.Status.ToString(), "Updated");
 
-        await context.SaveChangesAsync(ct);
-        return campaign;
+        return await repository.UpdateAsync(campaign, input, ct);
     }
 
-    public async Task<bool> DeleteAsync(Guid id, CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var campaign = await context.Campaigns
-            .FirstOrDefaultAsync(
-                c => c.Id == id && c.AdvertiserProfile.UserId == userId, ct);
+    public async Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct) {
+        var campaign = await repository.GetByIdWithOwnerAsync(id, ct)
+            ?? throw new NotFoundException("Campaign", id);
 
-        if (campaign is null) return false;
+        if (campaign.AdvertiserProfile.UserId != userId)
+            throw new ForbiddenException("delete this campaign");
 
-        var hasActiveBookings = await context.Bookings
-            .AnyAsync(b => b.CampaignId == id &&
-                           b.Status != BookingStatus.Completed &&
-                           b.Status != BookingStatus.Cancelled &&
-                           b.Status != BookingStatus.Rejected, ct);
+        if (await repository.HasActiveBookingsAsync(id, ct))
+            throw new ConflictException("Campaign", "Cannot delete campaign with active bookings");
 
-        if (hasActiveBookings)
-            throw new GraphQLException(
-                "Cannot delete campaign with active bookings");
-
-        context.Campaigns.Remove(campaign);
-        await context.SaveChangesAsync(ct);
-        return true;
+        return await repository.DeleteAsync(campaign, ct);
     }
 
-    public async Task<Campaign> SubmitAsync(Guid id, CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var campaign = await context.Campaigns
-                           .FirstOrDefaultAsync(
-                               c => c.Id == id && c.AdvertiserProfile.UserId ==
-                                   userId, ct)
-                       ?? throw new GraphQLException("Campaign not found");
+    public async Task<Campaign> SubmitAsync(Guid userId, Guid id, CancellationToken ct) {
+        var campaign = await repository.GetByIdWithOwnerAsync(id, ct)
+            ?? throw new NotFoundException("Campaign", id);
+
+        if (campaign.AdvertiserProfile.UserId != userId)
+            throw new ForbiddenException("submit this campaign");
 
         if (campaign.Status != CampaignStatus.Draft)
-            throw new GraphQLException("Only draft campaigns can be submitted");
+            throw new InvalidStatusTransitionException(campaign.Status.ToString(), CampaignStatus.Submitted.ToString());
 
-        context.Entry(campaign).Property(c => c.Status).CurrentValue =
-            CampaignStatus.Submitted;
-        await context.SaveChangesAsync(ct);
-        return campaign;
+        return await repository.UpdateStatusAsync(campaign, CampaignStatus.Submitted, ct);
     }
 
-    public async Task<Campaign> CancelAsync(Guid id, CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var campaign = await context.Campaigns
-                           .FirstOrDefaultAsync(
-                               c => c.Id == id && c.AdvertiserProfile.UserId ==
-                                   userId, ct)
-                       ?? throw new GraphQLException("Campaign not found");
+    public async Task<Campaign> CancelAsync(Guid userId, Guid id, CancellationToken ct) {
+        var campaign = await repository.GetByIdWithOwnerAsync(id, ct)
+            ?? throw new NotFoundException("Campaign", id);
 
-        context.Entry(campaign).Property(c => c.Status).CurrentValue =
-            CampaignStatus.Cancelled;
-        await context.SaveChangesAsync(ct);
-        return campaign;
-    }
+        if (campaign.AdvertiserProfile.UserId != userId)
+            throw new ForbiddenException("cancel this campaign");
 
-    public IQueryable<Booking> GetBookingsByCampaignId(Guid campaignId) {
-        return context.Bookings.Where(b => b.CampaignId == campaignId);
-    }
-
-    public async Task<AdvertiserProfile?> GetAdvertiserByCampaignIdAsync(
-        Guid campaignId, CancellationToken ct) {
-        return await campaignRepository.GetAdvertiserByCampaignIdAsync(
-            campaignId, ct);
-    }
-
-    private Guid GetCurrentUserId() {
-        return GetCurrentUserIdOrNull() ??
-               throw new GraphQLException("Not authenticated");
+        return await repository.UpdateStatusAsync(campaign, CampaignStatus.Cancelled, ct);
     }
 }

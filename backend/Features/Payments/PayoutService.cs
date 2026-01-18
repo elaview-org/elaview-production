@@ -1,80 +1,51 @@
-using System.Security.Claims;
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
-using Microsoft.EntityFrameworkCore;
+using ElaviewBackend.Features.Shared.Errors;
 using Stripe;
 using EntityPayout = ElaviewBackend.Data.Entities.Payout;
 
 namespace ElaviewBackend.Features.Payments;
 
 public interface IPayoutService {
-    Guid? GetCurrentUserIdOrNull();
-    IQueryable<EntityPayout> GetMyPayoutsQuery();
-    IQueryable<EntityPayout> GetPayoutByIdQuery(Guid id);
-    Task<EntityPayout?> GetPayoutByIdAsync(Guid id, CancellationToken ct);
-    Task<EarningsSummary> GetEarningsSummaryAsync(CancellationToken ct);
-
-    Task<EntityPayout> ProcessPayoutAsync(Guid bookingId, PayoutStage stage,
-        CancellationToken ct);
-
+    IQueryable<EntityPayout> GetByUserId(Guid userId);
+    IQueryable<EntityPayout> GetById(Guid id);
+    Task<EntityPayout?> GetByIdAsync(Guid id, CancellationToken ct);
+    Task<EarningsSummary> GetEarningsSummaryAsync(Guid userId, CancellationToken ct);
+    Task<EntityPayout> ProcessPayoutAsync(Guid bookingId, PayoutStage stage, CancellationToken ct);
     Task<EntityPayout> RetryPayoutAsync(Guid payoutId, CancellationToken ct);
 }
 
 public sealed class PayoutService(
-    IHttpContextAccessor httpContextAccessor,
-    AppDbContext context,
-    IPayoutRepository payoutRepository,
+    IPayoutRepository repository,
     ITransactionRepository transactionRepository
 ) : IPayoutService {
     private const decimal Stage1PayoutPercent = 0.30m;
 
-    public Guid? GetCurrentUserIdOrNull() {
-        var principalId = httpContextAccessor.HttpContext?.User.FindFirstValue(
-            ClaimTypes.NameIdentifier
-        );
-        return principalId is null ? null : Guid.Parse(principalId);
-    }
+    public IQueryable<EntityPayout> GetByUserId(Guid userId)
+        => repository.GetByUserId(userId);
 
-    public IQueryable<EntityPayout> GetMyPayoutsQuery() {
-        var userId = GetCurrentUserId();
-        return context.Payouts.Where(p => p.SpaceOwnerProfile.UserId == userId);
-    }
+    public IQueryable<EntityPayout> GetById(Guid id)
+        => repository.GetById(id);
 
-    public IQueryable<EntityPayout> GetPayoutByIdQuery(Guid id) {
-        return context.Payouts.Where(p => p.Id == id);
-    }
+    public async Task<EntityPayout?> GetByIdAsync(Guid id, CancellationToken ct)
+        => await repository.GetByIdAsync(id, ct);
 
-    public async Task<EntityPayout?> GetPayoutByIdAsync(Guid id,
-        CancellationToken ct) {
-        return await payoutRepository.GetByIdAsync(id, ct);
-    }
-
-    public async Task<EarningsSummary> GetEarningsSummaryAsync(
-        CancellationToken ct) {
-        var userId = GetCurrentUserId();
+    public async Task<EarningsSummary> GetEarningsSummaryAsync(Guid userId, CancellationToken ct) {
         var now = DateTime.UtcNow;
-        var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0,
-            DateTimeKind.Utc);
+        var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
         var startOfLastMonth = startOfMonth.AddMonths(-1);
 
-        var payouts = await context.Payouts
-            .Where(p => p.SpaceOwnerProfile.UserId == userId)
-            .ToListAsync(ct);
+        var payouts = await repository.GetByUserIdAsync(userId, ct);
 
         var totalEarnings = payouts
             .Where(p => p.Status == PayoutStatus.Completed)
             .Sum(p => p.Amount);
 
         var pendingPayouts = payouts
-            .Where(p =>
-                p.Status == PayoutStatus.Pending ||
-                p.Status == PayoutStatus.Processing)
+            .Where(p => p.Status is PayoutStatus.Pending or PayoutStatus.Processing)
             .Sum(p => p.Amount);
 
         var thisMonthEarnings = payouts
-            .Where(p =>
-                p.Status == PayoutStatus.Completed &&
-                p.ProcessedAt >= startOfMonth)
+            .Where(p => p.Status == PayoutStatus.Completed && p.ProcessedAt >= startOfMonth)
             .Sum(p => p.Amount);
 
         var lastMonthEarnings = payouts
@@ -92,47 +63,39 @@ public sealed class PayoutService(
         );
     }
 
-    public async Task<EntityPayout> ProcessPayoutAsync(Guid bookingId,
-        PayoutStage stage, CancellationToken ct) {
-        var booking = await context.Bookings
-                          .Include(b => b.Space)
-                          .ThenInclude(s => s.SpaceOwnerProfile)
-                          .FirstOrDefaultAsync(b => b.Id == bookingId, ct)
-                      ?? throw new GraphQLException("Booking not found");
+    public async Task<EntityPayout> ProcessPayoutAsync(
+        Guid bookingId, PayoutStage stage, CancellationToken ct
+    ) {
+        var booking = await repository.GetBookingInfoForPayoutAsync(bookingId, ct)
+            ?? throw new NotFoundException("Booking", bookingId);
 
-        var existingPayout = await context.Payouts
-            .FirstOrDefaultAsync(
-                p => p.BookingId == bookingId && p.Stage == stage, ct);
-
+        var existingPayout = await repository.GetByBookingIdAndStageAsync(bookingId, stage, ct);
         if (existingPayout is not null)
-            throw new GraphQLException($"Payout for {stage} already exists");
+            throw new ConflictException("Payout", $"Payout for {stage} already exists");
+
+        if (string.IsNullOrEmpty(booking.StripeAccountId))
+            throw new PaymentException("payout", "Space owner has not connected Stripe account");
 
         var amount = stage == PayoutStage.Stage1
-            ? booking.InstallationFee +
-              booking.SubtotalAmount * Stage1PayoutPercent
+            ? booking.InstallationFee + booking.SubtotalAmount * Stage1PayoutPercent
             : booking.SubtotalAmount * (1 - Stage1PayoutPercent);
 
         var payout = new EntityPayout {
             BookingId = bookingId,
-            SpaceOwnerProfileId = booking.Space.SpaceOwnerProfileId,
+            SpaceOwnerProfileId = booking.SpaceOwnerProfileId,
             Stage = stage,
             Amount = amount,
             Status = PayoutStatus.Pending,
             CreatedAt = DateTime.UtcNow
         };
 
-        await payoutRepository.AddAsync(payout, ct);
+        await repository.AddAsync(payout, ct);
 
         try {
-            var ownerProfile = booking.Space.SpaceOwnerProfile;
-            if (string.IsNullOrEmpty(ownerProfile.StripeAccountId))
-                throw new GraphQLException(
-                    "Space owner has not connected Stripe account");
-
             var options = new TransferCreateOptions {
                 Amount = (long)(amount * 100),
                 Currency = "usd",
-                Destination = ownerProfile.StripeAccountId,
+                Destination = booking.StripeAccountId,
                 Metadata = new Dictionary<string, string> {
                     ["booking_id"] = bookingId.ToString(),
                     ["payout_id"] = payout.Id.ToString(),
@@ -141,15 +104,9 @@ public sealed class PayoutService(
             };
 
             var service = new TransferService();
-            var transfer =
-                await service.CreateAsync(options, cancellationToken: ct);
+            var transfer = await service.CreateAsync(options, cancellationToken: ct);
 
-            var entry = context.Entry(payout);
-            entry.Property(p => p.StripeTransferId).CurrentValue = transfer.Id;
-            entry.Property(p => p.Status).CurrentValue = PayoutStatus.Completed;
-            entry.Property(p => p.ProcessedAt).CurrentValue = DateTime.UtcNow;
-            entry.Property(p => p.AttemptCount).CurrentValue = 1;
-            entry.Property(p => p.LastAttemptAt).CurrentValue = DateTime.UtcNow;
+            await repository.UpdateStatusCompletedAsync(payout, transfer.Id, ct);
 
             await transactionRepository.AddAsync(new Transaction {
                 BookingId = bookingId,
@@ -160,47 +117,33 @@ public sealed class PayoutService(
                 Description = $"{stage} payout for booking {bookingId}",
                 CreatedAt = DateTime.UtcNow
             }, ct);
-
-            await context.SaveChangesAsync(ct);
         }
         catch (StripeException ex) {
-            var entry = context.Entry(payout);
-            entry.Property(p => p.Status).CurrentValue = PayoutStatus.Failed;
-            entry.Property(p => p.FailureReason).CurrentValue = ex.Message;
-            entry.Property(p => p.AttemptCount).CurrentValue = 1;
-            entry.Property(p => p.LastAttemptAt).CurrentValue = DateTime.UtcNow;
-            await context.SaveChangesAsync(ct);
-            throw new GraphQLException($"Payout failed: {ex.Message}");
+            await repository.UpdateStatusFailedAsync(payout, ex.Message, ct);
+            throw new PaymentException("payout", ex.Message);
         }
 
         return payout;
     }
 
-    public async Task<EntityPayout> RetryPayoutAsync(Guid payoutId,
-        CancellationToken ct) {
-        var payout = await payoutRepository.GetByIdAsync(payoutId, ct)
-                     ?? throw new GraphQLException("Payout not found");
+    public async Task<EntityPayout> RetryPayoutAsync(Guid payoutId, CancellationToken ct) {
+        var payout = await repository.GetByIdAsync(payoutId, ct)
+            ?? throw new NotFoundException("Payout", payoutId);
 
         if (payout.Status != PayoutStatus.Failed)
-            throw new GraphQLException("Only failed payouts can be retried");
+            throw new InvalidStatusTransitionException(payout.Status.ToString(), "retry");
 
-        var booking = await context.Bookings
-                          .Include(b => b.Space)
-                          .ThenInclude(s => s.SpaceOwnerProfile)
-                          .FirstOrDefaultAsync(b => b.Id == payout.BookingId,
-                              ct)
-                      ?? throw new GraphQLException("Booking not found");
+        var booking = await repository.GetBookingInfoForPayoutAsync(payout.BookingId, ct)
+            ?? throw new NotFoundException("Booking", payout.BookingId);
+
+        if (string.IsNullOrEmpty(booking.StripeAccountId))
+            throw new PaymentException("payout retry", "Space owner has not connected Stripe account");
 
         try {
-            var ownerProfile = booking.Space.SpaceOwnerProfile;
-            if (string.IsNullOrEmpty(ownerProfile.StripeAccountId))
-                throw new GraphQLException(
-                    "Space owner has not connected Stripe account");
-
             var options = new TransferCreateOptions {
                 Amount = (long)(payout.Amount * 100),
                 Currency = "usd",
-                Destination = ownerProfile.StripeAccountId,
+                Destination = booking.StripeAccountId,
                 Metadata = new Dictionary<string, string> {
                     ["booking_id"] = payout.BookingId.ToString(),
                     ["payout_id"] = payout.Id.ToString(),
@@ -210,17 +153,9 @@ public sealed class PayoutService(
             };
 
             var service = new TransferService();
-            var transfer =
-                await service.CreateAsync(options, cancellationToken: ct);
+            var transfer = await service.CreateAsync(options, cancellationToken: ct);
 
-            var entry = context.Entry(payout);
-            entry.Property(p => p.StripeTransferId).CurrentValue = transfer.Id;
-            entry.Property(p => p.Status).CurrentValue = PayoutStatus.Completed;
-            entry.Property(p => p.ProcessedAt).CurrentValue = DateTime.UtcNow;
-            entry.Property(p => p.FailureReason).CurrentValue = null;
-            entry.Property(p => p.AttemptCount).CurrentValue =
-                payout.AttemptCount + 1;
-            entry.Property(p => p.LastAttemptAt).CurrentValue = DateTime.UtcNow;
+            await repository.UpdateStatusCompletedAsync(payout, transfer.Id, ct);
 
             await transactionRepository.AddAsync(new Transaction {
                 BookingId = payout.BookingId,
@@ -228,29 +163,16 @@ public sealed class PayoutService(
                 Amount = -payout.Amount,
                 ReferenceType = "Payout",
                 ReferenceId = payout.Id,
-                Description =
-                    $"{payout.Stage} payout retry for booking {payout.BookingId}",
+                Description = $"{payout.Stage} payout retry for booking {payout.BookingId}",
                 CreatedAt = DateTime.UtcNow
             }, ct);
-
-            await context.SaveChangesAsync(ct);
         }
         catch (StripeException ex) {
-            var entry = context.Entry(payout);
-            entry.Property(p => p.FailureReason).CurrentValue = ex.Message;
-            entry.Property(p => p.AttemptCount).CurrentValue =
-                payout.AttemptCount + 1;
-            entry.Property(p => p.LastAttemptAt).CurrentValue = DateTime.UtcNow;
-            await context.SaveChangesAsync(ct);
-            throw new GraphQLException($"Payout retry failed: {ex.Message}");
+            await repository.UpdateStatusFailedAsync(payout, ex.Message, ct);
+            throw new PaymentException("payout retry", ex.Message);
         }
 
         return payout;
-    }
-
-    private Guid GetCurrentUserId() {
-        return GetCurrentUserIdOrNull() ??
-               throw new GraphQLException("Not authenticated");
     }
 }
 

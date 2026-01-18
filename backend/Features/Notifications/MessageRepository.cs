@@ -7,11 +7,13 @@ namespace ElaviewBackend.Features.Notifications;
 public interface IMessageRepository {
     IQueryable<Message> Query();
     Task<Message?> GetByIdAsync(Guid id, CancellationToken ct);
-
-    Task<IReadOnlyList<Message>> GetByConversationIdAsync(Guid conversationId,
-        CancellationToken ct);
-
+    IQueryable<Message> GetByConversationId(Guid conversationId);
+    Task<IReadOnlyList<Message>> GetByConversationIdAsync(Guid conversationId, CancellationToken ct);
+    Task<bool> IsUserParticipantAsync(Guid conversationId, Guid userId, CancellationToken ct);
+    Task<Conversation?> GetConversationByIdAsync(Guid conversationId, CancellationToken ct);
+    Task<List<Guid>> GetOtherParticipantsAsync(Guid conversationId, Guid excludeUserId, CancellationToken ct);
     Task<Message> AddAsync(Message message, CancellationToken ct);
+    Task UpdateConversationTimestampAsync(Guid conversationId, CancellationToken ct);
 }
 
 public sealed class MessageRepository(
@@ -19,24 +21,45 @@ public sealed class MessageRepository(
     IMessageByIdDataLoader messageById,
     IMessagesByConversationIdDataLoader messagesByConversationId
 ) : IMessageRepository {
-    public IQueryable<Message> Query() {
-        return context.Messages;
-    }
+    public IQueryable<Message> Query()
+        => context.Messages;
 
-    public async Task<Message?> GetByIdAsync(Guid id, CancellationToken ct) {
-        return await messageById.LoadAsync(id, ct);
-    }
+    public async Task<Message?> GetByIdAsync(Guid id, CancellationToken ct)
+        => await messageById.LoadAsync(id, ct);
 
-    public async Task<IReadOnlyList<Message>> GetByConversationIdAsync(
-        Guid conversationId, CancellationToken ct) {
-        return await messagesByConversationId.LoadAsync(conversationId, ct) ??
-               [];
-    }
+    public IQueryable<Message> GetByConversationId(Guid conversationId)
+        => context.Messages
+            .Where(m => m.ConversationId == conversationId)
+            .OrderByDescending(m => m.CreatedAt);
+
+    public async Task<IReadOnlyList<Message>> GetByConversationIdAsync(Guid conversationId, CancellationToken ct)
+        => await messagesByConversationId.LoadAsync(conversationId, ct) ?? [];
+
+    public async Task<bool> IsUserParticipantAsync(Guid conversationId, Guid userId, CancellationToken ct)
+        => await context.ConversationParticipants
+            .AnyAsync(p => p.ConversationId == conversationId && p.UserId == userId, ct);
+
+    public async Task<Conversation?> GetConversationByIdAsync(Guid conversationId, CancellationToken ct)
+        => await context.Conversations.FindAsync([conversationId], ct);
+
+    public async Task<List<Guid>> GetOtherParticipantsAsync(Guid conversationId, Guid excludeUserId, CancellationToken ct)
+        => await context.ConversationParticipants
+            .Where(p => p.ConversationId == conversationId && p.UserId != excludeUserId)
+            .Select(p => p.UserId)
+            .ToListAsync(ct);
 
     public async Task<Message> AddAsync(Message message, CancellationToken ct) {
         context.Messages.Add(message);
         await context.SaveChangesAsync(ct);
         return message;
+    }
+
+    public async Task UpdateConversationTimestampAsync(Guid conversationId, CancellationToken ct) {
+        var conversation = await context.Conversations.FindAsync([conversationId], ct);
+        if (conversation is not null) {
+            context.Entry(conversation).Property(c => c.UpdatedAt).CurrentValue = DateTime.UtcNow;
+            await context.SaveChangesAsync(ct);
+        }
     }
 }
 

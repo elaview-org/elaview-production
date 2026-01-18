@@ -1,72 +1,38 @@
-using System.Security.Claims;
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
-using Microsoft.EntityFrameworkCore;
+using ElaviewBackend.Features.Shared.Errors;
 using Stripe;
 
 namespace ElaviewBackend.Features.Payments;
 
 public interface IPaymentService {
-    Guid? GetCurrentUserIdOrNull();
-    IQueryable<Payment> GetPaymentByIdQuery(Guid id);
-    IQueryable<Payment> GetPaymentsByBookingIdQuery(Guid bookingId);
-    Task<Payment?> GetPaymentByIdAsync(Guid id, CancellationToken ct);
-
-    Task<PaymentIntentResult> CreatePaymentIntentAsync(Guid bookingId,
-        CancellationToken ct);
-
-    Task<Payment> ConfirmPaymentAsync(string paymentIntentId,
-        CancellationToken ct);
+    IQueryable<Payment> GetById(Guid id);
+    IQueryable<Payment> GetByBookingId(Guid bookingId);
+    Task<Payment?> GetByIdAsync(Guid id, CancellationToken ct);
+    Task<PaymentIntentResult> CreatePaymentIntentAsync(Guid userId, Guid bookingId, CancellationToken ct);
+    Task<Payment> ConfirmPaymentAsync(string paymentIntentId, CancellationToken ct);
 }
 
 public sealed class PaymentService(
-    IHttpContextAccessor httpContextAccessor,
-    AppDbContext context,
-    IPaymentRepository paymentRepository,
+    IPaymentRepository repository,
     ITransactionRepository transactionRepository
 ) : IPaymentService {
-    public Guid? GetCurrentUserIdOrNull() {
-        var principalId = httpContextAccessor.HttpContext?.User.FindFirstValue(
-            ClaimTypes.NameIdentifier
-        );
-        return principalId is null ? null : Guid.Parse(principalId);
-    }
+    public IQueryable<Payment> GetById(Guid id)
+        => repository.GetById(id);
 
-    public IQueryable<Payment> GetPaymentByIdQuery(Guid id) {
-        return context.Payments.Where(p => p.Id == id);
-    }
+    public IQueryable<Payment> GetByBookingId(Guid bookingId)
+        => repository.GetByBookingId(bookingId);
 
-    public IQueryable<Payment> GetPaymentsByBookingIdQuery(Guid bookingId) {
-        return context.Payments.Where(p => p.BookingId == bookingId);
-    }
+    public async Task<Payment?> GetByIdAsync(Guid id, CancellationToken ct)
+        => await repository.GetByIdAsync(id, ct);
 
-    public async Task<Payment?> GetPaymentByIdAsync(Guid id,
-        CancellationToken ct) {
-        return await paymentRepository.GetByIdAsync(id, ct);
-    }
-
-    public async Task<PaymentIntentResult> CreatePaymentIntentAsync(
-        Guid bookingId, CancellationToken ct) {
-        var userId = GetCurrentUserId();
-
-        var booking = await context.Bookings
-                          .Include(b => b.Campaign)
-                          .ThenInclude(c => c.AdvertiserProfile)
-                          .FirstOrDefaultAsync(
-                              b => b.Id == bookingId &&
-                                   b.Campaign.AdvertiserProfile.UserId ==
-                                   userId, ct)
-                      ?? throw new GraphQLException("Booking not found");
+    public async Task<PaymentIntentResult> CreatePaymentIntentAsync(Guid userId, Guid bookingId, CancellationToken ct) {
+        var booking = await repository.GetBookingInfoForPaymentAsync(bookingId, userId, ct)
+            ?? throw new NotFoundException("Booking", bookingId);
 
         if (booking.Status != BookingStatus.Approved)
-            throw new GraphQLException(
-                "Booking must be approved before payment");
+            throw new InvalidStatusTransitionException(booking.Status.ToString(), "Payment");
 
-        var existingPayment = await context.Payments
-            .FirstOrDefaultAsync(
-                p => p.BookingId == bookingId &&
-                     p.Status == PaymentStatus.Pending, ct);
-
+        var existingPayment = await repository.GetPendingByBookingIdAsync(bookingId, ct);
         if (existingPayment is not null)
             return new PaymentIntentResult(
                 existingPayment.StripePaymentIntentId,
@@ -84,8 +50,7 @@ public sealed class PaymentService(
         };
 
         var service = new PaymentIntentService();
-        var paymentIntent =
-            await service.CreateAsync(options, cancellationToken: ct);
+        var paymentIntent = await service.CreateAsync(options, cancellationToken: ct);
 
         var payment = new Payment {
             BookingId = bookingId,
@@ -96,7 +61,7 @@ public sealed class PaymentService(
             CreatedAt = DateTime.UtcNow
         };
 
-        await paymentRepository.AddAsync(payment, ct);
+        await repository.AddAsync(payment, ct);
 
         return new PaymentIntentResult(
             paymentIntent.ClientSecret,
@@ -105,37 +70,21 @@ public sealed class PaymentService(
         );
     }
 
-    public async Task<Payment> ConfirmPaymentAsync(string paymentIntentId,
-        CancellationToken ct) {
-        var payment =
-            await paymentRepository.GetByStripePaymentIntentIdAsync(
-                paymentIntentId, ct)
-            ?? throw new GraphQLException("Payment not found");
+    public async Task<Payment> ConfirmPaymentAsync(string paymentIntentId, CancellationToken ct) {
+        var payment = await repository.GetByStripePaymentIntentIdAsync(paymentIntentId, ct)
+            ?? throw new NotFoundException("Payment", Guid.Empty);
 
         if (payment.Status == PaymentStatus.Succeeded)
             return payment;
 
         var service = new PaymentIntentService();
-        var paymentIntent =
-            await service.GetAsync(paymentIntentId, cancellationToken: ct);
+        var paymentIntent = await service.GetAsync(paymentIntentId, cancellationToken: ct);
 
         if (paymentIntent.Status != "succeeded")
-            throw new GraphQLException("Payment has not succeeded");
+            throw new PaymentException("confirmation", "Payment has not succeeded");
 
-        var entry = context.Entry(payment);
-        entry.Property(p => p.Status).CurrentValue = PaymentStatus.Succeeded;
-        entry.Property(p => p.StripeChargeId).CurrentValue =
-            paymentIntent.LatestChargeId;
-        entry.Property(p => p.PaidAt).CurrentValue = DateTime.UtcNow;
-
-        var booking = await context.Bookings.FindAsync([payment.BookingId], ct);
-        if (booking is not null) {
-            var bookingEntry = context.Entry(booking);
-            bookingEntry.Property(b => b.Status).CurrentValue =
-                BookingStatus.Paid;
-            bookingEntry.Property(b => b.UpdatedAt).CurrentValue =
-                DateTime.UtcNow;
-        }
+        await repository.UpdateStatusAsync(payment, PaymentStatus.Succeeded, paymentIntent.LatestChargeId, ct);
+        await repository.UpdateBookingToPaidAsync(payment.BookingId, ct);
 
         await transactionRepository.AddAsync(new Transaction {
             BookingId = payment.BookingId,
@@ -147,13 +96,7 @@ public sealed class PaymentService(
             CreatedAt = DateTime.UtcNow
         }, ct);
 
-        await context.SaveChangesAsync(ct);
         return payment;
-    }
-
-    private Guid GetCurrentUserId() {
-        return GetCurrentUserIdOrNull() ??
-               throw new GraphQLException("Not authenticated");
     }
 }
 

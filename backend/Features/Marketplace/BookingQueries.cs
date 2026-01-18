@@ -1,4 +1,5 @@
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Marketplace;
@@ -9,10 +10,9 @@ public static partial class BookingQueries {
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<Booking> GetBookingById(
-        [ID] Guid id, IBookingService bookingService
-    ) {
-        return bookingService.GetBookingByIdQuery(id);
-    }
+        [ID] Guid id,
+        IBookingService bookingService
+    ) => bookingService.GetById(id);
 
     [Authorize]
     [UsePaging]
@@ -20,9 +20,9 @@ public static partial class BookingQueries {
     [UseFiltering]
     [UseSorting]
     public static IQueryable<Booking> GetMyBookingsAsAdvertiser(
-        IBookingService bookingService) {
-        return bookingService.GetMyBookingsAsAdvertiserQuery();
-    }
+        IUserService userService,
+        IBookingService bookingService
+    ) => bookingService.GetByAdvertiserUserId(userService.GetPrincipalId());
 
     [Authorize]
     [UsePaging]
@@ -30,24 +30,24 @@ public static partial class BookingQueries {
     [UseFiltering]
     [UseSorting]
     public static IQueryable<Booking> GetMyBookingsAsOwner(
-        IBookingService bookingService) {
-        return bookingService.GetMyBookingsAsOwnerQuery();
-    }
+        IUserService userService,
+        IBookingService bookingService
+    ) => bookingService.GetByOwnerUserId(userService.GetPrincipalId());
 
     [Authorize]
     [UsePaging]
     [UseProjection]
     [UseSorting]
     public static IQueryable<Booking> GetIncomingBookingRequests(
-        IBookingService bookingService) {
-        return bookingService.GetIncomingBookingRequestsQuery();
-    }
+        IUserService userService,
+        IBookingService bookingService
+    ) => bookingService.GetPendingByOwnerUserId(userService.GetPrincipalId());
 
     [Authorize]
     [UsePaging]
     [UseProjection]
     public static IQueryable<Booking> GetBookingsRequiringAction(
-        IBookingService bookingService) {
-        return bookingService.GetBookingsRequiringActionQuery();
-    }
+        IUserService userService,
+        IBookingService bookingService
+    ) => bookingService.GetRequiringActionByUserId(userService.GetPrincipalId());
 }

@@ -5,18 +5,15 @@ using Microsoft.EntityFrameworkCore;
 namespace ElaviewBackend.Features.Payments;
 
 public interface ITransactionRepository {
-    IQueryable<Transaction> Query();
+    IQueryable<Transaction> GetByBookingId(Guid bookingId);
     Task<Transaction> AddAsync(Transaction transaction, CancellationToken ct);
 }
 
-public sealed class TransactionRepository(AppDbContext context)
-    : ITransactionRepository {
-    public IQueryable<Transaction> Query() {
-        return context.Transactions;
-    }
+public sealed class TransactionRepository(AppDbContext context) : ITransactionRepository {
+    public IQueryable<Transaction> GetByBookingId(Guid bookingId)
+        => context.Transactions.Where(t => t.BookingId == bookingId);
 
-    public async Task<Transaction> AddAsync(Transaction transaction,
-        CancellationToken ct) {
+    public async Task<Transaction> AddAsync(Transaction transaction, CancellationToken ct) {
         context.Transactions.Add(transaction);
         await context.SaveChangesAsync(ct);
         return transaction;

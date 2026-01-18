@@ -1,21 +1,20 @@
-using System.Diagnostics.CodeAnalysis;
+using ElaviewBackend.Features.Shared.Errors;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Payments;
 
 [MutationType]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static partial class RefundMutations {
     [Authorize(Roles = ["Admin"])]
+    [Error<NotFoundException>]
+    [Error<InvalidStatusTransitionException>]
+    [Error<ValidationException>]
+    [Error<PaymentException>]
     public static async Task<RequestRefundPayload> RequestRefund(
         [ID] Guid paymentId,
         decimal amount,
         string reason,
         IRefundService refundService,
         CancellationToken ct
-    ) {
-        return new RequestRefundPayload(
-            await refundService.RequestRefundAsync(paymentId, amount, reason,
-                ct));
-    }
+    ) => new(await refundService.RequestRefundAsync(paymentId, amount, reason, ct));
 }

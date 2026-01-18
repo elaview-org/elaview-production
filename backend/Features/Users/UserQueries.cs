@@ -7,29 +7,10 @@ namespace ElaviewBackend.Features.Users;
 [QueryType]
 [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static partial class UserQueries {
-    // [Authorize]
-    // [GraphQLName("me")]
-    // [UseFirstOrDefault]
-    // [UseProjection]
-    // public static IQueryable<User> Me(IUserService userService) {
-    //     return userService.GetCurrentUser();
-    // }
-    //
-    // [Authorize(Roles = ["Admin"])]
-    // [UseFirstOrDefault]
-    // [UseProjection]
-    // public static IQueryable<User> GetUserById(
-    //     [ID] Guid id, IUserService userService
-    // ) {
-    //     return userService.GetUserById(id);
-    // }
-    //
-    // [Authorize(Roles = ["Admin"])]
-    // [UsePaging]
-    // [UseProjection]
-    // [UseFiltering]
-    // [UseSorting]
-    // public static IQueryable<User> GetUsers(IUserService userService) {
-    //     return userService.GetAllUsers();
-    // }
+    [Authorize]
+    [UseFirstOrDefault]
+    [UseProjection]
+    public static IQueryable<User> Me(IUserService userService) {
+        return userService.GetCurrentUser();
+    }
 }

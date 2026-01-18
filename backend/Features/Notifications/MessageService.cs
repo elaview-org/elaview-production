@@ -1,53 +1,26 @@
-using System.Security.Claims;
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Shared.Errors;
 using HotChocolate.Subscriptions;
-using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.Features.Notifications;
 
 public interface IMessageService {
-    Guid? GetCurrentUserIdOrNull();
-    IQueryable<Message> GetMessagesByConversationIdQuery(Guid conversationId);
-
-    Task<Message> SendMessageAsync(Guid conversationId, string content,
-        MessageType type, List<string>? attachments, CancellationToken ct);
+    IQueryable<Message> GetByConversationId(Guid conversationId);
+    Task<Message> SendMessageAsync(Guid userId, Guid conversationId, string content, MessageType type, List<string>? attachments, CancellationToken ct);
 }
 
 public sealed class MessageService(
-    IHttpContextAccessor httpContextAccessor,
-    AppDbContext context,
-    IMessageRepository messageRepository,
+    IMessageRepository repository,
     INotificationService notificationService,
     ITopicEventSender eventSender
 ) : IMessageService {
-    public Guid? GetCurrentUserIdOrNull() {
-        var principalId = httpContextAccessor.HttpContext?.User.FindFirstValue(
-            ClaimTypes.NameIdentifier
-        );
-        return principalId is null ? null : Guid.Parse(principalId);
-    }
+    public IQueryable<Message> GetByConversationId(Guid conversationId)
+        => repository.GetByConversationId(conversationId);
 
-    public IQueryable<Message> GetMessagesByConversationIdQuery(
-        Guid conversationId) {
-        return context.Messages
-            .Where(m => m.ConversationId == conversationId)
-            .OrderByDescending(m => m.CreatedAt);
-    }
-
-    public async Task<Message> SendMessageAsync(Guid conversationId,
-        string content, MessageType type, List<string>? attachments,
-        CancellationToken ct) {
-        var userId = GetCurrentUserId();
-
-        var isParticipant = await context.ConversationParticipants
-            .AnyAsync(
-                p => p.ConversationId == conversationId && p.UserId == userId,
-                ct);
-
+    public async Task<Message> SendMessageAsync(Guid userId, Guid conversationId, string content, MessageType type, List<string>? attachments, CancellationToken ct) {
+        var isParticipant = await repository.IsUserParticipantAsync(conversationId, userId, ct);
         if (!isParticipant)
-            throw new GraphQLException(
-                "You are not a participant of this conversation");
+            throw new ForbiddenException("send messages in this conversation");
 
         var now = DateTime.UtcNow;
         var message = new Message {
@@ -59,21 +32,10 @@ public sealed class MessageService(
             CreatedAt = now
         };
 
-        await messageRepository.AddAsync(message, ct);
+        await repository.AddAsync(message, ct);
+        await repository.UpdateConversationTimestampAsync(conversationId, ct);
 
-        var conversation =
-            await context.Conversations.FindAsync([conversationId], ct);
-        if (conversation is not null) {
-            var convEntry = context.Entry(conversation);
-            convEntry.Property(c => c.UpdatedAt).CurrentValue = now;
-            await context.SaveChangesAsync(ct);
-        }
-
-        var otherParticipants = await context.ConversationParticipants
-            .Where(p =>
-                p.ConversationId == conversationId && p.UserId != userId)
-            .Select(p => p.UserId)
-            .ToListAsync(ct);
+        var otherParticipants = await repository.GetOtherParticipantsAsync(conversationId, userId, ct);
 
         foreach (var recipientId in otherParticipants)
             await notificationService.SendNotificationAsync(
@@ -89,10 +51,5 @@ public sealed class MessageService(
         await eventSender.SendAsync($"messages:{conversationId}", message, ct);
 
         return message;
-    }
-
-    private Guid GetCurrentUserId() {
-        return GetCurrentUserIdOrNull() ??
-               throw new GraphQLException("Not authenticated");
     }
 }

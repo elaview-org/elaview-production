@@ -1,128 +1,61 @@
-using System.Security.Claims;
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Shared.Errors;
 using HotChocolate.Subscriptions;
-using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.Features.Notifications;
 
 public interface INotificationService {
-    Guid? GetCurrentUserIdOrNull();
-    IQueryable<Notification> GetMyNotificationsQuery();
-    IQueryable<Notification> GetNotificationByIdQuery(Guid id);
-    Task<Notification?> GetNotificationByIdAsync(Guid id, CancellationToken ct);
-    Task<int> GetUnreadCountAsync(CancellationToken ct);
-    Task<Notification> MarkAsReadAsync(Guid id, CancellationToken ct);
-    Task<int> MarkAllAsReadAsync(CancellationToken ct);
-    Task<bool> DeleteNotificationAsync(Guid id, CancellationToken ct);
-
-    Task<IReadOnlyList<NotificationPreference>> GetMyPreferencesAsync(
-        CancellationToken ct);
-
-    Task<NotificationPreference> UpdatePreferenceAsync(
-        UpdateNotificationPreferenceInput input, CancellationToken ct);
-
-    Task SendNotificationAsync(Guid userId, NotificationType type, string title,
-        string body, string? entityType, Guid? entityId, CancellationToken ct);
-
-    Task SendBookingNotificationAsync(Guid bookingId, NotificationType type,
-        string title, string body, CancellationToken ct);
+    IQueryable<Notification> GetByUserId(Guid userId);
+    Task<Notification?> GetByIdAsync(Guid id, CancellationToken ct);
+    Task<int> GetUnreadCountAsync(Guid userId, CancellationToken ct);
+    Task<Notification> MarkAsReadAsync(Guid userId, Guid id, CancellationToken ct);
+    Task<int> MarkAllAsReadAsync(Guid userId, CancellationToken ct);
+    Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct);
+    Task<IReadOnlyList<NotificationPreference>> GetPreferencesByUserIdAsync(Guid userId, CancellationToken ct);
+    Task<NotificationPreference> UpdatePreferenceAsync(Guid userId, UpdateNotificationPreferenceInput input, CancellationToken ct);
+    Task SendNotificationAsync(Guid userId, NotificationType type, string title, string body, string? entityType, Guid? entityId, CancellationToken ct);
+    Task SendBookingNotificationAsync(Guid bookingId, NotificationType type, string title, string body, CancellationToken ct);
 }
 
 public sealed class NotificationService(
-    IHttpContextAccessor httpContextAccessor,
-    AppDbContext context,
-    INotificationRepository notificationRepository,
+    INotificationRepository repository,
     INotificationPreferenceRepository preferenceRepository,
     ITopicEventSender eventSender
 ) : INotificationService {
-    public Guid? GetCurrentUserIdOrNull() {
-        var principalId = httpContextAccessor.HttpContext?.User.FindFirstValue(
-            ClaimTypes.NameIdentifier
-        );
-        return principalId is null ? null : Guid.Parse(principalId);
+    public IQueryable<Notification> GetByUserId(Guid userId)
+        => repository.GetByUserId(userId);
+
+    public async Task<Notification?> GetByIdAsync(Guid id, CancellationToken ct)
+        => await repository.GetByIdAsync(id, ct);
+
+    public async Task<int> GetUnreadCountAsync(Guid userId, CancellationToken ct)
+        => await repository.GetUnreadCountByUserIdAsync(userId, ct);
+
+    public async Task<Notification> MarkAsReadAsync(Guid userId, Guid id, CancellationToken ct) {
+        var notification = await repository.GetByIdAndUserIdAsync(id, userId, ct)
+            ?? throw new NotFoundException("Notification", id);
+
+        if (notification.IsRead)
+            return notification;
+
+        return await repository.MarkAsReadAsync(notification, ct);
     }
 
-    public IQueryable<Notification> GetMyNotificationsQuery() {
-        var userId = GetCurrentUserId();
-        return context.Notifications
-            .Where(n => n.UserId == userId)
-            .OrderByDescending(n => n.CreatedAt);
-    }
+    public async Task<int> MarkAllAsReadAsync(Guid userId, CancellationToken ct)
+        => await repository.MarkAllAsReadByUserIdAsync(userId, ct);
 
-    public IQueryable<Notification> GetNotificationByIdQuery(Guid id) {
-        var userId = GetCurrentUserId();
-        return context.Notifications.Where(n =>
-            n.Id == id && n.UserId == userId);
-    }
-
-    public async Task<Notification?> GetNotificationByIdAsync(Guid id,
-        CancellationToken ct) {
-        return await notificationRepository.GetByIdAsync(id, ct);
-    }
-
-    public async Task<int> GetUnreadCountAsync(CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        return await context.Notifications.CountAsync(
-            n => n.UserId == userId && !n.IsRead, ct);
-    }
-
-    public async Task<Notification> MarkAsReadAsync(Guid id,
-        CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var notification = await context.Notifications
-                               .FirstOrDefaultAsync(
-                                   n => n.Id == id && n.UserId == userId, ct)
-                           ?? throw new GraphQLException(
-                               "Notification not found");
-
-        if (!notification.IsRead) {
-            var entry = context.Entry(notification);
-            entry.Property(n => n.IsRead).CurrentValue = true;
-            entry.Property(n => n.ReadAt).CurrentValue = DateTime.UtcNow;
-            await context.SaveChangesAsync(ct);
-        }
-
-        return notification;
-    }
-
-    public async Task<int> MarkAllAsReadAsync(CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var now = DateTime.UtcNow;
-
-        return await context.Notifications
-            .Where(n => n.UserId == userId && !n.IsRead)
-            .ExecuteUpdateAsync(s => s
-                .SetProperty(n => n.IsRead, true)
-                .SetProperty(n => n.ReadAt, now), ct);
-    }
-
-    public async Task<bool> DeleteNotificationAsync(Guid id,
-        CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var notification = await context.Notifications
-            .FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId, ct);
-
+    public async Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct) {
+        var notification = await repository.GetByIdAndUserIdAsync(id, userId, ct);
         if (notification is null) return false;
 
-        context.Notifications.Remove(notification);
-        await context.SaveChangesAsync(ct);
-        return true;
+        return await repository.DeleteAsync(notification, ct);
     }
 
-    public async Task<IReadOnlyList<NotificationPreference>>
-        GetMyPreferencesAsync(CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        return await preferenceRepository.GetByUserIdAsync(userId, ct);
-    }
+    public async Task<IReadOnlyList<NotificationPreference>> GetPreferencesByUserIdAsync(Guid userId, CancellationToken ct)
+        => await preferenceRepository.GetByUserIdAsync(userId, ct);
 
-    public async Task<NotificationPreference> UpdatePreferenceAsync(
-        UpdateNotificationPreferenceInput input, CancellationToken ct) {
-        var userId = GetCurrentUserId();
-
-        var preference =
-            await preferenceRepository.GetByUserIdAndTypeAsync(userId,
-                input.NotificationType, ct);
+    public async Task<NotificationPreference> UpdatePreferenceAsync(Guid userId, UpdateNotificationPreferenceInput input, CancellationToken ct) {
+        var preference = await preferenceRepository.GetByUserIdAndTypeAsync(userId, input.NotificationType, ct);
 
         if (preference is null) {
             preference = new NotificationPreference {
@@ -133,31 +66,14 @@ public sealed class NotificationService(
                 InAppEnabled = input.InAppEnabled ?? true,
                 CreatedAt = DateTime.UtcNow
             };
-            await preferenceRepository.AddAsync(preference, ct);
-        }
-        else {
-            var entry = context.Entry(preference);
-            if (input.EmailEnabled.HasValue)
-                entry.Property(p => p.EmailEnabled).CurrentValue =
-                    input.EmailEnabled.Value;
-            if (input.PushEnabled.HasValue)
-                entry.Property(p => p.PushEnabled).CurrentValue =
-                    input.PushEnabled.Value;
-            if (input.InAppEnabled.HasValue)
-                entry.Property(p => p.InAppEnabled).CurrentValue =
-                    input.InAppEnabled.Value;
-            await context.SaveChangesAsync(ct);
+            return await preferenceRepository.AddAsync(preference, ct);
         }
 
-        return preference;
+        return await preferenceRepository.UpdateAsync(preference, input, ct);
     }
 
-    public async Task SendNotificationAsync(Guid userId, NotificationType type,
-        string title, string body, string? entityType, Guid? entityId,
-        CancellationToken ct) {
-        var preference =
-            await preferenceRepository.GetByUserIdAndTypeAsync(userId, type,
-                ct);
+    public async Task SendNotificationAsync(Guid userId, NotificationType type, string title, string body, string? entityType, Guid? entityId, CancellationToken ct) {
+        var preference = await preferenceRepository.GetByUserIdAndTypeAsync(userId, type, ct);
 
         if (preference is not null && !preference.InAppEnabled)
             return;
@@ -173,59 +89,27 @@ public sealed class NotificationService(
             CreatedAt = DateTime.UtcNow
         };
 
-        await notificationRepository.AddAsync(notification, ct);
-        await eventSender.SendAsync($"notifications:{userId}", notification,
-            ct);
+        await repository.AddAsync(notification, ct);
+        await eventSender.SendAsync($"notifications:{userId}", notification, ct);
     }
 
-    public async Task SendBookingNotificationAsync(Guid bookingId,
-        NotificationType type, string title, string body,
-        CancellationToken ct) {
-        var booking = await context.Bookings
-            .Include(b => b.Campaign)
-            .ThenInclude(c => c.AdvertiserProfile)
-            .Include(b => b.Space)
-            .ThenInclude(s => s.SpaceOwnerProfile)
-            .FirstOrDefaultAsync(b => b.Id == bookingId, ct);
-
+    public async Task SendBookingNotificationAsync(Guid bookingId, NotificationType type, string title, string body, CancellationToken ct) {
+        var booking = await repository.GetBookingNotificationInfoAsync(bookingId, ct);
         if (booking is null) return;
 
         var recipientIds = type switch {
-            NotificationType.BookingRequested => new[]
-                { booking.Space.SpaceOwnerProfile.UserId },
-            NotificationType.BookingApproved
-                or NotificationType.BookingRejected =>
-                new[] { booking.Campaign.AdvertiserProfile.UserId },
-            NotificationType.BookingCancelled =>
-                new[] {
-                    booking.Campaign.AdvertiserProfile.UserId,
-                    booking.Space.SpaceOwnerProfile.UserId
-                },
-            NotificationType.PaymentReceived
-                or NotificationType.PayoutProcessed =>
-                new[] { booking.Space.SpaceOwnerProfile.UserId },
-            NotificationType.ProofUploaded =>
-                new[] { booking.Campaign.AdvertiserProfile.UserId },
-            NotificationType.ProofApproved or NotificationType.ProofRejected
-                or NotificationType.ProofDisputed =>
-                new[] { booking.Space.SpaceOwnerProfile.UserId },
-            NotificationType.DisputeFiled =>
-                new[] { booking.Space.SpaceOwnerProfile.UserId },
-            NotificationType.DisputeResolved =>
-                new[] {
-                    booking.Campaign.AdvertiserProfile.UserId,
-                    booking.Space.SpaceOwnerProfile.UserId
-                },
+            NotificationType.BookingRequested => new[] { booking.OwnerUserId },
+            NotificationType.BookingApproved or NotificationType.BookingRejected => new[] { booking.AdvertiserUserId },
+            NotificationType.BookingCancelled => new[] { booking.AdvertiserUserId, booking.OwnerUserId },
+            NotificationType.PaymentReceived or NotificationType.PayoutProcessed => new[] { booking.OwnerUserId },
+            NotificationType.ProofUploaded => new[] { booking.AdvertiserUserId },
+            NotificationType.ProofApproved or NotificationType.ProofRejected or NotificationType.ProofDisputed => new[] { booking.OwnerUserId },
+            NotificationType.DisputeFiled => new[] { booking.OwnerUserId },
+            NotificationType.DisputeResolved => new[] { booking.AdvertiserUserId, booking.OwnerUserId },
             _ => Array.Empty<Guid>()
         };
 
         foreach (var userId in recipientIds.Distinct())
-            await SendNotificationAsync(userId, type, title, body, "Booking",
-                bookingId, ct);
-    }
-
-    private Guid GetCurrentUserId() {
-        return GetCurrentUserIdOrNull() ??
-               throw new GraphQLException("Not authenticated");
+            await SendNotificationAsync(userId, type, title, body, "Booking", bookingId, ct);
     }
 }

@@ -1,26 +1,30 @@
-using System.Diagnostics.CodeAnalysis;
+using ElaviewBackend.Features.Shared.Errors;
+using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Payments;
 
 [MutationType]
-[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static partial class StripeConnectMutations {
     [Authorize]
+    [Error<NotFoundException>]
+    [Error<PaymentException>]
     public static async Task<ConnectStripeAccountPayload> ConnectStripeAccount(
-        IStripeConnectService stripeConnectService, CancellationToken ct
+        IUserService userService,
+        IStripeConnectService stripeConnectService,
+        CancellationToken ct
     ) {
-        var result = await stripeConnectService.CreateConnectAccountAsync(ct);
-        return new ConnectStripeAccountPayload(result.AccountId,
-            result.OnboardingUrl);
+        var result = await stripeConnectService.CreateConnectAccountAsync(userService.GetPrincipalId(), ct);
+        return new ConnectStripeAccountPayload(result.AccountId, result.OnboardingUrl);
     }
 
     [Authorize]
-    public static async Task<RefreshStripeAccountStatusPayload>
-        RefreshStripeAccountStatus(
-            IStripeConnectService stripeConnectService, CancellationToken ct
-        ) {
-        return new RefreshStripeAccountStatusPayload(
-            await stripeConnectService.RefreshAccountStatusAsync(ct));
-    }
+    [Error<NotFoundException>]
+    [Error<ValidationException>]
+    [Error<PaymentException>]
+    public static async Task<RefreshStripeAccountStatusPayload> RefreshStripeAccountStatus(
+        IUserService userService,
+        IStripeConnectService stripeConnectService,
+        CancellationToken ct
+    ) => new(await stripeConnectService.RefreshAccountStatusAsync(userService.GetPrincipalId(), ct));
 }

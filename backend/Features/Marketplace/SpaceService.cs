@@ -1,83 +1,52 @@
-using System.Security.Claims;
-using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
-using Microsoft.EntityFrameworkCore;
+using ElaviewBackend.Features.Shared.Errors;
 
 namespace ElaviewBackend.Features.Marketplace;
 
 public interface ISpaceService {
-    Guid? GetCurrentUserIdOrNull();
-    IQueryable<Space> GetSpacesQuery();
-    IQueryable<Space> GetSpacesExcludingCurrentUserQuery();
-    IQueryable<Space> GetSpaceByIdQuery(Guid id);
-    IQueryable<Space> GetMySpacesQuery();
+    IQueryable<Space> GetAll();
+    IQueryable<Space> GetAllExcludingUser(Guid? userId);
+    IQueryable<Space> GetById(Guid id);
+    IQueryable<Space> GetByUserId(Guid userId);
     IQueryable<Space> GetByOwnerId(Guid ownerProfileId);
-    Task<Space?> GetSpaceByIdAsync(Guid id, CancellationToken ct);
-    Task<Space> CreateAsync(CreateSpaceInput input, CancellationToken ct);
-
-    Task<Space> UpdateAsync(Guid id, UpdateSpaceInput input,
-        CancellationToken ct);
-
-    Task<bool> DeleteAsync(Guid id, CancellationToken ct);
-    Task<Space> DeactivateAsync(Guid id, CancellationToken ct);
-    Task<Space> ReactivateAsync(Guid id, CancellationToken ct);
     IQueryable<Booking> GetBookingsBySpaceId(Guid spaceId);
     IQueryable<Review> GetReviewsBySpaceId(Guid spaceId);
-
-    Task<SpaceOwnerProfile?> GetSpaceOwnerBySpaceIdAsync(Guid spaceId,
-        CancellationToken ct);
+    Task<SpaceOwnerProfile?> GetSpaceOwnerBySpaceIdAsync(Guid spaceId, CancellationToken ct);
+    Task<Space> CreateAsync(Guid userId, CreateSpaceInput input, CancellationToken ct);
+    Task<Space> UpdateAsync(Guid userId, Guid id, UpdateSpaceInput input, CancellationToken ct);
+    Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct);
+    Task<Space> DeactivateAsync(Guid userId, Guid id, CancellationToken ct);
+    Task<Space> ReactivateAsync(Guid userId, Guid id, CancellationToken ct);
 }
 
-public sealed class SpaceService(
-    IHttpContextAccessor httpContextAccessor,
-    AppDbContext context,
-    ISpaceRepository spaceRepository
-) : ISpaceService {
-    public Guid? GetCurrentUserIdOrNull() {
-        var principalId = httpContextAccessor.HttpContext?.User.FindFirstValue(
-            ClaimTypes.NameIdentifier
-        );
-        return principalId is null ? null : Guid.Parse(principalId);
-    }
+public sealed class SpaceService(ISpaceRepository repository) : ISpaceService {
+    public IQueryable<Space> GetAll()
+        => repository.Query();
 
-    public IQueryable<Space> GetSpacesQuery() {
-        return context.Spaces;
-    }
+    public IQueryable<Space> GetAllExcludingUser(Guid? userId)
+        => repository.GetExcludingUserId(userId);
 
-    public IQueryable<Space> GetSpacesExcludingCurrentUserQuery() {
-        var userId = GetCurrentUserIdOrNull();
-        return userId is null
-            ? context.Spaces
-            : context.Spaces.Where(s => s.SpaceOwnerProfile.UserId != userId);
-    }
+    public IQueryable<Space> GetById(Guid id)
+        => repository.Query().Where(s => s.Id == id);
 
-    public IQueryable<Space> GetSpaceByIdQuery(Guid id) {
-        return context.Spaces.Where(s => s.Id == id);
-    }
-
-    public IQueryable<Space> GetMySpacesQuery() {
-        var userId = GetCurrentUserId();
-        return context.Spaces.Where(s => s.SpaceOwnerProfile.UserId == userId);
-    }
+    public IQueryable<Space> GetByUserId(Guid userId)
+        => repository.GetByUserId(userId);
 
     public IQueryable<Space> GetByOwnerId(Guid ownerProfileId)
-        => context.Spaces
-            .Where(s => s.SpaceOwnerProfileId == ownerProfileId)
-            .OrderByDescending(s => s.CreatedAt);
+        => repository.GetByOwnerId(ownerProfileId);
 
-    public async Task<Space?> GetSpaceByIdAsync(Guid id, CancellationToken ct) {
-        return await spaceRepository.GetByIdAsync(id, ct);
-    }
+    public IQueryable<Booking> GetBookingsBySpaceId(Guid spaceId)
+        => repository.GetBookingsBySpaceId(spaceId);
 
-    public async Task<Space> CreateAsync(CreateSpaceInput input,
-        CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var profile = await context.SpaceOwnerProfiles
-                          .Where(p => p.UserId == userId)
-                          .Select(p => new { p.Id })
-                          .FirstOrDefaultAsync(ct)
-                      ?? throw new GraphQLException(
-                          "Space owner profile not found");
+    public IQueryable<Review> GetReviewsBySpaceId(Guid spaceId)
+        => repository.GetReviewsBySpaceId(spaceId);
+
+    public async Task<SpaceOwnerProfile?> GetSpaceOwnerBySpaceIdAsync(Guid spaceId, CancellationToken ct)
+        => await repository.GetSpaceOwnerBySpaceIdAsync(spaceId, ct);
+
+    public async Task<Space> CreateAsync(Guid userId, CreateSpaceInput input, CancellationToken ct) {
+        var profile = await repository.GetSpaceOwnerProfileByUserIdAsync(userId, ct)
+            ?? throw new NotFoundException("SpaceOwnerProfile", userId);
 
         var space = new Space {
             SpaceOwnerProfileId = profile.Id,
@@ -106,116 +75,49 @@ public sealed class SpaceService(
             CreatedAt = DateTime.UtcNow
         };
 
-        context.Spaces.Add(space);
-        await context.SaveChangesAsync(ct);
-        return space;
+        return await repository.AddAsync(space, ct);
     }
 
-    public async Task<Space> UpdateAsync(Guid id, UpdateSpaceInput input,
-        CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var space = await context.Spaces
-                        .FirstOrDefaultAsync(
-                            s => s.Id == id &&
-                                 s.SpaceOwnerProfile.UserId == userId, ct)
-                    ?? throw new GraphQLException("Space not found");
+    public async Task<Space> UpdateAsync(Guid userId, Guid id, UpdateSpaceInput input, CancellationToken ct) {
+        var space = await repository.GetByIdWithOwnerAsync(id, ct)
+            ?? throw new NotFoundException("Space", id);
 
-        var entry = context.Entry(space);
-        if (input.Title is not null)
-            entry.Property(s => s.Title).CurrentValue = input.Title;
-        if (input.Description is not null)
-            entry.Property(s => s.Description).CurrentValue = input.Description;
-        if (input.PricePerDay is not null)
-            entry.Property(s => s.PricePerDay).CurrentValue =
-                input.PricePerDay.Value;
-        if (input.InstallationFee is not null)
-            entry.Property(s => s.InstallationFee).CurrentValue =
-                input.InstallationFee;
-        if (input.MinDuration is not null)
-            entry.Property(s => s.MinDuration).CurrentValue =
-                input.MinDuration.Value;
-        if (input.MaxDuration is not null)
-            entry.Property(s => s.MaxDuration).CurrentValue = input.MaxDuration;
-        if (input.Images is not null)
-            entry.Property(s => s.Images).CurrentValue = input.Images;
-        if (input.AvailableFrom is not null)
-            entry.Property(s => s.AvailableFrom).CurrentValue =
-                input.AvailableFrom;
-        if (input.AvailableTo is not null)
-            entry.Property(s => s.AvailableTo).CurrentValue = input.AvailableTo;
-        if (input.Traffic is not null)
-            entry.Property(s => s.Traffic).CurrentValue = input.Traffic;
+        if (space.SpaceOwnerProfile.UserId != userId)
+            throw new ForbiddenException("update this space");
 
-        await context.SaveChangesAsync(ct);
-        return space;
+        return await repository.UpdateAsync(space, input, ct);
     }
 
-    public async Task<bool> DeleteAsync(Guid id, CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var space = await context.Spaces
-            .FirstOrDefaultAsync(
-                s => s.Id == id && s.SpaceOwnerProfile.UserId == userId, ct);
+    public async Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct) {
+        var space = await repository.GetByIdWithOwnerAsync(id, ct)
+            ?? throw new NotFoundException("Space", id);
 
-        if (space is null) return false;
+        if (space.SpaceOwnerProfile.UserId != userId)
+            throw new ForbiddenException("delete this space");
 
-        var hasActiveBookings = await context.Bookings
-            .AnyAsync(b => b.SpaceId == id &&
-                           b.Status != BookingStatus.Completed &&
-                           b.Status != BookingStatus.Cancelled &&
-                           b.Status != BookingStatus.Rejected, ct);
+        if (await repository.HasActiveBookingsAsync(id, ct))
+            throw new ConflictException("Space", "Cannot delete space with active bookings");
 
-        if (hasActiveBookings)
-            throw new GraphQLException(
-                "Cannot delete space with active bookings");
-
-        context.Spaces.Remove(space);
-        await context.SaveChangesAsync(ct);
-        return true;
+        return await repository.DeleteAsync(space, ct);
     }
 
-    public async Task<Space> DeactivateAsync(Guid id, CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var space = await context.Spaces
-                        .FirstOrDefaultAsync(
-                            s => s.Id == id &&
-                                 s.SpaceOwnerProfile.UserId == userId, ct)
-                    ?? throw new GraphQLException("Space not found");
+    public async Task<Space> DeactivateAsync(Guid userId, Guid id, CancellationToken ct) {
+        var space = await repository.GetByIdWithOwnerAsync(id, ct)
+            ?? throw new NotFoundException("Space", id);
 
-        context.Entry(space).Property(s => s.Status).CurrentValue =
-            SpaceStatus.Inactive;
-        await context.SaveChangesAsync(ct);
-        return space;
+        if (space.SpaceOwnerProfile.UserId != userId)
+            throw new ForbiddenException("deactivate this space");
+
+        return await repository.UpdateStatusAsync(space, SpaceStatus.Inactive, ct);
     }
 
-    public async Task<Space> ReactivateAsync(Guid id, CancellationToken ct) {
-        var userId = GetCurrentUserId();
-        var space = await context.Spaces
-                        .FirstOrDefaultAsync(
-                            s => s.Id == id &&
-                                 s.SpaceOwnerProfile.UserId == userId, ct)
-                    ?? throw new GraphQLException("Space not found");
+    public async Task<Space> ReactivateAsync(Guid userId, Guid id, CancellationToken ct) {
+        var space = await repository.GetByIdWithOwnerAsync(id, ct)
+            ?? throw new NotFoundException("Space", id);
 
-        context.Entry(space).Property(s => s.Status).CurrentValue =
-            SpaceStatus.Active;
-        await context.SaveChangesAsync(ct);
-        return space;
-    }
+        if (space.SpaceOwnerProfile.UserId != userId)
+            throw new ForbiddenException("reactivate this space");
 
-    public IQueryable<Booking> GetBookingsBySpaceId(Guid spaceId) {
-        return context.Bookings.Where(b => b.SpaceId == spaceId);
-    }
-
-    public IQueryable<Review> GetReviewsBySpaceId(Guid spaceId) {
-        return context.Reviews.Where(r => r.SpaceId == spaceId);
-    }
-
-    public async Task<SpaceOwnerProfile?> GetSpaceOwnerBySpaceIdAsync(
-        Guid spaceId, CancellationToken ct) {
-        return await spaceRepository.GetSpaceOwnerBySpaceIdAsync(spaceId, ct);
-    }
-
-    private Guid GetCurrentUserId() {
-        return GetCurrentUserIdOrNull() ??
-               throw new GraphQLException("Not authenticated");
+        return await repository.UpdateStatusAsync(space, SpaceStatus.Active, ct);
     }
 }

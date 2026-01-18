@@ -1,4 +1,5 @@
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Marketplace;
@@ -9,10 +10,9 @@ public static partial class CampaignQueries {
     [UseFirstOrDefault]
     [UseProjection]
     public static IQueryable<Campaign> GetCampaignById(
-        [ID] Guid id, ICampaignService campaignService
-    ) {
-        return campaignService.GetCampaignByIdQuery(id);
-    }
+        [ID] Guid id,
+        ICampaignService campaignService
+    ) => campaignService.GetById(id);
 
     [Authorize]
     [UsePaging]
@@ -20,7 +20,7 @@ public static partial class CampaignQueries {
     [UseFiltering]
     [UseSorting]
     public static IQueryable<Campaign> GetMyCampaigns(
-        ICampaignService campaignService) {
-        return campaignService.GetMyCampaignsQuery();
-    }
+        IUserService userService,
+        ICampaignService campaignService
+    ) => campaignService.GetByUserId(userService.GetPrincipalId());
 }

@@ -155,6 +155,8 @@ builder
 
 ### Mutation Pattern with [Error]
 
+Mutation resolvers inject `IUserService` to get the current user's ID and pass it to domain services:
+
 ```csharp
 [MutationType]
 public static partial class BookingMutations {
@@ -165,9 +167,10 @@ public static partial class BookingMutations {
     public static async Task<Booking> ApproveBooking(
         [ID] Guid id,
         string? ownerNotes,
+        IUserService userService,
         IBookingService bookingService,
         CancellationToken ct
-    ) => await bookingService.ApproveAsync(id, ownerNotes, ct);
+    ) => await bookingService.ApproveAsync(userService.GetPrincipalId(), id, ownerNotes, ct);
 }
 ```
 
@@ -213,19 +216,22 @@ Exceptions map to error types automatically. "Exception" suffix replaced with "E
 
 ### Throwing Domain Exceptions
 
+Domain services receive `userId` as a parameter - only `IUserService` has access to `IHttpContextAccessor`:
+
 ```csharp
 public sealed class BookingService(
     IBookingRepository repository,
-    ISpaceService spaceService,
-    IHttpContextAccessor httpContextAccessor
+    ISpaceRepository spaceRepository
 ) : IBookingService {
 
-    public async Task<Booking> ApproveAsync(Guid id, string? ownerNotes, CancellationToken ct) {
+    public async Task<Booking> ApproveAsync(
+        Guid userId, Guid id, string? ownerNotes, CancellationToken ct
+    ) {
         var booking = await repository.GetByIdAsync(id, ct)
             ?? throw new NotFoundException("Booking", id);
 
-        var currentUserId = GetCurrentUserId();
-        if (booking.Space.SpaceOwnerProfile.UserId != currentUserId)
+        var space = await spaceRepository.GetByIdAsync(booking.SpaceId, ct)!;
+        if (space.SpaceOwnerProfile.UserId != userId)
             throw new ForbiddenException("approve this booking");
 
         if (booking.Status != BookingStatus.PendingApproval)
@@ -235,14 +241,27 @@ public sealed class BookingService(
         booking.OwnerNotes = ownerNotes;
         booking.UpdatedAt = DateTime.UtcNow;
 
-        await repository.SaveChangesAsync(ct);
-        return booking;
+        return await repository.UpdateAsync(booking, ct);
     }
+}
+```
 
-    private Guid GetCurrentUserId() {
-        var claim = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
-        return claim is not null ? Guid.Parse(claim.Value) : throw new ForbiddenException("access this resource");
-    }
+### Mutation Resolver (passes userId to service)
+
+```csharp
+[MutationType]
+public static class BookingMutations {
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
+    [Error<InvalidStatusTransitionException>]
+    public static async Task<Booking> ApproveBooking(
+        [ID] Guid id,
+        string? ownerNotes,
+        IUserService userService,
+        IBookingService bookingService,
+        CancellationToken ct
+    ) => await bookingService.ApproveAsync(userService.GetPrincipalId(), id, ownerNotes, ct);
 }
 ```
 
@@ -652,7 +671,7 @@ exception creation or dictionary building required.
 
 ---
 
-**Last Updated**: 2026-01-16
+**Last Updated**: 2026-01-18
 
 Sources:
 

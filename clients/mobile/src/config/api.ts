@@ -5,19 +5,30 @@
  * Uses environment variables from devbox/Doppler.
  */
 
+import Constants from 'expo-constants';
 import { API_URL, GRAPHQL_ENDPOINT } from './env';
 
-/**
- * Base API URL for REST endpoints
- * Example: http://localhost:7106 (development)
- */
-export const baseUrl = API_URL;
+const BACKEND_PORT = 7106;
 
-/**
- * GraphQL endpoint
- * Example: http://localhost:7106/api/graphql (development)
- */
-export const graphqlUrl = GRAPHQL_ENDPOINT;
+function getDevApiUrl(): string {
+  if (!__DEV__) {
+    return API_URL;
+  }
+
+  const hostUri = Constants.expoConfig?.hostUri;
+  if (hostUri) {
+    const host = hostUri.split(':')[0];
+    return `http://${host}:${BACKEND_PORT}`;
+  }
+
+  return API_URL;
+}
+
+export const baseUrl = getDevApiUrl();
+
+export const graphqlUrl = __DEV__
+  ? `${baseUrl}/api/graphql`
+  : GRAPHQL_ENDPOINT;
 
 /**
  * REST API endpoints

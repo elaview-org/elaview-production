@@ -3,6 +3,13 @@
 import api from "@/api/gql/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import type {
+  UpdateCurrentUserInput,
+  UpdateCurrentUserPayload,
+  UpdateAdvertiserProfileInput,
+  UpdateAdvertiserProfilePayload,
+  User,
+} from "@/types/graphql.generated";
 
 interface UpdateProfileState {
   success: boolean;
@@ -24,13 +31,36 @@ interface UpdateBusinessInfoState {
   };
 }
 
+type GetCurrentUserQuery = {
+  currentUser: {
+    id: string;
+    email: string;
+    name: string;
+    phone: string | null;
+    avatar: string | null;
+    createdAt: string;
+    lastLoginAt: string | null;
+    role: string;
+    activeProfileType: string;
+    status: string;
+    advertiserProfile?: {
+      id: string;
+      companyName: string;
+      industry: string;
+      website: string | null;
+      onboardingComplete: boolean;
+      createdAt: string;
+      userId: string;
+    } | null;
+  };
+};
+
 export async function updateProfileAction(
   _prevState: UpdateProfileState,
   formData: FormData
 ): Promise<UpdateProfileState> {
   try {
-    // Get current user first
-    const { data: currentUserData } = await api.query({
+    const { data: currentUserData } = await api.query<GetCurrentUserQuery>({
       query: api.gql`
         query GetCurrentUser {
           currentUser {
@@ -63,7 +93,6 @@ export async function updateProfileAction(
     }
 
     const user = currentUserData.currentUser;
-    const advertiserProfile = user.advertiserProfile;
 
     const name = formData.get("name")?.toString() ?? "";
     const email = formData.get("email")?.toString() ?? "";
@@ -86,40 +115,11 @@ export async function updateProfileAction(
       };
     }
 
-    // Build the update mutation
-    const updatedUser = {
-      id: user.id,
-      email,
-      name,
-      phone: phone || null,
-      avatar: user.avatar,
-      createdAt: user.createdAt,
-      lastLoginAt: user.lastLoginAt,
-      role: user.role,
-      activeProfileType: user.activeProfileType,
-      status: user.status,
-      password: "", // Keep existing password - don't update it
-      advertiserProfile: advertiserProfile
-        ? {
-            id: advertiserProfile.id,
-            companyName: advertiserProfile.companyName,
-            industry: advertiserProfile.industry,
-            website: advertiserProfile.website,
-            onboardingComplete: advertiserProfile.onboardingComplete,
-            createdAt: advertiserProfile.createdAt,
-            userId: advertiserProfile.userId,
-            campaigns: [],
-            stripeAccountId: null,
-            stripeAccountStatus: null,
-            stripeAccountDisconnectedAt: null,
-            stripeAccountDisconnectedNotifiedAt: null,
-            stripeLastAccountHealthCheck: null,
-          }
-        : undefined,
-      spaceOwnerProfile: undefined,
-    };
-
-    const { data, errors } = await api.query({
+    // Build the update mutation - UpdateUserInput only supports name, phone, and avatar
+    // Note: email cannot be updated through this mutation
+    const { data } = await api.query<{
+      updateCurrentUser: UpdateCurrentUserPayload;
+    }>({
       query: api.gql`
         mutation UpdateCurrentUser($input: UpdateCurrentUserInput!) {
           updateCurrentUser(input: $input) {
@@ -135,15 +135,19 @@ export async function updateProfileAction(
       `,
       variables: {
         input: {
-          updatedUser,
-        },
+          input: {
+            name,
+            phone: phone || null,
+            avatar: user.avatar || null,
+          },
+        } satisfies UpdateCurrentUserInput,
       },
     });
 
-    if (errors || !data?.updateCurrentUser?.user) {
+    if (!data?.updateCurrentUser?.user) {
       return {
         success: false,
-        message: errors?.[0]?.message ?? "Failed to update profile",
+        message: "Failed to update profile",
         data: { name, email, phone },
       };
     }
@@ -174,7 +178,7 @@ export async function updateBusinessInfoAction(
 ): Promise<UpdateBusinessInfoState> {
   try {
     // Get current user first
-    const { data: currentUserData } = await api.query({
+    const { data: currentUserData } = await api.query<User>({
       query: api.gql`
         query GetCurrentUser {
           currentUser {
@@ -202,11 +206,11 @@ export async function updateBusinessInfoAction(
       `,
     });
 
-    if (!currentUserData?.currentUser) {
+    if (!currentUserData) {
       redirect("/logout");
     }
 
-    const user = currentUserData.currentUser;
+    const user = currentUserData;
     const advertiserProfile = user.advertiserProfile;
 
     if (!advertiserProfile) {
@@ -225,63 +229,34 @@ export async function updateBusinessInfoAction(
     const industry = formData.get("industry")?.toString() ?? "";
     const website = formData.get("website")?.toString() ?? "";
 
-    // Build the update mutation
-    const updatedUser = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      phone: user.phone,
-      avatar: user.avatar,
-      createdAt: user.createdAt,
-      lastLoginAt: user.lastLoginAt,
-      role: user.role,
-      activeProfileType: user.activeProfileType,
-      status: user.status,
-      password: "", // Keep existing password
-      advertiserProfile: {
-        id: advertiserProfile.id,
-        companyName: companyName || null,
-        industry: industry || null,
-        website: website || null,
-        onboardingComplete: advertiserProfile.onboardingComplete,
-        createdAt: advertiserProfile.createdAt,
-        userId: advertiserProfile.userId,
-        campaigns: [],
-        stripeAccountId: null,
-        stripeAccountStatus: null,
-        stripeAccountDisconnectedAt: null,
-        stripeAccountDisconnectedNotifiedAt: null,
-        stripeLastAccountHealthCheck: null,
-      },
-      spaceOwnerProfile: undefined,
-    };
-
-    const { data, errors } = await api.query({
+    // Use the dedicated updateAdvertiserProfile mutation
+    const { data } = await api.query<{
+      updateAdvertiserProfile: UpdateAdvertiserProfilePayload;
+    }>({
       query: api.gql`
-        mutation UpdateCurrentUser($input: UpdateCurrentUserInput!) {
-          updateCurrentUser(input: $input) {
-            user {
-              id
-              advertiserProfile {
-                companyName
-                industry
-                website
-              }
+        mutation UpdateAdvertiserProfile($input: UpdateAdvertiserProfileInput!) {
+          updateAdvertiserProfile(input: $input) {
+            advertiserProfile {
+              companyName
+              industry
+              website
             }
           }
         }
       `,
       variables: {
         input: {
-          updatedUser,
-        },
+          companyName: companyName || null,
+          industry: industry || null,
+          website: website || null,
+        } satisfies UpdateAdvertiserProfileInput,
       },
     });
 
-    if (errors || !data?.updateCurrentUser?.user) {
+    if (!data?.updateAdvertiserProfile?.advertiserProfile) {
       return {
         success: false,
-        message: errors?.[0]?.message ?? "Failed to update business information",
+        message: "Failed to update business information",
         data: { companyName, industry, website },
       };
     }

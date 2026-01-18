@@ -15,12 +15,9 @@ import { AccountSettingsForm } from "./account-settings-form";
 import type { User } from "@/types/graphql.generated";
 
 interface AdvertiserSettingsContentProps {
-  user: NonNullable<Query["currentUser"]>;
+  user: User;
 }
 
-type Query = {
-  currentUser: User | null;
-};
 
 export function AdvertiserSettingsContent({
   user,

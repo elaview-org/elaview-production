@@ -23,6 +23,7 @@ import {
   Store,
   Camera,
   Locate,
+  LucideProps,
 } from "lucide-react";
 import useSupercluster from "use-supercluster";
 import type { BBox } from "geojson";
@@ -104,7 +105,7 @@ interface ClusterFeature {
 // CONSTANTS
 // ============================================================================
 
-const SPACE_TYPE_ICONS: Record<string, React.ComponentType<any>> = {
+const SPACE_TYPE_ICONS: Record<string, React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>> = {
   BILLBOARD: Building,
   STOREFRONT: Store,
   TRANSIT: Bus,
@@ -124,7 +125,7 @@ const SPACE_TYPE_COLORS: Record<string, string> = {
   OTHER: "#6B7280",
 };
 
-const DEBUG = process.env.NODE_ENV === "development";
+const DEBUG = process.env.ELAVIEW_WEB_NODE_ENV === "development";
 
 // Default world view
 const DEFAULT_CENTER = { lat: 0, lng: 0 };
@@ -242,7 +243,7 @@ const ClusterMarker: React.FC<{
           boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
         }}
       >
-        <div className="h-30 w-30 bg-red-800 rounded-full"></div>
+        <div className="h-30 w-30 rounded-full bg-red-800"></div>
         <span className="text-sm font-bold text-white">{pointCount}</span>
       </div>
     </AdvancedMarker>
@@ -583,7 +584,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
 
   // Render markers and clusters
   const markers = useMemo(() => {
-    if ( clusters.length === 0) return [];
+    if (clusters.length === 0) return [];
 
     if (DEBUG) {
       console.log("🔄 Rendering markers/clusters:", {
@@ -596,7 +597,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
       const properties = cluster.properties as ClusterProperties;
       const isCluster = properties.cluster;
 
-      console.log('isCluster', isCluster);
+      console.log("isCluster", isCluster);
       if (isCluster) {
         return (
           <ClusterMarker
@@ -609,9 +610,13 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
                 cluster.id,
                 Infinity
               );
+
               const clusterSpaces = clusterLeaves
-                .map((leaf) => (leaf.properties as any).space)
-                .filter((space): space is Space => space !== undefined);
+                .map((leaf: { properties: { space?: Space } }) => {
+                  const space: Space | undefined = leaf.properties.space;
+                  return space;
+                })
+                .filter((space: Space | undefined): space is Space => space !== undefined);
 
               if (DEBUG) {
                 console.log("🎯 Cluster clicked:", {
@@ -689,7 +694,7 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
     []
   );
 
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!;
+  const apiKey = process.env.ELAVIEW_WEB_NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!;
 
   if (!apiKey) {
     return (
@@ -733,7 +738,10 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
           //     onMapClick();
           //   }
           // }}
-          mapId={process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID"}
+          mapId={
+            process.env.ELAVIEW_WEB_NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID ||
+            "DEMO_MAP_ID"
+          }
           style={{ width: "100%", height: "100%" }}
           gestureHandling="greedy"
           disableDefaultUI={false}

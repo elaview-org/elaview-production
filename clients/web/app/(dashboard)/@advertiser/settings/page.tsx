@@ -1,36 +1,13 @@
-import api from "@/api/gql/server";
-import { Query } from "@/types/graphql.generated";
 import { redirect } from "next/navigation";
-import { AdvertiserSettingsContent } from "../../../../components/pages/advertiser-setting/advertiser-settings-content";
+import { AdvertiserSettingsContent } from "./components/advertiser-settings-content";
+import getAdvertiserQuery from "./advertiser-queries";
+import { User } from "@/types/graphql.generated";
 
 export default async function AdvertiserSettingsPage() {
-  const { data } = await api.query<Query>({
-    query: api.gql`
-      query GetCurrentUserForSettings {
-        currentUser {
-          id
-          email
-          name
-          avatar
-          phone
-          createdAt
-          lastLoginAt
-          activeProfileType
-          advertiserProfile {
-            id
-            companyName
-            industry
-            website
-            onboardingComplete
-          }
-        }
-      }
-    `,
-  });
-
-  if (!data?.currentUser) {
+  const { status, currentUser } = await getAdvertiserQuery();
+  if (status) {
     redirect("/logout");
   }
 
-  return <AdvertiserSettingsContent user={data.currentUser} />;
+  return <AdvertiserSettingsContent user={currentUser as User} />;
 }

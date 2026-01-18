@@ -7,7 +7,7 @@ const { getClient, query, PreloadQuery } = registerApolloClient(async () => {
     cache: new InMemoryCache(),
     link: new HttpLink({
       // this needs to be an absolute url, as relative urls cannot be used in SSR
-      uri: `${process.env.NEXT_PUBLIC_API_URL!}/graphql`,
+      uri: `${process.env.ELAVIEW_WEB_NEXT_PUBLIC_API_URL!}/graphql`,
       headers: {
         cookie: (await cookies()).toString(),
       },

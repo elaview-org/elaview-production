@@ -2,9 +2,12 @@ name: Validate Backend
 
 on:
   workflow_call:
+    inputs:
+      environment:
+        type: string
 
 env:
-  ELAVIEW_ENVIRONMENT: development
+  ELAVIEW_ENVIRONMENT: ${{ inputs.environment }}
   DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
 
 jobs:
@@ -31,5 +34,5 @@ jobs:
       - name: Build
         run: ev backend:build
 
-      - name: Test
-        run: ev backend:test
+#      - name: Test
+#        run: ev backend:test

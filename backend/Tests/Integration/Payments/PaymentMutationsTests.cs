@@ -237,7 +237,8 @@ public sealed class PaymentMutationsTests(IntegrationTestFixture fixture)
                 """,
             new {
                 input = new {
-                    paymentId = Guid.NewGuid(), amount = 100.00m,
+                    paymentId = Guid.NewGuid(),
+                    amount = 100.00m,
                     reason = "Test refund"
                 }
             });

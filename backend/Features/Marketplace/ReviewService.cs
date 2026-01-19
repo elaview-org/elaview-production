@@ -44,10 +44,12 @@ public sealed class ReviewService(IReviewRepository repository) : IReviewService
         if (booking.AdvertiserUserId == userId) {
             reviewerType = ReviewerType.Advertiser;
             reviewerProfileId = booking.AdvertiserProfileId;
-        } else if (booking.OwnerUserId == userId) {
+        }
+        else if (booking.OwnerUserId == userId) {
             reviewerType = ReviewerType.SpaceOwner;
             reviewerProfileId = booking.OwnerProfileId;
-        } else {
+        }
+        else {
             throw new ForbiddenException("review this booking");
         }
 

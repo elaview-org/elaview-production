@@ -40,7 +40,8 @@ public sealed class UserService(
                 var profile = await userRepository.GetAdvertiserProfileByUserIdAsync(userId, ct);
                 if (profile is null)
                     await userRepository.CreateAdvertiserProfileAsync(userId, ct);
-            } else {
+            }
+            else {
                 var profile = await userRepository.GetSpaceOwnerProfileByUserIdAsync(userId, ct);
                 if (profile is null)
                     await userRepository.CreateSpaceOwnerProfileAsync(userId, ct);

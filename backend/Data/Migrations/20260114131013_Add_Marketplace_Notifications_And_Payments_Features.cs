@@ -4,18 +4,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ElaviewBackend.Data.Migrations
-{
+namespace ElaviewBackend.Data.Migrations {
     /// <inheritdoc />
-    public partial class Add_Marketplace_Notifications_And_Payments_Features : Migration
-    {
+    public partial class Add_Marketplace_Notifications_And_Payments_Features : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.CreateTable(
                 name: "bookings",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     CampaignId = table.Column<Guid>(type: "uuid", nullable: false),
                     SpaceId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -41,8 +37,7 @@ namespace ElaviewBackend.Data.Migrations
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_bookings", x => x.Id);
                     table.ForeignKey(
                         name: "FK_bookings_campaigns_CampaignId",
@@ -66,8 +61,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "notification_preferences",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     NotificationType = table.Column<int>(type: "integer", nullable: false),
@@ -76,8 +70,7 @@ namespace ElaviewBackend.Data.Migrations
                     InAppEnabled = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_notification_preferences", x => x.Id);
                     table.ForeignKey(
                         name: "FK_notification_preferences_users_UserId",
@@ -89,8 +82,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "notifications",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
@@ -102,8 +94,7 @@ namespace ElaviewBackend.Data.Migrations
                     ReadAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_notifications", x => x.Id);
                     table.ForeignKey(
                         name: "FK_notifications_users_UserId",
@@ -115,8 +106,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "stripe_webhook_events",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     StripeEventId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     EventType = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
@@ -126,15 +116,13 @@ namespace ElaviewBackend.Data.Migrations
                     ProcessingError = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_stripe_webhook_events", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "booking_disputes",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     BookingId = table.Column<Guid>(type: "uuid", nullable: false),
                     IssueType = table.Column<int>(type: "integer", nullable: false),
@@ -148,8 +136,7 @@ namespace ElaviewBackend.Data.Migrations
                     ResolutionNotes = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_booking_disputes", x => x.Id);
                     table.ForeignKey(
                         name: "FK_booking_disputes_bookings_BookingId",
@@ -173,8 +160,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "booking_proofs",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     BookingId = table.Column<Guid>(type: "uuid", nullable: false),
                     Photos = table.Column<List<string>>(type: "text[]", nullable: false),
@@ -186,8 +172,7 @@ namespace ElaviewBackend.Data.Migrations
                     RejectionReason = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_booking_proofs", x => x.Id);
                     table.ForeignKey(
                         name: "FK_booking_proofs_bookings_BookingId",
@@ -205,15 +190,13 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "conversations",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     BookingId = table.Column<Guid>(type: "uuid", nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_conversations", x => x.Id);
                     table.ForeignKey(
                         name: "FK_conversations_bookings_BookingId",
@@ -225,8 +208,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "payments",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     BookingId = table.Column<Guid>(type: "uuid", nullable: false),
                     Type = table.Column<int>(type: "integer", nullable: false),
@@ -239,8 +221,7 @@ namespace ElaviewBackend.Data.Migrations
                     FailureReason = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_payments", x => x.Id);
                     table.ForeignKey(
                         name: "FK_payments_bookings_BookingId",
@@ -252,8 +233,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "payouts",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     BookingId = table.Column<Guid>(type: "uuid", nullable: false),
                     SpaceOwnerProfileId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -267,8 +247,7 @@ namespace ElaviewBackend.Data.Migrations
                     LastAttemptAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_payouts", x => x.Id);
                     table.ForeignKey(
                         name: "FK_payouts_bookings_BookingId",
@@ -286,8 +265,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "reviews",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     BookingId = table.Column<Guid>(type: "uuid", nullable: false),
                     SpaceId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -297,8 +275,7 @@ namespace ElaviewBackend.Data.Migrations
                     Comment = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_reviews", x => x.Id);
                     table.ForeignKey(
                         name: "FK_reviews_bookings_BookingId",
@@ -316,8 +293,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "transactions",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     BookingId = table.Column<Guid>(type: "uuid", nullable: true),
                     UserId = table.Column<Guid>(type: "uuid", nullable: true),
@@ -329,8 +305,7 @@ namespace ElaviewBackend.Data.Migrations
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_transactions", x => x.Id);
                     table.ForeignKey(
                         name: "FK_transactions_bookings_BookingId",
@@ -348,8 +323,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "conversation_participants",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     ConversationId = table.Column<Guid>(type: "uuid", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -357,8 +331,7 @@ namespace ElaviewBackend.Data.Migrations
                     LastReadAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_conversation_participants", x => x.Id);
                     table.ForeignKey(
                         name: "FK_conversation_participants_conversations_ConversationId",
@@ -376,8 +349,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "messages",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     ConversationId = table.Column<Guid>(type: "uuid", nullable: false),
                     SenderUserId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -386,8 +358,7 @@ namespace ElaviewBackend.Data.Migrations
                     Attachments = table.Column<List<string>>(type: "text[]", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_messages", x => x.Id);
                     table.ForeignKey(
                         name: "FK_messages_conversations_ConversationId",
@@ -405,8 +376,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "refunds",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     PaymentId = table.Column<Guid>(type: "uuid", nullable: false),
                     BookingId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -417,8 +387,7 @@ namespace ElaviewBackend.Data.Migrations
                     ProcessedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_refunds", x => x.Id);
                     table.ForeignKey(
                         name: "FK_refunds_bookings_BookingId",
@@ -687,8 +656,7 @@ namespace ElaviewBackend.Data.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropTable(
                 name: "booking_disputes");
 

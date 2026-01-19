@@ -153,7 +153,8 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture)
                 """,
             new {
                 input = new {
-                    paymentId = Guid.NewGuid(), amount = 100.00m,
+                    paymentId = Guid.NewGuid(),
+                    amount = 100.00m,
                     reason = "Test refund"
                 }
             });
@@ -185,7 +186,8 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture)
                 """,
             new {
                 input = new {
-                    paymentId = payment.Id, amount = 50.00m,
+                    paymentId = payment.Id,
+                    amount = 50.00m,
                     reason = "Test refund"
                 }
             });
@@ -219,7 +221,8 @@ public sealed class PaymentAdminMutationsTests(IntegrationTestFixture fixture)
                 """,
             new {
                 input = new {
-                    paymentId = payment.Id, amount = 150.00m,
+                    paymentId = payment.Id,
+                    amount = 150.00m,
                     reason = "Test refund"
                 }
             });

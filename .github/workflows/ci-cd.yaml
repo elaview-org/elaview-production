@@ -1,0 +1,142 @@
+name: CI/CD
+
+on:
+  pull_request:
+    branches: [ devops ]
+  push:
+    branches: [ devops ]
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+jobs:
+  # ═══════════════════════════════════════════════════════════════════════════
+  # STAGE 1: VALIDATION (parallel, reusable workflows)
+  # ═══════════════════════════════════════════════════════════════════════════
+
+  validate-backend:
+    name: Validate Backend
+    uses: ./.github/workflows/validate-backend.yaml
+    secrets: inherit
+    with:
+      environment: development
+
+#  validate-web:
+#    name: Validate Web
+#    uses: ./.github/workflows/jobs/validate-web.yaml
+#    secrets: inherit
+#
+#  validate-mobile:
+#    name: Validate Mobile
+#    uses: ./.github/workflows/jobs/validate-mobile.yaml
+#    secrets: inherit
+#
+#  # ═══════════════════════════════════════════════════════════════════════════
+#  # STAGE 2: SECURITY
+#  # ═══════════════════════════════════════════════════════════════════════════
+#
+#  security:
+#    name: Security Scanning
+#    needs: [ validate-backend, validate-web, validate-mobile ]
+#    uses: ./.github/workflows/jobs/security.yaml
+#    secrets: inherit
+#
+#  # ═══════════════════════════════════════════════════════════════════════════
+#  # STAGE 3: BUILD
+#  # ═══════════════════════════════════════════════════════════════════════════
+#
+#  build-backend:
+#    name: Build Backend
+#    needs: security
+#    uses: ./.github/workflows/jobs/build-backend.yaml
+#    secrets: inherit
+#
+#  build-web:
+#    name: Build Web
+#    needs: security
+#    uses: ./.github/workflows/jobs/build-web.yaml
+#    secrets: inherit
+#
+#  build-mobile:
+#    name: Build Mobile (EAS)
+#    needs: security
+#    if: github.ref == 'refs/heads/main'
+#    uses: ./.github/workflows/jobs/build-mobile.yaml
+#    secrets: inherit
+#
+#  # ═══════════════════════════════════════════════════════════════════════════
+#  # STAGE 4: TESTING
+#  # ═══════════════════════════════════════════════════════════════════════════
+#
+#  test-integration:
+#    name: Integration Tests
+#    needs: [ build-backend, build-web ]
+#    uses: ./.github/workflows/jobs/test-integration.yaml
+#    secrets: inherit
+#
+#  test-e2e:
+#    name: E2E Tests
+#    needs: [ build-backend, build-web ]
+#    uses: ./.github/workflows/jobs/test-e2e.yaml
+#    secrets: inherit
+#
+#  # ═══════════════════════════════════════════════════════════════════════════
+#  # STAGE 5: DEPLOY (main branch only)
+#  # ═══════════════════════════════════════════════════════════════════════════
+#
+#  deploy:
+#    name: Deploy to Staging
+#    needs: [ test-integration, test-e2e ]
+#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+#    uses: ./.github/workflows/jobs/deploy.yaml
+#    secrets: inherit
+#
+#  # ═══════════════════════════════════════════════════════════════════════════
+#  # CI/CD SUMMARY
+#  # ═══════════════════════════════════════════════════════════════════════════
+#
+#  summary:
+#    name: Pipeline Summary
+#    runs-on: ubuntu-latest
+#    needs: [ validate-backend, validate-web, validate-mobile, security, build-backend, build-web, test-integration, test-e2e ]
+#    if: always()
+#    steps:
+#      - name: Summary
+#        run: |
+#          echo "═══════════════════════════════════════════════════════"
+#          echo "                   CI/CD PIPELINE SUMMARY               "
+#          echo "═══════════════════════════════════════════════════════"
+#          echo ""
+#          echo "VALIDATION:"
+#          echo "  Backend:  ${{ needs.validate-backend.result }}"
+#          echo "  Web:      ${{ needs.validate-web.result }}"
+#          echo "  Mobile:   ${{ needs.validate-mobile.result }}"
+#          echo ""
+#          echo "SECURITY:   ${{ needs.security.result }}"
+#          echo ""
+#          echo "BUILD:"
+#          echo "  Backend:  ${{ needs.build-backend.result }}"
+#          echo "  Web:      ${{ needs.build-web.result }}"
+#          echo ""
+#          echo "TESTING:"
+#          echo "  Integration: ${{ needs.test-integration.result }}"
+#          echo "  E2E:         ${{ needs.test-e2e.result }}"
+#          echo "═══════════════════════════════════════════════════════"
+#
+#          # Fail if any required job failed
+#          if [[ "${{ needs.validate-backend.result }}" != "success" ]] || \
+#             [[ "${{ needs.validate-web.result }}" != "success" ]] || \
+#             [[ "${{ needs.validate-mobile.result }}" != "success" ]] || \
+#             [[ "${{ needs.security.result }}" != "success" ]] || \
+#             [[ "${{ needs.build-backend.result }}" != "success" ]] || \
+#             [[ "${{ needs.build-web.result }}" != "success" ]] || \
+#             [[ "${{ needs.test-integration.result }}" != "success" ]] || \
+#             [[ "${{ needs.test-e2e.result }}" != "success" ]]; then
+#            echo "❌ CI/CD Pipeline Failed"
+#            exit 1
+#          fi
+#          echo "✅ CI/CD Pipeline Passed"

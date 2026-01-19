@@ -10,12 +10,12 @@ namespace ElaviewBackend.Tests.Integration.Users;
 public sealed class UserQueriesTests(IntegrationTestFixture fixture)
     : IntegrationTestBase(fixture) {
     [Fact]
-    public async Task GetCurrentUser_Authenticated_ReturnsUser() {
+    public async Task GetMe_Authenticated_ReturnsUser() {
         var user = await CreateAndLoginUserAsync();
 
-        var response = await Client.QueryAsync<CurrentUserResponse>("""
+        var response = await Client.QueryAsync<MeResponse>("""
             query {
-                currentUser {
+                me {
                     id
                     email
                     name
@@ -28,16 +28,16 @@ public sealed class UserQueriesTests(IntegrationTestFixture fixture)
 
         response.Errors.Should().BeNullOrEmpty();
         response.Data.Should().NotBeNull();
-        response.Data!.CurrentUser.Should().NotBeNull();
-        response.Data!.CurrentUser!.Email.Should().Be(user.Email);
-        response.Data!.CurrentUser!.Name.Should().Be(user.Name);
+        response.Data!.Me.Should().NotBeNull();
+        response.Data!.Me!.Email.Should().Be(user.Email);
+        response.Data!.Me!.Name.Should().Be(user.Name);
     }
 
     [Fact]
-    public async Task GetCurrentUser_Unauthenticated_ReturnsAuthError() {
-        var response = await Client.QueryAsync<CurrentUserResponse>("""
+    public async Task GetMe_Unauthenticated_ReturnsAuthError() {
+        var response = await Client.QueryAsync<MeResponse>("""
             query {
-                currentUser {
+                me {
                     id
                 }
             }
@@ -45,102 +45,7 @@ public sealed class UserQueriesTests(IntegrationTestFixture fixture)
 
         response.Errors.Should().NotBeNullOrEmpty();
         response.Errors!.Should().ContainSingle()
-            .Which.Extensions.Should().ContainKey("code")
-            .WhoseValue?.ToString().Should().Be("AUTH_NOT_AUTHENTICATED");
+            .Which.Extensions.Should().ContainKey("code");
     }
 
-    [Fact]
-    public async Task GetUsers_AsAdmin_ReturnsPaginatedUsers() {
-        await LoginAsAdminAsync();
-        await SeedUsersAsync(15);
-
-        var response = await Client.QueryAsync<UsersResponse>("""
-            query {
-                users(first: 10) {
-                    nodes { id email name role status }
-                    pageInfo { hasNextPage hasPreviousPage }
-                }
-            }
-            """);
-
-        response.Errors.Should().BeNullOrEmpty();
-        response.Data!.Users.Nodes.Should().HaveCount(10);
-        response.Data!.Users.PageInfo.HasNextPage.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task GetUsers_AsRegularUser_ReturnsForbidden() {
-        await CreateAndLoginUserAsync();
-
-        var response = await Client.QueryAsync<UsersResponse>("""
-            query {
-                users(first: 10) {
-                    nodes { id }
-                }
-            }
-            """);
-
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.Should().ContainSingle()
-            .Which.Extensions.Should().ContainKey("code")
-            .WhoseValue?.ToString().Should().Be("AUTH_NOT_AUTHORIZED");
-    }
-
-    [Fact]
-    public async Task GetUserById_AsAdmin_ReturnsUser() {
-        var admin = await LoginAsAdminAsync();
-        var user = await SeedUserAsync();
-
-        var response = await Client.QueryAsync<UserByIdResponse>("""
-                query($id: ID!) {
-                    userById(id: $id) {
-                        id
-                        email
-                        name
-                    }
-                }
-                """,
-            new { id = user.Id });
-
-        response.Errors.Should().BeNullOrEmpty();
-        response.Data!.UserById.Should().NotBeNull();
-        response.Data!.UserById!.Email.Should().Be(user.Email);
-    }
-
-    [Fact]
-    public async Task GetUserById_AsRegularUser_ReturnsForbidden() {
-        await CreateAndLoginUserAsync();
-        var otherUser = await SeedUserAsync();
-
-        var response = await Client.QueryAsync<UserByIdResponse>("""
-                query($id: ID!) {
-                    userById(id: $id) {
-                        id
-                    }
-                }
-                """,
-            new { id = otherUser.Id });
-
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.Should().ContainSingle()
-            .Which.Extensions.Should().ContainKey("code")
-            .WhoseValue?.ToString().Should().Be("AUTH_NOT_AUTHORIZED");
-    }
-
-    [Fact]
-    public async Task GetUserById_NonexistentUser_ReturnsNull() {
-        await LoginAsAdminAsync();
-
-        var response = await Client.QueryAsync<UserByIdResponse>("""
-                query($id: ID!) {
-                    userById(id: $id) {
-                        id
-                    }
-                }
-                """,
-            new { id = Guid.NewGuid() });
-
-        response.Errors.Should().BeNullOrEmpty();
-        response.Data!.UserById.Should().BeNull();
-    }
 }

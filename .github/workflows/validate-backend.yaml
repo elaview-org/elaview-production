@@ -1,0 +1,38 @@
+name: Validate Backend
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+
+env:
+  ELAVIEW_ENVIRONMENT: ${{ inputs.environment }}
+  DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+jobs:
+  validate:
+    name: _
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: devbox run -- bash -e {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Devbox
+        uses: jetify-com/devbox-install-action@v0.11.0
+        with:
+          enable-cache: true
+
+      - name: Restore
+        run: ev backend:install
+
+      - name: Lint
+        run: ev backend:lint
+
+      - name: Build
+        run: ev backend:build
+
+      - name: Test
+        run: ev backend:test

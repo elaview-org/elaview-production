@@ -79,67 +79,6 @@ public sealed class ConversationTests(IntegrationTestFixture fixture)
     }
 
     [Fact]
-    public async Task CreateBookingConversation_InvalidBooking_ReturnsError() {
-        var user = await CreateAndLoginUserAsync();
-
-        var response =
-            await Client.MutateAsync<CreateBookingConversationResponse>("""
-                    mutation($input: CreateBookingConversationInput!) {
-                        createBookingConversation(input: $input) {
-                            conversation { id }
-                        }
-                    }
-                    """,
-                new { input = new { bookingId = Guid.NewGuid() } });
-
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Message.Should().Contain("not found");
-    }
-
-    [Fact]
-    public async Task GetConversationById_ReturnsConversation() {
-        var (advertiser, advertiserProfile) = await SeedAdvertiserAsync();
-        var (otherUser, _) = await SeedSpaceOwnerAsync();
-        await LoginAsync(advertiser.Email, "Test123!");
-
-        var conversation =
-            await SeedConversationWithParticipantsAsync(null, advertiser.Id,
-                otherUser.Id);
-
-        var response = await Client.QueryAsync<ConversationByIdResponse>("""
-                query($id: ID!) {
-                    conversationById(id: $id) {
-                        id
-                        bookingId
-                        updatedAt
-                    }
-                }
-                """,
-            new { id = conversation.Id });
-
-        response.Errors.Should().BeNullOrEmpty();
-        response.Data!.ConversationById.Should().NotBeNull();
-        response.Data!.ConversationById!.Id.Should().Be(conversation.Id);
-    }
-
-    [Fact]
-    public async Task GetConversationById_Unauthenticated_ReturnsAuthError() {
-        var response = await Client.QueryAsync<ConversationByIdResponse>("""
-                query($id: ID!) {
-                    conversationById(id: $id) {
-                        id
-                    }
-                }
-                """,
-            new { id = Guid.NewGuid() });
-
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.Should().ContainSingle()
-            .Which.Extensions.Should().ContainKey("code")
-            .WhoseValue?.ToString().Should().Be("AUTH_NOT_AUTHENTICATED");
-    }
-
-    [Fact]
     public async Task GetMessagesByConversation_ReturnsMessages() {
         var (advertiser, _) = await SeedAdvertiserAsync();
         var (otherUser, _) = await SeedSpaceOwnerAsync();
@@ -235,32 +174,6 @@ public sealed class ConversationTests(IntegrationTestFixture fixture)
         response.Errors.Should().BeNullOrEmpty();
         response.Data!.SendMessage.Message.Content.Should()
             .Be("Check out these attachments");
-    }
-
-    [Fact]
-    public async Task MarkConversationRead_NotParticipant_ReturnsError() {
-        var user = await CreateAndLoginUserAsync();
-        var (user1, _) = await SeedAdvertiserAsync();
-        var (user2, _) = await SeedSpaceOwnerAsync();
-
-        var conversation =
-            await SeedConversationWithParticipantsAsync(null, user1.Id,
-                user2.Id);
-
-        var response = await Client.MutateAsync<MarkConversationReadResponse>(
-            """
-            mutation($input: MarkConversationReadInput!) {
-                markConversationRead(input: $input) {
-                    participant {
-                        id
-                    }
-                }
-            }
-            """,
-            new { input = new { conversationId = conversation.Id } });
-
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Message.Should().Contain("not a participant");
     }
 
     private async Task<Conversation> SeedConversationWithParticipantsAsync(

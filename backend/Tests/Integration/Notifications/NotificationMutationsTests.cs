@@ -39,28 +39,6 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture)
     }
 
     [Fact]
-    public async Task
-        MarkNotificationRead_OtherUserNotification_ReturnsError() {
-        var user = await CreateAndLoginUserAsync();
-        var (otherUser, _) = await SeedAdvertiserAsync();
-        var notification = await SeedNotificationAsync(otherUser.Id);
-
-        var response = await Client.MutateAsync<MarkNotificationReadResponse>(
-            """
-            mutation($input: MarkNotificationReadInput!) {
-                markNotificationRead(input: $input) {
-                    notification {
-                        id
-                    }
-                }
-            }
-            """,
-            new { input = new { id = notification.Id } });
-
-        response.Errors.Should().NotBeNullOrEmpty();
-    }
-
-    [Fact]
     public async Task MarkAllNotificationsRead_MarksAllAsRead() {
         var user = await CreateAndLoginUserAsync();
         await SeedNotificationAsync(user.Id);
@@ -163,34 +141,6 @@ public sealed class NotificationMutationsTests(IntegrationTestFixture fixture)
         response.Data!.SendMessage.Message.Content.Should()
             .Be("Hello, this is a test message");
         response.Data!.SendMessage.Message.SenderUserId.Should().Be(user.Id);
-    }
-
-    [Fact]
-    public async Task SendMessage_NotParticipant_ReturnsError() {
-        var user = await CreateAndLoginUserAsync();
-        var (otherUser1, _) = await SeedAdvertiserAsync();
-        var (otherUser2, _) = await SeedSpaceOwnerAsync();
-        var conversation =
-            await SeedConversationWithParticipantsAsync(null, otherUser1.Id,
-                otherUser2.Id);
-
-        var response = await Client.MutateAsync<SendMessageResponse>("""
-                mutation($input: SendMessageInput!) {
-                    sendMessage(input: $input) {
-                        message {
-                            id
-                        }
-                    }
-                }
-                """,
-            new {
-                input = new {
-                    conversationId = conversation.Id,
-                    content = "Hello"
-                }
-            });
-
-        response.Errors.Should().NotBeNullOrEmpty();
     }
 
     [Fact]

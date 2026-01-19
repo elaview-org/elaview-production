@@ -8,9 +8,16 @@ public interface IUserService {
     Guid GetPrincipalId();
     Guid? GetPrincipalIdOrNull();
     IQueryable<User> GetCurrentUser();
-    Task<User> UpdateAsync(Guid userId, UpdateUserInput input, CancellationToken ct);
-    Task<AdvertiserProfile> UpdateAdvertiserProfileAsync(Guid userId, UpdateAdvertiserProfileInput input, CancellationToken ct);
-    Task<SpaceOwnerProfile> UpdateSpaceOwnerProfileAsync(Guid userId, UpdateSpaceOwnerProfileInput input, CancellationToken ct);
+
+    Task<User> UpdateAsync(Guid userId, UpdateUserInput input,
+        CancellationToken ct);
+
+    Task<AdvertiserProfile> UpdateAdvertiserProfileAsync(Guid userId,
+        UpdateAdvertiserProfileInput input, CancellationToken ct);
+
+    Task<SpaceOwnerProfile> UpdateSpaceOwnerProfileAsync(Guid userId,
+        UpdateSpaceOwnerProfileInput input, CancellationToken ct);
+
     Task<bool> DeleteAsync(Guid userId, CancellationToken ct);
 }
 
@@ -31,20 +38,26 @@ public sealed class UserService(
     public IQueryable<User> GetCurrentUser()
         => userRepository.GetUserById(GetPrincipalId());
 
-    public async Task<User> UpdateAsync(Guid userId, UpdateUserInput input, CancellationToken ct) {
+    public async Task<User> UpdateAsync(Guid userId, UpdateUserInput input,
+        CancellationToken ct) {
         var user = await userRepository.GetByIdAsync(userId, ct)
-            ?? throw new NotFoundException("User", userId);
+                   ?? throw new NotFoundException("User", userId);
 
-        if (input.ActiveProfileType is { } profileType) {
-            if (profileType == ProfileType.Advertiser) {
-                var profile = await userRepository.GetAdvertiserProfileByUserIdAsync(userId, ct);
-                if (profile is null)
-                    await userRepository.CreateAdvertiserProfileAsync(userId, ct);
-            } else {
-                var profile = await userRepository.GetSpaceOwnerProfileByUserIdAsync(userId, ct);
-                if (profile is null)
-                    await userRepository.CreateSpaceOwnerProfileAsync(userId, ct);
-            }
+        if (input.ActiveProfileType is not { } profileType)
+            return await userRepository.UpdateAsync(user, input, ct);
+        if (profileType == ProfileType.Advertiser) {
+            var profile =
+                await userRepository.GetAdvertiserProfileByUserIdAsync(userId,
+                    ct);
+            if (profile is null)
+                await userRepository.CreateAdvertiserProfileAsync(userId, ct);
+        }
+        else {
+            var profile =
+                await userRepository.GetSpaceOwnerProfileByUserIdAsync(userId,
+                    ct);
+            if (profile is null)
+                await userRepository.CreateSpaceOwnerProfileAsync(userId, ct);
         }
 
         return await userRepository.UpdateAsync(user, input, ct);
@@ -53,22 +66,26 @@ public sealed class UserService(
     public async Task<AdvertiserProfile> UpdateAdvertiserProfileAsync(
         Guid userId, UpdateAdvertiserProfileInput input, CancellationToken ct
     ) {
-        var profile = await userRepository.GetAdvertiserProfileByUserIdAsync(userId, ct)
+        var profile =
+            await userRepository.GetAdvertiserProfileByUserIdAsync(userId, ct)
             ?? throw new NotFoundException("AdvertiserProfile", userId);
-        return await userRepository.UpdateAdvertiserProfileAsync(profile, input, ct);
+        return await userRepository.UpdateAdvertiserProfileAsync(profile, input,
+            ct);
     }
 
     public async Task<SpaceOwnerProfile> UpdateSpaceOwnerProfileAsync(
         Guid userId, UpdateSpaceOwnerProfileInput input, CancellationToken ct
     ) {
-        var profile = await userRepository.GetSpaceOwnerProfileByUserIdAsync(userId, ct)
+        var profile =
+            await userRepository.GetSpaceOwnerProfileByUserIdAsync(userId, ct)
             ?? throw new NotFoundException("SpaceOwnerProfile", userId);
-        return await userRepository.UpdateSpaceOwnerProfileAsync(profile, input, ct);
+        return await userRepository.UpdateSpaceOwnerProfileAsync(profile, input,
+            ct);
     }
 
     public async Task<bool> DeleteAsync(Guid userId, CancellationToken ct) {
         var user = await userRepository.GetByIdAsync(userId, ct)
-            ?? throw new NotFoundException("User", userId);
+                   ?? throw new NotFoundException("User", userId);
         return await userRepository.DeleteAsync(user, ct);
     }
 }

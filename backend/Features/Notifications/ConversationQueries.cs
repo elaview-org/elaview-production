@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using ElaviewBackend.Data.Entities;
 using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
@@ -5,6 +6,7 @@ using HotChocolate.Authorization;
 namespace ElaviewBackend.Features.Notifications;
 
 [QueryType]
+[SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
 public static partial class ConversationQueries {
     [Authorize]
     [UsePaging]
@@ -21,5 +23,6 @@ public static partial class ConversationQueries {
         IUserService userService,
         IConversationService conversationService,
         CancellationToken ct
-    ) => await conversationService.GetUnreadCountAsync(userService.GetPrincipalId(), ct);
+    ) => await conversationService.GetUnreadCountAsync(
+        userService.GetPrincipalId(), ct);
 }

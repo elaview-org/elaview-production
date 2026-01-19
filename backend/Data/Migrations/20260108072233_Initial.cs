@@ -4,18 +4,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ElaviewBackend.Data.Migrations
-{
+namespace ElaviewBackend.Data.Migrations {
     /// <inheritdoc />
-    public partial class Initial : Migration
-    {
+    public partial class Initial : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.CreateTable(
                 name: "users",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Password = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
@@ -28,15 +24,13 @@ namespace ElaviewBackend.Data.Migrations
                     LastLoginAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_users", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
                 name: "advertiser_profiles",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     CompanyName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     Industry = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
@@ -50,8 +44,7 @@ namespace ElaviewBackend.Data.Migrations
                     StripeAccountDisconnectedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     StripeAccountDisconnectedNotifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_advertiser_profiles", x => x.Id);
                     table.ForeignKey(
                         name: "FK_advertiser_profiles_users_UserId",
@@ -63,8 +56,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "space_owner_profiles",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     BusinessName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     BusinessType = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
@@ -78,8 +70,7 @@ namespace ElaviewBackend.Data.Migrations
                     StripeAccountDisconnectedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     StripeAccountDisconnectedNotifiedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_space_owner_profiles", x => x.Id);
                     table.ForeignKey(
                         name: "FK_space_owner_profiles_users_UserId",
@@ -91,8 +82,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "campaigns",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     AdvertiserProfileId = table.Column<Guid>(type: "uuid", maxLength: 50, nullable: false),
                     Name = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
@@ -106,8 +96,7 @@ namespace ElaviewBackend.Data.Migrations
                     EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_campaigns", x => x.Id);
                     table.ForeignKey(
                         name: "FK_campaigns_advertiser_profiles_AdvertiserProfileId",
@@ -119,8 +108,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "spaces",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     SpaceOwnerProfileId = table.Column<Guid>(type: "uuid", maxLength: 50, nullable: false),
                     Title = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
@@ -151,8 +139,7 @@ namespace ElaviewBackend.Data.Migrations
                     Traffic = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_spaces", x => x.Id);
                     table.ForeignKey(
                         name: "FK_spaces_space_owner_profiles_SpaceOwnerProfileId",
@@ -192,8 +179,7 @@ namespace ElaviewBackend.Data.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropTable(
                 name: "campaigns");
 

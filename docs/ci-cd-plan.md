@@ -338,6 +338,8 @@ name: CI/CD
 on:
   pull_request:
     branches: [ main ]
+  merge_group:
+    types: [ checks_requested ]
   push:
     branches: [ main ]
 
@@ -1017,4 +1019,283 @@ For large artifacts that benefit from cross-run caching:
 
 ---
 
-**Last Updated:** 2026-01-13
+## Trunk-Based Development Strategy
+
+### Branching Strategy by Platform
+
+| Platform | Strategy | Deploy Trigger | Reason |
+|----------|----------|----------------|--------|
+| Backend | Pure TBD | Push to main | Continuous deployment, full control |
+| Web | Pure TBD | Push to main | Continuous deployment, full control |
+| Mobile | TBD + release branches | Push to release branch | App Store constraints, version fragmentation |
+
+### Pipeline Flow with Merge Queue
+
+```
+PR opened                    Merge Queue                     Main Branch
+    │                            │                               │
+    ▼                            ▼                               ▼
+┌─────────────┐           ┌─────────────┐                ┌─────────────┐
+│ Fast Checks │──────────▶│ Full Suite  │───────────────▶│   Deploy    │
+│   (~5 min)  │  approved │  (~15 min)  │  pass          │   Staging   │
+└─────────────┘           └─────────────┘                └─────────────┘
+       │                         │
+       │                         │ fail
+       │                         ▼
+       │                  ┌─────────────┐
+       │                  │  PR Stays   │
+       │                  │    Open     │
+       │                  └─────────────┘
+       │
+       │ fail
+       ▼
+┌─────────────┐
+│  Block PR   │
+└─────────────┘
+```
+
+**PR Validation (fast, on every push):**
+- Lint, format, typecheck
+- Unit tests
+- Build verification
+
+**Merge Queue (expensive, before merge):**
+- Integration tests
+- E2E tests
+- Full mobile builds (optional)
+
+**Post-merge (main branch):**
+- Deploy to staging
+- Smoke tests
+
+### GitHub Merge Queue Configuration
+
+The merge queue runs CI on the merged result before actually merging. If tests fail, the PR stays open.
+
+```yaml
+on:
+  pull_request:
+    branches: [ main ]
+  merge_group:
+    types: [ checks_requested ]
+  push:
+    branches: [ main ]
+
+jobs:
+  fast-checks:
+    # Runs on PR and merge_group
+    steps:
+      - lint
+      - typecheck
+      - unit-tests
+
+  expensive-checks:
+    # Only runs in merge_group (before actual merge)
+    if: github.event_name == 'merge_group'
+    steps:
+      - integration-tests
+      - e2e-tests
+```
+
+### Branch Protection Rules
+
+**Settings for `main` branch (GitHub repo settings):**
+
+| Setting | Value |
+|---------|-------|
+| Require a pull request before merging | Enabled |
+| Require approvals | Disabled (0 required) |
+| Require status checks to pass | Enabled |
+| Require branches to be up to date | Enabled |
+| Require merge queue | Enabled |
+| Required status checks | `ci-pass` |
+
+**Single summary job pattern:**
+
+```yaml
+jobs:
+  backend:
+    # ...
+  web:
+    # ...
+  mobile:
+    # ...
+
+  ci-pass:
+    name: CI Pass
+    needs: [ backend, web, mobile ]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check all jobs passed
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') }}" == "true" ]]; then
+            exit 1
+          fi
+```
+
+Require only `ci-pass` as the status check instead of individual jobs.
+
+### Mobile Release Branch Workflow
+
+Mobile uses TBD with release branches due to App Store constraints.
+
+```
+trunk (main)
+  │
+  ├── continuous development with feature flags
+  │
+  ├─── release/mobile/1.2.0  ← cut when submitting to App Store
+  │         │
+  │         └── hotfix cherry-picked from main if needed
+  │
+  ├── trunk continues forward
+  │
+  └─── release/mobile/1.3.0  ← next App Store submission
+```
+
+**Rules:**
+1. All development happens on trunk behind feature flags
+2. Cut `release/mobile/x.y.z` branch when submitting to App Store
+3. Only hotfixes go to release branches (cherry-pick from trunk)
+4. Expo EAS Update can push JS-only fixes OTA without new release
+
+**Mobile release workflow (`mobile-release.yaml`):**
+
+```yaml
+name: Mobile Release
+
+on:
+  push:
+    branches: [ 'release/mobile/**' ]
+  workflow_dispatch:
+    inputs:
+      submit:
+        description: 'Submit to App Store'
+        type: boolean
+        default: false
+
+env:
+  ELAVIEW_ENVIRONMENT: production
+  EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+jobs:
+  build:
+    name: Build Release
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: devbox run -- bash -e {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jetify-com/devbox-install-action@v0.11.0
+        with:
+          enable-cache: true
+      - run: ev mobile:build --profile production
+
+  submit:
+    name: Submit to Stores
+    needs: build
+    if: inputs.submit == true
+    runs-on: ubuntu-latest
+    environment:
+      name: app-store-submission
+    defaults:
+      run:
+        shell: devbox run -- bash -e {0}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jetify-com/devbox-install-action@v0.11.0
+        with:
+          enable-cache: true
+      - run: ev mobile:submit
+```
+
+---
+
+## Feature Flags Strategy
+
+Feature flags enable merging incomplete work to trunk safely.
+
+### Strategy by Platform
+
+| Platform | Solution | Reason |
+|----------|----------|--------|
+| Backend | Microsoft.FeatureManagement | Native .NET integration, config via Doppler |
+| Web | Backend-driven via GraphQL | Single source of truth, SSR compatible |
+| Mobile | Firebase Remote Config or ConfigCat | Version-aware targeting, handles multi-release |
+
+### Mobile Version Targeting
+
+Mobile requires version-aware flags because multiple app versions exist simultaneously.
+
+```typescript
+const flagContext = {
+  appVersion: Application.nativeApplicationVersion,
+  buildNumber: Application.nativeBuildVersion,
+  platform: Platform.OS,
+  userId: user?.id,
+};
+```
+
+**Flag evaluation rules:**
+- `show_new_checkout`: enabled for v1.3.0+, disabled for older
+- `kill_switch_v1.2.0`: force update prompt for buggy release
+- `beta_feature`: enabled for 10% of users on v1.4.0+
+
+### Shared Flag Provider (packages/features/feature-flags/)
+
+```
+packages/features/feature-flags/
+├── types.ts                 # Flag definitions
+├── useFeatureFlags.ts       # Shared hook
+├── FeatureFlagProvider.tsx  # Context provider
+└── index.ts
+```
+
+**Usage in components:**
+
+```typescript
+import { useFeatureFlag } from '@elaview/features/feature-flags';
+
+function CheckoutButton() {
+  const showNewCheckout = useFeatureFlag('show_new_checkout');
+
+  if (showNewCheckout) {
+    return <NewCheckoutFlow />;
+  }
+  return <LegacyCheckoutFlow />;
+}
+```
+
+### Backend Feature Flag Integration
+
+```csharp
+public interface IFeatureFlagService {
+    Task<bool> IsEnabledAsync(string flag, CancellationToken ct = default);
+    Task<bool> IsEnabledAsync(string flag, FeatureContext context, CancellationToken ct = default);
+}
+
+public sealed class FeatureContext {
+    public string? UserId { get; init; }
+    public string? AppVersion { get; init; }
+    public string? Platform { get; init; }
+}
+```
+
+**GraphQL exposure:**
+
+```csharp
+[QueryType]
+public static class FeatureFlagQueries {
+    public static async Task<IReadOnlyDictionary<string, bool>> FeatureFlags(
+        FeatureFlagInput? input,
+        IFeatureFlagService service,
+        CancellationToken ct
+    ) => await service.GetAllAsync(input?.ToContext(), ct);
+}
+```
+
+---
+
+**Last Updated:** 2026-01-19

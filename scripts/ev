@@ -1,0 +1,23 @@
+#!/bin/sh
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+. "$SCRIPT_DIR/core/log.sh"
+
+_ev_group="$1"
+shift
+
+case "$_ev_group" in
+    help)      sh "$SCRIPT_DIR/cmd/global.sh" help ;;
+    env:*)     sh "$SCRIPT_DIR/cmd/env.sh" "${_ev_group#env:}" "$@" ;;
+    backend:*) sh "$SCRIPT_DIR/cmd/backend.sh" "${_ev_group#backend:}" "$@" ;;
+    infra:*)   sh "$SCRIPT_DIR/cmd/infra.sh" "${_ev_group#infra:}" "$@" ;;
+    repo:*)    sh "$SCRIPT_DIR/cmd/repo.sh" "${_ev_group#repo:}" "$@" ;;
+    secrets:*) sh "$SCRIPT_DIR/cmd/secrets.sh" "${_ev_group#secrets:}" "$@" ;;
+    web:*)     sh "$SCRIPT_DIR/cmd/web.sh" "${_ev_group#web:}" "$@" ;;
+    mobile:*)  sh "$SCRIPT_DIR/cmd/mobile.sh" "${_ev_group#mobile:}" "$@" ;;
+    *)
+        ev_core_log_error "Unknown command group: $_ev_group"
+        echo "Run 'ev help' for usage."
+        exit 1
+        ;;
+esac

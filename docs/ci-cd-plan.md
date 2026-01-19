@@ -47,7 +47,7 @@ shell, ensuring consistency between local development and CI environments.
                                       │
                                       ▼
          ┌─────────────────────────────────────────────────────────────┐
-         │                    SECURITY (Parallel)                       │
+         │                    SECURITY (Parallel)                      │
          ├─────────────────────────────────────────────────────────────┤
          │  ev repo:secrets           Secret scanning (gitleaks)       │
          │  ev repo:secrets:deep      Deep scan (trufflehog)           │
@@ -80,9 +80,9 @@ shell, ensuring consistency between local development and CI environments.
                                        │
                     ┌──────────────────┴──────────────────┐
                     │                                     │
-        ┌───────────┴───────────┐           ┌────────────┴────────────┐
-        │      PR Branch        │           │      Main Branch        │
-        ▼                       │           ▼                         │
+        ┌───────────┴───────────┐           ┌─────────────┴────────────┐
+        │      PR Branch        │           │      Main Branch         │
+        ▼                       │           ▼                          │
 ┌─────────────────────┐         │  ┌─────────────────────────────────┐
 │   PREVIEW DEPLOY    │         │  │       STAGING DEPLOYMENT        │
 ├─────────────────────┤         │  ├─────────────────────────────────┤

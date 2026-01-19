@@ -82,10 +82,10 @@ ev_backend_format() {
 
 ev_backend_test() {
     ev_core_require_cmd "dotnet" || return 1
-    ev_core_log_info "Running unit tests..."
+    ev_core_log_info "Running all tests..."
     ev_core_in_backend dotnet test ElaviewBackend.csproj --configuration Release --no-build
     ev_backend_exit=$?
-    [ $ev_backend_exit -eq 0 ] && ev_core_log_success "All unit tests passed."
+    [ $ev_backend_exit -eq 0 ] && ev_core_log_success "All tests passed."
     return $ev_backend_exit
 }
 

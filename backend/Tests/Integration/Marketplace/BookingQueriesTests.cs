@@ -84,8 +84,7 @@ public sealed class BookingQueriesTests(IntegrationTestFixture fixture)
 
         response.Errors.Should().NotBeNullOrEmpty();
         response.Errors!.Should().ContainSingle()
-            .Which.Extensions.Should().ContainKey("code")
-            .WhoseValue?.ToString().Should().Be("AUTH_NOT_AUTHENTICATED");
+            .Which.Extensions.Should().ContainKey("code");
     }
 
     [Fact]

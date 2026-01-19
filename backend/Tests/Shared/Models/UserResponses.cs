@@ -1,5 +1,17 @@
 namespace ElaviewBackend.Tests.Shared.Models;
 
+public record MeResponse(MeData? Me);
+
+public record MeData(
+    Guid Id,
+    string Email,
+    string Name,
+    string? Phone,
+    string Role,
+    string Status,
+    string ActiveProfileType
+);
+
 public record CurrentUserResponse(CurrentUserData? CurrentUser);
 
 public record CurrentUserData(
@@ -50,4 +62,4 @@ public record SwitchProfileData(Guid Id, string ActiveProfileType);
 
 public record DeleteUserPayloadResponse(DeleteUserPayload DeleteUser);
 
-public record DeleteUserPayload(bool Boolean);
+public record DeleteUserPayload(bool Success);

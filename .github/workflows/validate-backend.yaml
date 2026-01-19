@@ -12,7 +12,7 @@ env:
 
 jobs:
   validate:
-    name: Validate
+    name: _
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,5 +34,5 @@ jobs:
       - name: Build
         run: ev backend:build
 
-#      - name: Test
-#        run: ev backend:test
+      - name: Test
+        run: ev backend:test

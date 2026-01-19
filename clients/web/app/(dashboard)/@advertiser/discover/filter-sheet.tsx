@@ -100,7 +100,7 @@ export default function FilterSheet({
           <SheetTitle>Filters</SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 space-y-8 overflow-y-auto py-6">
+        <div className="flex-1 space-y-8 overflow-y-auto py-6 px-5">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Price Range</Label>

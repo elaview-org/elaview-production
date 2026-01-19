@@ -1,4 +1,16 @@
+"use client";
+
+import { useState } from "react";
 import { BookingCard, BookingStatus } from "./booking-card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/dropdown-menu";
+import { Button } from "@/components/button";
+import { IconChevronDown, IconSearch } from "@tabler/icons-react";
+import { Input } from "@/components/input";
 
 const books = [
   {
@@ -104,23 +116,68 @@ const books = [
 ];
 
 export default function BookingsPage() {
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [filters, setFilters] = useState({
+    searchQuery:''
+  })
   return (
     <div className="p-6">
-      <div className="mb-8 border-b pb-4">
-        <h1 className="text-3xl font-bold">Bookings</h1>
-        <p className="text-muted-foreground mt-2">
-          View and manage your current, upcoming, and past bookings here.
-        </p>
-      </div>
-      <div className="grid grid-cols-1 gap-6 p-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {books.map((b) => (
-          <div
-            key={b.id}
-            className="transition-all duration-200 hover:shadow-lg"
-          >
-            <BookingCard {...b} />
+      <header className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Bookings</h1>
+          <p className="text-muted-foreground">
+            View and manage your current, upcoming, and past bookings here.
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+        <div className="relative w-full sm:w-64">
+            <IconSearch className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+            <Input
+              placeholder="Search locations..."
+              className="pl-10"
+              value={filters.searchQuery}
+              onChange={()=>{}}
+            />
           </div>
-        ))}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <span className="hidden lg:inline">Filter by status</span>
+                <span className="lg:hidden">Status</span>
+                <IconChevronDown />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              {[
+                { key: "1", value: "all" },
+                { key: "2", value: "pending" },
+                { key: "3", value: "active" },
+                { key: "4", value: "completed" },
+              ].map((item) => (
+                <DropdownMenuItem
+                  key={item.key}
+                  onSelect={() => setStatusFilter(item.value)}
+                >
+                  {item.value}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </header>
+
+      <div className="grid grid-cols-1 gap-6 p-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {books
+          .filter((b) => statusFilter === "all" || b.status === statusFilter)
+          .map((b) => (
+            <div
+              key={b.id}
+              className="transition-all duration-200 hover:shadow-lg"
+            >
+              <BookingCard {...b} />
+            </div>
+          ))}
       </div>
     </div>
   );

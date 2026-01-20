@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { AdvertiserSettingsContent } from "./components/advertiser-settings-content";
+import { AdvertiserSettingsContent } from "./advertiser-settings-content";
 import getAdvertiserQuery from "./advertiser-queries";
 import { User } from "@/types/graphql.generated";
 

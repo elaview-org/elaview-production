@@ -98,7 +98,8 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
             required
           />
           <FieldDescription>
-            We'll use this email to send you booking updates and notifications.
+            We&#39;ll use this email to send you booking updates and
+            notifications.
           </FieldDescription>
         </Field>
 

@@ -64,23 +64,6 @@ export type AdvertiserProfileFilterInput = {
   website?: InputMaybe<StringOperationFilterInput>;
 };
 
-export type AdvertiserProfileInput = {
-  campaigns: Array<CampaignInput>;
-  companyName?: InputMaybe<Scalars['String']['input']>;
-  createdAt: Scalars['DateTime']['input'];
-  id: Scalars['UUID']['input'];
-  industry?: InputMaybe<Scalars['String']['input']>;
-  onboardingComplete: Scalars['Boolean']['input'];
-  stripeAccountDisconnectedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  stripeAccountDisconnectedNotifiedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  stripeAccountId?: InputMaybe<Scalars['String']['input']>;
-  stripeAccountStatus?: InputMaybe<Scalars['String']['input']>;
-  stripeLastAccountHealthCheck?: InputMaybe<Scalars['DateTime']['input']>;
-  user: UserInput;
-  userId: Scalars['UUID']['input'];
-  website?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type AdvertiserProfileSortInput = {
   companyName?: InputMaybe<SortEnumType>;
   createdAt?: InputMaybe<SortEnumType>;
@@ -107,6 +90,305 @@ export enum ApplyPolicy {
   Validation = 'VALIDATION'
 }
 
+export type ApproveBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+
+export type ApproveBookingInput = {
+  id: Scalars['ID']['input'];
+  ownerNotes?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ApproveBookingPayload = {
+  __typename: 'ApproveBookingPayload';
+  booking: Maybe<Booking>;
+  errors: Maybe<Array<ApproveBookingError>>;
+};
+
+export type Booking = {
+  __typename: 'Booking';
+  advertiserNotes: Maybe<Scalars['String']['output']>;
+  campaign: Maybe<Campaign>;
+  campaignId: Scalars['UUID']['output'];
+  cancellationReason: Maybe<Scalars['String']['output']>;
+  cancelledAt: Maybe<Scalars['DateTime']['output']>;
+  cancelledByUser: Maybe<User>;
+  cancelledByUserId: Maybe<Scalars['UUID']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  dispute: Maybe<BookingDispute>;
+  endDate: Scalars['DateTime']['output'];
+  fileDownloadedAt: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['UUID']['output'];
+  installationFee: Scalars['Decimal']['output'];
+  ownerNotes: Maybe<Scalars['String']['output']>;
+  ownerPayoutAmount: Scalars['Decimal']['output'];
+  payments: Array<Payment>;
+  payouts: Array<Payout>;
+  platformFeeAmount: Scalars['Decimal']['output'];
+  platformFeePercent: Scalars['Decimal']['output'];
+  pricePerDay: Scalars['Decimal']['output'];
+  proof: Maybe<BookingProof>;
+  rejectedAt: Maybe<Scalars['DateTime']['output']>;
+  rejectionReason: Maybe<Scalars['String']['output']>;
+  reviews: Array<Review>;
+  space: Maybe<Space>;
+  spaceId: Scalars['UUID']['output'];
+  startDate: Scalars['DateTime']['output'];
+  status: BookingStatus;
+  subtotalAmount: Scalars['Decimal']['output'];
+  totalAmount: Scalars['Decimal']['output'];
+  totalDays: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+
+export type BookingPaymentsArgs = {
+  order?: InputMaybe<Array<PaymentSortInput>>;
+  where?: InputMaybe<PaymentFilterInput>;
+};
+
+
+export type BookingPayoutsArgs = {
+  order?: InputMaybe<Array<PayoutSortInput>>;
+  where?: InputMaybe<PayoutFilterInput>;
+};
+
+
+export type BookingReviewsArgs = {
+  order?: InputMaybe<Array<ReviewSortInput>>;
+  where?: InputMaybe<ReviewFilterInput>;
+};
+
+export type BookingDispute = {
+  __typename: 'BookingDispute';
+  booking: Booking;
+  bookingId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  disputedAt: Scalars['DateTime']['output'];
+  disputedByUser: User;
+  disputedByUserId: Scalars['UUID']['output'];
+  id: Scalars['UUID']['output'];
+  issueType: DisputeIssueType;
+  photos: Array<Scalars['String']['output']>;
+  reason: Scalars['String']['output'];
+  resolutionAction: Maybe<Scalars['String']['output']>;
+  resolutionNotes: Maybe<Scalars['String']['output']>;
+  resolvedAt: Maybe<Scalars['DateTime']['output']>;
+  resolvedByUser: Maybe<User>;
+  resolvedByUserId: Maybe<Scalars['UUID']['output']>;
+};
+
+export type BookingDisputeFilterInput = {
+  and?: InputMaybe<Array<BookingDisputeFilterInput>>;
+  booking?: InputMaybe<BookingFilterInput>;
+  bookingId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  disputedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  disputedByUser?: InputMaybe<UserFilterInput>;
+  disputedByUserId?: InputMaybe<UuidOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  issueType?: InputMaybe<DisputeIssueTypeOperationFilterInput>;
+  or?: InputMaybe<Array<BookingDisputeFilterInput>>;
+  photos?: InputMaybe<ListStringOperationFilterInput>;
+  reason?: InputMaybe<StringOperationFilterInput>;
+  resolutionAction?: InputMaybe<StringOperationFilterInput>;
+  resolutionNotes?: InputMaybe<StringOperationFilterInput>;
+  resolvedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  resolvedByUser?: InputMaybe<UserFilterInput>;
+  resolvedByUserId?: InputMaybe<UuidOperationFilterInput>;
+};
+
+export type BookingDisputeSortInput = {
+  booking?: InputMaybe<BookingSortInput>;
+  bookingId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  disputedAt?: InputMaybe<SortEnumType>;
+  disputedByUser?: InputMaybe<UserSortInput>;
+  disputedByUserId?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  issueType?: InputMaybe<SortEnumType>;
+  reason?: InputMaybe<SortEnumType>;
+  resolutionAction?: InputMaybe<SortEnumType>;
+  resolutionNotes?: InputMaybe<SortEnumType>;
+  resolvedAt?: InputMaybe<SortEnumType>;
+  resolvedByUser?: InputMaybe<UserSortInput>;
+  resolvedByUserId?: InputMaybe<SortEnumType>;
+};
+
+export type BookingFilterInput = {
+  advertiserNotes?: InputMaybe<StringOperationFilterInput>;
+  and?: InputMaybe<Array<BookingFilterInput>>;
+  campaign?: InputMaybe<CampaignFilterInput>;
+  campaignId?: InputMaybe<UuidOperationFilterInput>;
+  cancellationReason?: InputMaybe<StringOperationFilterInput>;
+  cancelledAt?: InputMaybe<DateTimeOperationFilterInput>;
+  cancelledByUser?: InputMaybe<UserFilterInput>;
+  cancelledByUserId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  dispute?: InputMaybe<BookingDisputeFilterInput>;
+  endDate?: InputMaybe<DateTimeOperationFilterInput>;
+  fileDownloadedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  installationFee?: InputMaybe<DecimalOperationFilterInput>;
+  or?: InputMaybe<Array<BookingFilterInput>>;
+  ownerNotes?: InputMaybe<StringOperationFilterInput>;
+  ownerPayoutAmount?: InputMaybe<DecimalOperationFilterInput>;
+  payments?: InputMaybe<ListFilterInputTypeOfPaymentFilterInput>;
+  payouts?: InputMaybe<ListFilterInputTypeOfPayoutFilterInput>;
+  platformFeeAmount?: InputMaybe<DecimalOperationFilterInput>;
+  platformFeePercent?: InputMaybe<DecimalOperationFilterInput>;
+  pricePerDay?: InputMaybe<DecimalOperationFilterInput>;
+  proof?: InputMaybe<BookingProofFilterInput>;
+  rejectedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  rejectionReason?: InputMaybe<StringOperationFilterInput>;
+  reviews?: InputMaybe<ListFilterInputTypeOfReviewFilterInput>;
+  space?: InputMaybe<SpaceFilterInput>;
+  spaceId?: InputMaybe<UuidOperationFilterInput>;
+  startDate?: InputMaybe<DateTimeOperationFilterInput>;
+  status?: InputMaybe<BookingStatusOperationFilterInput>;
+  subtotalAmount?: InputMaybe<DecimalOperationFilterInput>;
+  totalAmount?: InputMaybe<DecimalOperationFilterInput>;
+  totalDays?: InputMaybe<IntOperationFilterInput>;
+  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type BookingProof = {
+  __typename: 'BookingProof';
+  autoApproveAt: Scalars['DateTime']['output'];
+  booking: Booking;
+  bookingId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['UUID']['output'];
+  photos: Array<Scalars['String']['output']>;
+  rejectionReason: Maybe<Scalars['String']['output']>;
+  reviewedAt: Maybe<Scalars['DateTime']['output']>;
+  reviewedByUser: Maybe<User>;
+  reviewedByUserId: Maybe<Scalars['UUID']['output']>;
+  status: ProofStatus;
+  submittedAt: Scalars['DateTime']['output'];
+};
+
+export type BookingProofFilterInput = {
+  and?: InputMaybe<Array<BookingProofFilterInput>>;
+  autoApproveAt?: InputMaybe<DateTimeOperationFilterInput>;
+  booking?: InputMaybe<BookingFilterInput>;
+  bookingId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<BookingProofFilterInput>>;
+  photos?: InputMaybe<ListStringOperationFilterInput>;
+  rejectionReason?: InputMaybe<StringOperationFilterInput>;
+  reviewedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  reviewedByUser?: InputMaybe<UserFilterInput>;
+  reviewedByUserId?: InputMaybe<UuidOperationFilterInput>;
+  status?: InputMaybe<ProofStatusOperationFilterInput>;
+  submittedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type BookingProofSortInput = {
+  autoApproveAt?: InputMaybe<SortEnumType>;
+  booking?: InputMaybe<BookingSortInput>;
+  bookingId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  rejectionReason?: InputMaybe<SortEnumType>;
+  reviewedAt?: InputMaybe<SortEnumType>;
+  reviewedByUser?: InputMaybe<UserSortInput>;
+  reviewedByUserId?: InputMaybe<SortEnumType>;
+  status?: InputMaybe<SortEnumType>;
+  submittedAt?: InputMaybe<SortEnumType>;
+};
+
+export type BookingSortInput = {
+  advertiserNotes?: InputMaybe<SortEnumType>;
+  campaign?: InputMaybe<CampaignSortInput>;
+  campaignId?: InputMaybe<SortEnumType>;
+  cancellationReason?: InputMaybe<SortEnumType>;
+  cancelledAt?: InputMaybe<SortEnumType>;
+  cancelledByUser?: InputMaybe<UserSortInput>;
+  cancelledByUserId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  dispute?: InputMaybe<BookingDisputeSortInput>;
+  endDate?: InputMaybe<SortEnumType>;
+  fileDownloadedAt?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  installationFee?: InputMaybe<SortEnumType>;
+  ownerNotes?: InputMaybe<SortEnumType>;
+  ownerPayoutAmount?: InputMaybe<SortEnumType>;
+  platformFeeAmount?: InputMaybe<SortEnumType>;
+  platformFeePercent?: InputMaybe<SortEnumType>;
+  pricePerDay?: InputMaybe<SortEnumType>;
+  proof?: InputMaybe<BookingProofSortInput>;
+  rejectedAt?: InputMaybe<SortEnumType>;
+  rejectionReason?: InputMaybe<SortEnumType>;
+  space?: InputMaybe<SpaceSortInput>;
+  spaceId?: InputMaybe<SortEnumType>;
+  startDate?: InputMaybe<SortEnumType>;
+  status?: InputMaybe<SortEnumType>;
+  subtotalAmount?: InputMaybe<SortEnumType>;
+  totalAmount?: InputMaybe<SortEnumType>;
+  totalDays?: InputMaybe<SortEnumType>;
+  updatedAt?: InputMaybe<SortEnumType>;
+};
+
+export enum BookingStatus {
+  Approved = 'APPROVED',
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  Disputed = 'DISPUTED',
+  FileDownloaded = 'FILE_DOWNLOADED',
+  Installed = 'INSTALLED',
+  Paid = 'PAID',
+  PendingApproval = 'PENDING_APPROVAL',
+  Rejected = 'REJECTED',
+  Verified = 'VERIFIED'
+}
+
+export type BookingStatusOperationFilterInput = {
+  eq?: InputMaybe<BookingStatus>;
+  in?: InputMaybe<Array<BookingStatus>>;
+  neq?: InputMaybe<BookingStatus>;
+  nin?: InputMaybe<Array<BookingStatus>>;
+};
+
+/** A connection to a list of items. */
+export type BookingsConnection = {
+  __typename: 'BookingsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<BookingsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Booking>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type BookingsEdge = {
+  __typename: 'BookingsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Booking;
+};
+
+/** A connection to a list of items. */
+export type BookingsRequiringActionConnection = {
+  __typename: 'BookingsRequiringActionConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<BookingsRequiringActionEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Booking>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type BookingsRequiringActionEdge = {
+  __typename: 'BookingsRequiringActionEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Booking;
+};
+
 export type BooleanOperationFilterInput = {
   eq?: InputMaybe<Scalars['Boolean']['input']>;
   neq?: InputMaybe<Scalars['Boolean']['input']>;
@@ -114,8 +396,10 @@ export type BooleanOperationFilterInput = {
 
 export type Campaign = {
   __typename: 'Campaign';
+  advertiser: Maybe<AdvertiserProfile>;
   advertiserProfile: AdvertiserProfile;
   advertiserProfileId: Scalars['UUID']['output'];
+  bookings: Maybe<BookingsConnection>;
   createdAt: Scalars['DateTime']['output'];
   description: Maybe<Scalars['String']['output']>;
   endDate: Maybe<Scalars['DateTime']['output']>;
@@ -129,10 +413,21 @@ export type Campaign = {
   totalBudget: Maybe<Scalars['Decimal']['output']>;
 };
 
+
+export type CampaignBookingsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<BookingSortInput>>;
+  where?: InputMaybe<BookingFilterInput>;
+};
+
 export type CampaignFilterInput = {
   advertiserProfile?: InputMaybe<AdvertiserProfileFilterInput>;
   advertiserProfileId?: InputMaybe<UuidOperationFilterInput>;
   and?: InputMaybe<Array<CampaignFilterInput>>;
+  bookings?: InputMaybe<ListFilterInputTypeOfBookingFilterInput>;
   createdAt?: InputMaybe<DateTimeOperationFilterInput>;
   description?: InputMaybe<StringOperationFilterInput>;
   endDate?: InputMaybe<DateTimeOperationFilterInput>;
@@ -145,22 +440,6 @@ export type CampaignFilterInput = {
   status?: InputMaybe<CampaignStatusOperationFilterInput>;
   targetAudience?: InputMaybe<StringOperationFilterInput>;
   totalBudget?: InputMaybe<DecimalOperationFilterInput>;
-};
-
-export type CampaignInput = {
-  advertiserProfile: AdvertiserProfileInput;
-  advertiserProfileId: Scalars['UUID']['input'];
-  createdAt: Scalars['DateTime']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  endDate?: InputMaybe<Scalars['DateTime']['input']>;
-  goals?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['UUID']['input'];
-  imageUrl: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  startDate?: InputMaybe<Scalars['DateTime']['input']>;
-  status: CampaignStatus;
-  targetAudience?: InputMaybe<Scalars['String']['input']>;
-  totalBudget?: InputMaybe<Scalars['Decimal']['input']>;
 };
 
 export type CampaignSortInput = {
@@ -214,6 +493,201 @@ export type CampaignsEdge = {
   node: Campaign;
 };
 
+export type CancelBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+
+export type CancelBookingInput = {
+  id: Scalars['ID']['input'];
+  reason: Scalars['String']['input'];
+};
+
+export type CancelBookingPayload = {
+  __typename: 'CancelBookingPayload';
+  booking: Maybe<Booking>;
+  errors: Maybe<Array<CancelBookingError>>;
+};
+
+export type CancelCampaignError = ForbiddenError | NotFoundError;
+
+export type CancelCampaignInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type CancelCampaignPayload = {
+  __typename: 'CancelCampaignPayload';
+  campaign: Maybe<Campaign>;
+  errors: Maybe<Array<CancelCampaignError>>;
+};
+
+export type ConfirmPaymentError = NotFoundError | PaymentError;
+
+export type ConfirmPaymentInput = {
+  paymentIntentId: Scalars['String']['input'];
+};
+
+export type ConfirmPaymentPayload = {
+  __typename: 'ConfirmPaymentPayload';
+  errors: Maybe<Array<ConfirmPaymentError>>;
+  payment: Maybe<Payment>;
+};
+
+export type ConflictError = Error & {
+  __typename: 'ConflictError';
+  code: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+  reason: Scalars['String']['output'];
+  resource: Scalars['String']['output'];
+};
+
+export type ConnectStripeAccountError = NotFoundError | PaymentError;
+
+export type ConnectStripeAccountPayload = {
+  __typename: 'ConnectStripeAccountPayload';
+  accountId: Maybe<Scalars['String']['output']>;
+  errors: Maybe<Array<ConnectStripeAccountError>>;
+  onboardingUrl: Maybe<Scalars['String']['output']>;
+};
+
+export type Conversation = {
+  __typename: 'Conversation';
+  booking: Maybe<Booking>;
+  bookingId: Maybe<Scalars['UUID']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['UUID']['output'];
+  messages: Maybe<MessagesConnection>;
+  participants: Array<ConversationParticipant>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+
+export type ConversationMessagesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<MessageSortInput>>;
+  where?: InputMaybe<MessageFilterInput>;
+};
+
+export type ConversationFilterInput = {
+  and?: InputMaybe<Array<ConversationFilterInput>>;
+  booking?: InputMaybe<BookingFilterInput>;
+  bookingId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  messages?: InputMaybe<ListFilterInputTypeOfMessageFilterInput>;
+  or?: InputMaybe<Array<ConversationFilterInput>>;
+  participants?: InputMaybe<ListFilterInputTypeOfConversationParticipantFilterInput>;
+  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type ConversationParticipant = {
+  __typename: 'ConversationParticipant';
+  conversation: Conversation;
+  conversationId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['UUID']['output'];
+  joinedAt: Scalars['DateTime']['output'];
+  lastReadAt: Maybe<Scalars['DateTime']['output']>;
+  user: User;
+  userId: Scalars['UUID']['output'];
+};
+
+export type ConversationParticipantFilterInput = {
+  and?: InputMaybe<Array<ConversationParticipantFilterInput>>;
+  conversation?: InputMaybe<ConversationFilterInput>;
+  conversationId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  joinedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  lastReadAt?: InputMaybe<DateTimeOperationFilterInput>;
+  or?: InputMaybe<Array<ConversationParticipantFilterInput>>;
+  user?: InputMaybe<UserFilterInput>;
+  userId?: InputMaybe<UuidOperationFilterInput>;
+};
+
+export type ConversationSortInput = {
+  booking?: InputMaybe<BookingSortInput>;
+  bookingId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  updatedAt?: InputMaybe<SortEnumType>;
+};
+
+export type CreateBookingConversationError = NotFoundError;
+
+export type CreateBookingConversationInput = {
+  bookingId: Scalars['ID']['input'];
+};
+
+export type CreateBookingConversationPayload = {
+  __typename: 'CreateBookingConversationPayload';
+  conversation: Maybe<Conversation>;
+  errors: Maybe<Array<CreateBookingConversationError>>;
+};
+
+export type CreateBookingError = NotFoundError | ValidationError;
+
+export type CreateBookingInput = {
+  advertiserNotes?: InputMaybe<Scalars['String']['input']>;
+  endDate: Scalars['DateTime']['input'];
+  spaceId: Scalars['UUID']['input'];
+  startDate: Scalars['DateTime']['input'];
+};
+
+export type CreateBookingPayload = {
+  __typename: 'CreateBookingPayload';
+  booking: Maybe<Booking>;
+  errors: Maybe<Array<CreateBookingError>>;
+};
+
+export type CreateCampaignError = NotFoundError;
+
+export type CreateCampaignInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  goals?: InputMaybe<Scalars['String']['input']>;
+  imageUrl: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+  targetAudience?: InputMaybe<Scalars['String']['input']>;
+  totalBudget?: InputMaybe<Scalars['Decimal']['input']>;
+};
+
+export type CreateCampaignPayload = {
+  __typename: 'CreateCampaignPayload';
+  campaign: Maybe<Campaign>;
+  errors: Maybe<Array<CreateCampaignError>>;
+};
+
+export type CreatePaymentIntentError = InvalidStatusTransitionError | NotFoundError;
+
+export type CreatePaymentIntentInput = {
+  bookingId: Scalars['ID']['input'];
+};
+
+export type CreatePaymentIntentPayload = {
+  __typename: 'CreatePaymentIntentPayload';
+  amount: Maybe<Scalars['Decimal']['output']>;
+  clientSecret: Maybe<Scalars['String']['output']>;
+  errors: Maybe<Array<CreatePaymentIntentError>>;
+  paymentIntentId: Maybe<Scalars['String']['output']>;
+};
+
+export type CreateReviewError = ConflictError | ForbiddenError | NotFoundError;
+
+export type CreateReviewInput = {
+  comment?: InputMaybe<Scalars['String']['input']>;
+  rating: Scalars['Int']['input'];
+};
+
+export type CreateReviewPayload = {
+  __typename: 'CreateReviewPayload';
+  errors: Maybe<Array<CreateReviewError>>;
+  review: Maybe<Review>;
+};
+
+export type CreateSpaceError = NotFoundError;
+
 export type CreateSpaceInput = {
   address: Scalars['String']['input'];
   availableFrom?: InputMaybe<Scalars['DateTime']['input']>;
@@ -240,6 +714,7 @@ export type CreateSpaceInput = {
 
 export type CreateSpacePayload = {
   __typename: 'CreateSpacePayload';
+  errors: Maybe<Array<CreateSpaceError>>;
   space: Maybe<Space>;
 };
 
@@ -258,6 +733,18 @@ export type DateTimeOperationFilterInput = {
   nlte?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+export type DeactivateSpaceError = ForbiddenError | NotFoundError;
+
+export type DeactivateSpaceInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type DeactivateSpacePayload = {
+  __typename: 'DeactivateSpacePayload';
+  errors: Maybe<Array<DeactivateSpaceError>>;
+  space: Maybe<Space>;
+};
+
 export type DecimalOperationFilterInput = {
   eq?: InputMaybe<Scalars['Decimal']['input']>;
   gt?: InputMaybe<Scalars['Decimal']['input']>;
@@ -273,13 +760,87 @@ export type DecimalOperationFilterInput = {
   nlte?: InputMaybe<Scalars['Decimal']['input']>;
 };
 
+export type DeleteCampaignError = ConflictError | ForbiddenError | NotFoundError;
+
+export type DeleteCampaignInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type DeleteCampaignPayload = {
+  __typename: 'DeleteCampaignPayload';
+  errors: Maybe<Array<DeleteCampaignError>>;
+  success: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type DeleteNotificationInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type DeleteNotificationPayload = {
+  __typename: 'DeleteNotificationPayload';
+  success: Scalars['Boolean']['output'];
+};
+
+export type DeleteReviewInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type DeleteReviewPayload = {
+  __typename: 'DeleteReviewPayload';
+  success: Scalars['Boolean']['output'];
+};
+
+export type DeleteSpaceError = ConflictError | ForbiddenError | NotFoundError;
+
 export type DeleteSpaceInput = {
   id: Scalars['ID']['input'];
 };
 
 export type DeleteSpacePayload = {
   __typename: 'DeleteSpacePayload';
-  space: Maybe<Space>;
+  errors: Maybe<Array<DeleteSpaceError>>;
+  success: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type DeleteUserError = NotFoundError;
+
+export type DeleteUserInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type DeleteUserPayload = {
+  __typename: 'DeleteUserPayload';
+  errors: Maybe<Array<DeleteUserError>>;
+  success: Maybe<Scalars['Boolean']['output']>;
+};
+
+export enum DisputeIssueType {
+  DamageToCreative = 'DAMAGE_TO_CREATIVE',
+  MisleadingListing = 'MISLEADING_LISTING',
+  NotVisible = 'NOT_VISIBLE',
+  PoorQuality = 'POOR_QUALITY',
+  SafetyIssue = 'SAFETY_ISSUE',
+  WrongLocation = 'WRONG_LOCATION'
+}
+
+export type DisputeIssueTypeOperationFilterInput = {
+  eq?: InputMaybe<DisputeIssueType>;
+  in?: InputMaybe<Array<DisputeIssueType>>;
+  neq?: InputMaybe<DisputeIssueType>;
+  nin?: InputMaybe<Array<DisputeIssueType>>;
+};
+
+export type EarningsSummary = {
+  __typename: 'EarningsSummary';
+  availableBalance: Maybe<Scalars['Decimal']['output']>;
+  lastMonthEarnings: Maybe<Scalars['Decimal']['output']>;
+  pendingPayouts: Maybe<Scalars['Decimal']['output']>;
+  thisMonthEarnings: Maybe<Scalars['Decimal']['output']>;
+  totalEarnings: Maybe<Scalars['Decimal']['output']>;
+};
+
+export type Error = {
+  message: Scalars['String']['output'];
 };
 
 export type FloatOperationFilterInput = {
@@ -297,6 +858,33 @@ export type FloatOperationFilterInput = {
   nlte?: InputMaybe<Scalars['Float']['input']>;
 };
 
+export type ForbiddenError = Error & {
+  __typename: 'ForbiddenError';
+  action: Scalars['String']['output'];
+  code: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+};
+
+/** A connection to a list of items. */
+export type IncomingBookingRequestsConnection = {
+  __typename: 'IncomingBookingRequestsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<IncomingBookingRequestsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Booking>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type IncomingBookingRequestsEdge = {
+  __typename: 'IncomingBookingRequestsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Booking;
+};
+
 export type IntOperationFilterInput = {
   eq?: InputMaybe<Scalars['Int']['input']>;
   gt?: InputMaybe<Scalars['Int']['input']>;
@@ -312,11 +900,74 @@ export type IntOperationFilterInput = {
   nlte?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type InvalidStatusTransitionError = Error & {
+  __typename: 'InvalidStatusTransitionError';
+  code: Scalars['String']['output'];
+  fromStatus: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+  toStatus: Scalars['String']['output'];
+};
+
+export type KeyValuePairOfStringAndString__ = {
+  __typename: 'KeyValuePairOfStringAndString__';
+  key: Scalars['String']['output'];
+  value: Array<Scalars['String']['output']>;
+};
+
+export type ListFilterInputTypeOfBookingFilterInput = {
+  all?: InputMaybe<BookingFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<BookingFilterInput>;
+  some?: InputMaybe<BookingFilterInput>;
+};
+
 export type ListFilterInputTypeOfCampaignFilterInput = {
   all?: InputMaybe<CampaignFilterInput>;
   any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<CampaignFilterInput>;
   some?: InputMaybe<CampaignFilterInput>;
+};
+
+export type ListFilterInputTypeOfConversationParticipantFilterInput = {
+  all?: InputMaybe<ConversationParticipantFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<ConversationParticipantFilterInput>;
+  some?: InputMaybe<ConversationParticipantFilterInput>;
+};
+
+export type ListFilterInputTypeOfMessageFilterInput = {
+  all?: InputMaybe<MessageFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<MessageFilterInput>;
+  some?: InputMaybe<MessageFilterInput>;
+};
+
+export type ListFilterInputTypeOfPaymentFilterInput = {
+  all?: InputMaybe<PaymentFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<PaymentFilterInput>;
+  some?: InputMaybe<PaymentFilterInput>;
+};
+
+export type ListFilterInputTypeOfPayoutFilterInput = {
+  all?: InputMaybe<PayoutFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<PayoutFilterInput>;
+  some?: InputMaybe<PayoutFilterInput>;
+};
+
+export type ListFilterInputTypeOfRefundFilterInput = {
+  all?: InputMaybe<RefundFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<RefundFilterInput>;
+  some?: InputMaybe<RefundFilterInput>;
+};
+
+export type ListFilterInputTypeOfReviewFilterInput = {
+  all?: InputMaybe<ReviewFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<ReviewFilterInput>;
+  some?: InputMaybe<ReviewFilterInput>;
 };
 
 export type ListFilterInputTypeOfSpaceFilterInput = {
@@ -333,11 +984,241 @@ export type ListStringOperationFilterInput = {
   some?: InputMaybe<StringOperationFilterInput>;
 };
 
+export type MarkAllNotificationsReadPayload = {
+  __typename: 'MarkAllNotificationsReadPayload';
+  count: Scalars['Int']['output'];
+};
+
+export type MarkConversationReadError = ForbiddenError;
+
+export type MarkConversationReadInput = {
+  conversationId: Scalars['ID']['input'];
+};
+
+export type MarkConversationReadPayload = {
+  __typename: 'MarkConversationReadPayload';
+  errors: Maybe<Array<MarkConversationReadError>>;
+  participant: Maybe<ConversationParticipant>;
+};
+
+export type MarkFileDownloadedError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+
+export type MarkFileDownloadedInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type MarkFileDownloadedPayload = {
+  __typename: 'MarkFileDownloadedPayload';
+  booking: Maybe<Booking>;
+  errors: Maybe<Array<MarkFileDownloadedError>>;
+};
+
+export type MarkInstalledError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+
+export type MarkInstalledInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type MarkInstalledPayload = {
+  __typename: 'MarkInstalledPayload';
+  booking: Maybe<Booking>;
+  errors: Maybe<Array<MarkInstalledError>>;
+};
+
+export type MarkNotificationReadError = NotFoundError;
+
+export type MarkNotificationReadInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type MarkNotificationReadPayload = {
+  __typename: 'MarkNotificationReadPayload';
+  errors: Maybe<Array<MarkNotificationReadError>>;
+  notification: Maybe<Notification>;
+};
+
+export type Message = {
+  __typename: 'Message';
+  attachments: Maybe<Array<Scalars['String']['output']>>;
+  content: Scalars['String']['output'];
+  conversation: Conversation;
+  conversationId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['UUID']['output'];
+  senderUser: User;
+  senderUserId: Scalars['UUID']['output'];
+  type: MessageType;
+};
+
+export type MessageFilterInput = {
+  and?: InputMaybe<Array<MessageFilterInput>>;
+  attachments?: InputMaybe<ListStringOperationFilterInput>;
+  content?: InputMaybe<StringOperationFilterInput>;
+  conversation?: InputMaybe<ConversationFilterInput>;
+  conversationId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<MessageFilterInput>>;
+  senderUser?: InputMaybe<UserFilterInput>;
+  senderUserId?: InputMaybe<UuidOperationFilterInput>;
+  type?: InputMaybe<MessageTypeOperationFilterInput>;
+};
+
+export type MessageSortInput = {
+  content?: InputMaybe<SortEnumType>;
+  conversation?: InputMaybe<ConversationSortInput>;
+  conversationId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  senderUser?: InputMaybe<UserSortInput>;
+  senderUserId?: InputMaybe<SortEnumType>;
+  type?: InputMaybe<SortEnumType>;
+};
+
+export enum MessageType {
+  CorrectionRequest = 'CORRECTION_REQUEST',
+  ProofApproved = 'PROOF_APPROVED',
+  ProofDisputed = 'PROOF_DISPUTED',
+  ProofRejected = 'PROOF_REJECTED',
+  ProofSubmission = 'PROOF_SUBMISSION',
+  QualityConcern = 'QUALITY_CONCERN',
+  System = 'SYSTEM',
+  Text = 'TEXT'
+}
+
+export type MessageTypeOperationFilterInput = {
+  eq?: InputMaybe<MessageType>;
+  in?: InputMaybe<Array<MessageType>>;
+  neq?: InputMaybe<MessageType>;
+  nin?: InputMaybe<Array<MessageType>>;
+};
+
+/** A connection to a list of items. */
+export type MessagesByConversationConnection = {
+  __typename: 'MessagesByConversationConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MessagesByConversationEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Message>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type MessagesByConversationEdge = {
+  __typename: 'MessagesByConversationEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Message;
+};
+
+/** A connection to a list of items. */
+export type MessagesConnection = {
+  __typename: 'MessagesConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MessagesEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Message>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type MessagesEdge = {
+  __typename: 'MessagesEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Message;
+};
+
 export type Mutation = {
   __typename: 'Mutation';
+  approveBooking: ApproveBookingPayload;
+  cancelBooking: CancelBookingPayload;
+  cancelCampaign: CancelCampaignPayload;
+  confirmPayment: ConfirmPaymentPayload;
+  connectStripeAccount: ConnectStripeAccountPayload;
+  createBooking: CreateBookingPayload;
+  createBookingConversation: CreateBookingConversationPayload;
+  createCampaign: CreateCampaignPayload;
+  createPaymentIntent: CreatePaymentIntentPayload;
+  createReview: CreateReviewPayload;
   createSpace: CreateSpacePayload;
+  deactivateSpace: DeactivateSpacePayload;
+  deleteCampaign: DeleteCampaignPayload;
+  deleteNotification: DeleteNotificationPayload;
+  deleteReview: DeleteReviewPayload;
   deleteSpace: DeleteSpacePayload;
+  deleteUser: DeleteUserPayload;
+  markAllNotificationsRead: MarkAllNotificationsReadPayload;
+  markConversationRead: MarkConversationReadPayload;
+  markFileDownloaded: MarkFileDownloadedPayload;
+  markInstalled: MarkInstalledPayload;
+  markNotificationRead: MarkNotificationReadPayload;
+  processPayout: ProcessPayoutPayload;
+  reactivateSpace: ReactivateSpacePayload;
+  refreshStripeAccountStatus: RefreshStripeAccountStatusPayload;
+  rejectBooking: RejectBookingPayload;
+  requestRefund: RequestRefundPayload;
+  retryPayout: RetryPayoutPayload;
+  sendMessage: SendMessagePayload;
+  submitCampaign: SubmitCampaignPayload;
+  updateAdvertiserProfile: UpdateAdvertiserProfilePayload;
+  updateCampaign: UpdateCampaignPayload;
   updateCurrentUser: UpdateCurrentUserPayload;
+  updateNotificationPreference: UpdateNotificationPreferencePayload;
+  updateReview: UpdateReviewPayload;
+  updateSpace: UpdateSpacePayload;
+  updateSpaceOwnerProfile: UpdateSpaceOwnerProfilePayload;
+};
+
+
+export type MutationApproveBookingArgs = {
+  input: ApproveBookingInput;
+};
+
+
+export type MutationCancelBookingArgs = {
+  input: CancelBookingInput;
+};
+
+
+export type MutationCancelCampaignArgs = {
+  input: CancelCampaignInput;
+};
+
+
+export type MutationConfirmPaymentArgs = {
+  input: ConfirmPaymentInput;
+};
+
+
+export type MutationCreateBookingArgs = {
+  campaignId: Scalars['ID']['input'];
+  input: CreateBookingInput;
+};
+
+
+export type MutationCreateBookingConversationArgs = {
+  input: CreateBookingConversationInput;
+};
+
+
+export type MutationCreateCampaignArgs = {
+  input: CreateCampaignInput;
+};
+
+
+export type MutationCreatePaymentIntentArgs = {
+  input: CreatePaymentIntentInput;
+};
+
+
+export type MutationCreateReviewArgs = {
+  bookingId: Scalars['ID']['input'];
+  input: CreateReviewInput;
 };
 
 
@@ -346,13 +1227,383 @@ export type MutationCreateSpaceArgs = {
 };
 
 
+export type MutationDeactivateSpaceArgs = {
+  input: DeactivateSpaceInput;
+};
+
+
+export type MutationDeleteCampaignArgs = {
+  input: DeleteCampaignInput;
+};
+
+
+export type MutationDeleteNotificationArgs = {
+  input: DeleteNotificationInput;
+};
+
+
+export type MutationDeleteReviewArgs = {
+  input: DeleteReviewInput;
+};
+
+
 export type MutationDeleteSpaceArgs = {
   input: DeleteSpaceInput;
 };
 
 
+export type MutationDeleteUserArgs = {
+  input: DeleteUserInput;
+};
+
+
+export type MutationMarkConversationReadArgs = {
+  input: MarkConversationReadInput;
+};
+
+
+export type MutationMarkFileDownloadedArgs = {
+  input: MarkFileDownloadedInput;
+};
+
+
+export type MutationMarkInstalledArgs = {
+  input: MarkInstalledInput;
+};
+
+
+export type MutationMarkNotificationReadArgs = {
+  input: MarkNotificationReadInput;
+};
+
+
+export type MutationProcessPayoutArgs = {
+  input: ProcessPayoutInput;
+};
+
+
+export type MutationReactivateSpaceArgs = {
+  input: ReactivateSpaceInput;
+};
+
+
+export type MutationRejectBookingArgs = {
+  input: RejectBookingInput;
+};
+
+
+export type MutationRequestRefundArgs = {
+  input: RequestRefundInput;
+};
+
+
+export type MutationRetryPayoutArgs = {
+  input: RetryPayoutInput;
+};
+
+
+export type MutationSendMessageArgs = {
+  input: SendMessageInput;
+};
+
+
+export type MutationSubmitCampaignArgs = {
+  input: SubmitCampaignInput;
+};
+
+
+export type MutationUpdateAdvertiserProfileArgs = {
+  input: UpdateAdvertiserProfileInput;
+};
+
+
+export type MutationUpdateCampaignArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateCampaignInput;
+};
+
+
 export type MutationUpdateCurrentUserArgs = {
   input: UpdateCurrentUserInput;
+};
+
+
+export type MutationUpdateNotificationPreferenceArgs = {
+  input: UpdateNotificationPreferenceInput;
+};
+
+
+export type MutationUpdateReviewArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateReviewInput;
+};
+
+
+export type MutationUpdateSpaceArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateSpaceInput;
+};
+
+
+export type MutationUpdateSpaceOwnerProfileArgs = {
+  input: UpdateSpaceOwnerProfileInput;
+};
+
+/** A connection to a list of items. */
+export type MyBookingsAsAdvertiserConnection = {
+  __typename: 'MyBookingsAsAdvertiserConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MyBookingsAsAdvertiserEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Booking>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type MyBookingsAsAdvertiserEdge = {
+  __typename: 'MyBookingsAsAdvertiserEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Booking;
+};
+
+/** A connection to a list of items. */
+export type MyBookingsAsOwnerConnection = {
+  __typename: 'MyBookingsAsOwnerConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MyBookingsAsOwnerEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Booking>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type MyBookingsAsOwnerEdge = {
+  __typename: 'MyBookingsAsOwnerEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Booking;
+};
+
+/** A connection to a list of items. */
+export type MyCampaignsConnection = {
+  __typename: 'MyCampaignsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MyCampaignsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Campaign>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type MyCampaignsEdge = {
+  __typename: 'MyCampaignsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Campaign;
+};
+
+/** A connection to a list of items. */
+export type MyConversationsConnection = {
+  __typename: 'MyConversationsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MyConversationsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Conversation>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type MyConversationsEdge = {
+  __typename: 'MyConversationsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Conversation;
+};
+
+/** A connection to a list of items. */
+export type MyNotificationsConnection = {
+  __typename: 'MyNotificationsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MyNotificationsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Notification>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type MyNotificationsEdge = {
+  __typename: 'MyNotificationsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Notification;
+};
+
+/** A connection to a list of items. */
+export type MyPayoutsConnection = {
+  __typename: 'MyPayoutsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MyPayoutsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Payout>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type MyPayoutsEdge = {
+  __typename: 'MyPayoutsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Payout;
+};
+
+/** A connection to a list of items. */
+export type MyReviewsConnection = {
+  __typename: 'MyReviewsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MyReviewsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Review>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type MyReviewsEdge = {
+  __typename: 'MyReviewsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Review;
+};
+
+/** A connection to a list of items. */
+export type MySpacesConnection = {
+  __typename: 'MySpacesConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MySpacesEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Space>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type MySpacesEdge = {
+  __typename: 'MySpacesEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Space;
+};
+
+export type NotFoundError = Error & {
+  __typename: 'NotFoundError';
+  code: Scalars['String']['output'];
+  entityId: Scalars['UUID']['output'];
+  entityType: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+};
+
+export type Notification = {
+  __typename: 'Notification';
+  body: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  entityId: Maybe<Scalars['UUID']['output']>;
+  entityType: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  isRead: Scalars['Boolean']['output'];
+  readAt: Maybe<Scalars['DateTime']['output']>;
+  title: Scalars['String']['output'];
+  type: NotificationType;
+  user: User;
+  userId: Scalars['UUID']['output'];
+};
+
+export type NotificationFilterInput = {
+  and?: InputMaybe<Array<NotificationFilterInput>>;
+  body?: InputMaybe<StringOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  entityId?: InputMaybe<UuidOperationFilterInput>;
+  entityType?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  isRead?: InputMaybe<BooleanOperationFilterInput>;
+  or?: InputMaybe<Array<NotificationFilterInput>>;
+  readAt?: InputMaybe<DateTimeOperationFilterInput>;
+  title?: InputMaybe<StringOperationFilterInput>;
+  type?: InputMaybe<NotificationTypeOperationFilterInput>;
+  user?: InputMaybe<UserFilterInput>;
+  userId?: InputMaybe<UuidOperationFilterInput>;
+};
+
+export type NotificationPreference = {
+  __typename: 'NotificationPreference';
+  createdAt: Scalars['DateTime']['output'];
+  emailEnabled: Scalars['Boolean']['output'];
+  id: Scalars['UUID']['output'];
+  inAppEnabled: Scalars['Boolean']['output'];
+  notificationType: NotificationType;
+  pushEnabled: Scalars['Boolean']['output'];
+  user: User;
+  userId: Scalars['UUID']['output'];
+};
+
+export type NotificationSortInput = {
+  body?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  entityId?: InputMaybe<SortEnumType>;
+  entityType?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  isRead?: InputMaybe<SortEnumType>;
+  readAt?: InputMaybe<SortEnumType>;
+  title?: InputMaybe<SortEnumType>;
+  type?: InputMaybe<SortEnumType>;
+  user?: InputMaybe<UserSortInput>;
+  userId?: InputMaybe<SortEnumType>;
+};
+
+export enum NotificationType {
+  BookingApproved = 'BOOKING_APPROVED',
+  BookingCancelled = 'BOOKING_CANCELLED',
+  BookingRejected = 'BOOKING_REJECTED',
+  BookingRequested = 'BOOKING_REQUESTED',
+  DisputeFiled = 'DISPUTE_FILED',
+  DisputeResolved = 'DISPUTE_RESOLVED',
+  MessageReceived = 'MESSAGE_RECEIVED',
+  PaymentFailed = 'PAYMENT_FAILED',
+  PaymentReceived = 'PAYMENT_RECEIVED',
+  PaymentReminder = 'PAYMENT_REMINDER',
+  PayoutProcessed = 'PAYOUT_PROCESSED',
+  ProofApproved = 'PROOF_APPROVED',
+  ProofDisputed = 'PROOF_DISPUTED',
+  ProofRejected = 'PROOF_REJECTED',
+  ProofUploaded = 'PROOF_UPLOADED',
+  RefundProcessed = 'REFUND_PROCESSED',
+  SessionExpired = 'SESSION_EXPIRED',
+  SpaceApproved = 'SPACE_APPROVED',
+  SpaceReactivated = 'SPACE_REACTIVATED',
+  SpaceRejected = 'SPACE_REJECTED',
+  SpaceSuspended = 'SPACE_SUSPENDED',
+  SystemUpdate = 'SYSTEM_UPDATE'
+}
+
+export type NotificationTypeOperationFilterInput = {
+  eq?: InputMaybe<NotificationType>;
+  in?: InputMaybe<Array<NotificationType>>;
+  neq?: InputMaybe<NotificationType>;
+  nin?: InputMaybe<Array<NotificationType>>;
 };
 
 /** Information about pagination in a connection. */
@@ -368,6 +1619,159 @@ export type PageInfo = {
   startCursor: Maybe<Scalars['String']['output']>;
 };
 
+export type Payment = {
+  __typename: 'Payment';
+  amount: Scalars['Decimal']['output'];
+  booking: Booking;
+  bookingId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  failureReason: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  paidAt: Maybe<Scalars['DateTime']['output']>;
+  refunds: Maybe<RefundsConnection>;
+  status: PaymentStatus;
+  stripeChargeId: Maybe<Scalars['String']['output']>;
+  stripeFee: Maybe<Scalars['Decimal']['output']>;
+  stripePaymentIntentId: Scalars['String']['output'];
+  type: PaymentType;
+};
+
+
+export type PaymentRefundsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<RefundSortInput>>;
+  where?: InputMaybe<RefundFilterInput>;
+};
+
+export type PaymentError = Error & {
+  __typename: 'PaymentError';
+  code: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+  operation: Scalars['String']['output'];
+  reason: Scalars['String']['output'];
+};
+
+export type PaymentFilterInput = {
+  amount?: InputMaybe<DecimalOperationFilterInput>;
+  and?: InputMaybe<Array<PaymentFilterInput>>;
+  booking?: InputMaybe<BookingFilterInput>;
+  bookingId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  failureReason?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<PaymentFilterInput>>;
+  paidAt?: InputMaybe<DateTimeOperationFilterInput>;
+  refunds?: InputMaybe<ListFilterInputTypeOfRefundFilterInput>;
+  status?: InputMaybe<PaymentStatusOperationFilterInput>;
+  stripeChargeId?: InputMaybe<StringOperationFilterInput>;
+  stripeFee?: InputMaybe<DecimalOperationFilterInput>;
+  stripePaymentIntentId?: InputMaybe<StringOperationFilterInput>;
+  type?: InputMaybe<PaymentTypeOperationFilterInput>;
+};
+
+export type PaymentSortInput = {
+  amount?: InputMaybe<SortEnumType>;
+  booking?: InputMaybe<BookingSortInput>;
+  bookingId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  failureReason?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  paidAt?: InputMaybe<SortEnumType>;
+  status?: InputMaybe<SortEnumType>;
+  stripeChargeId?: InputMaybe<SortEnumType>;
+  stripeFee?: InputMaybe<SortEnumType>;
+  stripePaymentIntentId?: InputMaybe<SortEnumType>;
+  type?: InputMaybe<SortEnumType>;
+};
+
+export enum PaymentStatus {
+  Failed = 'FAILED',
+  PartiallyRefunded = 'PARTIALLY_REFUNDED',
+  Pending = 'PENDING',
+  Refunded = 'REFUNDED',
+  Succeeded = 'SUCCEEDED'
+}
+
+export type PaymentStatusOperationFilterInput = {
+  eq?: InputMaybe<PaymentStatus>;
+  in?: InputMaybe<Array<PaymentStatus>>;
+  neq?: InputMaybe<PaymentStatus>;
+  nin?: InputMaybe<Array<PaymentStatus>>;
+};
+
+export enum PaymentType {
+  Balance = 'BALANCE',
+  Deposit = 'DEPOSIT',
+  Full = 'FULL'
+}
+
+export type PaymentTypeOperationFilterInput = {
+  eq?: InputMaybe<PaymentType>;
+  in?: InputMaybe<Array<PaymentType>>;
+  neq?: InputMaybe<PaymentType>;
+  nin?: InputMaybe<Array<PaymentType>>;
+};
+
+/** A connection to a list of items. */
+export type PaymentsByBookingConnection = {
+  __typename: 'PaymentsByBookingConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<PaymentsByBookingEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Payment>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type PaymentsByBookingEdge = {
+  __typename: 'PaymentsByBookingEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Payment;
+};
+
+export type Payout = {
+  __typename: 'Payout';
+  amount: Scalars['Decimal']['output'];
+  attemptCount: Scalars['Int']['output'];
+  booking: Booking;
+  bookingId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  failureReason: Maybe<Scalars['String']['output']>;
+  id: Scalars['UUID']['output'];
+  lastAttemptAt: Maybe<Scalars['DateTime']['output']>;
+  processedAt: Maybe<Scalars['DateTime']['output']>;
+  spaceOwnerProfile: SpaceOwnerProfile;
+  spaceOwnerProfileId: Scalars['UUID']['output'];
+  stage: PayoutStage;
+  status: PayoutStatus;
+  stripeTransferId: Maybe<Scalars['String']['output']>;
+};
+
+export type PayoutFilterInput = {
+  amount?: InputMaybe<DecimalOperationFilterInput>;
+  and?: InputMaybe<Array<PayoutFilterInput>>;
+  attemptCount?: InputMaybe<IntOperationFilterInput>;
+  booking?: InputMaybe<BookingFilterInput>;
+  bookingId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  failureReason?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  lastAttemptAt?: InputMaybe<DateTimeOperationFilterInput>;
+  or?: InputMaybe<Array<PayoutFilterInput>>;
+  processedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileFilterInput>;
+  spaceOwnerProfileId?: InputMaybe<UuidOperationFilterInput>;
+  stage?: InputMaybe<PayoutStageOperationFilterInput>;
+  status?: InputMaybe<PayoutStatusOperationFilterInput>;
+  stripeTransferId?: InputMaybe<StringOperationFilterInput>;
+};
+
 export enum PayoutSchedule {
   Biweekly = 'BIWEEKLY',
   Monthly = 'MONTHLY',
@@ -379,6 +1783,63 @@ export type PayoutScheduleOperationFilterInput = {
   in?: InputMaybe<Array<PayoutSchedule>>;
   neq?: InputMaybe<PayoutSchedule>;
   nin?: InputMaybe<Array<PayoutSchedule>>;
+};
+
+export type PayoutSortInput = {
+  amount?: InputMaybe<SortEnumType>;
+  attemptCount?: InputMaybe<SortEnumType>;
+  booking?: InputMaybe<BookingSortInput>;
+  bookingId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  failureReason?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  lastAttemptAt?: InputMaybe<SortEnumType>;
+  processedAt?: InputMaybe<SortEnumType>;
+  spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileSortInput>;
+  spaceOwnerProfileId?: InputMaybe<SortEnumType>;
+  stage?: InputMaybe<SortEnumType>;
+  status?: InputMaybe<SortEnumType>;
+  stripeTransferId?: InputMaybe<SortEnumType>;
+};
+
+export enum PayoutStage {
+  Stage1 = 'STAGE1',
+  Stage2 = 'STAGE2'
+}
+
+export type PayoutStageOperationFilterInput = {
+  eq?: InputMaybe<PayoutStage>;
+  in?: InputMaybe<Array<PayoutStage>>;
+  neq?: InputMaybe<PayoutStage>;
+  nin?: InputMaybe<Array<PayoutStage>>;
+};
+
+export enum PayoutStatus {
+  Completed = 'COMPLETED',
+  Failed = 'FAILED',
+  PartiallyPaid = 'PARTIALLY_PAID',
+  Pending = 'PENDING',
+  Processing = 'PROCESSING'
+}
+
+export type PayoutStatusOperationFilterInput = {
+  eq?: InputMaybe<PayoutStatus>;
+  in?: InputMaybe<Array<PayoutStatus>>;
+  neq?: InputMaybe<PayoutStatus>;
+  nin?: InputMaybe<Array<PayoutStatus>>;
+};
+
+export type ProcessPayoutError = ConflictError | NotFoundError | PaymentError;
+
+export type ProcessPayoutInput = {
+  bookingId: Scalars['ID']['input'];
+  stage: PayoutStage;
+};
+
+export type ProcessPayoutPayload = {
+  __typename: 'ProcessPayoutPayload';
+  errors: Maybe<Array<ProcessPayoutError>>;
+  payout: Maybe<Payout>;
 };
 
 export enum ProfileType {
@@ -393,13 +1854,204 @@ export type ProfileTypeOperationFilterInput = {
   nin?: InputMaybe<Array<ProfileType>>;
 };
 
+export enum ProofStatus {
+  Approved = 'APPROVED',
+  CorrectionRequested = 'CORRECTION_REQUESTED',
+  Disputed = 'DISPUTED',
+  Pending = 'PENDING',
+  Rejected = 'REJECTED',
+  UnderReview = 'UNDER_REVIEW'
+}
+
+export type ProofStatusOperationFilterInput = {
+  eq?: InputMaybe<ProofStatus>;
+  in?: InputMaybe<Array<ProofStatus>>;
+  neq?: InputMaybe<ProofStatus>;
+  nin?: InputMaybe<Array<ProofStatus>>;
+};
+
 export type Query = {
   __typename: 'Query';
-  currentUser: Maybe<User>;
+  bookingById: Maybe<Booking>;
+  bookingsRequiringAction: Maybe<BookingsRequiringActionConnection>;
+  campaignById: Maybe<Campaign>;
+  earningsSummary: EarningsSummary;
+  incomingBookingRequests: Maybe<IncomingBookingRequestsConnection>;
+  me: Maybe<User>;
+  messagesByConversation: Maybe<MessagesByConversationConnection>;
+  myBookingsAsAdvertiser: Maybe<MyBookingsAsAdvertiserConnection>;
+  myBookingsAsOwner: Maybe<MyBookingsAsOwnerConnection>;
+  myCampaigns: Maybe<MyCampaignsConnection>;
+  myConversations: Maybe<MyConversationsConnection>;
+  myNotificationPreferences: Array<NotificationPreference>;
+  myNotifications: Maybe<MyNotificationsConnection>;
+  myPayouts: Maybe<MyPayoutsConnection>;
+  myReviews: Maybe<MyReviewsConnection>;
+  mySpaces: Maybe<MySpacesConnection>;
+  paymentById: Maybe<Payment>;
+  paymentsByBooking: Maybe<PaymentsByBookingConnection>;
+  payoutById: Maybe<Payout>;
+  reviewByBooking: Maybe<Review>;
+  reviewsBySpace: Maybe<ReviewsBySpaceConnection>;
   spaceById: Maybe<Space>;
   spaces: Maybe<SpacesConnection>;
-  userById: Maybe<User>;
-  users: Maybe<UsersConnection>;
+  transactionsByBooking: Maybe<TransactionsByBookingConnection>;
+  unreadConversationsCount: Scalars['Int']['output'];
+  unreadNotificationsCount: Scalars['Int']['output'];
+};
+
+
+export type QueryBookingByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryBookingsRequiringActionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryCampaignByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryIncomingBookingRequestsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<BookingSortInput>>;
+};
+
+
+export type QueryMessagesByConversationArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  conversationId: Scalars['ID']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<MessageSortInput>>;
+  where?: InputMaybe<MessageFilterInput>;
+};
+
+
+export type QueryMyBookingsAsAdvertiserArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<BookingSortInput>>;
+  where?: InputMaybe<BookingFilterInput>;
+};
+
+
+export type QueryMyBookingsAsOwnerArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<BookingSortInput>>;
+  where?: InputMaybe<BookingFilterInput>;
+};
+
+
+export type QueryMyCampaignsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<CampaignSortInput>>;
+  where?: InputMaybe<CampaignFilterInput>;
+};
+
+
+export type QueryMyConversationsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<ConversationSortInput>>;
+  where?: InputMaybe<ConversationFilterInput>;
+};
+
+
+export type QueryMyNotificationsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<NotificationSortInput>>;
+  where?: InputMaybe<NotificationFilterInput>;
+};
+
+
+export type QueryMyPayoutsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<PayoutSortInput>>;
+  where?: InputMaybe<PayoutFilterInput>;
+};
+
+
+export type QueryMyReviewsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<ReviewSortInput>>;
+};
+
+
+export type QueryMySpacesArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<SpaceSortInput>>;
+  where?: InputMaybe<SpaceFilterInput>;
+};
+
+
+export type QueryPaymentByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryPaymentsByBookingArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  bookingId: Scalars['ID']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<PaymentSortInput>>;
+  where?: InputMaybe<PaymentFilterInput>;
+};
+
+
+export type QueryPayoutByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryReviewByBookingArgs = {
+  bookingId: Scalars['ID']['input'];
+  reviewerType: ReviewerType;
+};
+
+
+export type QueryReviewsBySpaceArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<ReviewSortInput>>;
+  spaceId: Scalars['ID']['input'];
 };
 
 
@@ -418,18 +2070,260 @@ export type QuerySpacesArgs = {
 };
 
 
-export type QueryUserByIdArgs = {
+export type QueryTransactionsByBookingArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  bookingId: Scalars['ID']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<TransactionSortInput>>;
+  where?: InputMaybe<TransactionFilterInput>;
+};
+
+export type ReactivateSpaceError = ForbiddenError | NotFoundError;
+
+export type ReactivateSpaceInput = {
   id: Scalars['ID']['input'];
 };
 
+export type ReactivateSpacePayload = {
+  __typename: 'ReactivateSpacePayload';
+  errors: Maybe<Array<ReactivateSpaceError>>;
+  space: Maybe<Space>;
+};
 
-export type QueryUsersArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-  order?: InputMaybe<Array<UserSortInput>>;
-  where?: InputMaybe<UserFilterInput>;
+export type RefreshStripeAccountStatusError = NotFoundError | PaymentError | ValidationError;
+
+export type RefreshStripeAccountStatusPayload = {
+  __typename: 'RefreshStripeAccountStatusPayload';
+  errors: Maybe<Array<RefreshStripeAccountStatusError>>;
+  profile: Maybe<SpaceOwnerProfile>;
+};
+
+export type Refund = {
+  __typename: 'Refund';
+  amount: Scalars['Decimal']['output'];
+  booking: Booking;
+  bookingId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['UUID']['output'];
+  payment: Payment;
+  paymentId: Scalars['UUID']['output'];
+  processedAt: Maybe<Scalars['DateTime']['output']>;
+  reason: Scalars['String']['output'];
+  status: RefundStatus;
+  stripeRefundId: Maybe<Scalars['String']['output']>;
+};
+
+export type RefundFilterInput = {
+  amount?: InputMaybe<DecimalOperationFilterInput>;
+  and?: InputMaybe<Array<RefundFilterInput>>;
+  booking?: InputMaybe<BookingFilterInput>;
+  bookingId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<RefundFilterInput>>;
+  payment?: InputMaybe<PaymentFilterInput>;
+  paymentId?: InputMaybe<UuidOperationFilterInput>;
+  processedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  reason?: InputMaybe<StringOperationFilterInput>;
+  status?: InputMaybe<RefundStatusOperationFilterInput>;
+  stripeRefundId?: InputMaybe<StringOperationFilterInput>;
+};
+
+export type RefundSortInput = {
+  amount?: InputMaybe<SortEnumType>;
+  booking?: InputMaybe<BookingSortInput>;
+  bookingId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  payment?: InputMaybe<PaymentSortInput>;
+  paymentId?: InputMaybe<SortEnumType>;
+  processedAt?: InputMaybe<SortEnumType>;
+  reason?: InputMaybe<SortEnumType>;
+  status?: InputMaybe<SortEnumType>;
+  stripeRefundId?: InputMaybe<SortEnumType>;
+};
+
+export enum RefundStatus {
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  Succeeded = 'SUCCEEDED'
+}
+
+export type RefundStatusOperationFilterInput = {
+  eq?: InputMaybe<RefundStatus>;
+  in?: InputMaybe<Array<RefundStatus>>;
+  neq?: InputMaybe<RefundStatus>;
+  nin?: InputMaybe<Array<RefundStatus>>;
+};
+
+/** A connection to a list of items. */
+export type RefundsConnection = {
+  __typename: 'RefundsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<RefundsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Refund>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type RefundsEdge = {
+  __typename: 'RefundsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Refund;
+};
+
+export type RejectBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+
+export type RejectBookingInput = {
+  id: Scalars['ID']['input'];
+  reason: Scalars['String']['input'];
+};
+
+export type RejectBookingPayload = {
+  __typename: 'RejectBookingPayload';
+  booking: Maybe<Booking>;
+  errors: Maybe<Array<RejectBookingError>>;
+};
+
+export type RequestRefundError = InvalidStatusTransitionError | NotFoundError | PaymentError | ValidationError;
+
+export type RequestRefundInput = {
+  amount: Scalars['Decimal']['input'];
+  paymentId: Scalars['ID']['input'];
+  reason: Scalars['String']['input'];
+};
+
+export type RequestRefundPayload = {
+  __typename: 'RequestRefundPayload';
+  errors: Maybe<Array<RequestRefundError>>;
+  refund: Maybe<Refund>;
+};
+
+export type RetryPayoutError = InvalidStatusTransitionError | NotFoundError | PaymentError;
+
+export type RetryPayoutInput = {
+  payoutId: Scalars['ID']['input'];
+};
+
+export type RetryPayoutPayload = {
+  __typename: 'RetryPayoutPayload';
+  errors: Maybe<Array<RetryPayoutError>>;
+  payout: Maybe<Payout>;
+};
+
+export type Review = {
+  __typename: 'Review';
+  booking: Booking;
+  bookingId: Scalars['UUID']['output'];
+  comment: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['UUID']['output'];
+  rating: Scalars['Int']['output'];
+  reviewerProfileId: Scalars['UUID']['output'];
+  reviewerType: ReviewerType;
+  space: Space;
+  spaceId: Scalars['UUID']['output'];
+};
+
+export type ReviewFilterInput = {
+  and?: InputMaybe<Array<ReviewFilterInput>>;
+  booking?: InputMaybe<BookingFilterInput>;
+  bookingId?: InputMaybe<UuidOperationFilterInput>;
+  comment?: InputMaybe<StringOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<ReviewFilterInput>>;
+  rating?: InputMaybe<IntOperationFilterInput>;
+  reviewerProfileId?: InputMaybe<UuidOperationFilterInput>;
+  reviewerType?: InputMaybe<ReviewerTypeOperationFilterInput>;
+  space?: InputMaybe<SpaceFilterInput>;
+  spaceId?: InputMaybe<UuidOperationFilterInput>;
+};
+
+export type ReviewSortInput = {
+  booking?: InputMaybe<BookingSortInput>;
+  bookingId?: InputMaybe<SortEnumType>;
+  comment?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  rating?: InputMaybe<SortEnumType>;
+  reviewerProfileId?: InputMaybe<SortEnumType>;
+  reviewerType?: InputMaybe<SortEnumType>;
+  space?: InputMaybe<SpaceSortInput>;
+  spaceId?: InputMaybe<SortEnumType>;
+};
+
+export enum ReviewerType {
+  Advertiser = 'ADVERTISER',
+  SpaceOwner = 'SPACE_OWNER'
+}
+
+export type ReviewerTypeOperationFilterInput = {
+  eq?: InputMaybe<ReviewerType>;
+  in?: InputMaybe<Array<ReviewerType>>;
+  neq?: InputMaybe<ReviewerType>;
+  nin?: InputMaybe<Array<ReviewerType>>;
+};
+
+/** A connection to a list of items. */
+export type ReviewsBySpaceConnection = {
+  __typename: 'ReviewsBySpaceConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<ReviewsBySpaceEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Review>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type ReviewsBySpaceEdge = {
+  __typename: 'ReviewsBySpaceEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Review;
+};
+
+/** A connection to a list of items. */
+export type ReviewsConnection = {
+  __typename: 'ReviewsConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<ReviewsEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Review>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type ReviewsEdge = {
+  __typename: 'ReviewsEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Review;
+};
+
+export type SendMessageError = ForbiddenError;
+
+export type SendMessageInput = {
+  attachments?: InputMaybe<Array<Scalars['String']['input']>>;
+  content: Scalars['String']['input'];
+  conversationId: Scalars['ID']['input'];
+  type?: InputMaybe<MessageType>;
+};
+
+export type SendMessagePayload = {
+  __typename: 'SendMessagePayload';
+  errors: Maybe<Array<SendMessageError>>;
+  message: Maybe<Message>;
 };
 
 export enum SortEnumType {
@@ -443,6 +2337,7 @@ export type Space = {
   availableFrom: Maybe<Scalars['DateTime']['output']>;
   availableTo: Maybe<Scalars['DateTime']['output']>;
   averageRating: Maybe<Scalars['Float']['output']>;
+  bookings: Maybe<BookingsConnection>;
   city: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   description: Maybe<Scalars['String']['output']>;
@@ -456,8 +2351,10 @@ export type Space = {
   longitude: Scalars['Float']['output'];
   maxDuration: Maybe<Scalars['Int']['output']>;
   minDuration: Scalars['Int']['output'];
+  owner: Maybe<SpaceOwnerProfile>;
   pricePerDay: Scalars['Decimal']['output'];
   rejectionReason: Maybe<Scalars['String']['output']>;
+  reviews: Maybe<ReviewsConnection>;
   spaceOwnerProfile: SpaceOwnerProfile;
   spaceOwnerProfileId: Scalars['UUID']['output'];
   state: Scalars['String']['output'];
@@ -471,12 +2368,33 @@ export type Space = {
   zipCode: Maybe<Scalars['String']['output']>;
 };
 
+
+export type SpaceBookingsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<BookingSortInput>>;
+  where?: InputMaybe<BookingFilterInput>;
+};
+
+
+export type SpaceReviewsArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<ReviewSortInput>>;
+  where?: InputMaybe<ReviewFilterInput>;
+};
+
 export type SpaceFilterInput = {
   address?: InputMaybe<StringOperationFilterInput>;
   and?: InputMaybe<Array<SpaceFilterInput>>;
   availableFrom?: InputMaybe<DateTimeOperationFilterInput>;
   availableTo?: InputMaybe<DateTimeOperationFilterInput>;
   averageRating?: InputMaybe<FloatOperationFilterInput>;
+  bookings?: InputMaybe<ListFilterInputTypeOfBookingFilterInput>;
   city?: InputMaybe<StringOperationFilterInput>;
   createdAt?: InputMaybe<DateTimeOperationFilterInput>;
   description?: InputMaybe<StringOperationFilterInput>;
@@ -493,6 +2411,7 @@ export type SpaceFilterInput = {
   or?: InputMaybe<Array<SpaceFilterInput>>;
   pricePerDay?: InputMaybe<DecimalOperationFilterInput>;
   rejectionReason?: InputMaybe<StringOperationFilterInput>;
+  reviews?: InputMaybe<ListFilterInputTypeOfReviewFilterInput>;
   spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileFilterInput>;
   spaceOwnerProfileId?: InputMaybe<UuidOperationFilterInput>;
   state?: InputMaybe<StringOperationFilterInput>;
@@ -506,39 +2425,6 @@ export type SpaceFilterInput = {
   zipCode?: InputMaybe<StringOperationFilterInput>;
 };
 
-export type SpaceInput = {
-  address: Scalars['String']['input'];
-  availableFrom?: InputMaybe<Scalars['DateTime']['input']>;
-  availableTo?: InputMaybe<Scalars['DateTime']['input']>;
-  averageRating?: InputMaybe<Scalars['Float']['input']>;
-  city: Scalars['String']['input'];
-  createdAt: Scalars['DateTime']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  dimensions?: InputMaybe<Scalars['String']['input']>;
-  dimensionsText?: InputMaybe<Scalars['String']['input']>;
-  height?: InputMaybe<Scalars['Float']['input']>;
-  id: Scalars['UUID']['input'];
-  images: Array<Scalars['String']['input']>;
-  installationFee?: InputMaybe<Scalars['Decimal']['input']>;
-  latitude: Scalars['Float']['input'];
-  longitude: Scalars['Float']['input'];
-  maxDuration?: InputMaybe<Scalars['Int']['input']>;
-  minDuration: Scalars['Int']['input'];
-  pricePerDay: Scalars['Decimal']['input'];
-  rejectionReason?: InputMaybe<Scalars['String']['input']>;
-  spaceOwnerProfile: SpaceOwnerProfileInput;
-  spaceOwnerProfileId: Scalars['UUID']['input'];
-  state: Scalars['String']['input'];
-  status: SpaceStatus;
-  title: Scalars['String']['input'];
-  totalBookings: Scalars['Int']['input'];
-  totalRevenue: Scalars['Decimal']['input'];
-  traffic?: InputMaybe<Scalars['String']['input']>;
-  type: SpaceType;
-  width?: InputMaybe<Scalars['Float']['input']>;
-  zipCode?: InputMaybe<Scalars['String']['input']>;
-};
-
 export type SpaceOwnerProfile = {
   __typename: 'SpaceOwnerProfile';
   businessName: Maybe<Scalars['String']['output']>;
@@ -547,6 +2433,7 @@ export type SpaceOwnerProfile = {
   id: Scalars['UUID']['output'];
   onboardingComplete: Scalars['Boolean']['output'];
   payoutSchedule: PayoutSchedule;
+  payouts: Array<Payout>;
   spaces: Maybe<SpacesConnection>;
   stripeAccountDisconnectedAt: Maybe<Scalars['DateTime']['output']>;
   stripeAccountDisconnectedNotifiedAt: Maybe<Scalars['DateTime']['output']>;
@@ -576,6 +2463,7 @@ export type SpaceOwnerProfileFilterInput = {
   onboardingComplete?: InputMaybe<BooleanOperationFilterInput>;
   or?: InputMaybe<Array<SpaceOwnerProfileFilterInput>>;
   payoutSchedule?: InputMaybe<PayoutScheduleOperationFilterInput>;
+  payouts?: InputMaybe<ListFilterInputTypeOfPayoutFilterInput>;
   spaces?: InputMaybe<ListFilterInputTypeOfSpaceFilterInput>;
   stripeAccountDisconnectedAt?: InputMaybe<DateTimeOperationFilterInput>;
   stripeAccountDisconnectedNotifiedAt?: InputMaybe<DateTimeOperationFilterInput>;
@@ -584,23 +2472,6 @@ export type SpaceOwnerProfileFilterInput = {
   stripeLastAccountHealthCheck?: InputMaybe<DateTimeOperationFilterInput>;
   user?: InputMaybe<UserFilterInput>;
   userId?: InputMaybe<UuidOperationFilterInput>;
-};
-
-export type SpaceOwnerProfileInput = {
-  businessName?: InputMaybe<Scalars['String']['input']>;
-  businessType?: InputMaybe<Scalars['String']['input']>;
-  createdAt: Scalars['DateTime']['input'];
-  id: Scalars['UUID']['input'];
-  onboardingComplete: Scalars['Boolean']['input'];
-  payoutSchedule: PayoutSchedule;
-  spaces: Array<SpaceInput>;
-  stripeAccountDisconnectedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  stripeAccountDisconnectedNotifiedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  stripeAccountId?: InputMaybe<Scalars['String']['input']>;
-  stripeAccountStatus?: InputMaybe<Scalars['String']['input']>;
-  stripeLastAccountHealthCheck?: InputMaybe<Scalars['DateTime']['input']>;
-  user: UserInput;
-  userId: Scalars['UUID']['input'];
 };
 
 export type SpaceOwnerProfileSortInput = {
@@ -718,13 +2589,238 @@ export type StringOperationFilterInput = {
   startsWith?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type SubmitCampaignError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+
+export type SubmitCampaignInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type SubmitCampaignPayload = {
+  __typename: 'SubmitCampaignPayload';
+  campaign: Maybe<Campaign>;
+  errors: Maybe<Array<SubmitCampaignError>>;
+};
+
+export type Subscription = {
+  __typename: 'Subscription';
+  onBookingUpdate: Booking;
+  onMessage: Message;
+  onNotification: Notification;
+  onProofUpdate: BookingProof;
+};
+
+
+export type SubscriptionOnBookingUpdateArgs = {
+  bookingId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionOnMessageArgs = {
+  conversationId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionOnNotificationArgs = {
+  userId: Scalars['ID']['input'];
+};
+
+
+export type SubscriptionOnProofUpdateArgs = {
+  bookingId: Scalars['ID']['input'];
+};
+
+export type Transaction = {
+  __typename: 'Transaction';
+  amount: Scalars['Decimal']['output'];
+  booking: Maybe<Booking>;
+  bookingId: Maybe<Scalars['UUID']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  currency: Scalars['String']['output'];
+  description: Scalars['String']['output'];
+  id: Scalars['UUID']['output'];
+  referenceId: Scalars['UUID']['output'];
+  referenceType: Scalars['String']['output'];
+  type: TransactionType;
+  user: Maybe<User>;
+  userId: Maybe<Scalars['UUID']['output']>;
+};
+
+export type TransactionFilterInput = {
+  amount?: InputMaybe<DecimalOperationFilterInput>;
+  and?: InputMaybe<Array<TransactionFilterInput>>;
+  booking?: InputMaybe<BookingFilterInput>;
+  bookingId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  currency?: InputMaybe<StringOperationFilterInput>;
+  description?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<TransactionFilterInput>>;
+  referenceId?: InputMaybe<UuidOperationFilterInput>;
+  referenceType?: InputMaybe<StringOperationFilterInput>;
+  type?: InputMaybe<TransactionTypeOperationFilterInput>;
+  user?: InputMaybe<UserFilterInput>;
+  userId?: InputMaybe<UuidOperationFilterInput>;
+};
+
+export type TransactionSortInput = {
+  amount?: InputMaybe<SortEnumType>;
+  booking?: InputMaybe<BookingSortInput>;
+  bookingId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  currency?: InputMaybe<SortEnumType>;
+  description?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  referenceId?: InputMaybe<SortEnumType>;
+  referenceType?: InputMaybe<SortEnumType>;
+  type?: InputMaybe<SortEnumType>;
+  user?: InputMaybe<UserSortInput>;
+  userId?: InputMaybe<SortEnumType>;
+};
+
+export enum TransactionType {
+  Payment = 'PAYMENT',
+  Payout = 'PAYOUT',
+  PlatformFee = 'PLATFORM_FEE',
+  Refund = 'REFUND'
+}
+
+export type TransactionTypeOperationFilterInput = {
+  eq?: InputMaybe<TransactionType>;
+  in?: InputMaybe<Array<TransactionType>>;
+  neq?: InputMaybe<TransactionType>;
+  nin?: InputMaybe<Array<TransactionType>>;
+};
+
+/** A connection to a list of items. */
+export type TransactionsByBookingConnection = {
+  __typename: 'TransactionsByBookingConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<TransactionsByBookingEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Transaction>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+};
+
+/** An edge in a connection. */
+export type TransactionsByBookingEdge = {
+  __typename: 'TransactionsByBookingEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Transaction;
+};
+
+export type UpdateAdvertiserProfileError = NotFoundError;
+
+export type UpdateAdvertiserProfileInput = {
+  companyName?: InputMaybe<Scalars['String']['input']>;
+  industry?: InputMaybe<Scalars['String']['input']>;
+  website?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateAdvertiserProfilePayload = {
+  __typename: 'UpdateAdvertiserProfilePayload';
+  advertiserProfile: Maybe<AdvertiserProfile>;
+  errors: Maybe<Array<UpdateAdvertiserProfileError>>;
+};
+
+export type UpdateCampaignError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+
+export type UpdateCampaignInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  goals?: InputMaybe<Scalars['String']['input']>;
+  imageUrl?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+  targetAudience?: InputMaybe<Scalars['String']['input']>;
+  totalBudget?: InputMaybe<Scalars['Decimal']['input']>;
+};
+
+export type UpdateCampaignPayload = {
+  __typename: 'UpdateCampaignPayload';
+  campaign: Maybe<Campaign>;
+  errors: Maybe<Array<UpdateCampaignError>>;
+};
+
+export type UpdateCurrentUserError = NotFoundError;
+
 export type UpdateCurrentUserInput = {
-  updatedUser: UserInput;
+  input: UpdateUserInput;
 };
 
 export type UpdateCurrentUserPayload = {
   __typename: 'UpdateCurrentUserPayload';
+  errors: Maybe<Array<UpdateCurrentUserError>>;
   user: Maybe<User>;
+};
+
+export type UpdateNotificationPreferenceInput = {
+  emailEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  inAppEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  notificationType: NotificationType;
+  pushEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type UpdateNotificationPreferencePayload = {
+  __typename: 'UpdateNotificationPreferencePayload';
+  preference: NotificationPreference;
+};
+
+export type UpdateReviewError = ForbiddenError | NotFoundError | ValidationError;
+
+export type UpdateReviewInput = {
+  comment?: InputMaybe<Scalars['String']['input']>;
+  rating?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateReviewPayload = {
+  __typename: 'UpdateReviewPayload';
+  errors: Maybe<Array<UpdateReviewError>>;
+  review: Maybe<Review>;
+};
+
+export type UpdateSpaceError = ForbiddenError | NotFoundError;
+
+export type UpdateSpaceInput = {
+  availableFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  availableTo?: InputMaybe<Scalars['DateTime']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  images?: InputMaybe<Array<Scalars['String']['input']>>;
+  installationFee?: InputMaybe<Scalars['Decimal']['input']>;
+  maxDuration?: InputMaybe<Scalars['Int']['input']>;
+  minDuration?: InputMaybe<Scalars['Int']['input']>;
+  pricePerDay?: InputMaybe<Scalars['Decimal']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  traffic?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateSpaceOwnerProfileError = NotFoundError;
+
+export type UpdateSpaceOwnerProfileInput = {
+  businessName?: InputMaybe<Scalars['String']['input']>;
+  businessType?: InputMaybe<Scalars['String']['input']>;
+  payoutSchedule?: InputMaybe<PayoutSchedule>;
+};
+
+export type UpdateSpaceOwnerProfilePayload = {
+  __typename: 'UpdateSpaceOwnerProfilePayload';
+  errors: Maybe<Array<UpdateSpaceOwnerProfileError>>;
+  spaceOwnerProfile: Maybe<SpaceOwnerProfile>;
+};
+
+export type UpdateSpacePayload = {
+  __typename: 'UpdateSpacePayload';
+  errors: Maybe<Array<UpdateSpaceError>>;
+  space: Maybe<Space>;
+};
+
+export type UpdateUserInput = {
+  activeProfileType?: InputMaybe<ProfileType>;
+  avatar?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type User = {
@@ -760,22 +2856,6 @@ export type UserFilterInput = {
   role?: InputMaybe<UserRoleOperationFilterInput>;
   spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileFilterInput>;
   status?: InputMaybe<UserStatusOperationFilterInput>;
-};
-
-export type UserInput = {
-  activeProfileType: ProfileType;
-  advertiserProfile?: InputMaybe<AdvertiserProfileInput>;
-  avatar?: InputMaybe<Scalars['String']['input']>;
-  createdAt: Scalars['DateTime']['input'];
-  email: Scalars['String']['input'];
-  id: Scalars['UUID']['input'];
-  lastLoginAt?: InputMaybe<Scalars['DateTime']['input']>;
-  name: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-  phone?: InputMaybe<Scalars['String']['input']>;
-  role: UserRole;
-  spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileInput>;
-  status: UserStatus;
 };
 
 export enum UserRole {
@@ -820,26 +2900,6 @@ export type UserStatusOperationFilterInput = {
   nin?: InputMaybe<Array<UserStatus>>;
 };
 
-/** A connection to a list of items. */
-export type UsersConnection = {
-  __typename: 'UsersConnection';
-  /** A list of edges. */
-  edges: Maybe<Array<UsersEdge>>;
-  /** A flattened list of the nodes. */
-  nodes: Maybe<Array<User>>;
-  /** Information to aid in pagination. */
-  pageInfo: PageInfo;
-};
-
-/** An edge in a connection. */
-export type UsersEdge = {
-  __typename: 'UsersEdge';
-  /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
-  /** The item at the end of the edge. */
-  node: User;
-};
-
 export type UuidOperationFilterInput = {
   eq?: InputMaybe<Scalars['UUID']['input']>;
   gt?: InputMaybe<Scalars['UUID']['input']>;
@@ -853,4 +2913,11 @@ export type UuidOperationFilterInput = {
   nin?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
   nlt?: InputMaybe<Scalars['UUID']['input']>;
   nlte?: InputMaybe<Scalars['UUID']['input']>;
+};
+
+export type ValidationError = Error & {
+  __typename: 'ValidationError';
+  code: Scalars['String']['output'];
+  errors: Array<KeyValuePairOfStringAndString__>;
+  message: Scalars['String']['output'];
 };

@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using ElaviewBackend.Data.Entities;
 using ElaviewBackend.Features.Shared.Errors;
 using HotChocolate.Authorization;
 
@@ -14,32 +13,28 @@ public static partial class UserMutations {
         UpdateUserInput input,
         IUserService userService,
         CancellationToken ct
-    ) {
-        var user = await userService.UpdateAsync(userService.GetPrincipalId(), input, ct);
-        return new UpdateCurrentUserPayload(user);
-    }
+    ) => new(await userService.UpdateAsync(userService.GetPrincipalId(), input,
+        ct));
 
     [Authorize]
     [Error<NotFoundException>]
-    public static async Task<UpdateAdvertiserProfilePayload> UpdateAdvertiserProfile(
-        UpdateAdvertiserProfileInput input,
-        IUserService userService,
-        CancellationToken ct
-    ) {
-        var profile = await userService.UpdateAdvertiserProfileAsync(userService.GetPrincipalId(), input, ct);
-        return new UpdateAdvertiserProfilePayload(profile);
-    }
+    public static async Task<UpdateAdvertiserProfilePayload>
+        UpdateAdvertiserProfile(
+            UpdateAdvertiserProfileInput input,
+            IUserService userService,
+            CancellationToken ct
+        ) => new(await userService.UpdateAdvertiserProfileAsync(
+        userService.GetPrincipalId(), input, ct));
 
     [Authorize]
     [Error<NotFoundException>]
-    public static async Task<UpdateSpaceOwnerProfilePayload> UpdateSpaceOwnerProfile(
-        UpdateSpaceOwnerProfileInput input,
-        IUserService userService,
-        CancellationToken ct
-    ) {
-        var profile = await userService.UpdateSpaceOwnerProfileAsync(userService.GetPrincipalId(), input, ct);
-        return new UpdateSpaceOwnerProfilePayload(profile);
-    }
+    public static async Task<UpdateSpaceOwnerProfilePayload>
+        UpdateSpaceOwnerProfile(
+            UpdateSpaceOwnerProfileInput input,
+            IUserService userService,
+            CancellationToken ct
+        ) => new(await userService.UpdateSpaceOwnerProfileAsync(
+        userService.GetPrincipalId(), input, ct));
 
     [Authorize(Roles = ["Admin"])]
     [Error<NotFoundException>]
@@ -47,8 +42,5 @@ public static partial class UserMutations {
         [ID] Guid id,
         IUserService userService,
         CancellationToken ct
-    ) {
-        var success = await userService.DeleteAsync(id, ct);
-        return new DeleteUserPayload(success);
-    }
+    ) => new(await userService.DeleteAsync(id, ct));
 }

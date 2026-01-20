@@ -2,32 +2,32 @@
 "use client";
 
 import React, {
-  useState,
   useCallback,
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import {
+  AdvancedMarker,
   APIProvider,
   Map,
-  AdvancedMarker,
   useMap,
 } from "@vis.gl/react-google-maps";
 import {
-  MapPin,
   Building,
-  Monitor,
   Bus,
-  Car,
-  Store,
   Camera,
+  Car,
   Locate,
   LucideProps,
+  MapPin,
+  Monitor,
+  Store,
 } from "lucide-react";
 import useSupercluster from "use-supercluster";
 import type { BBox } from "geojson";
-import useGoogleMap from "@/hooks/useGoogleMap";
+import useGoogleMap from "@/hooks/use-google-map";
 
 // ============================================================================
 // TYPES
@@ -105,7 +105,12 @@ interface ClusterFeature {
 // CONSTANTS
 // ============================================================================
 
-const SPACE_TYPE_ICONS: Record<string, React.ForwardRefExoticComponent<Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>>> = {
+const SPACE_TYPE_ICONS: Record<
+  string,
+  React.ForwardRefExoticComponent<
+    Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
+  >
+> = {
   BILLBOARD: Building,
   STOREFRONT: Store,
   TRANSIT: Bus,
@@ -616,7 +621,10 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
                   const space: Space | undefined = leaf.properties.space;
                   return space;
                 })
-                .filter((space: Space | undefined): space is Space => space !== undefined);
+                .filter(
+                  (space: Space | undefined): space is Space =>
+                    space !== undefined
+                );
 
               if (DEBUG) {
                 console.log("🎯 Cluster clicked:", {

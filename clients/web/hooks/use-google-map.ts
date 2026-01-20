@@ -1,6 +1,8 @@
 "use client";
+
 import type { BBox } from "geojson";
-import { useState, useRef, useCallback} from "react";
+import { useCallback, useRef, useState } from "react";
+import { Space } from "@/types/graphql.generated";
 
 interface MapBounds {
   north: number;
@@ -15,7 +17,7 @@ export default function useGoogleMap({
   spaces,
   onBoundsChange,
 }: {
-  spaces: any[];
+  spaces: Space[];
   onBoundsChange: (bounds: MapBounds, zoom: number) => void;
 }) {
   //parameter
@@ -31,19 +33,19 @@ export default function useGoogleMap({
   const [bounds, setBounds] = useState<BBox | undefined>();
   const [zoom, setZoom] = useState(mapZoom);
   //function start
-  
+
   const hasBoundsChangedSignificantly = (
     oldBounds: MapBounds | null,
     newBounds: MapBounds,
     threshold = 0.005
   ): boolean => {
     if (!oldBounds) return true;
-    
+
     const latDiff = Math.abs(newBounds.north - oldBounds.north);
     const lngDiff = Math.abs(newBounds.east - oldBounds.east);
-    
+
     const changed = latDiff > threshold || lngDiff > threshold;
-    
+
     if (DEBUG && !changed) {
       console.log("🚫 Bounds movement too small, skipping update", {
         latDiff: latDiff.toFixed(4),
@@ -51,7 +53,7 @@ export default function useGoogleMap({
         threshold,
       });
     }
-    
+
     return changed;
   };
   console.log(spaces, setMapReady, bounds, zoom);

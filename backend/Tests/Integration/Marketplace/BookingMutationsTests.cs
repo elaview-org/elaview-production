@@ -17,8 +17,9 @@ public sealed class BookingMutationsTests(IntegrationTestFixture fixture)
         await LoginAsync(advertiser.Email, "Test123!");
 
         var campaign = await SeedCampaignAsync(advertiserProfile.Id);
-        var space =
-            await SeedSpaceWithPricingAsync(ownerProfile.Id, 50.00m, 25.00m);
+        var space = await SeedSpaceWithPricingAsync(
+            ownerProfile.Id, 50.00m, 25.00m
+        );
 
         var startDate = DateTime.UtcNow.AddDays(7);
         var endDate = DateTime.UtcNow.AddDays(14);

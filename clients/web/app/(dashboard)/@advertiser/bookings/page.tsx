@@ -1,8 +1,8 @@
-import getBooksQuries from "./book-quries";
-import BookingsPage from "./components/bookings";
+import getBooksQueries from "./book-queries";
+import BookingsPage from "./bookings";
 
 export default async function Page() {
-  const { name } = await getBooksQuries();
-  console.log('name',name);
+  const { name } = await getBooksQueries();
+  console.log("name", name);
   return <BookingsPage />;
 }

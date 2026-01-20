@@ -67,7 +67,7 @@ export function BusinessSettingsForm({ user }: BusinessSettingsFormProps) {
           />
           <FieldDescription>
             The name of your business or organization. This helps space owners
-            understand who they're working with.
+            understand who they&#39;re working with.
           </FieldDescription>
         </Field>
 

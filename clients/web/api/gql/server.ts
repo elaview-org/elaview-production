@@ -1,4 +1,11 @@
-import { ApolloClient, gql, HttpLink, InMemoryCache } from "@apollo/client";
+import {
+  ApolloClient,
+  gql,
+  HttpLink,
+  InMemoryCache,
+  type OperationVariables,
+  type TypedDocumentNode,
+} from "@apollo/client";
 import { registerApolloClient } from "@apollo/client-integration-nextjs";
 import { cookies } from "next/headers";
 
@@ -6,27 +13,35 @@ const { getClient, query, PreloadQuery } = registerApolloClient(async () => {
   return new ApolloClient({
     cache: new InMemoryCache(),
     link: new HttpLink({
-      // this needs to be an absolute url, as relative urls cannot be used in SSR
-      uri: `${process.env.ELAVIEW_WEB_NEXT_PUBLIC_API_URL!}/graphql`,
+      uri: `${process.env.NEXT_PUBLIC_API_URL!}/graphql`,
       headers: {
         cookie: (await cookies()).toString(),
       },
-      fetchOptions: {
-        // you can pass additional options that should be passed to `fetch` here,
-        // e.g. Next.js-related `fetch` options regarding caching and revalidation
-        // see https://nextjs.org/docs/app/api-reference/functions/fetch#fetchurl-options
-      },
+      fetchOptions: {},
     }),
   });
 });
 
+type MutationInput<TData, TVariables extends OperationVariables> = {
+  mutation: TypedDocumentNode<TData, TVariables>;
+  variables?: TVariables;
+};
+
+async function mutate<
+  TData,
+  TVariables extends OperationVariables = OperationVariables,
+>(options: MutationInput<TData, TVariables>) {
+  const client = await getClient();
+  return client.mutate<TData, TVariables>({
+    mutation: options.mutation,
+    ...(options.variables && { variables: options.variables }),
+  } as Parameters<typeof client.mutate<TData, TVariables>>[0]);
+}
+
 const api = {
   gql,
   query,
-  // mutate: (
-  //   options: Parameters<ReturnType<typeof getClient>["mutate"]>[0]
-  // ): ReturnType<ReturnType<typeof getClient>["mutate"]> =>
-  //   getClient().mutate(options),
+  mutate,
   getClient,
 };
 

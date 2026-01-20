@@ -15,12 +15,8 @@ import type { User } from "@/types/graphql.generated";
 import { toast } from "sonner";
 
 interface ProfileSettingsFormProps {
-  user: NonNullable<Query["currentUser"]>;
+  user: User;
 }
-
-type Query = {
-  currentUser: User | null;
-};
 
 export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
   const [state, action, pending] = useActionState(updateProfileAction, {

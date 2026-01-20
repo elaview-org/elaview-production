@@ -4,8 +4,8 @@ import { Query } from "@/types/graphql.generated";
 export default async function getAdvertiserQuery() {
   const { data } = await api.query<Query>({
     query: api.gql`
-      query GetCurrentUserForSettings {
-        currentUser {
+      query {
+        me {
           id
           email
           name
@@ -26,7 +26,7 @@ export default async function getAdvertiserQuery() {
     `,
   });
   return {
-    status:!data?.currentUser,
-    currentUser: data?.currentUser
+    status: !data?.me,
+    user: data?.me,
   };
 }

@@ -14,12 +14,8 @@ import type { User } from "@/types/graphql.generated";
 import { toast } from "sonner";
 
 interface BusinessSettingsFormProps {
-  user: NonNullable<Query["currentUser"]>;
+  user: User;
 }
-
-type Query = {
-  currentUser: User | null;
-};
 
 const INDUSTRY_OPTIONS = [
   "Restaurant & Food Service",

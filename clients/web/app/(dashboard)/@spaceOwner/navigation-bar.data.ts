@@ -6,7 +6,6 @@ import {
   IconHelp,
   IconMessage,
   IconPlus,
-  IconSettings,
   IconShieldCheck,
   IconWallet,
 } from "@tabler/icons-react";
@@ -42,11 +41,6 @@ const spaceOwnerData = {
       title: "Messages",
       url: "/messages",
       icon: IconMessage,
-    },
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: IconSettings,
     },
   ],
   documents: [],

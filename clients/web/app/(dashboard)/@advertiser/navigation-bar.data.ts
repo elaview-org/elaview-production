@@ -7,7 +7,6 @@ import {
   IconMessage,
   IconPlus,
   IconSearch,
-  IconSettings,
 } from "@tabler/icons-react";
 
 const advertiserData = {
@@ -36,11 +35,6 @@ const advertiserData = {
       title: "Messages",
       url: "/messages",
       icon: IconMessage,
-    },
-    {
-      title: "Settings",
-      url: "/settings",
-      icon: IconSettings,
     },
   ],
   documents: [],

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(pnpm typecheck:*)",
       "Bash(tree:*)",
-      "Bash(node -c:*)"
+      "Bash(node -c:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

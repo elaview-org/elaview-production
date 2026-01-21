@@ -69,7 +69,7 @@ export default function Listings() {
       compact={viewMode === "list"}
       gridMode={viewMode === "grid"}
       onPress={() => {
-        // TODO: Navigate to listing detail/edit
+        router.push(`./space/${item.id}`);
       }}
     />
   );

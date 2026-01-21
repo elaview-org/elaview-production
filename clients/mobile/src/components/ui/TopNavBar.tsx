@@ -2,7 +2,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useRole } from "@/contexts/RoleContext";
+import { useSession } from "@/contexts/SessionContext";
+import { ProfileType } from "@/types/graphql";
 import { colors } from "@/constants/theme";
 
 interface TopNavBarProps {
@@ -15,8 +16,10 @@ export default function TopNavBar({
   onCartPress,
 }: TopNavBarProps) {
   const { theme } = useTheme();
-  const { role } = useRole();
+  const { profileType } = useSession();
   const insets = useSafeAreaInsets();
+
+  const isAdvertiser = profileType === ProfileType.Advertiser;
 
   return (
     <View
@@ -25,14 +28,14 @@ export default function TopNavBar({
         {
           backgroundColor: theme.background,
           borderBottomColor: theme.border,
-          paddingTop: insets.top + 12, // Add safe area top inset
+          paddingTop: insets.top + 12,
         },
       ]}
     >
       <Text style={[styles.logo, { color: theme.text }]}>ELAVIEW</Text>
 
       <View style={styles.rightActions}>
-        {role === "advertiser" && onCartPress && (
+        {isAdvertiser && onCartPress && (
           <TouchableOpacity onPress={onCartPress} style={styles.iconButton}>
             <Ionicons name="cart-outline" size={24} color={theme.text} />
           </TouchableOpacity>

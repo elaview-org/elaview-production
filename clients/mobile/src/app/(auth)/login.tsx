@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,22 +12,35 @@ import {
 import { SocialIconBar } from "@/components/features/SocialIconBar";
 import { Link, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { useAuth } from "@/contexts/AuthContext";
+import { useSession } from "@/contexts/SessionContext";
+import { ProfileType } from "@/types/graphql";
 
 const { width, height } = Dimensions.get("window");
 
 export default function Login() {
   const router = useRouter();
-  const { login, isLoading } = useAuth();
+  const { login, isLoading, isAuthenticated, profileType } = useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (!profileType) {
+        router.replace("/(protected)/profile-select" as any);
+      } else {
+        const route =
+          profileType === ProfileType.SpaceOwner
+            ? "/(protected)/(owner)/listings"
+            : "/(protected)/(advertiser)/discover";
+        router.replace(route as any);
+      }
+    }
+  }, [isAuthenticated, profileType, router]);
+
   const handleSignIn = async () => {
-    // Clear previous errors
     setError("");
 
-    // Validate input
     if (!email.trim()) {
       setError("Please enter your email");
       return;
@@ -38,7 +51,6 @@ export default function Login() {
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setError("Please enter a valid email address");
@@ -47,10 +59,6 @@ export default function Login() {
 
     try {
       await login(email.trim(), password);
-
-      // After successful login, navigate to role selection
-      // The user will choose whether to use advertiser or owner features
-      router.replace("/(auth)/role-select");
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Login failed. Please try again.";

@@ -47,3 +47,5 @@ Thumbs.db
 # Generated files
 bun.lockb
 src/types/graphql.ts
+
+*.md

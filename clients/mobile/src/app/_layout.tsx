@@ -3,8 +3,7 @@ import { Slot } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { ApolloWrapper } from "@/api";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { RoleProvider } from "@/contexts/RoleContext";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { SessionProvider } from "@/contexts/SessionContext";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -12,13 +11,11 @@ export default function RootLayout() {
   return (
     <View style={{ flex: 1 }}>
       <ApolloWrapper>
-        <AuthProvider>
+        <SessionProvider>
           <ThemeProvider>
-            <RoleProvider>
-              <Slot />
-            </RoleProvider>
+            <Slot />
           </ThemeProvider>
-        </AuthProvider>
+        </SessionProvider>
       </ApolloWrapper>
     </View>
   );

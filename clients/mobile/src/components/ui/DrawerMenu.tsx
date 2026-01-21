@@ -8,11 +8,12 @@ import {
   Dimensions,
   Pressable,
 } from "react-native";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useRole } from "@/contexts/RoleContext";
+import { useSession } from "@/contexts/SessionContext";
+import { ProfileType } from "@/types/graphql";
 import { colors, spacing, fontSize } from "@/constants/theme";
 
 const { width } = Dimensions.get("window");
@@ -26,8 +27,9 @@ interface DrawerMenuProps {
 export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
   const router = useRouter();
   const { theme } = useTheme();
-  const { clearRole } = useRole();
+  const { profileType, switchProfile, logout } = useSession();
   const slideAnim = useRef(new Animated.Value(DRAWER_WIDTH)).current;
+  const [isSwitching, setIsSwitching] = useState(false);
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -38,9 +40,25 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
   }, [visible]);
 
   const handleSwitchRole = async () => {
-    onClose();
-    await clearRole();
-    router.replace("/(auth)/role-select");
+    if (isSwitching) return;
+    setIsSwitching(true);
+    try {
+      const targetType =
+        profileType === ProfileType.SpaceOwner
+          ? ProfileType.Advertiser
+          : ProfileType.SpaceOwner;
+      await switchProfile(targetType);
+      onClose();
+      const route =
+        targetType === ProfileType.SpaceOwner
+          ? "/(protected)/(owner)/listings"
+          : "/(protected)/(advertiser)/discover";
+      router.replace(route as any);
+    } catch (error) {
+      console.error("Failed to switch profile:", error);
+    } finally {
+      setIsSwitching(false);
+    }
   };
 
   const handleSettings = () => {
@@ -55,8 +73,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
 
   const handleLogout = async () => {
     onClose();
-    await clearRole();
-    // TODO: Clear auth session when implemented
+    await logout();
     router.replace("/(auth)/login");
   };
 

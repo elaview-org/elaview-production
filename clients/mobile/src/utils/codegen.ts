@@ -15,7 +15,12 @@ const config: CodegenConfig = {
   // Don't exit with non-zero status when there are no documents
   ignoreNoDocuments: true,
   generates: {
-    // Generate TypeScript types and React Apollo hooks
+    "./src/types/schema.graphql": {
+      plugins: ["schema-ast"],
+      config: {
+        includeDirectives: true,
+      },
+    },
     "./src/types/graphql.ts": {
       plugins: [
         "typescript",
@@ -24,22 +29,16 @@ const config: CodegenConfig = {
       ],
       config: {
         avoidOptionals: {
-          // Use `null` for nullable fields instead of optionals
           field: true,
-          // Allow nullable input fields to remain unspecified
           inputValue: false,
         },
-        // Use `unknown` instead of `any` for unconfigured scalars
         defaultScalarType: "unknown",
-        // Apollo Client always includes `__typename` fields
         nonOptionalTypename: true,
-        // Apollo Client doesn't add the `__typename` field to root types
         skipTypeNameForRoot: true,
         maybeValue: "T | undefined | null",
-        // Generate typed hooks for queries and mutations
         withHooks: true,
-        // Export fragment types
         exportFragmentSpreadSubTypes: true,
+        apolloReactHooksImportFrom: "@apollo/client/react",
       },
     },
   },

@@ -12,46 +12,34 @@ import { LinearGradient } from "expo-linear-gradient";
 import * as SplashScreen from "expo-splash-screen";
 import ElaviewLogo from "@/components/features/ElaviewLogo";
 import SlideToStart from "@/components/features/SlideToStartExpoGo";
-import { useRole } from "@/contexts/RoleContext";
+import { useSession } from "@/contexts/SessionContext";
+import { ProfileType } from "@/types/graphql";
 import { colors, spacing } from "@/constants/theme";
 
 const { height } = Dimensions.get("window");
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { role, isLoading } = useRole();
-
-  // const client = useApolloClient();
-  // client.query({
-  //   query: gql`
-  //     query GetSpaces {
-  //       spaces {
-  //         nodes {
-  //           id
-  //           title
-  //         }
-  //       }
-  //     }
-  //   `,
-  // }).then(result => console.log(result));
+  const { isLoading, isAuthenticated, profileType } = useSession();
 
   useEffect(() => {
-    if (!isLoading) {
-      // Hide the native splash screen once role is loaded
-      SplashScreen.hideAsync();
+    if (isLoading) return;
 
-      // Auth flow: If user has a role saved, they've completed auth + role selection
-      // Navigate them directly to their app
-      // TODO: When real auth is added, also check auth state here
-      if (role) {
-        const route =
-          role === "advertiser"
-            ? "/(advertiser)/discover"
-            : "/(owner)/listings";
-        router.replace(route);
+    SplashScreen.hideAsync();
+
+    if (isAuthenticated) {
+      if (!profileType) {
+        router.replace("/(protected)/profile-select" as any);
+        return;
       }
+
+      const route =
+        profileType === ProfileType.SpaceOwner
+          ? "/(protected)/(owner)/listings"
+          : "/(protected)/(advertiser)/discover";
+      router.replace(route as any);
     }
-  }, [isLoading, role]);
+  }, [isLoading, isAuthenticated, profileType, router]);
 
   const handleSlideComplete = () => {
     // Navigate to login (auth comes before role selection)

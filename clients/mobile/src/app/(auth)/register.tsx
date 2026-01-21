@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,24 +12,37 @@ import {
 import { SocialIconBar } from "@/components/features/SocialIconBar";
 import { Link, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { useAuth } from "@/contexts/AuthContext";
+import { useSession } from "@/contexts/SessionContext";
+import { ProfileType } from "@/types/graphql";
 
 const { width, height } = Dimensions.get("window");
 
 export default function Register() {
   const router = useRouter();
-  const { signup, isLoading } = useAuth();
+  const { signup, isLoading, isAuthenticated, profileType } = useSession();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    if (isAuthenticated) {
+      if (!profileType) {
+        router.replace("/(protected)/profile-select" as any);
+      } else {
+        const route =
+          profileType === ProfileType.SpaceOwner
+            ? "/(protected)/(owner)/listings"
+            : "/(protected)/(advertiser)/discover";
+        router.replace(route as any);
+      }
+    }
+  }, [isAuthenticated, profileType, router]);
+
   const handleSignUp = async () => {
-    // Clear previous errors
     setError("");
 
-    // Validate input
     if (!name.trim()) {
       setError("Please enter your name");
       return;
@@ -40,7 +53,6 @@ export default function Register() {
       return;
     }
 
-    // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email.trim())) {
       setError("Please enter a valid email address");
@@ -68,9 +80,6 @@ export default function Register() {
         email: email.trim(),
         password,
       });
-
-      // After successful signup, navigate to role selection
-      router.replace("/(auth)/role-select");
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Signup failed. Please try again.";

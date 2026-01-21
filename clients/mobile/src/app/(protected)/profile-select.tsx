@@ -7,23 +7,27 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRole } from "@/contexts/RoleContext";
+import { useSession } from "@/contexts/SessionContext";
+import { ProfileType } from "@/types/graphql";
 
 const { width, height } = Dimensions.get("window");
 
-export default function RoleSelect() {
+export default function ProfileSelect() {
   const router = useRouter();
-  const { setRole } = useRole();
+  const { switchProfile } = useSession();
 
   const handleRoleSelect = async (role: "advertiser" | "owner") => {
     try {
-      await setRole(role);
-      // Navigate to the appropriate route group
+      const profileType =
+        role === "advertiser" ? ProfileType.Advertiser : ProfileType.SpaceOwner;
+      await switchProfile(profileType);
       const route =
-        role === "advertiser" ? "/(advertiser)/discover" : "/(owner)/listings";
-      router.replace(route);
+        role === "advertiser"
+          ? "/(protected)/(advertiser)/discover"
+          : "/(protected)/(owner)/listings";
+      router.replace(route as any);
     } catch (error) {
-      console.error("Failed to save role:", error);
+      console.error("Failed to save profile:", error);
     }
   };
 

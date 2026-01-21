@@ -1,7 +1,9 @@
+import { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useRole } from "@/contexts/RoleContext";
+import { useSession } from "@/contexts/SessionContext";
+import { ProfileType } from "@/types/graphql";
 import Avatar from "@/components/ui/Avatar";
 import ListItem from "@/components/ui/ListItem";
 import Card from "@/components/ui/Card";
@@ -11,35 +13,42 @@ import { User, PaymentMethod } from "@/mocks/user";
 interface ProfileContentProps {
   user: User;
   paymentMethods?: PaymentMethod[];
-  /** Whether viewing as owner or advertiser */
   perspective: "owner" | "advertiser";
 }
 
-/**
- * ProfileContent - Shared profile screen content
- * Used in both advertiser and owner Profile screens
- */
 export default function ProfileContent({
   user,
   paymentMethods = [],
   perspective,
 }: ProfileContentProps) {
   const { theme } = useTheme();
-  const { setRole } = useRole();
+  const { switchProfile, logout } = useSession();
   const router = useRouter();
+  const [isSwitching, setIsSwitching] = useState(false);
 
-  const handleSwitchRole = () => {
-    const newRole = perspective === "advertiser" ? "owner" : "advertiser";
-    setRole(newRole);
-    if (newRole === "advertiser") {
-      router.replace("/(advertiser)/discover");
-    } else {
-      router.replace("/(owner)/listings");
+  const handleSwitchRole = async () => {
+    if (isSwitching) return;
+    setIsSwitching(true);
+    try {
+      const targetType =
+        perspective === "advertiser"
+          ? ProfileType.SpaceOwner
+          : ProfileType.Advertiser;
+      await switchProfile(targetType);
+      const route =
+        targetType === ProfileType.Advertiser
+          ? "/(protected)/(advertiser)/discover"
+          : "/(protected)/(owner)/listings";
+      router.replace(route as any);
+    } catch (error) {
+      console.error("Failed to switch profile:", error);
+    } finally {
+      setIsSwitching(false);
     }
   };
 
-  const handleLogout = () => {
-    // TODO: Clear auth tokens
+  const handleLogout = async () => {
+    await logout();
     router.replace("/(auth)/login");
   };
 

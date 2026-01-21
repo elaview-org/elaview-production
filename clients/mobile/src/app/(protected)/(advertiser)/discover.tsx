@@ -1,28 +1,30 @@
-import { useState, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
-  View,
-  Text,
+  Animated,
+  Dimensions,
+  FlatList,
+  PanResponder,
+  ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  Dimensions,
-  Animated,
-  PanResponder,
-  FlatList,
+  View,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/ThemeContext";
+import Map from "@/components/ui/Map";
 import SpaceCard from "@/components/features/SpaceCard";
-import Card from "@/components/ui/Card";
-import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
-import {
-  mockSpaces,
-  Space,
-  SpaceType,
-  spaceTypeLabels,
-  spaceTypeIcons,
-} from "@/mocks/spaces";
+import { borderRadius, colors, fontSize, spacing } from "@/constants/theme";
+import api from "@/api";
+import { Query, Space, SpaceType } from "@/types/graphql";
+
+const DEFAULT_REGION = {
+  latitude: 33.7175,
+  longitude: -117.8311,
+  latitudeDelta: 0.5,
+  longitudeDelta: 0.5,
+};
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SHEET_MIN_HEIGHT = 180;
@@ -32,61 +34,105 @@ type FilterType = "all" | SpaceType;
 
 const filters: { key: FilterType; label: string }[] = [
   { key: "all", label: "All Types" },
-  { key: "window", label: "Windows" },
-  { key: "billboard", label: "Billboards" },
-  { key: "poster", label: "Posters" },
-  { key: "digital_screen", label: "Digital" },
-  { key: "vehicle", label: "Vehicles" },
+  { key: SpaceType.WindowDisplay, label: "Windows" },
+  { key: SpaceType.Billboard, label: "Billboards" },
+  { key: SpaceType.Storefront, label: "Storefronts" },
+  { key: SpaceType.DigitalDisplay, label: "Digital" },
+  { key: SpaceType.VehicleWrap, label: "Vehicles" },
 ];
 
 export default function Discover() {
-  const { theme, isDark } = useTheme();
+  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
-  const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
+
+  const { data } = api.query<Pick<Query, "spaces">>(
+    api.gql`
+      query {
+        spaces(first: 50, where: { status: { eq: ACTIVE } }) {
+          nodes {
+            id
+            title
+            description
+            address
+            city
+            state
+            latitude
+            longitude
+            pricePerDay
+            type
+            images
+            dimensionsText
+            averageRating
+            totalBookings
+            status
+            spaceOwnerProfile {
+              id
+              user {
+                name
+              }
+            }
+          }
+        }
+      }
+    `,
+    { fetchPolicy: "cache-and-network" }
+  );
+
+  const spaces = useMemo(() => {
+    if (!data?.spaces?.nodes) return [];
+    return data.spaces.nodes as Space[];
+  }, [data]);
 
   // Bottom sheet animation
   const sheetHeight = useRef(new Animated.Value(SHEET_MIN_HEIGHT)).current;
+  const currentHeight = useRef(SHEET_MIN_HEIGHT);
 
   const panResponder = useRef(
     PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        sheetHeight.setOffset(currentHeight.current);
+        sheetHeight.setValue(0);
+      },
       onPanResponderMove: (_, gestureState) => {
-        const newHeight = SHEET_MIN_HEIGHT - gestureState.dy;
-        if (newHeight >= SHEET_MIN_HEIGHT && newHeight <= SHEET_MAX_HEIGHT) {
+        const newHeight = -gestureState.dy;
+        const totalHeight = currentHeight.current + newHeight;
+        if (totalHeight >= SHEET_MIN_HEIGHT && totalHeight <= SHEET_MAX_HEIGHT) {
           sheetHeight.setValue(newHeight);
         }
       },
       onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dy < -50) {
-          // Swipe up - expand
-          Animated.spring(sheetHeight, {
-            toValue: SHEET_MAX_HEIGHT,
-            useNativeDriver: false,
-          }).start();
-        } else if (gestureState.dy > 50) {
-          // Swipe down - collapse
-          Animated.spring(sheetHeight, {
-            toValue: SHEET_MIN_HEIGHT,
-            useNativeDriver: false,
-          }).start();
-        }
+        sheetHeight.flattenOffset();
+        const targetHeight =
+          gestureState.dy < -50
+            ? SHEET_MAX_HEIGHT
+            : gestureState.dy > 50
+              ? SHEET_MIN_HEIGHT
+              : currentHeight.current;
+        currentHeight.current = targetHeight;
+        Animated.spring(sheetHeight, {
+          toValue: targetHeight,
+          useNativeDriver: false,
+        }).start();
       },
     })
   ).current;
 
-  // Filter spaces
-  const filteredSpaces = mockSpaces.filter((space) => {
-    const matchesSearch =
-      searchQuery === "" ||
-      space.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      space.city.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = activeFilter === "all" || space.type === activeFilter;
-    return matchesSearch && matchesFilter;
-  });
+  const filteredSpaces = useMemo(() => {
+    return spaces.filter((space) => {
+      const matchesSearch =
+        searchQuery === "" ||
+        space.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        space.city.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesFilter =
+        activeFilter === "all" || space.type === activeFilter;
+      return matchesSearch && matchesFilter;
+    });
+  }, [spaces, searchQuery, activeFilter]);
 
-  const handleSpacePress = (space: Space) => {
-    setSelectedSpace(space);
+  const handleSpacePress = (_space: Space) => {
     // TODO: Navigate to space detail
   };
 
@@ -155,48 +201,21 @@ export default function Discover() {
         ))}
       </ScrollView>
 
-      {/* Map Placeholder */}
-      <View
-        style={[
-          styles.mapContainer,
-          { backgroundColor: isDark ? "#2D2D2D" : "#E8F4FD" },
-        ]}
-      >
-        <View style={styles.mapPlaceholder}>
-          <Ionicons name="map-outline" size={48} color={theme.textMuted} />
-          <Text
-            style={[styles.mapPlaceholderText, { color: theme.textSecondary }]}
-          >
-            Map View
-          </Text>
-          <Text
-            style={[styles.mapPlaceholderSubtext, { color: theme.textMuted }]}
-          >
-            {filteredSpaces.length} spaces in this area
-          </Text>
-        </View>
-
-        {/* Mock map pins */}
-        {filteredSpaces.slice(0, 5).map((space, index) => (
-          <TouchableOpacity
-            key={space.id}
-            style={[
-              styles.mapPin,
-              {
-                top: 60 + ((index * 40) % 150),
-                left: 40 + ((index * 70) % 250),
-              },
-            ]}
-            onPress={() => handleSpacePress(space)}
-          >
-            <View style={styles.mapPinIcon}>
-              <Ionicons name="location" size={24} color={colors.primary} />
-            </View>
-            <View style={styles.mapPinPrice}>
-              <Text style={styles.mapPinPriceText}>${space.dailyRate}</Text>
-            </View>
-          </TouchableOpacity>
-        ))}
+      {/* Map */}
+      <View style={styles.mapContainer}>
+        <Map
+          initialRegion={DEFAULT_REGION}
+          markers={filteredSpaces.map((space) => ({
+            id: String(space.id),
+            latitude: space.latitude,
+            longitude: space.longitude,
+            price: Number(space.pricePerDay),
+          }))}
+          onMarkerPress={(id) => {
+            const space = filteredSpaces.find((s) => String(s.id) === id);
+            if (space) handleSpacePress(space);
+          }}
+        />
       </View>
 
       {/* Bottom Sheet */}
@@ -226,7 +245,7 @@ export default function Discover() {
         {/* Spaces List */}
         <FlatList
           data={filteredSpaces}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => String(item.id)}
           renderItem={({ item }) => (
             <SpaceCard
               space={item}
@@ -275,6 +294,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.full,
     marginRight: spacing.sm,
+    justifyContent: "center",
+    alignItems: "center",
   },
   filterChipActive: {
     backgroundColor: colors.primary,
@@ -285,47 +306,6 @@ const styles = StyleSheet.create({
   },
   mapContainer: {
     flex: 1,
-    position: "relative",
-  },
-  mapPlaceholder: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  mapPlaceholderText: {
-    fontSize: fontSize.lg,
-    fontWeight: "600",
-    marginTop: spacing.sm,
-  },
-  mapPlaceholderSubtext: {
-    fontSize: fontSize.sm,
-    marginTop: spacing.xs,
-  },
-  mapPin: {
-    position: "absolute",
-    alignItems: "center",
-  },
-  mapPinIcon: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-  mapPinPrice: {
-    backgroundColor: colors.white,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
-    borderRadius: borderRadius.sm,
-    marginTop: -4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  mapPinPriceText: {
-    fontSize: fontSize.xs,
-    fontWeight: "700",
-    color: colors.black,
   },
   bottomSheet: {
     position: "absolute",

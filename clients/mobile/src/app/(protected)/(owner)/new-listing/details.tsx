@@ -12,17 +12,36 @@ import { useTheme } from "@/contexts/ThemeContext";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
-import { SpaceType, spaceTypeLabels, spaceTypeIcons } from "@/mocks/spaces";
+import { SpaceType } from "@/types/graphql";
+
+const spaceTypeLabels: Record<SpaceType, string> = {
+  [SpaceType.Billboard]: "Billboard",
+  [SpaceType.DigitalDisplay]: "Digital Display",
+  [SpaceType.Other]: "Other",
+  [SpaceType.Storefront]: "Storefront",
+  [SpaceType.Transit]: "Transit",
+  [SpaceType.VehicleWrap]: "Vehicle Wrap",
+  [SpaceType.WindowDisplay]: "Window Display",
+};
+
+const spaceTypeIcons: Record<SpaceType, string> = {
+  [SpaceType.Billboard]: "easel-outline",
+  [SpaceType.DigitalDisplay]: "tv-outline",
+  [SpaceType.Other]: "ellipsis-horizontal-outline",
+  [SpaceType.Storefront]: "storefront-outline",
+  [SpaceType.Transit]: "bus-outline",
+  [SpaceType.VehicleWrap]: "car-outline",
+  [SpaceType.WindowDisplay]: "browsers-outline",
+};
 
 const spaceTypes: SpaceType[] = [
-  "window",
-  "storefront",
-  "wall",
-  "poster",
-  "billboard",
-  "digital_screen",
-  "vehicle",
-  "other",
+  SpaceType.WindowDisplay,
+  SpaceType.Storefront,
+  SpaceType.Billboard,
+  SpaceType.DigitalDisplay,
+  SpaceType.VehicleWrap,
+  SpaceType.Transit,
+  SpaceType.Other,
 ];
 
 /**

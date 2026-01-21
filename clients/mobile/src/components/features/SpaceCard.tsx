@@ -2,13 +2,22 @@ import { View, Text, StyleSheet, Image, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Card from "@/components/ui/Card";
 import { useTheme } from "@/contexts/ThemeContext";
-import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
-import {
-  Space,
-  spaceTypeLabels,
-  formatPrice,
-  formatDimensions,
-} from "@/mocks/spaces";
+import { spacing, fontSize, colors } from "@/constants/theme";
+import { Space, SpaceType } from "@/types/graphql";
+
+const spaceTypeLabels: Record<SpaceType, string> = {
+  [SpaceType.Billboard]: "Billboard",
+  [SpaceType.DigitalDisplay]: "Digital Display",
+  [SpaceType.Other]: "Other",
+  [SpaceType.Storefront]: "Storefront",
+  [SpaceType.Transit]: "Transit",
+  [SpaceType.VehicleWrap]: "Vehicle Wrap",
+  [SpaceType.WindowDisplay]: "Window Display",
+};
+
+function formatPrice(price: number | string): string {
+  return `$${Number(price).toFixed(0)}`;
+}
 
 const screenWidth = Dimensions.get("window").width;
 const GRID_GAP = spacing.sm;
@@ -34,11 +43,12 @@ export default function SpaceCard({
 }: SpaceCardProps) {
   const { theme } = useTheme();
 
-  // Grid mode - simplified vertical layout for 2-column grids
+  const imageUri = space.images[0] ?? "https://picsum.photos/seed/default/400/300";
+
   if (gridMode) {
     return (
       <Card onPress={onPress} style={styles.gridCard}>
-        <Image source={{ uri: space.photos[0] }} style={styles.gridImage} />
+        <Image source={{ uri: imageUri }} style={styles.gridImage} />
         <View style={styles.gridContent}>
           <Text
             style={[styles.gridTitle, { color: theme.text }]}
@@ -53,7 +63,7 @@ export default function SpaceCard({
               </Text>
             </View>
             <Text style={[styles.gridPrice, { color: theme.text }]}>
-              {formatPrice(space.dailyRate)}
+              {formatPrice(Number(space.pricePerDay))}
               <Text
                 style={[styles.gridPriceUnit, { color: theme.textSecondary }]}
               >
@@ -69,7 +79,7 @@ export default function SpaceCard({
   if (compact) {
     return (
       <Card onPress={onPress} style={styles.compactCard}>
-        <Image source={{ uri: space.photos[0] }} style={styles.compactImage} />
+        <Image source={{ uri: imageUri }} style={styles.compactImage} />
         <View style={styles.compactContent}>
           <Text
             style={[styles.compactTitle, { color: theme.text }]}
@@ -81,7 +91,7 @@ export default function SpaceCard({
             {spaceTypeLabels[space.type]}
           </Text>
           <Text style={[styles.compactPrice, { color: colors.primary }]}>
-            {formatPrice(space.dailyRate)}/day
+            {formatPrice(Number(space.pricePerDay))}/day
           </Text>
         </View>
       </Card>
@@ -90,20 +100,20 @@ export default function SpaceCard({
 
   return (
     <Card onPress={onPress} style={styles.card}>
-      <Image source={{ uri: space.photos[0] }} style={styles.image} />
+      <Image source={{ uri: imageUri }} style={styles.image} />
       <View style={styles.content}>
         <View style={styles.header}>
           <Text style={[styles.title, { color: theme.text }]} numberOfLines={2}>
             {space.title}
           </Text>
-          {space.rating && (
+          {space.averageRating && (
             <View style={styles.rating}>
               <Ionicons name="star" size={14} color="#FFB800" />
               <Text style={[styles.ratingText, { color: theme.text }]}>
-                {space.rating.toFixed(1)}
+                {space.averageRating.toFixed(1)}
               </Text>
               <Text style={[styles.reviewCount, { color: theme.textMuted }]}>
-                ({space.reviewCount})
+                ({space.totalBookings})
               </Text>
             </View>
           )}
@@ -123,16 +133,18 @@ export default function SpaceCard({
               {space.city}, {space.state}
             </Text>
           </View>
-          <View style={styles.detailRow}>
-            <Ionicons
-              name="resize-outline"
-              size={14}
-              color={theme.textSecondary}
-            />
-            <Text style={[styles.detailText, { color: theme.textSecondary }]}>
-              {formatDimensions(space.dimensions)}
-            </Text>
-          </View>
+          {space.dimensionsText && (
+            <View style={styles.detailRow}>
+              <Ionicons
+                name="resize-outline"
+                size={14}
+                color={theme.textSecondary}
+              />
+              <Text style={[styles.detailText, { color: theme.textSecondary }]}>
+                {space.dimensionsText}
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.footer}>
@@ -143,7 +155,7 @@ export default function SpaceCard({
           </View>
           <Text style={[styles.price, { color: theme.text }]}>
             <Text style={styles.priceAmount}>
-              {formatPrice(space.dailyRate)}
+              {formatPrice(Number(space.pricePerDay))}
             </Text>
             <Text style={[styles.priceUnit, { color: theme.textSecondary }]}>
               /day

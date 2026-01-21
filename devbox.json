@@ -1,6 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.16.0/.schema/devbox.schema.json",
   "packages": {
+    "which": {
+      "version": "latest"
+    },
+    "ncurses": {
+      "version": "latest"
+    },
     "dotnet-sdk_10": {
       "version": "latest"
     },
@@ -8,12 +14,6 @@
       "version": "latest"
     },
     "docker": {
-      "version": "latest"
-    },
-    "nodejs": {
-      "version": "latest"
-    },
-    "pnpm": {
       "version": "latest"
     },
     "bun": {

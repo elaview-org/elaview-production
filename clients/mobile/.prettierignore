@@ -45,5 +45,5 @@ Thumbs.db
 *.tsbuildinfo
 
 # Generated files
-pnpm-lock.yaml
+bun.lockb
 src/types/graphql.ts

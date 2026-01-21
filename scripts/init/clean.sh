@@ -1,3 +1,3 @@
 #!/bin/sh
 
-trap "ev backend:stop" EXIT
+#trap "ev backend:stop" EXIT

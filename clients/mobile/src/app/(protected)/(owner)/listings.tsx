@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -14,50 +14,41 @@ import { useTheme } from "@/contexts/ThemeContext";
 import SpaceCard from "@/components/features/SpaceCard";
 import EmptyState from "@/components/ui/EmptyState";
 import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
-import { mockSpaces, Space } from "@/mocks/spaces";
-
-const PAGE_SIZE = 10;
+import api from "@/api";
+import { Query, Space } from "@/types/graphql";
 
 export default function Listings() {
   const { theme } = useTheme();
   const router = useRouter();
-  const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState<"list" | "grid">("list");
-  const [displayedSpaces, setDisplayedSpaces] = useState<Space[]>(
-    mockSpaces.slice(0, PAGE_SIZE)
+
+  const { data, loading, refetch } = api.query<Pick<Query, "mySpaces">>(
+    api.gql`
+      query {
+        mySpaces(first: 50) {
+          nodes {
+            id
+            title
+            type
+            city
+            state
+            pricePerDay
+            images
+            dimensionsText
+            averageRating
+            totalBookings
+            status
+          }
+        }
+      }
+    `,
+    { fetchPolicy: "cache-and-network" }
   );
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(mockSpaces.length > PAGE_SIZE);
 
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    // Simulate API refresh
-    setTimeout(() => {
-      setDisplayedSpaces(mockSpaces.slice(0, PAGE_SIZE));
-      setHasMore(mockSpaces.length > PAGE_SIZE);
-      setRefreshing(false);
-    }, 1000);
-  }, []);
-
-  const loadMore = useCallback(() => {
-    if (isLoadingMore || !hasMore) return;
-
-    setIsLoadingMore(true);
-    // TODO: Replace with HotChocolate GraphQL query using [UsePaging]
-    // Example: useSpacesQuery({ first: PAGE_SIZE, after: cursor })
-    // The backend SpaceQueries.cs already has [UsePaging] configured
-    // See: backend/Features/Spaces/SpaceQueries.cs - GetSpaces query
-    setTimeout(() => {
-      const currentLength = displayedSpaces.length;
-      const nextSpaces = mockSpaces.slice(
-        currentLength,
-        currentLength + PAGE_SIZE
-      );
-      setDisplayedSpaces((prev) => [...prev, ...nextSpaces]);
-      setHasMore(currentLength + nextSpaces.length < mockSpaces.length);
-      setIsLoadingMore(false);
-    }, 500);
-  }, [displayedSpaces.length, isLoadingMore, hasMore]);
+  const spaces = useMemo(() => {
+    if (!data?.mySpaces?.nodes) return [];
+    return data.mySpaces.nodes as Space[];
+  }, [data]);
 
   const handleAddListing = () => {
     router.push("./new-listing");
@@ -74,25 +65,12 @@ export default function Listings() {
     />
   );
 
-  const renderFooter = () => {
-    if (!isLoadingMore) return null;
-    return (
-      <View style={styles.loadingFooter}>
-        <ActivityIndicator size="small" color={colors.primary} />
-        <Text style={[styles.loadingText, { color: theme.textMuted }]}>
-          Loading more...
-        </Text>
-      </View>
-    );
-  };
-
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Header with view toggle */}
       <View style={[styles.header, { borderBottomColor: theme.border }]}>
         <Text style={[styles.headerTitle, { color: theme.text }]}>
-          {displayedSpaces.length}{" "}
-          {displayedSpaces.length === 1 ? "Space" : "Spaces"}
+          {spaces.length} {spaces.length === 1 ? "Space" : "Spaces"}
         </Text>
         <View style={styles.headerActions}>
           <TouchableOpacity
@@ -126,32 +104,38 @@ export default function Listings() {
 
       {/* Listings */}
       <FlatList
-        data={displayedSpaces}
-        keyExtractor={(item) => item.id}
+        data={spaces}
+        keyExtractor={(item) => String(item.id)}
         renderItem={renderSpace}
         numColumns={viewMode === "grid" ? 2 : 1}
-        key={viewMode} // Force re-render when switching modes
+        key={viewMode}
         columnWrapperStyle={viewMode === "grid" ? styles.gridRow : undefined}
         contentContainerStyle={[
           styles.listContainer,
-          displayedSpaces.length === 0 && styles.emptyContainer,
+          spaces.length === 0 && styles.emptyContainer,
         ]}
         ListEmptyComponent={
-          <EmptyState
-            icon="business-outline"
-            title="No listings yet"
-            subtitle="Add your first advertising space to start earning."
-            actionLabel="Add Space"
-            onAction={handleAddListing}
-          />
+          !loading ? (
+            <EmptyState
+              icon="business-outline"
+              title="No listings yet"
+              subtitle="Add your first advertising space to start earning."
+              actionLabel="Add Space"
+              onAction={handleAddListing}
+            />
+          ) : null
         }
-        ListFooterComponent={renderFooter}
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.3}
+        ListFooterComponent={
+          loading ? (
+            <View style={styles.loadingFooter}>
+              <ActivityIndicator size="small" color={colors.primary} />
+            </View>
+          ) : null
+        }
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
+            refreshing={loading}
+            onRefresh={() => refetch()}
             tintColor={theme.textMuted}
           />
         }
@@ -159,7 +143,7 @@ export default function Listings() {
       />
 
       {/* FAB for adding new listing */}
-      {displayedSpaces.length > 0 && (
+      {spaces.length > 0 && (
         <TouchableOpacity
           style={styles.fab}
           onPress={handleAddListing}

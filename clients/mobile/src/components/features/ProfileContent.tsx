@@ -8,21 +8,14 @@ import Avatar from "@/components/ui/Avatar";
 import ListItem from "@/components/ui/ListItem";
 import Card from "@/components/ui/Card";
 import { spacing, fontSize, colors } from "@/constants/theme";
-import { User, PaymentMethod } from "@/mocks/user";
 
 interface ProfileContentProps {
-  user: User;
-  paymentMethods?: PaymentMethod[];
   perspective: "owner" | "advertiser";
 }
 
-export default function ProfileContent({
-  user,
-  paymentMethods = [],
-  perspective,
-}: ProfileContentProps) {
+export default function ProfileContent({ perspective }: ProfileContentProps) {
   const { theme } = useTheme();
-  const { switchProfile, logout } = useSession();
+  const { user, switchProfile, logout } = useSession();
   const router = useRouter();
   const [isSwitching, setIsSwitching] = useState(false);
 
@@ -52,6 +45,10 @@ export default function ProfileContent({
     router.replace("/(auth)/login");
   };
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <ScrollView
       style={[styles.container, { backgroundColor: theme.background }]}
@@ -60,18 +57,11 @@ export default function ProfileContent({
     >
       {/* User Header */}
       <View style={styles.header}>
-        <Avatar source={user.avatarUrl} name={user.fullName} size="xl" />
-        <Text style={[styles.name, { color: theme.text }]}>
-          {user.fullName}
-        </Text>
+        <Avatar source={user.avatar} name={user.name} size="xl" />
+        <Text style={[styles.name, { color: theme.text }]}>{user.name}</Text>
         <Text style={[styles.email, { color: theme.textSecondary }]}>
           {user.email}
         </Text>
-        {user.phone && (
-          <Text style={[styles.phone, { color: theme.textSecondary }]}>
-            {user.phone}
-          </Text>
-        )}
       </View>
 
       {/* Role Badge */}
@@ -98,11 +88,7 @@ export default function ProfileContent({
         <ListItem
           title="Payment Methods"
           leftIcon="card-outline"
-          subtitle={
-            paymentMethods.length > 0
-              ? `${paymentMethods.length} card(s) saved`
-              : "No cards added"
-          }
+          subtitle="Manage cards"
           onPress={() => {}}
         />
         <ListItem
@@ -211,10 +197,6 @@ const styles = StyleSheet.create({
   email: {
     fontSize: fontSize.md,
     marginTop: spacing.xs,
-  },
-  phone: {
-    fontSize: fontSize.sm,
-    marginTop: 4,
   },
   roleBadge: {
     alignSelf: "center",

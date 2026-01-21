@@ -71,11 +71,17 @@ export default function OwnerLayout() {
             ),
           }}
         />
-        {/* Hidden from tab bar - accessed via FAB button */}
+        {/* Hidden from tab bar - accessed via navigation */}
         <Tabs.Screen
           name="new-listing"
           options={{
-            href: null, // Hides from tab bar
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="space"
+          options={{
+            tabBarButton: () => null,
           }}
         />
       </Tabs>

@@ -477,8 +477,8 @@ npx expo run:android      # Build & run on Android
 
 ## Related Documentation
 
-- [NAVIGATION.md](./NAVIGATION.md) - Navigation architecture
-- [commands.md](./commands.md) - Command reference
-- [MOBILE-SCREENS.md](../../docs/MOBILE-SCREENS.md) - Screen specifications
-- [NOTIFICATIONS.md](../../docs/NOTIFICATIONS.md) - Push notifications
-- [ARCHITECTURE.md](../../docs/ARCHITECTURE.md) - System architecture
+- [NAVIGATION.md](navigation.md) - Navigation architecture
+- [commands.md](commands.md) - Command reference
+- [MOBILE-SCREENS.md](../../../docs/MOBILE-SCREENS.md) - Screen specifications
+- [NOTIFICATIONS.md](../../../docs/NOTIFICATIONS.md) - Push notifications
+- [ARCHITECTURE.md](../../../docs/ARCHITECTURE.md) - System architecture

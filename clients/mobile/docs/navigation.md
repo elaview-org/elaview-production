@@ -295,6 +295,6 @@ For full-screen modals:
 
 ## Related Documentation
 
-- [MOBILE-SCREENS.md](../../docs/MOBILE-SCREENS.md) - Screen specifications
-- [PLAYBOOK.md](./PLAYBOOK.md) - Development roadmap
+- [MOBILE-SCREENS.md](../../../docs/MOBILE-SCREENS.md) - Screen specifications
+- [PLAYBOOK.md](playbook.md) - Development roadmap
 - [Expo Router Docs](https://docs.expo.dev/router/introduction/)

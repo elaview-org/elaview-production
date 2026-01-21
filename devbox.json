@@ -19,6 +19,9 @@
     "bun": {
       "version": "latest"
     },
+    "git": {
+      "version": "latest"
+    },
     "opentofu": {
       "version": "latest"
     },

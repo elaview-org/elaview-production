@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "main": "expo-router/entry",
   "scripts": {
-    "preinstall": "node -e \"if(process.env.npm_execpath && !process.env.npm_execpath.includes('bun')) { console.error('Use bun install'); process.exit(1) }\"",
     "start": "expo start",
     "dev": "expo start --dev-client",
     "android": "expo run:android",

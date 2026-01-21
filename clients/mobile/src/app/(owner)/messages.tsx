@@ -1,7 +1,7 @@
-import { View, StyleSheet } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import MessagesList from '@/components/features/MessagesList';
-import { mockConversations } from '@/mocks/messages';
+import { View, StyleSheet } from "react-native";
+import { useTheme } from "@/contexts/ThemeContext";
+import MessagesList from "@/components/features/MessagesList";
+import { mockConversations } from "@/mocks/messages";
 
 export default function Messages() {
   const { theme } = useTheme();

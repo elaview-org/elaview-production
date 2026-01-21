@@ -1,6 +1,6 @@
-import { Stack } from 'expo-router';
-import { useTheme } from '@/contexts/ThemeContext';
-import { colors } from '@/constants/theme';
+import { Stack } from "expo-router";
+import { useTheme } from "@/contexts/ThemeContext";
+import { colors } from "@/constants/theme";
 
 /**
  * New Listing Stack Layout
@@ -18,7 +18,7 @@ export default function NewListingLayout() {
         },
         headerTintColor: theme.text,
         headerTitleStyle: {
-          fontWeight: '600',
+          fontWeight: "600",
         },
         headerShadowVisible: false,
         contentStyle: {
@@ -29,36 +29,36 @@ export default function NewListingLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Add Photos',
-          headerBackTitle: 'Cancel',
+          title: "Add Photos",
+          headerBackTitle: "Cancel",
         }}
       />
       <Stack.Screen
         name="details"
         options={{
-          title: 'Space Details',
-          headerBackTitle: 'Photos',
+          title: "Space Details",
+          headerBackTitle: "Photos",
         }}
       />
       <Stack.Screen
         name="location"
         options={{
-          title: 'Location',
-          headerBackTitle: 'Details',
+          title: "Location",
+          headerBackTitle: "Details",
         }}
       />
       <Stack.Screen
         name="pricing"
         options={{
-          title: 'Pricing',
-          headerBackTitle: 'Location',
+          title: "Pricing",
+          headerBackTitle: "Location",
         }}
       />
       <Stack.Screen
         name="preview"
         options={{
-          title: 'Review & Publish',
-          headerBackTitle: 'Pricing',
+          title: "Review & Publish",
+          headerBackTitle: "Pricing",
         }}
       />
     </Stack>

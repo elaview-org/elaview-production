@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -6,26 +6,41 @@ import {
   FlatList,
   TouchableOpacity,
   RefreshControl,
-} from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import BookingCard from '@/components/features/BookingCard';
-import EmptyState from '@/components/ui/EmptyState';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
-import { mockAdvertiserBookings, filterBookingsByStatus } from '@/mocks/bookings';
-import { BookingStatus } from '@/components/ui/StatusBadge';
+} from "react-native";
+import { useTheme } from "@/contexts/ThemeContext";
+import BookingCard from "@/components/features/BookingCard";
+import EmptyState from "@/components/ui/EmptyState";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
+import {
+  mockAdvertiserBookings,
+  filterBookingsByStatus,
+} from "@/mocks/bookings";
+import { BookingStatus } from "@/components/ui/StatusBadge";
 
-type TabFilter = 'all' | 'active' | 'pending' | 'completed';
+type TabFilter = "all" | "active" | "pending" | "completed";
 
 const tabs: { key: TabFilter; label: string; statuses: BookingStatus[] }[] = [
-  { key: 'all', label: 'All', statuses: [] },
-  { key: 'pending', label: 'Pending', statuses: ['pending', 'accepted', 'paid'] },
-  { key: 'active', label: 'Active', statuses: ['active', 'verification_pending'] },
-  { key: 'completed', label: 'Past', statuses: ['completed', 'cancelled', 'declined'] },
+  { key: "all", label: "All", statuses: [] },
+  {
+    key: "pending",
+    label: "Pending",
+    statuses: ["pending", "accepted", "paid"],
+  },
+  {
+    key: "active",
+    label: "Active",
+    statuses: ["active", "verification_pending"],
+  },
+  {
+    key: "completed",
+    label: "Past",
+    statuses: ["completed", "cancelled", "declined"],
+  },
 ];
 
 export default function Bookings() {
   const { theme } = useTheme();
-  const [activeTab, setActiveTab] = useState<TabFilter>('all');
+  const [activeTab, setActiveTab] = useState<TabFilter>("all");
   const [refreshing, setRefreshing] = useState(false);
 
   const filteredBookings = useMemo(() => {
@@ -45,20 +60,24 @@ export default function Bookings() {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Filter Tabs */}
-      <View style={[styles.tabsContainer, { backgroundColor: theme.background }]}>
+      <View
+        style={[styles.tabsContainer, { backgroundColor: theme.background }]}
+      >
         {tabs.map((tab) => (
           <TouchableOpacity
             key={tab.key}
-            style={[
-              styles.tab,
-              activeTab === tab.key && styles.tabActive,
-            ]}
+            style={[styles.tab, activeTab === tab.key && styles.tabActive]}
             onPress={() => setActiveTab(tab.key)}
           >
             <Text
               style={[
                 styles.tabText,
-                { color: activeTab === tab.key ? colors.primary : theme.textSecondary },
+                {
+                  color:
+                    activeTab === tab.key
+                      ? colors.primary
+                      : theme.textSecondary,
+                },
               ]}
             >
               {tab.label}
@@ -89,7 +108,7 @@ export default function Bookings() {
             icon="calendar-outline"
             title="No bookings found"
             subtitle={
-              activeTab === 'all'
+              activeTab === "all"
                 ? "You haven't made any bookings yet. Discover spaces to get started!"
                 : `No ${activeTab} bookings to show.`
             }
@@ -113,7 +132,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tabsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -130,7 +149,7 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: fontSize.sm,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   listContainer: {
     padding: spacing.md,

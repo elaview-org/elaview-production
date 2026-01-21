@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,12 @@ import {
   Image,
   ActivityIndicator,
   Alert,
-} from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import Button from '@/components/ui/Button';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
+} from "react-native";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/contexts/ThemeContext";
+import Button from "@/components/ui/Button";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
 
 /**
  * Step 5: Preview & Submit
@@ -31,21 +31,21 @@ export default function NewListingPreview() {
   // Placeholder data - would come from shared state
   const previewData = {
     photos: [
-      'https://via.placeholder.com/400x300',
-      'https://via.placeholder.com/400x300',
+      "https://via.placeholder.com/400x300",
+      "https://via.placeholder.com/400x300",
     ],
-    spaceType: 'Storefront Window',
-    title: 'Premium Downtown Window Space',
+    spaceType: "Storefront Window",
+    title: "Premium Downtown Window Space",
     description:
-      'High-traffic location on Main Street. Perfect for brand awareness campaigns.',
-    address: '123 Main St, San Francisco, CA 94102',
-    dailyRate: dailyRate || '25',
-    weeklyRate: weeklyRate || '150',
-    monthlyRate: monthlyRate || '500',
+      "High-traffic location on Main Street. Perfect for brand awareness campaigns.",
+    address: "123 Main St, San Francisco, CA 94102",
+    dailyRate: dailyRate || "25",
+    weeklyRate: weeklyRate || "150",
+    monthlyRate: monthlyRate || "500",
     dimensions: {
-      width: width || '48',
-      height: height || '36',
-      unit: unit || 'in',
+      width: width || "48",
+      height: height || "36",
+      unit: unit || "in",
     },
   };
 
@@ -60,21 +60,19 @@ export default function NewListingPreview() {
       await new Promise((resolve) => setTimeout(resolve, 1500));
 
       Alert.alert(
-        '🎉 Listing Created!',
-        'Your space is now live and visible to advertisers.',
+        "🎉 Listing Created!",
+        "Your space is now live and visible to advertisers.",
         [
           {
-            text: 'View Listings',
-            onPress: () => router.replace('/(owner)/listings'),
+            text: "View Listings",
+            onPress: () => router.replace("/(owner)/listings"),
           },
         ]
       );
     } catch (error) {
-      Alert.alert(
-        'Error',
-        'Failed to create listing. Please try again.',
-        [{ text: 'OK' }]
-      );
+      Alert.alert("Error", "Failed to create listing. Please try again.", [
+        { text: "OK" },
+      ]);
     } finally {
       setIsSubmitting(false);
     }
@@ -83,17 +81,17 @@ export default function NewListingPreview() {
   const handleEdit = (step: string) => {
     // Navigate back to specific step to edit
     switch (step) {
-      case 'photos':
-        router.push('/(owner)/new-listing');
+      case "photos":
+        router.push("/(owner)/new-listing");
         break;
-      case 'details':
-        router.push('/(owner)/new-listing/details');
+      case "details":
+        router.push("/(owner)/new-listing/details");
         break;
-      case 'location':
-        router.push('/(owner)/new-listing/location');
+      case "location":
+        router.push("/(owner)/new-listing/location");
         break;
-      case 'pricing':
-        router.push('/(owner)/new-listing/pricing');
+      case "pricing":
+        router.push("/(owner)/new-listing/pricing");
         break;
     }
   };
@@ -107,9 +105,13 @@ export default function NewListingPreview() {
     editStep: string;
     children: React.ReactNode;
   }) => (
-    <View style={[styles.section, { backgroundColor: theme.backgroundSecondary }]}>
+    <View
+      style={[styles.section, { backgroundColor: theme.backgroundSecondary }]}
+    >
       <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: theme.text }]}>{title}</Text>
+        <Text style={[styles.sectionTitle, { color: theme.text }]}>
+          {title}
+        </Text>
         <Button
           title="Edit"
           variant="ghost"
@@ -133,7 +135,9 @@ export default function NewListingPreview() {
           {[1, 2, 3, 4, 5].map((step, index) => (
             <View key={step} style={styles.progressStep}>
               {index > 0 && (
-                <View style={[styles.progressLine, styles.progressLineCompleted]} />
+                <View
+                  style={[styles.progressLine, styles.progressLineCompleted]}
+                />
               )}
               <View style={[styles.progressDot, styles.progressDotCompleted]}>
                 <Ionicons name="checkmark" size={8} color={colors.white} />
@@ -169,7 +173,11 @@ export default function NewListingPreview() {
         {/* Details Preview */}
         <PreviewSection title="📝 Details" editStep="details">
           <View style={styles.detailRow}>
-            <Ionicons name="pricetag-outline" size={18} color={theme.textMuted} />
+            <Ionicons
+              name="pricetag-outline"
+              size={18}
+              color={theme.textMuted}
+            />
             <Text style={[styles.detailValue, { color: theme.text }]}>
               {previewData.spaceType}
             </Text>
@@ -177,7 +185,9 @@ export default function NewListingPreview() {
           <Text style={[styles.previewTitle, { color: theme.text }]}>
             {previewData.title}
           </Text>
-          <Text style={[styles.previewDescription, { color: theme.textSecondary }]}>
+          <Text
+            style={[styles.previewDescription, { color: theme.textSecondary }]}
+          >
             {previewData.description}
           </Text>
         </PreviewSection>
@@ -185,7 +195,11 @@ export default function NewListingPreview() {
         {/* Location Preview */}
         <PreviewSection title="📍 Location" editStep="location">
           <View style={styles.detailRow}>
-            <Ionicons name="location-outline" size={18} color={theme.textMuted} />
+            <Ionicons
+              name="location-outline"
+              size={18}
+              color={theme.textMuted}
+            />
             <Text style={[styles.detailValue, { color: theme.text }]}>
               {previewData.address}
             </Text>
@@ -196,28 +210,45 @@ export default function NewListingPreview() {
         <PreviewSection title="💰 Pricing & Size" editStep="pricing">
           <View style={styles.pricingGrid}>
             <View style={styles.priceBox}>
-              <Text style={[styles.priceLabel, { color: theme.textMuted }]}>Daily</Text>
+              <Text style={[styles.priceLabel, { color: theme.textMuted }]}>
+                Daily
+              </Text>
               <Text style={[styles.priceValue, { color: theme.text }]}>
                 ${previewData.dailyRate}
               </Text>
             </View>
             <View style={styles.priceBox}>
-              <Text style={[styles.priceLabel, { color: theme.textMuted }]}>Weekly</Text>
+              <Text style={[styles.priceLabel, { color: theme.textMuted }]}>
+                Weekly
+              </Text>
               <Text style={[styles.priceValue, { color: theme.text }]}>
                 ${previewData.weeklyRate}
               </Text>
             </View>
             <View style={styles.priceBox}>
-              <Text style={[styles.priceLabel, { color: theme.textMuted }]}>Monthly</Text>
+              <Text style={[styles.priceLabel, { color: theme.textMuted }]}>
+                Monthly
+              </Text>
               <Text style={[styles.priceValue, { color: theme.text }]}>
                 ${previewData.monthlyRate}
               </Text>
             </View>
           </View>
-          <View style={[styles.dimensionsBadge, { backgroundColor: theme.backgroundSecondary }]}>
-            <Ionicons name="expand-outline" size={16} color={theme.textSecondary} />
-            <Text style={[styles.dimensionsText, { color: theme.textSecondary }]}>
-              {previewData.dimensions.width} × {previewData.dimensions.height}{' '}
+          <View
+            style={[
+              styles.dimensionsBadge,
+              { backgroundColor: theme.backgroundSecondary },
+            ]}
+          >
+            <Ionicons
+              name="expand-outline"
+              size={16}
+              color={theme.textSecondary}
+            />
+            <Text
+              style={[styles.dimensionsText, { color: theme.textSecondary }]}
+            >
+              {previewData.dimensions.width} × {previewData.dimensions.height}{" "}
               {previewData.dimensions.unit}
             </Text>
           </View>
@@ -225,10 +256,14 @@ export default function NewListingPreview() {
 
         {/* Terms Notice */}
         <View style={[styles.termsNotice, { borderColor: theme.border }]}>
-          <Ionicons name="information-circle-outline" size={20} color={colors.primary} />
+          <Ionicons
+            name="information-circle-outline"
+            size={20}
+            color={colors.primary}
+          />
           <Text style={[styles.termsText, { color: theme.textSecondary }]}>
-            By publishing, you agree to our Terms of Service and Listing Guidelines.
-            Your space will be reviewed within 24 hours.
+            By publishing, you agree to our Terms of Service and Listing
+            Guidelines. Your space will be reviewed within 24 hours.
           </Text>
         </View>
       </ScrollView>
@@ -239,13 +274,13 @@ export default function NewListingPreview() {
           title="Save as Draft"
           variant="outline"
           onPress={() => {
-            Alert.alert('Saved', 'Your listing has been saved as a draft.');
-            router.replace('/(owner)/listings');
+            Alert.alert("Saved", "Your listing has been saved as a draft.");
+            router.replace("/(owner)/listings");
           }}
           style={styles.draftButton}
         />
         <Button
-          title={isSubmitting ? 'Publishing...' : '🚀 Publish Listing'}
+          title={isSubmitting ? "Publishing..." : "🚀 Publish Listing"}
           onPress={handleSubmit}
           disabled={isSubmitting}
           style={styles.publishButton}
@@ -279,22 +314,22 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: spacing.lg,
   },
   progressStep: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   progressDot: {
     width: 16,
     height: 16,
     borderRadius: 8,
     backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   progressDotCompleted: {
     backgroundColor: colors.primary,
@@ -309,7 +344,7 @@ const styles = StyleSheet.create({
   },
   pageTitle: {
     fontSize: fontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: spacing.xs,
   },
   pageSubtitle: {
@@ -322,14 +357,14 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: spacing.sm,
   },
   sectionTitle: {
     fontSize: fontSize.md,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   photosRow: {
     gap: spacing.sm,
@@ -341,8 +376,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray200,
   },
   detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.sm,
     marginBottom: spacing.xs,
   },
@@ -352,7 +387,7 @@ const styles = StyleSheet.create({
   },
   previewTitle: {
     fontSize: fontSize.lg,
-    fontWeight: '600',
+    fontWeight: "600",
     marginTop: spacing.sm,
     marginBottom: spacing.xs,
   },
@@ -361,16 +396,16 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   pricingGrid: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: spacing.sm,
     marginBottom: spacing.sm,
   },
   priceBox: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.md,
-    backgroundColor: colors.primary + '10',
+    backgroundColor: colors.primary + "10",
   },
   priceLabel: {
     fontSize: fontSize.xs,
@@ -378,13 +413,13 @@ const styles = StyleSheet.create({
   },
   priceValue: {
     fontSize: fontSize.lg,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   dimensionsBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.xs,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     paddingVertical: spacing.xs,
     paddingHorizontal: spacing.sm,
     borderRadius: borderRadius.sm,
@@ -393,7 +428,7 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
   },
   termsNotice: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: spacing.sm,
     padding: spacing.md,
     borderWidth: 1,
@@ -406,7 +441,7 @@ const styles = StyleSheet.create({
     lineHeight: 18,
   },
   bottomActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: spacing.md,
     gap: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
@@ -419,18 +454,18 @@ const styles = StyleSheet.create({
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   loadingCard: {
     padding: spacing.xl,
     borderRadius: borderRadius.lg,
-    alignItems: 'center',
+    alignItems: "center",
     gap: spacing.md,
   },
   loadingText: {
     fontSize: fontSize.md,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

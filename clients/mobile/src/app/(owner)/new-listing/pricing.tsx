@@ -1,25 +1,25 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/contexts/ThemeContext";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
 
-type DimensionUnit = 'in' | 'ft' | 'cm' | 'm';
+type DimensionUnit = "in" | "ft" | "cm" | "m";
 
 const DIMENSION_UNITS: { value: DimensionUnit; label: string }[] = [
-  { value: 'in', label: 'Inches' },
-  { value: 'ft', label: 'Feet' },
-  { value: 'cm', label: 'cm' },
-  { value: 'm', label: 'Meters' },
+  { value: "in", label: "Inches" },
+  { value: "ft", label: "Feet" },
+  { value: "cm", label: "cm" },
+  { value: "m", label: "Meters" },
 ];
 
 /**
@@ -29,12 +29,12 @@ const DIMENSION_UNITS: { value: DimensionUnit; label: string }[] = [
 export default function NewListingPricing() {
   const { theme } = useTheme();
   const router = useRouter();
-  const [dailyRate, setDailyRate] = useState('');
-  const [weeklyRate, setWeeklyRate] = useState('');
-  const [monthlyRate, setMonthlyRate] = useState('');
-  const [width, setWidth] = useState('');
-  const [height, setHeight] = useState('');
-  const [unit, setUnit] = useState<DimensionUnit>('in');
+  const [dailyRate, setDailyRate] = useState("");
+  const [weeklyRate, setWeeklyRate] = useState("");
+  const [monthlyRate, setMonthlyRate] = useState("");
+  const [width, setWidth] = useState("");
+  const [height, setHeight] = useState("");
+  const [unit, setUnit] = useState<DimensionUnit>("in");
   const [errors, setErrors] = useState<{
     dailyRate?: string;
     width?: string;
@@ -46,7 +46,7 @@ export default function NewListingPricing() {
   const suggestMonthlyRate = (daily: number) => Math.round(daily * 22); // ~27% discount
 
   const handleDailyRateChange = (text: string) => {
-    const cleaned = text.replace(/[^\d.]/g, '');
+    const cleaned = text.replace(/[^\d.]/g, "");
     setDailyRate(cleaned);
     setErrors((prev) => ({ ...prev, dailyRate: undefined }));
 
@@ -62,19 +62,19 @@ export default function NewListingPricing() {
 
     const daily = parseFloat(dailyRate);
     if (!dailyRate || isNaN(daily) || daily <= 0) {
-      newErrors.dailyRate = 'Please enter a valid daily rate';
+      newErrors.dailyRate = "Please enter a valid daily rate";
     } else if (daily < 5) {
-      newErrors.dailyRate = 'Minimum daily rate is $5';
+      newErrors.dailyRate = "Minimum daily rate is $5";
     }
 
     const w = parseFloat(width);
     if (!width || isNaN(w) || w <= 0) {
-      newErrors.width = 'Please enter width';
+      newErrors.width = "Please enter width";
     }
 
     const h = parseFloat(height);
     if (!height || isNaN(h) || h <= 0) {
-      newErrors.height = 'Please enter height';
+      newErrors.height = "Please enter height";
     }
 
     setErrors(newErrors);
@@ -82,7 +82,7 @@ export default function NewListingPricing() {
     if (Object.keys(newErrors).length === 0) {
       // TODO: Store in context/state management
       router.push({
-        pathname: '/(owner)/new-listing/preview',
+        pathname: "/(owner)/new-listing/preview",
         params: {
           dailyRate,
           weeklyRate: weeklyRate || suggestWeeklyRate(daily).toString(),
@@ -112,7 +112,9 @@ export default function NewListingPricing() {
           <View style={[styles.progressDot, styles.progressDotCompleted]} />
           <View style={[styles.progressLine, styles.progressLineCompleted]} />
           <View style={[styles.progressDot, styles.progressDotActive]} />
-          <View style={[styles.progressLine, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.progressLine, { backgroundColor: theme.border }]}
+          />
           <View style={[styles.progressDot, { borderColor: theme.border }]} />
         </View>
 
@@ -121,7 +123,8 @@ export default function NewListingPricing() {
           💰 Set your pricing
         </Text>
         <Text style={[styles.sectionSubtitle, { color: theme.textSecondary }]}>
-          Set competitive rates to attract advertisers. You can always adjust later.
+          Set competitive rates to attract advertisers. You can always adjust
+          later.
         </Text>
 
         {/* Daily Rate (Required) */}
@@ -138,7 +141,9 @@ export default function NewListingPricing() {
             error={errors.dailyRate}
             containerStyle={styles.priceInput}
           />
-          <Text style={[styles.perUnit, { color: theme.textSecondary }]}>/day</Text>
+          <Text style={[styles.perUnit, { color: theme.textSecondary }]}>
+            /day
+          </Text>
         </View>
 
         {/* Weekly Rate (Optional) */}
@@ -148,13 +153,19 @@ export default function NewListingPricing() {
         <View style={styles.priceInputContainer}>
           <Text style={[styles.currencySymbol, { color: theme.text }]}>$</Text>
           <Input
-            placeholder={dailyRate ? suggestWeeklyRate(parseFloat(dailyRate) || 0).toString() : '150'}
+            placeholder={
+              dailyRate
+                ? suggestWeeklyRate(parseFloat(dailyRate) || 0).toString()
+                : "150"
+            }
             value={weeklyRate}
-            onChangeText={(text) => setWeeklyRate(text.replace(/[^\d.]/g, ''))}
+            onChangeText={(text) => setWeeklyRate(text.replace(/[^\d.]/g, ""))}
             keyboardType="decimal-pad"
             containerStyle={styles.priceInput}
           />
-          <Text style={[styles.perUnit, { color: theme.textSecondary }]}>/week</Text>
+          <Text style={[styles.perUnit, { color: theme.textSecondary }]}>
+            /week
+          </Text>
         </View>
 
         {/* Monthly Rate (Optional) */}
@@ -164,17 +175,28 @@ export default function NewListingPricing() {
         <View style={styles.priceInputContainer}>
           <Text style={[styles.currencySymbol, { color: theme.text }]}>$</Text>
           <Input
-            placeholder={dailyRate ? suggestMonthlyRate(parseFloat(dailyRate) || 0).toString() : '500'}
+            placeholder={
+              dailyRate
+                ? suggestMonthlyRate(parseFloat(dailyRate) || 0).toString()
+                : "500"
+            }
             value={monthlyRate}
-            onChangeText={(text) => setMonthlyRate(text.replace(/[^\d.]/g, ''))}
+            onChangeText={(text) => setMonthlyRate(text.replace(/[^\d.]/g, ""))}
             keyboardType="decimal-pad"
             containerStyle={styles.priceInput}
           />
-          <Text style={[styles.perUnit, { color: theme.textSecondary }]}>/month</Text>
+          <Text style={[styles.perUnit, { color: theme.textSecondary }]}>
+            /month
+          </Text>
         </View>
 
         {/* Dimensions Section */}
-        <Text style={[styles.sectionTitle, { color: theme.text, marginTop: spacing.xl }]}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            { color: theme.text, marginTop: spacing.xl },
+          ]}
+        >
           📐 Space Dimensions
         </Text>
         <Text style={[styles.sectionSubtitle, { color: theme.textSecondary }]}>
@@ -189,7 +211,10 @@ export default function NewListingPricing() {
               style={[
                 styles.unitButton,
                 {
-                  backgroundColor: unit === u.value ? colors.primary : theme.backgroundSecondary,
+                  backgroundColor:
+                    unit === u.value
+                      ? colors.primary
+                      : theme.backgroundSecondary,
                   borderColor: unit === u.value ? colors.primary : theme.border,
                 },
               ]}
@@ -217,7 +242,7 @@ export default function NewListingPricing() {
               placeholder="48"
               value={width}
               onChangeText={(text) => {
-                setWidth(text.replace(/[^\d.]/g, ''));
+                setWidth(text.replace(/[^\d.]/g, ""));
                 setErrors((prev) => ({ ...prev, width: undefined }));
               }}
               keyboardType="decimal-pad"
@@ -236,7 +261,7 @@ export default function NewListingPricing() {
               placeholder="36"
               value={height}
               onChangeText={(text) => {
-                setHeight(text.replace(/[^\d.]/g, ''));
+                setHeight(text.replace(/[^\d.]/g, ""));
                 setErrors((prev) => ({ ...prev, height: undefined }));
               }}
               keyboardType="decimal-pad"
@@ -248,7 +273,12 @@ export default function NewListingPricing() {
 
         {/* Dimension Preview */}
         {width && height && (
-          <View style={[styles.dimensionPreview, { backgroundColor: theme.backgroundSecondary }]}>
+          <View
+            style={[
+              styles.dimensionPreview,
+              { backgroundColor: theme.backgroundSecondary },
+            ]}
+          >
             <Text style={[styles.dimensionPreviewText, { color: theme.text }]}>
               {width} × {height} {unit}
             </Text>
@@ -280,9 +310,9 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: spacing.lg,
   },
   progressDot: {
@@ -291,7 +321,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 2,
     borderColor: colors.primary,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   progressDotActive: {
     backgroundColor: colors.primary,
@@ -310,7 +340,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: fontSize.lg,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: spacing.xs,
   },
   sectionSubtitle: {
@@ -320,7 +350,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: fontSize.sm,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: spacing.xs,
     marginTop: spacing.sm,
   },
@@ -328,12 +358,12 @@ const styles = StyleSheet.create({
     color: colors.error,
   },
   priceInputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   currencySymbol: {
     fontSize: fontSize.xl,
-    fontWeight: '600',
+    fontWeight: "600",
     marginRight: spacing.sm,
   },
   priceInput: {
@@ -344,7 +374,7 @@ const styles = StyleSheet.create({
     marginLeft: spacing.sm,
   },
   unitSelector: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: spacing.sm,
     marginBottom: spacing.sm,
   },
@@ -354,15 +384,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   unitButtonText: {
     fontSize: fontSize.sm,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   dimensionRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    flexDirection: "row",
+    alignItems: "flex-end",
   },
   dimensionInput: {
     flex: 1,
@@ -375,11 +405,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     padding: spacing.md,
     borderRadius: borderRadius.md,
-    alignItems: 'center',
+    alignItems: "center",
   },
   dimensionPreviewText: {
     fontSize: fontSize.lg,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   bottomActions: {
     padding: spacing.md,

@@ -1,0 +1,49 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Build outputs
+build
+dist
+ios
+android
+*.jsbundle
+
+# Expo
+.expo
+expo-env.d.ts
+
+# Cache
+.cache
+.turbo
+.eslintcache
+
+# Environment
+.env
+.env*.local
+
+# Testing
+coverage
+test-results
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Misc
+*.tsbuildinfo
+
+# Generated files
+pnpm-lock.yaml
+src/types/graphql.ts

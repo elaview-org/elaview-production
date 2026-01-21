@@ -1,18 +1,18 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRole } from '@/contexts/RoleContext';
-import Avatar from '@/components/ui/Avatar';
-import ListItem from '@/components/ui/ListItem';
-import Card from '@/components/ui/Card';
-import { spacing, fontSize, colors } from '@/constants/theme';
-import { User, PaymentMethod } from '@/mocks/user';
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useRole } from "@/contexts/RoleContext";
+import Avatar from "@/components/ui/Avatar";
+import ListItem from "@/components/ui/ListItem";
+import Card from "@/components/ui/Card";
+import { spacing, fontSize, colors } from "@/constants/theme";
+import { User, PaymentMethod } from "@/mocks/user";
 
 interface ProfileContentProps {
   user: User;
   paymentMethods?: PaymentMethod[];
   /** Whether viewing as owner or advertiser */
-  perspective: 'owner' | 'advertiser';
+  perspective: "owner" | "advertiser";
 }
 
 /**
@@ -29,18 +29,18 @@ export default function ProfileContent({
   const router = useRouter();
 
   const handleSwitchRole = () => {
-    const newRole = perspective === 'advertiser' ? 'owner' : 'advertiser';
+    const newRole = perspective === "advertiser" ? "owner" : "advertiser";
     setRole(newRole);
-    if (newRole === 'advertiser') {
-      router.replace('/(advertiser)/discover');
+    if (newRole === "advertiser") {
+      router.replace("/(advertiser)/discover");
     } else {
-      router.replace('/(owner)/listings');
+      router.replace("/(owner)/listings");
     }
   };
 
   const handleLogout = () => {
     // TODO: Clear auth tokens
-    router.replace('/(auth)/login');
+    router.replace("/(auth)/login");
   };
 
   return (
@@ -52,17 +52,27 @@ export default function ProfileContent({
       {/* User Header */}
       <View style={styles.header}>
         <Avatar source={user.avatarUrl} name={user.fullName} size="xl" />
-        <Text style={[styles.name, { color: theme.text }]}>{user.fullName}</Text>
-        <Text style={[styles.email, { color: theme.textSecondary }]}>{user.email}</Text>
+        <Text style={[styles.name, { color: theme.text }]}>
+          {user.fullName}
+        </Text>
+        <Text style={[styles.email, { color: theme.textSecondary }]}>
+          {user.email}
+        </Text>
         {user.phone && (
-          <Text style={[styles.phone, { color: theme.textSecondary }]}>{user.phone}</Text>
+          <Text style={[styles.phone, { color: theme.textSecondary }]}>
+            {user.phone}
+          </Text>
         )}
       </View>
 
       {/* Role Badge */}
-      <View style={[styles.roleBadge, { backgroundColor: colors.primaryLight }]}>
+      <View
+        style={[styles.roleBadge, { backgroundColor: colors.primaryLight }]}
+      >
         <Text style={styles.roleText}>
-          {perspective === 'advertiser' ? '📣 Advertiser Mode' : '🏠 Owner Mode'}
+          {perspective === "advertiser"
+            ? "📣 Advertiser Mode"
+            : "🏠 Owner Mode"}
         </Text>
       </View>
 
@@ -82,7 +92,7 @@ export default function ProfileContent({
           subtitle={
             paymentMethods.length > 0
               ? `${paymentMethods.length} card(s) saved`
-              : 'No cards added'
+              : "No cards added"
           }
           onPress={() => {}}
         />
@@ -127,7 +137,7 @@ export default function ProfileContent({
         <ListItem
           title="Help Center"
           leftIcon="help-circle-outline"
-          onPress={() => router.push('/help')}
+          onPress={() => router.push("/help")}
         />
         <ListItem
           title="Contact Support"
@@ -150,7 +160,7 @@ export default function ProfileContent({
       {/* Actions Section */}
       <Card style={styles.section}>
         <ListItem
-          title={`Switch to ${perspective === 'advertiser' ? 'Owner' : 'Advertiser'} Mode`}
+          title={`Switch to ${perspective === "advertiser" ? "Owner" : "Advertiser"} Mode`}
           leftIcon="swap-horizontal-outline"
           leftIconColor={colors.primary}
           onPress={handleSwitchRole}
@@ -181,12 +191,12 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: spacing.lg,
   },
   name: {
     fontSize: fontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
     marginTop: spacing.md,
   },
   email: {
@@ -198,7 +208,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   roleBadge: {
-    alignSelf: 'center',
+    alignSelf: "center",
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: 20,
@@ -207,7 +217,7 @@ const styles = StyleSheet.create({
   roleText: {
     color: colors.primary,
     fontSize: fontSize.sm,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   section: {
     marginBottom: spacing.md,
@@ -216,14 +226,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: fontSize.xs,
-    fontWeight: '600',
+    fontWeight: "600",
     letterSpacing: 0.5,
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.sm,
   },
   version: {
     fontSize: fontSize.xs,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: spacing.md,
   },
 });

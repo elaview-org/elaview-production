@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
@@ -7,13 +7,13 @@ import {
   Image,
   ScrollView,
   Alert,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';
-import { useTheme } from '@/contexts/ThemeContext';
-import Button from '@/components/ui/Button';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { useTheme } from "@/contexts/ThemeContext";
+import Button from "@/components/ui/Button";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
 
 const MIN_PHOTOS = 1;
 const MAX_PHOTOS = 5;
@@ -29,15 +29,18 @@ export default function NewListingPhotos() {
 
   const pickImage = async () => {
     if (photos.length >= MAX_PHOTOS) {
-      Alert.alert('Maximum Photos', `You can upload up to ${MAX_PHOTOS} photos.`);
+      Alert.alert(
+        "Maximum Photos",
+        `You can upload up to ${MAX_PHOTOS} photos.`
+      );
       return;
     }
 
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
+    if (status !== "granted") {
       Alert.alert(
-        'Permission Required',
-        'Please allow access to your photo library to upload images.'
+        "Permission Required",
+        "Please allow access to your photo library to upload images."
       );
       return;
     }
@@ -50,22 +53,27 @@ export default function NewListingPhotos() {
     });
 
     if (!result.canceled) {
-      const newPhotos = result.assets.map((asset: { uri: string }) => asset.uri);
+      const newPhotos = result.assets.map(
+        (asset: { uri: string }) => asset.uri
+      );
       setPhotos((prev) => [...prev, ...newPhotos].slice(0, MAX_PHOTOS));
     }
   };
 
   const takePhoto = async () => {
     if (photos.length >= MAX_PHOTOS) {
-      Alert.alert('Maximum Photos', `You can upload up to ${MAX_PHOTOS} photos.`);
+      Alert.alert(
+        "Maximum Photos",
+        `You can upload up to ${MAX_PHOTOS} photos.`
+      );
       return;
     }
 
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
+    if (status !== "granted") {
       Alert.alert(
-        'Permission Required',
-        'Please allow access to your camera to take photos.'
+        "Permission Required",
+        "Please allow access to your camera to take photos."
       );
       return;
     }
@@ -85,13 +93,16 @@ export default function NewListingPhotos() {
 
   const handleContinue = () => {
     if (photos.length < MIN_PHOTOS) {
-      Alert.alert('Photos Required', 'Please add at least one photo of your space.');
+      Alert.alert(
+        "Photos Required",
+        "Please add at least one photo of your space."
+      );
       return;
     }
     // TODO: Store photos in context/state management
     // For now, pass via params (limited for demo)
     router.push({
-      pathname: '/(owner)/new-listing/details',
+      pathname: "/(owner)/new-listing/details",
       params: { photoCount: photos.length },
     });
   };
@@ -106,13 +117,21 @@ export default function NewListingPhotos() {
         {/* Progress Indicator */}
         <View style={styles.progressContainer}>
           <View style={[styles.progressDot, styles.progressDotActive]} />
-          <View style={[styles.progressLine, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.progressLine, { backgroundColor: theme.border }]}
+          />
           <View style={[styles.progressDot, { borderColor: theme.border }]} />
-          <View style={[styles.progressLine, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.progressLine, { backgroundColor: theme.border }]}
+          />
           <View style={[styles.progressDot, { borderColor: theme.border }]} />
-          <View style={[styles.progressLine, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.progressLine, { backgroundColor: theme.border }]}
+          />
           <View style={[styles.progressDot, { borderColor: theme.border }]} />
-          <View style={[styles.progressLine, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.progressLine, { backgroundColor: theme.border }]}
+          />
           <View style={[styles.progressDot, { borderColor: theme.border }]} />
         </View>
 
@@ -121,7 +140,8 @@ export default function NewListingPhotos() {
           Add photos of your space
         </Text>
         <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          High-quality photos help attract more advertisers. Add up to {MAX_PHOTOS} photos showing different angles.
+          High-quality photos help attract more advertisers. Add up to{" "}
+          {MAX_PHOTOS} photos showing different angles.
         </Text>
 
         {/* Photo Grid */}
@@ -149,7 +169,9 @@ export default function NewListingPhotos() {
               onPress={pickImage}
             >
               <Ionicons name="add" size={32} color={colors.primary} />
-              <Text style={[styles.addPhotoText, { color: theme.textSecondary }]}>
+              <Text
+                style={[styles.addPhotoText, { color: theme.textSecondary }]}
+              >
                 Add Photo
               </Text>
             </TouchableOpacity>
@@ -157,7 +179,12 @@ export default function NewListingPhotos() {
         </View>
 
         {/* Photo Tips */}
-        <View style={[styles.tipsContainer, { backgroundColor: theme.backgroundSecondary }]}>
+        <View
+          style={[
+            styles.tipsContainer,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
+        >
           <Text style={[styles.tipsTitle, { color: theme.text }]}>
             📸 Photo Tips
           </Text>
@@ -182,7 +209,7 @@ export default function NewListingPhotos() {
           <Ionicons name="camera-outline" size={24} color={colors.primary} />
         </TouchableOpacity>
         <Button
-          title={`Continue ${photos.length > 0 ? `(${photos.length} photo${photos.length !== 1 ? 's' : ''})` : ''}`}
+          title={`Continue ${photos.length > 0 ? `(${photos.length} photo${photos.length !== 1 ? "s" : ""})` : ""}`}
           onPress={handleContinue}
           disabled={photos.length < MIN_PHOTOS}
           fullWidth
@@ -205,9 +232,9 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: spacing.lg,
   },
   progressDot: {
@@ -216,7 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 2,
     borderColor: colors.primary,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   progressDotActive: {
     backgroundColor: colors.primary,
@@ -228,7 +255,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: spacing.sm,
   },
   subtitle: {
@@ -237,31 +264,31 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   photoGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.sm,
     marginBottom: spacing.lg,
   },
   photoWrapper: {
-    width: '48%',
+    width: "48%",
     aspectRatio: 4 / 3,
     borderRadius: borderRadius.md,
-    overflow: 'hidden',
-    position: 'relative',
+    overflow: "hidden",
+    position: "relative",
   },
   photo: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   removeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: spacing.xs,
     right: spacing.xs,
     backgroundColor: colors.white,
     borderRadius: 12,
   },
   primaryBadge: {
-    position: 'absolute',
+    position: "absolute",
     bottom: spacing.xs,
     left: spacing.xs,
     backgroundColor: colors.primary,
@@ -272,16 +299,16 @@ const styles = StyleSheet.create({
   primaryBadgeText: {
     color: colors.white,
     fontSize: fontSize.xs,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   addPhotoButton: {
-    width: '48%',
+    width: "48%",
     aspectRatio: 4 / 3,
     borderRadius: borderRadius.md,
     borderWidth: 2,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderStyle: "dashed",
+    justifyContent: "center",
+    alignItems: "center",
   },
   addPhotoText: {
     fontSize: fontSize.sm,
@@ -293,7 +320,7 @@ const styles = StyleSheet.create({
   },
   tipsTitle: {
     fontSize: fontSize.md,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: spacing.sm,
   },
   tipText: {
@@ -302,7 +329,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   bottomActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: spacing.md,
     borderTopWidth: StyleSheet.hairlineWidth,
     gap: spacing.sm,
@@ -313,8 +340,8 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
     borderWidth: 1,
     borderColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   continueButton: {
     flex: 1,

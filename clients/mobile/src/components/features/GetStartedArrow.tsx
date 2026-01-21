@@ -1,5 +1,5 @@
-import React from 'react';
-import Svg, { Circle, Path } from 'react-native-svg';
+import React from "react";
+import Svg, { Circle, Path } from "react-native-svg";
 
 interface GetStartedArrowProps {
   size?: number;
@@ -10,13 +10,13 @@ interface GetStartedArrowProps {
 
 export default function GetStartedArrow({
   size = 58,
-  circleColor = '#0088FF',
-  strokeColor = '#FFFFFF',
-  arrowColor = '#FFFFFF',
+  circleColor = "#0088FF",
+  strokeColor = "#FFFFFF",
+  arrowColor = "#FFFFFF",
 }: GetStartedArrowProps) {
   // Scale factor based on original 58px design
   const scale = size / 58;
-  
+
   return (
     <Svg width={size} height={size} viewBox="0 0 58 58" fill="none">
       {/* Blue circle with white border */}

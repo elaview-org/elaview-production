@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -6,25 +6,33 @@ import {
   FlatList,
   TouchableOpacity,
   RefreshControl,
-} from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import BookingCard from '@/components/features/BookingCard';
-import EmptyState from '@/components/ui/EmptyState';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
-import { mockOwnerBookings, filterBookingsByStatus } from '@/mocks/bookings';
-import { BookingStatus } from '@/components/ui/StatusBadge';
+} from "react-native";
+import { useTheme } from "@/contexts/ThemeContext";
+import BookingCard from "@/components/features/BookingCard";
+import EmptyState from "@/components/ui/EmptyState";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
+import { mockOwnerBookings, filterBookingsByStatus } from "@/mocks/bookings";
+import { BookingStatus } from "@/components/ui/StatusBadge";
 
-type TabFilter = 'requests' | 'active' | 'past';
+type TabFilter = "requests" | "active" | "past";
 
 const tabs: { key: TabFilter; label: string; statuses: BookingStatus[] }[] = [
-  { key: 'requests', label: 'Requests', statuses: ['pending'] },
-  { key: 'active', label: 'Active', statuses: ['accepted', 'paid', 'active', 'verification_pending'] },
-  { key: 'past', label: 'Past', statuses: ['completed', 'cancelled', 'declined'] },
+  { key: "requests", label: "Requests", statuses: ["pending"] },
+  {
+    key: "active",
+    label: "Active",
+    statuses: ["accepted", "paid", "active", "verification_pending"],
+  },
+  {
+    key: "past",
+    label: "Past",
+    statuses: ["completed", "cancelled", "declined"],
+  },
 ];
 
 export default function Bookings() {
   const { theme } = useTheme();
-  const [activeTab, setActiveTab] = useState<TabFilter>('requests');
+  const [activeTab, setActiveTab] = useState<TabFilter>("requests");
   const [refreshing, setRefreshing] = useState(false);
 
   const filteredBookings = useMemo(() => {
@@ -35,7 +43,7 @@ export default function Bookings() {
 
   // Count pending requests for badge
   const pendingCount = useMemo(() => {
-    return filterBookingsByStatus(mockOwnerBookings, ['pending']).length;
+    return filterBookingsByStatus(mockOwnerBookings, ["pending"]).length;
   }, []);
 
   const onRefresh = () => {
@@ -46,25 +54,29 @@ export default function Bookings() {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Filter Tabs */}
-      <View style={[styles.tabsContainer, { backgroundColor: theme.background }]}>
+      <View
+        style={[styles.tabsContainer, { backgroundColor: theme.background }]}
+      >
         {tabs.map((tab) => (
           <TouchableOpacity
             key={tab.key}
-            style={[
-              styles.tab,
-              activeTab === tab.key && styles.tabActive,
-            ]}
+            style={[styles.tab, activeTab === tab.key && styles.tabActive]}
             onPress={() => setActiveTab(tab.key)}
           >
             <Text
               style={[
                 styles.tabText,
-                { color: activeTab === tab.key ? colors.primary : theme.textSecondary },
+                {
+                  color:
+                    activeTab === tab.key
+                      ? colors.primary
+                      : theme.textSecondary,
+                },
               ]}
             >
               {tab.label}
             </Text>
-            {tab.key === 'requests' && pendingCount > 0 && (
+            {tab.key === "requests" && pendingCount > 0 && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{pendingCount}</Text>
               </View>
@@ -81,7 +93,7 @@ export default function Bookings() {
           <BookingCard
             booking={item}
             perspective="owner"
-            showActions={item.status === 'pending'}
+            showActions={item.status === "pending"}
             onPress={() => {
               // TODO: Navigate to booking detail
             }}
@@ -93,17 +105,19 @@ export default function Bookings() {
         ]}
         ListEmptyComponent={
           <EmptyState
-            icon={activeTab === 'requests' ? 'mail-outline' : 'calendar-outline'}
+            icon={
+              activeTab === "requests" ? "mail-outline" : "calendar-outline"
+            }
             title={
-              activeTab === 'requests'
-                ? 'No pending requests'
-                : activeTab === 'active'
-                ? 'No active bookings'
-                : 'No past bookings'
+              activeTab === "requests"
+                ? "No pending requests"
+                : activeTab === "active"
+                  ? "No active bookings"
+                  : "No past bookings"
             }
             subtitle={
-              activeTab === 'requests'
-                ? 'When advertisers request to book your spaces, they\'ll appear here.'
+              activeTab === "requests"
+                ? "When advertisers request to book your spaces, they'll appear here."
                 : undefined
             }
           />
@@ -126,15 +140,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   tabsContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.gray200,
   },
   tab: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
     marginRight: spacing.xs,
@@ -145,22 +159,22 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: fontSize.sm,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   badge: {
     backgroundColor: colors.error,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: spacing.xs,
     paddingHorizontal: 6,
   },
   badgeText: {
     color: colors.white,
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   listContainer: {
     padding: spacing.md,

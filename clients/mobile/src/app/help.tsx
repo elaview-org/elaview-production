@@ -1,10 +1,17 @@
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
-import { Stack } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import Card from '@/components/ui/Card';
-import ListItem from '@/components/ui/ListItem';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+} from "react-native";
+import { Stack } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/contexts/ThemeContext";
+import Card from "@/components/ui/Card";
+import ListItem from "@/components/ui/ListItem";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
 
 interface FAQItem {
   question: string;
@@ -13,24 +20,29 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: 'How do I book an advertising space?',
-    answer: 'Browse available spaces in the Discover tab, select a space you like, choose your dates, and submit a booking request. The space owner will review and approve your request.',
+    question: "How do I book an advertising space?",
+    answer:
+      "Browse available spaces in the Discover tab, select a space you like, choose your dates, and submit a booking request. The space owner will review and approve your request.",
   },
   {
-    question: 'How do payments work?',
-    answer: 'Payment is held securely until the space owner confirms your ad installation. After verification, the payment is released to the owner minus our service fee.',
+    question: "How do payments work?",
+    answer:
+      "Payment is held securely until the space owner confirms your ad installation. After verification, the payment is released to the owner minus our service fee.",
   },
   {
-    question: 'What if my ad isn\'t installed correctly?',
-    answer: 'If there\'s an issue with your installation, you can open a dispute within 24 hours of the verification photo being submitted. Our team will review and resolve the issue.',
+    question: "What if my ad isn't installed correctly?",
+    answer:
+      "If there's an issue with your installation, you can open a dispute within 24 hours of the verification photo being submitted. Our team will review and resolve the issue.",
   },
   {
-    question: 'How do I list my space?',
-    answer: 'Switch to Owner mode using the menu, then go to Listings and tap the + button to add a new space. Fill in the details, upload photos, and set your pricing.',
+    question: "How do I list my space?",
+    answer:
+      "Switch to Owner mode using the menu, then go to Listings and tap the + button to add a new space. Fill in the details, upload photos, and set your pricing.",
   },
   {
-    question: 'When do I get paid as a space owner?',
-    answer: 'Payouts are processed after the advertiser approves the installation verification (or after 48 hours auto-approval). Funds typically arrive in 2-3 business days.',
+    question: "When do I get paid as a space owner?",
+    answer:
+      "Payouts are processed after the advertiser approves the installation verification (or after 48 hours auto-approval). Funds typically arrive in 2-3 business days.",
   },
 ];
 
@@ -38,19 +50,19 @@ export default function Help() {
   const { theme } = useTheme();
 
   const handleContactSupport = () => {
-    Linking.openURL('mailto:support@elaview.com');
+    Linking.openURL("mailto:support@elaview.com");
   };
 
   const handleVisitWebsite = () => {
-    Linking.openURL('https://elaview.com/help');
+    Linking.openURL("https://elaview.com/help");
   };
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: 'Help Center',
-          headerBackTitle: 'Back',
+          title: "Help Center",
+          headerBackTitle: "Back",
         }}
       />
       <ScrollView
@@ -60,8 +72,17 @@ export default function Help() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <View style={[styles.iconContainer, { backgroundColor: colors.primaryLight }]}>
-            <Ionicons name="help-buoy-outline" size={32} color={colors.primary} />
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: colors.primaryLight },
+            ]}
+          >
+            <Ionicons
+              name="help-buoy-outline"
+              size={32}
+              color={colors.primary}
+            />
           </View>
           <Text style={[styles.headerTitle, { color: theme.text }]}>
             How can we help?
@@ -77,8 +98,17 @@ export default function Help() {
             style={[styles.quickAction, { backgroundColor: theme.card }]}
             onPress={handleContactSupport}
           >
-            <View style={[styles.quickActionIcon, { backgroundColor: `${colors.primary}15` }]}>
-              <Ionicons name="chatbubble-outline" size={24} color={colors.primary} />
+            <View
+              style={[
+                styles.quickActionIcon,
+                { backgroundColor: `${colors.primary}15` },
+              ]}
+            >
+              <Ionicons
+                name="chatbubble-outline"
+                size={24}
+                color={colors.primary}
+              />
             </View>
             <Text style={[styles.quickActionText, { color: theme.text }]}>
               Contact Support
@@ -89,7 +119,12 @@ export default function Help() {
             style={[styles.quickAction, { backgroundColor: theme.card }]}
             onPress={handleVisitWebsite}
           >
-            <View style={[styles.quickActionIcon, { backgroundColor: `${colors.success}15` }]}>
+            <View
+              style={[
+                styles.quickActionIcon,
+                { backgroundColor: `${colors.success}15` },
+              ]}
+            >
               <Ionicons name="globe-outline" size={24} color={colors.success} />
             </View>
             <Text style={[styles.quickActionText, { color: theme.text }]}>
@@ -160,39 +195,39 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: spacing.lg,
   },
   iconContainer: {
     width: 64,
     height: 64,
     borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: spacing.md,
   },
   headerTitle: {
     fontSize: fontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: spacing.xs,
   },
   headerSubtitle: {
     fontSize: fontSize.md,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 22,
     maxWidth: 280,
   },
   quickActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: spacing.lg,
   },
   quickAction: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     padding: spacing.md,
     borderRadius: borderRadius.lg,
     marginHorizontal: spacing.xs,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -202,17 +237,17 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: spacing.sm,
   },
   quickActionText: {
     fontSize: fontSize.sm,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   sectionTitle: {
     fontSize: fontSize.xs,
-    fontWeight: '600',
+    fontWeight: "600",
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
     marginTop: spacing.md,
@@ -226,7 +261,7 @@ const styles = StyleSheet.create({
   },
   faqQuestion: {
     fontSize: fontSize.md,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: spacing.xs,
   },
   faqAnswer: {

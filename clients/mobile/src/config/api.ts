@@ -5,8 +5,8 @@
  * Uses environment variables from devbox/Doppler.
  */
 
-import Constants from 'expo-constants';
-import { API_URL, GRAPHQL_ENDPOINT } from './env';
+import Constants from "expo-constants";
+import { API_URL, GRAPHQL_ENDPOINT } from "./env";
 
 const BACKEND_PORT = 7106;
 
@@ -17,7 +17,7 @@ function getDevApiUrl(): string {
 
   const hostUri = Constants.expoConfig?.hostUri;
   if (hostUri) {
-    const host = hostUri.split(':')[0];
+    const host = hostUri.split(":")[0];
     return `http://${host}:${BACKEND_PORT}`;
   }
 
@@ -26,9 +26,9 @@ function getDevApiUrl(): string {
 
 export const baseUrl = getDevApiUrl();
 
-export const graphqlUrl = __DEV__
-  ? `${baseUrl}/api/graphql`
-  : GRAPHQL_ENDPOINT;
+export const graphqlUrl = __DEV__ ? `${baseUrl}/api/graphql` : GRAPHQL_ENDPOINT;
+
+export const graphqlWsUrl = graphqlUrl.replace(/^http/, "ws");
 
 /**
  * REST API endpoints
@@ -47,8 +47,8 @@ export const endpoints = {
  * Includes credentials to send/receive cookies for authentication
  */
 export const defaultFetchOptions: RequestInit = {
-  credentials: 'include',
+  credentials: "include",
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
 };

@@ -1,14 +1,18 @@
-import { useState, useCallback } from 'react';
-import { FlatList, RefreshControl, StyleSheet } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import NotificationCard from '@/components/features/notifications/NotificationCard';
-import EmptyNotifications from '@/components/features/notifications/EmptyNotifications';
-import { mockNotifications, markAsRead as markAsReadHelper } from '@/mocks/notifications';
-import { Notification } from '@/types/notifications';
+import { useState, useCallback } from "react";
+import { FlatList, RefreshControl, StyleSheet } from "react-native";
+import { useTheme } from "@/contexts/ThemeContext";
+import NotificationCard from "@/components/features/notifications/NotificationCard";
+import EmptyNotifications from "@/components/features/notifications/EmptyNotifications";
+import {
+  mockNotifications,
+  markAsRead as markAsReadHelper,
+} from "@/mocks/notifications";
+import { Notification } from "@/types/notifications";
 
 export default function Alerts() {
   const { theme } = useTheme();
-  const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
+  const [notifications, setNotifications] =
+    useState<Notification[]>(mockNotifications);
   const [refreshing, setRefreshing] = useState(false);
 
   // Simulate fetching fresh notifications

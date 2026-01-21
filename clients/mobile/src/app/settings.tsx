@@ -1,10 +1,17 @@
-import { View, Text, StyleSheet, ScrollView, Switch, Alert } from 'react-native';
-import { useRouter, Stack } from 'expo-router';
-import { useState } from 'react';
-import { useTheme } from '@/contexts/ThemeContext';
-import Card from '@/components/ui/Card';
-import ListItem from '@/components/ui/ListItem';
-import { spacing, fontSize, colors } from '@/constants/theme';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Switch,
+  Alert,
+} from "react-native";
+import { useRouter, Stack } from "expo-router";
+import { useState } from "react";
+import { useTheme } from "@/contexts/ThemeContext";
+import Card from "@/components/ui/Card";
+import ListItem from "@/components/ui/ListItem";
+import { spacing, fontSize, colors } from "@/constants/theme";
 
 export default function Settings() {
   const { theme, isDark, setThemeMode } = useTheme();
@@ -17,11 +24,11 @@ export default function Settings() {
 
   const handleClearCache = () => {
     Alert.alert(
-      'Clear Cache',
-      'This will clear cached data and images. Continue?',
+      "Clear Cache",
+      "This will clear cached data and images. Continue?",
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Clear', style: 'destructive', onPress: () => {} },
+        { text: "Cancel", style: "cancel" },
+        { text: "Clear", style: "destructive", onPress: () => {} },
       ]
     );
   };
@@ -30,8 +37,8 @@ export default function Settings() {
     <>
       <Stack.Screen
         options={{
-          title: 'Settings',
-          headerBackTitle: 'Back',
+          title: "Settings",
+          headerBackTitle: "Back",
         }}
       />
       <ScrollView
@@ -49,7 +56,7 @@ export default function Settings() {
             leftIcon="moon-outline"
             rightElement="toggle"
             toggleValue={isDark}
-            onToggleChange={(value) => setThemeMode(value ? 'dark' : 'light')}
+            onToggleChange={(value) => setThemeMode(value ? "dark" : "light")}
             showBorder={false}
           />
         </Card>
@@ -169,7 +176,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: fontSize.xs,
-    fontWeight: '600',
+    fontWeight: "600",
     letterSpacing: 0.5,
     marginBottom: spacing.sm,
     marginTop: spacing.md,

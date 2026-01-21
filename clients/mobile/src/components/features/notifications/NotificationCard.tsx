@@ -1,10 +1,10 @@
-import { View, Text, Pressable, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { formatDistanceToNow } from 'date-fns';
-import { useTheme } from '@/contexts/ThemeContext';
-import { Notification, NotificationType } from '@/types/notifications';
-import { colors, spacing, fontSize, borderRadius } from '@/constants/theme';
+import { View, Text, Pressable, StyleSheet } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { formatDistanceToNow } from "date-fns";
+import { useTheme } from "@/contexts/ThemeContext";
+import { Notification, NotificationType } from "@/types/notifications";
+import { colors, spacing, fontSize, borderRadius } from "@/constants/theme";
 
 interface NotificationCardProps {
   notification: Notification;
@@ -18,75 +18,75 @@ function getNotificationIcon(type: NotificationType): {
   backgroundColor: string;
 } {
   switch (type) {
-    case 'BOOKING_ACCEPTED':
+    case "BOOKING_ACCEPTED":
       return {
-        name: 'checkmark-circle',
+        name: "checkmark-circle",
         color: colors.success,
-        backgroundColor: '#E8F5E9',
+        backgroundColor: "#E8F5E9",
       };
 
-    case 'BOOKING_DECLINED':
+    case "BOOKING_DECLINED":
       return {
-        name: 'close-circle',
+        name: "close-circle",
         color: colors.error,
-        backgroundColor: '#FFEBEE',
+        backgroundColor: "#FFEBEE",
       };
 
-    case 'VERIFICATION_SUBMITTED':
+    case "VERIFICATION_SUBMITTED":
       return {
-        name: 'camera',
+        name: "camera",
         color: colors.primary,
         backgroundColor: colors.primaryLight,
       };
 
-    case 'AUTO_APPROVAL_WARNING':
+    case "AUTO_APPROVAL_WARNING":
       return {
-        name: 'time',
+        name: "time",
         color: colors.warning,
-        backgroundColor: '#FFF9C4',
+        backgroundColor: "#FFF9C4",
       };
 
-    case 'PAYMENT_RECEIVED':
-    case 'PAYOUT_SENT':
+    case "PAYMENT_RECEIVED":
+    case "PAYOUT_SENT":
       return {
-        name: 'cash',
+        name: "cash",
         color: colors.success,
-        backgroundColor: '#E8F5E9',
+        backgroundColor: "#E8F5E9",
       };
 
-    case 'PAYMENT_FAILED':
-    case 'PAYOUT_FAILED':
+    case "PAYMENT_FAILED":
+    case "PAYOUT_FAILED":
       return {
-        name: 'alert-circle',
+        name: "alert-circle",
         color: colors.error,
-        backgroundColor: '#FFEBEE',
+        backgroundColor: "#FFEBEE",
       };
 
-    case 'BOOKING_APPROVED':
-    case 'BOOKING_AUTO_APPROVED':
+    case "BOOKING_APPROVED":
+    case "BOOKING_AUTO_APPROVED":
       return {
-        name: 'checkmark-done',
+        name: "checkmark-done",
         color: colors.success,
-        backgroundColor: '#E8F5E9',
+        backgroundColor: "#E8F5E9",
       };
 
-    case 'BOOKING_COMPLETED':
+    case "BOOKING_COMPLETED":
       return {
-        name: 'checkmark-circle-outline',
+        name: "checkmark-circle-outline",
         color: colors.gray600,
         backgroundColor: colors.gray100,
       };
 
-    case 'DISPUTE_OPENED':
+    case "DISPUTE_OPENED":
       return {
-        name: 'warning',
+        name: "warning",
         color: colors.warning,
-        backgroundColor: '#FFF9C4',
+        backgroundColor: "#FFF9C4",
       };
 
     default:
       return {
-        name: 'notifications',
+        name: "notifications",
         color: colors.primary,
         backgroundColor: colors.primaryLight,
       };
@@ -148,7 +148,7 @@ export default function NotificationCard({
               styles.title,
               {
                 color: theme.text,
-                fontWeight: notification.read ? '500' : '700',
+                fontWeight: notification.read ? "500" : "700",
               },
             ]}
             numberOfLines={1}
@@ -183,8 +183,8 @@ export default function NotificationCard({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: spacing.md,
     borderBottomWidth: 1,
     gap: spacing.md,
@@ -193,16 +193,16 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: borderRadius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   content: {
     flex: 1,
     gap: spacing.xs,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: spacing.sm,
   },
   title: {

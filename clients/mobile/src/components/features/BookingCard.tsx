@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import Card from '@/components/ui/Card';
-import StatusBadge, { BookingStatus } from '@/components/ui/StatusBadge';
-import { useTheme } from '@/contexts/ThemeContext';
-import { spacing, fontSize, colors } from '@/constants/theme';
-import { Booking, formatDateRange } from '@/mocks/bookings';
+import { View, Text, StyleSheet, Image } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import Card from "@/components/ui/Card";
+import StatusBadge, { BookingStatus } from "@/components/ui/StatusBadge";
+import { useTheme } from "@/contexts/ThemeContext";
+import { spacing, fontSize, colors } from "@/constants/theme";
+import { Booking, formatDateRange } from "@/mocks/bookings";
 
 interface BookingCardProps {
   booking: Booking;
@@ -12,7 +12,7 @@ interface BookingCardProps {
   /** Shows accept/decline preview for owners */
   showActions?: boolean;
   /** Whether viewing as owner or advertiser */
-  perspective?: 'owner' | 'advertiser';
+  perspective?: "owner" | "advertiser";
 }
 
 /**
@@ -23,12 +23,12 @@ export default function BookingCard({
   booking,
   onPress,
   showActions = false,
-  perspective = 'advertiser',
+  perspective = "advertiser",
 }: BookingCardProps) {
   const { theme } = useTheme();
 
   const counterpartyName =
-    perspective === 'advertiser' ? booking.ownerName : booking.advertiserName;
+    perspective === "advertiser" ? booking.ownerName : booking.advertiserName;
 
   return (
     <Card onPress={onPress} style={styles.card}>
@@ -39,7 +39,8 @@ export default function BookingCard({
             {booking.spaceTitle}
           </Text>
           <Text style={[styles.counterparty, { color: theme.textSecondary }]}>
-            {perspective === 'advertiser' ? 'Owner:' : 'Advertiser:'} {counterpartyName}
+            {perspective === "advertiser" ? "Owner:" : "Advertiser:"}{" "}
+            {counterpartyName}
           </Text>
           <StatusBadge status={booking.status} />
         </View>
@@ -49,31 +50,57 @@ export default function BookingCard({
 
       <View style={styles.details}>
         <View style={styles.detailItem}>
-          <Ionicons name="calendar-outline" size={16} color={theme.textSecondary} />
+          <Ionicons
+            name="calendar-outline"
+            size={16}
+            color={theme.textSecondary}
+          />
           <Text style={[styles.detailText, { color: theme.textSecondary }]}>
             {formatDateRange(booking.startDate, booking.endDate)}
           </Text>
         </View>
         <View style={styles.detailItem}>
-          <Ionicons name="pricetag-outline" size={16} color={theme.textSecondary} />
+          <Ionicons
+            name="pricetag-outline"
+            size={16}
+            color={theme.textSecondary}
+          />
           <Text style={[styles.detailText, { color: theme.text }]}>
             ${booking.totalPrice.toFixed(0)}
           </Text>
         </View>
       </View>
 
-      {booking.message && perspective === 'owner' && booking.status === 'pending' && (
-        <View style={[styles.messageBox, { backgroundColor: theme.backgroundSecondary }]}>
-          <Ionicons name="chatbubble-outline" size={14} color={theme.textSecondary} />
-          <Text style={[styles.messageText, { color: theme.textSecondary }]} numberOfLines={2}>
-            "{booking.message}"
-          </Text>
-        </View>
-      )}
+      {booking.message &&
+        perspective === "owner" &&
+        booking.status === "pending" && (
+          <View
+            style={[
+              styles.messageBox,
+              { backgroundColor: theme.backgroundSecondary },
+            ]}
+          >
+            <Ionicons
+              name="chatbubble-outline"
+              size={14}
+              color={theme.textSecondary}
+            />
+            <Text
+              style={[styles.messageText, { color: theme.textSecondary }]}
+              numberOfLines={2}
+            >
+              "{booking.message}"
+            </Text>
+          </View>
+        )}
 
-      {showActions && booking.status === 'pending' && (
+      {showActions && booking.status === "pending" && (
         <View style={styles.actionHint}>
-          <Ionicons name="hand-right-outline" size={14} color={colors.primary} />
+          <Ionicons
+            name="hand-right-outline"
+            size={14}
+            color={colors.primary}
+          />
           <Text style={[styles.actionHintText, { color: colors.primary }]}>
             Tap to review request
           </Text>
@@ -89,7 +116,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   header: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   image: {
     width: 72,
@@ -103,7 +130,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize.md,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   counterparty: {
@@ -115,20 +142,20 @@ const styles = StyleSheet.create({
     marginVertical: spacing.md,
   },
   details: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
   },
   detailItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   detailText: {
     fontSize: fontSize.sm,
     marginLeft: 6,
   },
   messageBox: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     padding: spacing.sm,
     borderRadius: 8,
     marginTop: spacing.md,
@@ -137,12 +164,12 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
     marginLeft: spacing.sm,
     flex: 1,
-    fontStyle: 'italic',
+    fontStyle: "italic",
   },
   actionHint: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: spacing.md,
     paddingTop: spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
@@ -150,7 +177,7 @@ const styles = StyleSheet.create({
   },
   actionHintText: {
     fontSize: fontSize.sm,
-    fontWeight: '500',
+    fontWeight: "500",
     marginLeft: spacing.xs,
   },
 });

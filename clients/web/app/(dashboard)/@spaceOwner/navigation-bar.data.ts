@@ -7,7 +7,6 @@ import {
   IconMessage,
   IconPlus,
   IconShieldCheck,
-  IconWallet,
 } from "@tabler/icons-react";
 
 const spaceOwnerData = {
@@ -26,11 +25,6 @@ const spaceOwnerData = {
       title: "Listings",
       url: "/listings",
       icon: IconBuildingStore,
-    },
-    {
-      title: "Earnings",
-      url: "/earnings",
-      icon: IconWallet,
     },
     {
       title: "Verification Flow",

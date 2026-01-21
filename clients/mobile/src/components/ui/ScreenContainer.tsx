@@ -1,11 +1,11 @@
-import { View, StyleSheet, ViewStyle, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme } from '@/contexts/ThemeContext';
+import { View, StyleSheet, ViewStyle, StatusBar } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface ScreenContainerProps {
   children: React.ReactNode;
   style?: ViewStyle;
-  edges?: ('top' | 'bottom' | 'left' | 'right')[];
+  edges?: ("top" | "bottom" | "left" | "right")[];
   /** If true, uses regular View instead of SafeAreaView */
   unsafe?: boolean;
 }
@@ -17,7 +17,7 @@ interface ScreenContainerProps {
 export default function ScreenContainer({
   children,
   style,
-  edges = ['bottom'],
+  edges = ["bottom"],
   unsafe = false,
 }: ScreenContainerProps) {
   const { theme, isDark } = useTheme();
@@ -31,7 +31,7 @@ export default function ScreenContainer({
   if (unsafe) {
     return (
       <>
-        <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+        <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
         <View style={containerStyle}>{children}</View>
       </>
     );
@@ -39,7 +39,7 @@ export default function ScreenContainer({
 
   return (
     <>
-      <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} />
+      <StatusBar barStyle={isDark ? "light-content" : "dark-content"} />
       <SafeAreaView style={containerStyle} edges={edges}>
         {children}
       </SafeAreaView>

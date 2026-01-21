@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,14 +7,14 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import SpaceCard from '@/components/features/SpaceCard';
-import EmptyState from '@/components/ui/EmptyState';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
-import { mockSpaces, Space } from '@/mocks/spaces';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/contexts/ThemeContext";
+import SpaceCard from "@/components/features/SpaceCard";
+import EmptyState from "@/components/ui/EmptyState";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
+import { mockSpaces, Space } from "@/mocks/spaces";
 
 const PAGE_SIZE = 10;
 
@@ -22,7 +22,7 @@ export default function Listings() {
   const { theme } = useTheme();
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
-  const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
+  const [viewMode, setViewMode] = useState<"list" | "grid">("list");
   const [displayedSpaces, setDisplayedSpaces] = useState<Space[]>(
     mockSpaces.slice(0, PAGE_SIZE)
   );
@@ -60,14 +60,14 @@ export default function Listings() {
   }, [displayedSpaces.length, isLoadingMore, hasMore]);
 
   const handleAddListing = () => {
-    router.push('/(owner)/new-listing');
+    router.push("/(owner)/new-listing");
   };
 
   const renderSpace = ({ item }: { item: Space }) => (
     <SpaceCard
       space={item}
-      compact={viewMode === 'list'}
-      gridMode={viewMode === 'grid'}
+      compact={viewMode === "list"}
+      gridMode={viewMode === "grid"}
       onPress={() => {
         // TODO: Navigate to listing detail/edit
       }}
@@ -91,33 +91,34 @@ export default function Listings() {
       {/* Header with view toggle */}
       <View style={[styles.header, { borderBottomColor: theme.border }]}>
         <Text style={[styles.headerTitle, { color: theme.text }]}>
-          {displayedSpaces.length} {displayedSpaces.length === 1 ? 'Space' : 'Spaces'}
+          {displayedSpaces.length}{" "}
+          {displayedSpaces.length === 1 ? "Space" : "Spaces"}
         </Text>
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={[
               styles.viewToggle,
-              viewMode === 'list' && { backgroundColor: colors.primaryLight },
+              viewMode === "list" && { backgroundColor: colors.primaryLight },
             ]}
-            onPress={() => setViewMode('list')}
+            onPress={() => setViewMode("list")}
           >
             <Ionicons
               name="list-outline"
               size={18}
-              color={viewMode === 'list' ? colors.primary : theme.textMuted}
+              color={viewMode === "list" ? colors.primary : theme.textMuted}
             />
           </TouchableOpacity>
           <TouchableOpacity
             style={[
               styles.viewToggle,
-              viewMode === 'grid' && { backgroundColor: colors.primaryLight },
+              viewMode === "grid" && { backgroundColor: colors.primaryLight },
             ]}
-            onPress={() => setViewMode('grid')}
+            onPress={() => setViewMode("grid")}
           >
             <Ionicons
               name="grid-outline"
               size={18}
-              color={viewMode === 'grid' ? colors.primary : theme.textMuted}
+              color={viewMode === "grid" ? colors.primary : theme.textMuted}
             />
           </TouchableOpacity>
         </View>
@@ -128,9 +129,9 @@ export default function Listings() {
         data={displayedSpaces}
         keyExtractor={(item) => item.id}
         renderItem={renderSpace}
-        numColumns={viewMode === 'grid' ? 2 : 1}
+        numColumns={viewMode === "grid" ? 2 : 1}
         key={viewMode} // Force re-render when switching modes
-        columnWrapperStyle={viewMode === 'grid' ? styles.gridRow : undefined}
+        columnWrapperStyle={viewMode === "grid" ? styles.gridRow : undefined}
         contentContainerStyle={[
           styles.listContainer,
           displayedSpaces.length === 0 && styles.emptyContainer,
@@ -176,26 +177,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   headerTitle: {
     fontSize: fontSize.md,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   headerActions: {
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   viewToggle: {
     width: 36,
     height: 36,
     borderRadius: borderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginLeft: spacing.xs,
   },
   listContainer: {
@@ -206,13 +207,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   gridRow: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     gap: spacing.sm,
   },
   loadingFooter: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: spacing.md,
     gap: spacing.sm,
   },
@@ -220,19 +221,19 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
   },
   fab: {
-  position: 'absolute',
-  bottom: spacing.lg,
-  alignSelf: 'center',
-  width: 56,
-  height: 56,
-  borderRadius: 28,
-  backgroundColor: colors.primary,
-  justifyContent: 'center',
-  alignItems: 'center',
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.3,
-  shadowRadius: 8,
-  elevation: 5,
-},
+    position: "absolute",
+    bottom: spacing.lg,
+    alignSelf: "center",
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
 });

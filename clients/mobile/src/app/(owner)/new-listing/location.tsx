@@ -1,23 +1,63 @@
-import { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { useTheme } from '@/contexts/ThemeContext';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
+import { useState } from "react";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
+import { useTheme } from "@/contexts/ThemeContext";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
 
 // US States for picker
 const US_STATES = [
-  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
-  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
-  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY',
+  "AL",
+  "AK",
+  "AZ",
+  "AR",
+  "CA",
+  "CO",
+  "CT",
+  "DE",
+  "FL",
+  "GA",
+  "HI",
+  "ID",
+  "IL",
+  "IN",
+  "IA",
+  "KS",
+  "KY",
+  "LA",
+  "ME",
+  "MD",
+  "MA",
+  "MI",
+  "MN",
+  "MS",
+  "MO",
+  "MT",
+  "NE",
+  "NV",
+  "NH",
+  "NJ",
+  "NM",
+  "NY",
+  "NC",
+  "ND",
+  "OH",
+  "OK",
+  "OR",
+  "PA",
+  "RI",
+  "SC",
+  "SD",
+  "TN",
+  "TX",
+  "UT",
+  "VT",
+  "VA",
+  "WA",
+  "WV",
+  "WI",
+  "WY",
 ];
 
 /**
@@ -28,10 +68,10 @@ const US_STATES = [
 export default function NewListingLocation() {
   const { theme } = useTheme();
   const router = useRouter();
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState('');
-  const [state, setState] = useState('');
-  const [zipCode, setZipCode] = useState('');
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [zipCode, setZipCode] = useState("");
   const [errors, setErrors] = useState<{
     address?: string;
     city?: string;
@@ -43,20 +83,20 @@ export default function NewListingLocation() {
     const newErrors: typeof errors = {};
 
     if (!address.trim()) {
-      newErrors.address = 'Please enter the street address';
+      newErrors.address = "Please enter the street address";
     }
     if (!city.trim()) {
-      newErrors.city = 'Please enter the city';
+      newErrors.city = "Please enter the city";
     }
     if (!state.trim()) {
-      newErrors.state = 'Please enter the state';
+      newErrors.state = "Please enter the state";
     } else if (!US_STATES.includes(state.toUpperCase())) {
-      newErrors.state = 'Please enter a valid US state abbreviation';
+      newErrors.state = "Please enter a valid US state abbreviation";
     }
     if (!zipCode.trim()) {
-      newErrors.zipCode = 'Please enter the ZIP code';
+      newErrors.zipCode = "Please enter the ZIP code";
     } else if (!/^\d{5}(-\d{4})?$/.test(zipCode.trim())) {
-      newErrors.zipCode = 'Please enter a valid ZIP code';
+      newErrors.zipCode = "Please enter a valid ZIP code";
     }
 
     setErrors(newErrors);
@@ -64,7 +104,7 @@ export default function NewListingLocation() {
     if (Object.keys(newErrors).length === 0) {
       // TODO: Store in context/state management and geocode address
       router.push({
-        pathname: '/(owner)/new-listing/pricing',
+        pathname: "/(owner)/new-listing/pricing",
         params: {
           address: address.trim(),
           city: city.trim(),
@@ -90,9 +130,13 @@ export default function NewListingLocation() {
           <View style={[styles.progressDot, styles.progressDotCompleted]} />
           <View style={[styles.progressLine, styles.progressLineCompleted]} />
           <View style={[styles.progressDot, styles.progressDotActive]} />
-          <View style={[styles.progressLine, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.progressLine, { backgroundColor: theme.border }]}
+          />
           <View style={[styles.progressDot, { borderColor: theme.border }]} />
-          <View style={[styles.progressLine, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.progressLine, { backgroundColor: theme.border }]}
+          />
           <View style={[styles.progressDot, { borderColor: theme.border }]} />
         </View>
 
@@ -101,11 +145,14 @@ export default function NewListingLocation() {
           Where is your space located?
         </Text>
         <Text style={[styles.subtitle, { color: theme.textSecondary }]}>
-          Enter the address of your advertising space. This helps advertisers find local opportunities.
+          Enter the address of your advertising space. This helps advertisers
+          find local opportunities.
         </Text>
 
         {/* Address Input */}
-        <Text style={[styles.label, { color: theme.text }]}>Street Address</Text>
+        <Text style={[styles.label, { color: theme.text }]}>
+          Street Address
+        </Text>
         <Input
           placeholder="123 Main Street"
           value={address}
@@ -154,7 +201,7 @@ export default function NewListingLocation() {
               placeholder="94102"
               value={zipCode}
               onChangeText={(text) => {
-                setZipCode(text.replace(/[^\d-]/g, '').slice(0, 10));
+                setZipCode(text.replace(/[^\d-]/g, "").slice(0, 10));
                 setErrors((prev) => ({ ...prev, zipCode: undefined }));
               }}
               error={errors.zipCode}
@@ -166,7 +213,15 @@ export default function NewListingLocation() {
         </View>
 
         {/* Map Preview Placeholder */}
-        <View style={[styles.mapPlaceholder, { backgroundColor: theme.backgroundSecondary, borderColor: theme.border }]}>
+        <View
+          style={[
+            styles.mapPlaceholder,
+            {
+              backgroundColor: theme.backgroundSecondary,
+              borderColor: theme.border,
+            },
+          ]}
+        >
           <Text style={[styles.mapPlaceholderText, { color: theme.textMuted }]}>
             📍 Map preview will appear here
           </Text>
@@ -176,7 +231,12 @@ export default function NewListingLocation() {
         </View>
 
         {/* Tips */}
-        <View style={[styles.tipsContainer, { backgroundColor: theme.backgroundSecondary }]}>
+        <View
+          style={[
+            styles.tipsContainer,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
+        >
           <Text style={[styles.tipsTitle, { color: theme.text }]}>
             📍 Location Tips
           </Text>
@@ -194,11 +254,7 @@ export default function NewListingLocation() {
 
       {/* Bottom Action */}
       <View style={[styles.bottomActions, { borderTopColor: theme.border }]}>
-        <Button
-          title="Continue"
-          onPress={validateAndContinue}
-          fullWidth
-        />
+        <Button title="Continue" onPress={validateAndContinue} fullWidth />
       </View>
     </View>
   );
@@ -216,9 +272,9 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: spacing.lg,
   },
   progressDot: {
@@ -227,7 +283,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 2,
     borderColor: colors.primary,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   progressDotActive: {
     backgroundColor: colors.primary,
@@ -246,7 +302,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: spacing.sm,
   },
   subtitle: {
@@ -256,12 +312,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: fontSize.sm,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: spacing.xs,
     marginTop: spacing.sm,
   },
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: spacing.md,
   },
   halfInput: {
@@ -271,9 +327,9 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: borderRadius.md,
     borderWidth: 1,
-    borderStyle: 'dashed',
-    justifyContent: 'center',
-    alignItems: 'center',
+    borderStyle: "dashed",
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: spacing.lg,
     marginBottom: spacing.lg,
   },
@@ -290,7 +346,7 @@ const styles = StyleSheet.create({
   },
   tipsTitle: {
     fontSize: fontSize.md,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: spacing.sm,
   },
   tipText: {

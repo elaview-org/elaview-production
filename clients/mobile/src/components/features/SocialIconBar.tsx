@@ -1,4 +1,4 @@
-import Svg, { Rect, Path } from 'react-native-svg';
+import Svg, { Rect, Path } from "react-native-svg";
 
 export function SocialIconBar() {
   return (

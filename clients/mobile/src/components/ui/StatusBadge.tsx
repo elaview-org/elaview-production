@@ -1,65 +1,68 @@
-import { View, Text, StyleSheet, ViewStyle } from 'react-native';
-import { colors, fontSize, spacing, borderRadius } from '@/constants/theme';
+import { View, Text, StyleSheet, ViewStyle } from "react-native";
+import { colors, fontSize, spacing, borderRadius } from "@/constants/theme";
 
 export type BookingStatus =
-  | 'pending'
-  | 'accepted'
-  | 'paid'
-  | 'active'
-  | 'verification_pending'
-  | 'completed'
-  | 'cancelled'
-  | 'declined'
-  | 'disputed';
+  | "pending"
+  | "accepted"
+  | "paid"
+  | "active"
+  | "verification_pending"
+  | "completed"
+  | "cancelled"
+  | "declined"
+  | "disputed";
 
 interface StatusBadgeProps {
   status: BookingStatus;
   style?: ViewStyle;
 }
 
-const statusConfig: Record<BookingStatus, { label: string; color: string; backgroundColor: string }> = {
+const statusConfig: Record<
+  BookingStatus,
+  { label: string; color: string; backgroundColor: string }
+> = {
   pending: {
-    label: 'Pending',
+    label: "Pending",
     color: colors.warning,
     backgroundColor: `${colors.warning}20`,
   },
   accepted: {
-    label: 'Accepted',
+    label: "Accepted",
     color: colors.primary,
     backgroundColor: `${colors.primary}20`,
   },
   paid: {
-    label: 'Paid',
+    label: "Paid",
     color: colors.primary,
     backgroundColor: `${colors.primary}20`,
   },
   active: {
-    label: 'Active',
+    label: "Active",
     color: colors.success,
     backgroundColor: `${colors.success}20`,
   },
   verification_pending: {
-    label: 'Awaiting Review',
+    label: "Awaiting Review",
     color: colors.warning,
     backgroundColor: `${colors.warning}20`,
   },
   completed: {
-    label: 'Completed',
+    label: "Completed",
     color: colors.gray600,
     backgroundColor: colors.gray100,
   },
   cancelled: {
-    label: 'Cancelled',
+    label: "Cancelled",
     color: colors.gray600,
     backgroundColor: colors.gray100,
   },
   declined: {
-    label: 'Declined',
+    label: "Declined",
     color: colors.error,
     backgroundColor: `${colors.error}20`,
   },
   disputed: {
-    label: 'Disputed',
+    label: "Disputed",
     color: colors.error,
     backgroundColor: `${colors.error}20`,
   },
@@ -73,11 +76,7 @@ export default function StatusBadge({ status, style }: StatusBadgeProps) {
 
   return (
     <View
-      style={[
-        styles.badge,
-        { backgroundColor: config.backgroundColor },
-        style,
-      ]}
+      style={[styles.badge, { backgroundColor: config.backgroundColor }, style]}
     >
       <Text style={[styles.text, { color: config.color }]}>{config.label}</Text>
     </View>
@@ -89,10 +88,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: borderRadius.full,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
   },
   text: {
     fontSize: fontSize.xs,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

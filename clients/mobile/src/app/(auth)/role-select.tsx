@@ -4,25 +4,26 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useRole } from '@/contexts/RoleContext';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { useRole } from "@/contexts/RoleContext";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 export default function RoleSelect() {
   const router = useRouter();
   const { setRole } = useRole();
 
-  const handleRoleSelect = async (role: 'advertiser' | 'owner') => {
+  const handleRoleSelect = async (role: "advertiser" | "owner") => {
     try {
       await setRole(role);
       // Navigate to the appropriate route group
-      const route = role === 'advertiser' ? '/(advertiser)/discover' : '/(owner)/listings';
+      const route =
+        role === "advertiser" ? "/(advertiser)/discover" : "/(owner)/listings";
       router.replace(route);
     } catch (error) {
-      console.error('Failed to save role:', error);
+      console.error("Failed to save role:", error);
     }
   };
 
@@ -30,7 +31,7 @@ export default function RoleSelect() {
     <View style={styles.container}>
       {/* Background gradient */}
       <LinearGradient
-        colors={['#0088FF', 'transparent']}
+        colors={["#0088FF", "transparent"]}
         style={styles.gradientBlur}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
@@ -50,7 +51,7 @@ export default function RoleSelect() {
         <View style={styles.optionsContainer}>
           <TouchableOpacity
             style={styles.optionCard}
-            onPress={() => handleRoleSelect('advertiser')}
+            onPress={() => handleRoleSelect("advertiser")}
           >
             <View style={styles.optionContent}>
               <Text style={styles.optionTitle}>I want to browse</Text>
@@ -63,7 +64,7 @@ export default function RoleSelect() {
 
           <TouchableOpacity
             style={styles.optionCard}
-            onPress={() => handleRoleSelect('owner')}
+            onPress={() => handleRoleSelect("owner")}
           >
             <View style={styles.optionContent}>
               <Text style={styles.optionTitle}>I want to list a</Text>
@@ -82,10 +83,10 @@ export default function RoleSelect() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   gradientBlur: {
-    position: 'absolute',
+    position: "absolute",
     top: -100,
     left: -50,
     width: width * 1.5,
@@ -94,41 +95,41 @@ const styles = StyleSheet.create({
   },
   logo: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#000',
+    fontWeight: "700",
+    color: "#000",
     letterSpacing: 1,
     marginTop: 60,
     marginLeft: 24,
   },
   content: {
-  flex: 1,
-  paddingHorizontal: 24,
-  justifyContent: 'center',
-  marginBottom: 60,
-},
+    flex: 1,
+    paddingHorizontal: 24,
+    justifyContent: "center",
+    marginBottom: 60,
+  },
   title: {
     fontSize: 28,
-    fontWeight: '700',
-    color: '#000',
-    textAlign: 'center',
+    fontWeight: "700",
+    color: "#000",
+    textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     marginBottom: 40,
   },
   optionsContainer: {
     gap: 16,
   },
   optionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#FFFFFF",
     borderWidth: 1,
-    borderColor: '#0088FF',
+    borderColor: "#0088FF",
     borderRadius: 12,
     padding: 20,
   },
@@ -137,8 +138,8 @@ const styles = StyleSheet.create({
   },
   optionTitle: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#000',
+    fontWeight: "500",
+    color: "#000",
     lineHeight: 22,
   },
   optionIcon: {
@@ -146,13 +147,13 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#DDD',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#FFF',
+    borderColor: "#DDD",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFF",
   },
   iconText: {
     fontSize: 20,
-    color: '#0088FF',
+    color: "#0088FF",
   },
 });

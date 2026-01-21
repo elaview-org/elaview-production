@@ -1,10 +1,10 @@
-import { useState } from 'react';
-import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import TopNavBar from '@/components/ui/TopNavBar';
-import DrawerMenu from '@/components/ui/DrawerMenu';
-import { colors } from '@/constants/theme';
+import { useState } from "react";
+import { Tabs } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/contexts/ThemeContext";
+import TopNavBar from "@/components/ui/TopNavBar";
+import DrawerMenu from "@/components/ui/DrawerMenu";
+import { colors } from "@/constants/theme";
 
 export default function OwnerLayout() {
   const { theme } = useTheme();
@@ -29,7 +29,7 @@ export default function OwnerLayout() {
         <Tabs.Screen
           name="listings"
           options={{
-            title: 'Listings',
+            title: "Listings",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="location-outline" size={size} color={color} />
             ),
@@ -38,7 +38,7 @@ export default function OwnerLayout() {
         <Tabs.Screen
           name="bookings"
           options={{
-            title: 'Bookings',
+            title: "Bookings",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="calendar-outline" size={size} color={color} />
             ),
@@ -47,7 +47,7 @@ export default function OwnerLayout() {
         <Tabs.Screen
           name="messages"
           options={{
-            title: 'Messages',
+            title: "Messages",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="chatbubble-outline" size={size} color={color} />
             ),
@@ -56,7 +56,7 @@ export default function OwnerLayout() {
         <Tabs.Screen
           name="earnings"
           options={{
-            title: 'Earnings',
+            title: "Earnings",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="wallet-outline" size={size} color={color} />
             ),
@@ -65,7 +65,7 @@ export default function OwnerLayout() {
         <Tabs.Screen
           name="profile"
           options={{
-            title: 'Profile',
+            title: "Profile",
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="person-outline" size={size} color={color} />
             ),
@@ -80,7 +80,10 @@ export default function OwnerLayout() {
         />
       </Tabs>
 
-      <DrawerMenu visible={drawerVisible} onClose={() => setDrawerVisible(false)} />
+      <DrawerMenu
+        visible={drawerVisible}
+        onClose={() => setDrawerVisible(false)}
+      />
     </>
   );
 }

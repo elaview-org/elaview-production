@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef } from "react";
 import {
   View,
   Text,
@@ -10,39 +10,39 @@ import {
   Animated,
   PanResponder,
   FlatList,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import SpaceCard from '@/components/features/SpaceCard';
-import Card from '@/components/ui/Card';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/contexts/ThemeContext";
+import SpaceCard from "@/components/features/SpaceCard";
+import Card from "@/components/ui/Card";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
 import {
   mockSpaces,
   Space,
   SpaceType,
   spaceTypeLabels,
   spaceTypeIcons,
-} from '@/mocks/spaces';
+} from "@/mocks/spaces";
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const SHEET_MIN_HEIGHT = 180;
 const SHEET_MAX_HEIGHT = SCREEN_HEIGHT * 0.7;
 
-type FilterType = 'all' | SpaceType;
+type FilterType = "all" | SpaceType;
 
 const filters: { key: FilterType; label: string }[] = [
-  { key: 'all', label: 'All Types' },
-  { key: 'window', label: 'Windows' },
-  { key: 'billboard', label: 'Billboards' },
-  { key: 'poster', label: 'Posters' },
-  { key: 'digital_screen', label: 'Digital' },
-  { key: 'vehicle', label: 'Vehicles' },
+  { key: "all", label: "All Types" },
+  { key: "window", label: "Windows" },
+  { key: "billboard", label: "Billboards" },
+  { key: "poster", label: "Posters" },
+  { key: "digital_screen", label: "Digital" },
+  { key: "vehicle", label: "Vehicles" },
 ];
 
 export default function Discover() {
   const { theme, isDark } = useTheme();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [selectedSpace, setSelectedSpace] = useState<Space | null>(null);
 
   // Bottom sheet animation
@@ -78,10 +78,10 @@ export default function Discover() {
   // Filter spaces
   const filteredSpaces = mockSpaces.filter((space) => {
     const matchesSearch =
-      searchQuery === '' ||
+      searchQuery === "" ||
       space.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       space.city.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter = activeFilter === 'all' || space.type === activeFilter;
+    const matchesFilter = activeFilter === "all" || space.type === activeFilter;
     return matchesSearch && matchesFilter;
   });
 
@@ -93,8 +93,15 @@ export default function Discover() {
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Search Bar */}
-      <View style={[styles.searchContainer, { backgroundColor: theme.background }]}>
-        <View style={[styles.searchBar, { backgroundColor: theme.backgroundSecondary }]}>
+      <View
+        style={[styles.searchContainer, { backgroundColor: theme.background }]}
+      >
+        <View
+          style={[
+            styles.searchBar,
+            { backgroundColor: theme.backgroundSecondary },
+          ]}
+        >
           <Ionicons name="search-outline" size={20} color={theme.textMuted} />
           <TextInput
             style={[styles.searchInput, { color: theme.text }]}
@@ -104,7 +111,7 @@ export default function Discover() {
             onChangeText={setSearchQuery}
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={() => setSearchQuery('')}>
+            <TouchableOpacity onPress={() => setSearchQuery("")}>
               <Ionicons name="close-circle" size={20} color={theme.textMuted} />
             </TouchableOpacity>
           )}
@@ -124,14 +131,22 @@ export default function Discover() {
             style={[
               styles.filterChip,
               activeFilter === filter.key && styles.filterChipActive,
-              { backgroundColor: activeFilter === filter.key ? colors.primary : theme.backgroundSecondary },
+              {
+                backgroundColor:
+                  activeFilter === filter.key
+                    ? colors.primary
+                    : theme.backgroundSecondary,
+              },
             ]}
             onPress={() => setActiveFilter(filter.key)}
           >
             <Text
               style={[
                 styles.filterChipText,
-                { color: activeFilter === filter.key ? colors.white : theme.text },
+                {
+                  color:
+                    activeFilter === filter.key ? colors.white : theme.text,
+                },
               ]}
             >
               {filter.label}
@@ -141,13 +156,22 @@ export default function Discover() {
       </ScrollView>
 
       {/* Map Placeholder */}
-      <View style={[styles.mapContainer, { backgroundColor: isDark ? '#2D2D2D' : '#E8F4FD' }]}>
+      <View
+        style={[
+          styles.mapContainer,
+          { backgroundColor: isDark ? "#2D2D2D" : "#E8F4FD" },
+        ]}
+      >
         <View style={styles.mapPlaceholder}>
           <Ionicons name="map-outline" size={48} color={theme.textMuted} />
-          <Text style={[styles.mapPlaceholderText, { color: theme.textSecondary }]}>
+          <Text
+            style={[styles.mapPlaceholderText, { color: theme.textSecondary }]}
+          >
             Map View
           </Text>
-          <Text style={[styles.mapPlaceholderSubtext, { color: theme.textMuted }]}>
+          <Text
+            style={[styles.mapPlaceholderSubtext, { color: theme.textMuted }]}
+          >
             {filteredSpaces.length} spaces in this area
           </Text>
         </View>
@@ -159,8 +183,8 @@ export default function Discover() {
             style={[
               styles.mapPin,
               {
-                top: 60 + (index * 40) % 150,
-                left: 40 + (index * 70) % 250,
+                top: 60 + ((index * 40) % 150),
+                left: 40 + ((index * 70) % 250),
               },
             ]}
             onPress={() => handleSpacePress(space)}
@@ -187,7 +211,9 @@ export default function Discover() {
       >
         {/* Drag Handle */}
         <View {...panResponder.panHandlers} style={styles.dragHandleContainer}>
-          <View style={[styles.dragHandle, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.dragHandle, { backgroundColor: theme.border }]}
+          />
         </View>
 
         {/* Sheet Header */}
@@ -225,8 +251,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.sm,
   },
   searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     borderRadius: borderRadius.lg,
@@ -255,20 +281,20 @@ const styles = StyleSheet.create({
   },
   filterChipText: {
     fontSize: fontSize.sm,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   mapContainer: {
     flex: 1,
-    position: 'relative',
+    position: "relative",
   },
   mapPlaceholder: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   mapPlaceholderText: {
     fontSize: fontSize.lg,
-    fontWeight: '600',
+    fontWeight: "600",
     marginTop: spacing.sm,
   },
   mapPlaceholderSubtext: {
@@ -276,11 +302,11 @@ const styles = StyleSheet.create({
     marginTop: spacing.xs,
   },
   mapPin: {
-    position: 'absolute',
-    alignItems: 'center',
+    position: "absolute",
+    alignItems: "center",
   },
   mapPinIcon: {
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -291,31 +317,31 @@ const styles = StyleSheet.create({
     paddingVertical: 2,
     borderRadius: borderRadius.sm,
     marginTop: -4,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
   mapPinPriceText: {
     fontSize: fontSize.xs,
-    fontWeight: '700',
+    fontWeight: "700",
     color: colors.black,
   },
   bottomSheet: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
     borderTopLeftRadius: borderRadius.xl,
     borderTopRightRadius: borderRadius.xl,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: -4 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 10,
   },
   dragHandleContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: spacing.sm,
   },
   dragHandle: {
@@ -329,7 +355,7 @@ const styles = StyleSheet.create({
   },
   sheetTitle: {
     fontSize: fontSize.lg,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   listContent: {
     paddingHorizontal: spacing.md,

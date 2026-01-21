@@ -1,28 +1,28 @@
 export const colors = {
   // Brand
-  primary: '#0088FF',
-  primaryLight: '#E6F4FF',
-  
+  primary: "#0088FF",
+  primaryLight: "#E6F4FF",
+
   // Neutral
-  black: '#000000',
-  white: '#FFFFFF',
-  
+  black: "#000000",
+  white: "#FFFFFF",
+
   // Grays
-  gray50: '#F8F9FA',
-  gray100: '#F1F3F5',
-  gray200: '#E9ECEF',
-  gray300: '#DEE2E6',
-  gray400: '#CED4DA',
-  gray500: '#ADB5BD',
-  gray600: '#868E96',
-  gray700: '#495057',
-  gray800: '#343A40',
-  gray900: '#212529',
-  
+  gray50: "#F8F9FA",
+  gray100: "#F1F3F5",
+  gray200: "#E9ECEF",
+  gray300: "#DEE2E6",
+  gray400: "#CED4DA",
+  gray500: "#ADB5BD",
+  gray600: "#868E96",
+  gray700: "#495057",
+  gray800: "#343A40",
+  gray900: "#212529",
+
   // Semantic
-  error: '#DC3545',
-  success: '#28A745',
-  warning: '#FFC107',
+  error: "#DC3545",
+  success: "#28A745",
+  warning: "#FFC107",
 };
 
 export const lightTheme = {
@@ -39,16 +39,16 @@ export const lightTheme = {
 };
 
 export const darkTheme = {
-  background: '#1E1E1E',
-  backgroundSecondary: '#2D2D2D',
+  background: "#1E1E1E",
+  backgroundSecondary: "#2D2D2D",
   text: colors.white,
   textSecondary: colors.gray400,
   textMuted: colors.gray500,
   border: colors.gray700,
   borderFocus: colors.primary,
-  card: '#2D2D2D',
+  card: "#2D2D2D",
   primary: colors.primary,
-  error: '#FF6B6B',
+  error: "#FF6B6B",
 };
 
 export type Theme = typeof lightTheme;

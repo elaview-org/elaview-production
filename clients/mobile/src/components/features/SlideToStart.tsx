@@ -1,6 +1,6 @@
-import React from 'react';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import React from "react";
+import { StyleSheet, Text, View, Dimensions } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -8,10 +8,10 @@ import Animated, {
   runOnJS,
   interpolate,
   Extrapolation,
-} from 'react-native-reanimated';
-import Svg, { Circle, Path } from 'react-native-svg';
+} from "react-native-reanimated";
+import Svg, { Circle, Path } from "react-native-svg";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface SlideToStartProps {
   onSlideComplete: () => void;
@@ -51,12 +51,12 @@ function ArrowIcon({ size = 58 }: { size?: number }) {
 
 export default function SlideToStart({
   onSlideComplete,
-  label = 'Get Started',
+  label = "Get Started",
   containerPadding = 24,
 }: SlideToStartProps) {
   const trackWidth = SCREEN_WIDTH - containerPadding * 2;
   const maxSlide = trackWidth - BUTTON_SIZE - TRACK_PADDING * 2;
-  
+
   const translateX = useSharedValue(0);
   const isComplete = useSharedValue(false);
 
@@ -72,7 +72,7 @@ export default function SlideToStart({
     })
     .onEnd(() => {
       if (isComplete.value) return;
-      
+
       // If dragged past 85% threshold, complete the action
       if (translateX.value > maxSlide * 0.85) {
         translateX.value = withSpring(maxSlide, SPRING_CONFIG);
@@ -117,20 +117,20 @@ export default function SlideToStart({
 const styles = StyleSheet.create({
   track: {
     height: BUTTON_SIZE + TRACK_PADDING * 2,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: "#1A1A1A",
     borderRadius: (BUTTON_SIZE + TRACK_PADDING * 2) / 2,
-    justifyContent: 'center',
+    justifyContent: "center",
     paddingHorizontal: TRACK_PADDING,
   },
   labelContainer: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   label: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#FFFFFF',
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
   button: {
     width: BUTTON_SIZE,

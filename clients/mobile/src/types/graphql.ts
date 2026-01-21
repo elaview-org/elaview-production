@@ -1,5 +1,4 @@
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
 export type Maybe<T> = T | undefined | null;
 export type InputMaybe<T> = T | undefined | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -7,7 +6,6 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -2924,55 +2922,3 @@ export type ValidationError = Error & {
   errors: Array<KeyValuePairOfStringAndString__>;
   message: Scalars['String']['output'];
 };
-
-export type GetSpacesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetSpacesQuery = { spaces: { __typename: 'SpacesConnection', nodes: Array<{ __typename: 'Space', id: unknown, title: string }> | undefined | null } | undefined | null };
-
-
-export const GetSpacesDocument = gql`
-    query GetSpaces {
-  spaces {
-    nodes {
-      id
-      title
-    }
-  }
-}
-    `;
-
-/**
- * __useGetSpacesQuery__
- *
- * To run a query within a React component, call `useGetSpacesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetSpacesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetSpacesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetSpacesQuery(baseOptions?: Apollo.QueryHookOptions<GetSpacesQuery, GetSpacesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetSpacesQuery, GetSpacesQueryVariables>(GetSpacesDocument, options);
-      }
-export function useGetSpacesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetSpacesQuery, GetSpacesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetSpacesQuery, GetSpacesQueryVariables>(GetSpacesDocument, options);
-        }
-// @ts-ignore
-export function useGetSpacesSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<GetSpacesQuery, GetSpacesQueryVariables>): Apollo.UseSuspenseQueryResult<GetSpacesQuery, GetSpacesQueryVariables>;
-export function useGetSpacesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetSpacesQuery, GetSpacesQueryVariables>): Apollo.UseSuspenseQueryResult<GetSpacesQuery | undefined, GetSpacesQueryVariables>;
-export function useGetSpacesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetSpacesQuery, GetSpacesQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetSpacesQuery, GetSpacesQueryVariables>(GetSpacesDocument, options);
-        }
-export type GetSpacesQueryHookResult = ReturnType<typeof useGetSpacesQuery>;
-export type GetSpacesLazyQueryHookResult = ReturnType<typeof useGetSpacesLazyQuery>;
-export type GetSpacesSuspenseQueryHookResult = ReturnType<typeof useGetSpacesSuspenseQuery>;
-export type GetSpacesQueryResult = Apollo.QueryResult<GetSpacesQuery, GetSpacesQueryVariables>;

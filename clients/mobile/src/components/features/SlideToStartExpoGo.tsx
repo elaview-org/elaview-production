@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,10 +6,10 @@ import {
   Dimensions,
   Animated,
   PanResponder,
-} from 'react-native';
-import Svg, { Circle, Path } from 'react-native-svg';
+} from "react-native";
+import Svg, { Circle, Path } from "react-native-svg";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface SlideToStartProps {
   onSlideComplete: () => void;
@@ -46,13 +46,13 @@ function ArrowIcon({ size = 58 }: { size?: number }) {
 
 /**
  * SlideToStart - Expo Go compatible version
- * 
+ *
  * Uses React Native's built-in Animated API + PanResponder
  * instead of react-native-reanimated (which requires a dev build).
  */
 export default function SlideToStart({
   onSlideComplete,
-  label = 'Get Started',
+  label = "Get Started",
   containerPadding = 24,
 }: SlideToStartProps) {
   const trackWidth = SCREEN_WIDTH - containerPadding * 2;
@@ -110,7 +110,7 @@ export default function SlideToStart({
   const textOpacity = translateX.interpolate({
     inputRange: [0, maxSlide * 0.5],
     outputRange: [1, 0],
-    extrapolate: 'clamp',
+    extrapolate: "clamp",
   });
 
   return (
@@ -122,10 +122,7 @@ export default function SlideToStart({
 
       {/* Draggable button */}
       <Animated.View
-        style={[
-          styles.button,
-          { transform: [{ translateX }] },
-        ]}
+        style={[styles.button, { transform: [{ translateX }] }]}
         {...panResponder.panHandlers}
       >
         <ArrowIcon size={BUTTON_SIZE} />
@@ -137,31 +134,31 @@ export default function SlideToStart({
 const styles = StyleSheet.create({
   track: {
     height: BUTTON_SIZE + TRACK_PADDING * 2,
-    backgroundColor: '#1A1A1A',
+    backgroundColor: "#1A1A1A",
     borderRadius: (BUTTON_SIZE + TRACK_PADDING * 2) / 2,
-    justifyContent: 'center',
-    position: 'relative',
+    justifyContent: "center",
+    position: "relative",
   },
   labelContainer: {
-    position: 'absolute',
+    position: "absolute",
     left: 0,
     right: 0,
-    alignItems: 'center',
+    alignItems: "center",
   },
   label: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     letterSpacing: 0.5,
   },
   button: {
-    position: 'absolute',
+    position: "absolute",
     left: TRACK_PADDING,
     top: TRACK_PADDING,
     width: BUTTON_SIZE,
     height: BUTTON_SIZE,
     borderRadius: BUTTON_SIZE / 2,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

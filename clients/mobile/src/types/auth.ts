@@ -8,12 +8,12 @@
  * User roles in the system
  * Note: These are permission levels, separate from profile types
  */
-export type UserRole = 'Admin' | 'Advertiser' | 'User';
+export type UserRole = "Admin" | "Advertiser" | "User";
 
 /**
  * User account status
  */
-export type UserStatus = 'Active' | 'Inactive' | 'Suspended';
+export type UserStatus = "Active" | "Inactive" | "Suspended";
 
 /**
  * User entity from the backend

@@ -4,10 +4,10 @@ import {
   useState,
   useEffect,
   ReactNode,
-} from 'react';
-import * as SecureStore from 'expo-secure-store';
+} from "react";
+import * as SecureStore from "expo-secure-store";
 
-export type UserRole = 'advertiser' | 'owner' | null;
+export type UserRole = "advertiser" | "owner" | null;
 
 interface RoleContextType {
   role: UserRole;
@@ -18,7 +18,7 @@ interface RoleContextType {
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
-const ROLE_STORAGE_KEY = 'user_role';
+const ROLE_STORAGE_KEY = "user_role";
 
 export function RoleProvider({ children }: { children: ReactNode }) {
   const [role, setRoleState] = useState<UserRole>(null);
@@ -29,11 +29,11 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     const loadRole = async () => {
       try {
         const savedRole = await SecureStore.getItemAsync(ROLE_STORAGE_KEY);
-        if (savedRole === 'advertiser' || savedRole === 'owner') {
+        if (savedRole === "advertiser" || savedRole === "owner") {
           setRoleState(savedRole);
         }
       } catch (error) {
-        console.error('Failed to load role:', error);
+        console.error("Failed to load role:", error);
       } finally {
         setIsLoading(false);
       }
@@ -50,7 +50,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
       }
       setRoleState(newRole);
     } catch (error) {
-      console.error('Failed to save role:', error);
+      console.error("Failed to save role:", error);
       throw error;
     }
   };
@@ -69,7 +69,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
 export function useRole() {
   const context = useContext(RoleContext);
   if (!context) {
-    throw new Error('useRole must be used within a RoleProvider');
+    throw new Error("useRole must be used within a RoleProvider");
   }
   return context;
 }

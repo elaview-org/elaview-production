@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
@@ -8,28 +8,28 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
-} from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+} from "react-native";
+import { Link, useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
 export default function ForgotPassword() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleResetPassword = async () => {
     // Validate email
     if (!email.trim()) {
-      setError('Please enter your email address');
+      setError("Please enter your email address");
       return;
     }
 
-    if (!email.includes('@')) {
-      setError('Please enter a valid email address');
+    if (!email.includes("@")) {
+      setError("Please enter a valid email address");
       return;
     }
 
@@ -45,7 +45,7 @@ export default function ForgotPassword() {
     return (
       <View style={styles.container}>
         <LinearGradient
-          colors={['#0088FF', 'transparent']}
+          colors={["#0088FF", "transparent"]}
           style={styles.gradientBlur}
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
@@ -61,7 +61,7 @@ export default function ForgotPassword() {
           </View>
           <Text style={styles.title}>Check your email</Text>
           <Text style={styles.subtitle}>
-            We've sent a password reset link to{'\n'}
+            We've sent a password reset link to{"\n"}
             <Text style={styles.emailHighlight}>{email}</Text>
           </Text>
 
@@ -73,7 +73,9 @@ export default function ForgotPassword() {
             style={styles.resendButton}
             onPress={() => setSubmitted(false)}
           >
-            <Text style={styles.resendText}>Didn't receive the email? Try again</Text>
+            <Text style={styles.resendText}>
+              Didn't receive the email? Try again
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -83,10 +85,10 @@ export default function ForgotPassword() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <LinearGradient
-        colors={['#0088FF', 'transparent']}
+        colors={["#0088FF", "transparent"]}
         style={styles.gradientBlur}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
@@ -99,7 +101,8 @@ export default function ForgotPassword() {
       <View style={styles.formContainer}>
         <Text style={styles.title}>Forgot Password?</Text>
         <Text style={styles.subtitle}>
-          Enter your email address and we'll send{'\n'}you a link to reset your password.
+          Enter your email address and we'll send{"\n"}you a link to reset your
+          password.
         </Text>
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -111,7 +114,7 @@ export default function ForgotPassword() {
           value={email}
           onChangeText={(text) => {
             setEmail(text);
-            setError('');
+            setError("");
           }}
           autoCapitalize="none"
           keyboardType="email-address"
@@ -135,10 +138,10 @@ export default function ForgotPassword() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
   },
   gradientBlur: {
-    position: 'absolute',
+    position: "absolute",
     top: -100,
     left: -50,
     width: width * 1.5,
@@ -146,13 +149,13 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   backButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 60,
     left: 24,
     width: 40,
     height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     zIndex: 10,
   },
   formContainer: {
@@ -164,73 +167,73 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#E6F4FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    alignSelf: 'center',
+    backgroundColor: "#E6F4FF",
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
     marginBottom: 24,
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
-    color: '#000',
-    textAlign: 'center',
+    fontWeight: "700",
+    color: "#000",
+    textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
+    color: "#666",
+    textAlign: "center",
     marginBottom: 32,
     lineHeight: 22,
   },
   emailHighlight: {
-    fontWeight: '600',
-    color: '#0088FF',
+    fontWeight: "600",
+    color: "#0088FF",
   },
   error: {
-    color: '#DC3545',
-    textAlign: 'center',
+    color: "#DC3545",
+    textAlign: "center",
     marginBottom: 16,
     fontSize: 14,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#0088FF',
+    borderColor: "#0088FF",
     borderRadius: 8,
     padding: 16,
     marginBottom: 24,
     fontSize: 16,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: "#F8F9FA",
   },
   button: {
-    backgroundColor: '#000',
+    backgroundColor: "#000",
     borderRadius: 8,
     paddingVertical: 16,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 16,
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   linkButton: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 12,
   },
   linkText: {
-    color: '#0088FF',
+    color: "#0088FF",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   resendButton: {
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: 16,
     marginTop: 16,
   },
   resendText: {
-    color: '#666',
+    color: "#666",
     fontSize: 14,
   },
 });

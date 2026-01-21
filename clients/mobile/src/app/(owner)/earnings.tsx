@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
@@ -6,19 +6,19 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/contexts/ThemeContext";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
 import {
   mockEarningsSummary,
   mockTransactions,
   mockPayouts,
   formatCurrency,
   EarningsTransaction,
-} from '@/mocks/earnings';
+} from "@/mocks/earnings";
 
 export default function Earnings() {
   const { theme } = useTheme();
@@ -42,7 +42,7 @@ export default function Earnings() {
       >
         <View style={styles.transactionIcon}>
           <Ionicons
-            name={isPositive ? 'arrow-down-circle' : 'arrow-up-circle'}
+            name={isPositive ? "arrow-down-circle" : "arrow-up-circle"}
             size={24}
             color={isPositive ? colors.success : theme.textSecondary}
           />
@@ -52,14 +52,19 @@ export default function Earnings() {
             {transaction.description}
           </Text>
           {transaction.spaceTitle && (
-            <Text style={[styles.transactionSubtitle, { color: theme.textSecondary }]}>
+            <Text
+              style={[
+                styles.transactionSubtitle,
+                { color: theme.textSecondary },
+              ]}
+            >
               {transaction.spaceTitle}
             </Text>
           )}
           <Text style={[styles.transactionDate, { color: theme.textMuted }]}>
-            {transaction.createdAt.toLocaleDateString('en-US', {
-              month: 'short',
-              day: 'numeric',
+            {transaction.createdAt.toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
             })}
           </Text>
         </View>
@@ -69,7 +74,8 @@ export default function Earnings() {
             { color: isPositive ? colors.success : theme.text },
           ]}
         >
-          {isPositive ? '+' : ''}{formatCurrency(transaction.amount)}
+          {isPositive ? "+" : ""}
+          {formatCurrency(transaction.amount)}
         </Text>
       </View>
     );
@@ -114,13 +120,17 @@ export default function Earnings() {
       {/* Stats Row */}
       <View style={styles.statsRow}>
         <Card style={styles.statCard}>
-          <Text style={[styles.statLabel, { color: theme.textSecondary }]}>This Month</Text>
+          <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+            This Month
+          </Text>
           <Text style={[styles.statValue, { color: theme.text }]}>
             {formatCurrency(mockEarningsSummary.thisMonthEarnings)}
           </Text>
         </Card>
         <Card style={styles.statCard}>
-          <Text style={[styles.statLabel, { color: theme.textSecondary }]}>Last Month</Text>
+          <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+            Last Month
+          </Text>
           <Text style={[styles.statValue, { color: theme.text }]}>
             {formatCurrency(mockEarningsSummary.lastMonthEarnings)}
           </Text>
@@ -134,7 +144,9 @@ export default function Earnings() {
             Recent Activity
           </Text>
           <TouchableOpacity>
-            <Text style={[styles.seeAllText, { color: colors.primary }]}>See All</Text>
+            <Text style={[styles.seeAllText, { color: colors.primary }]}>
+              See All
+            </Text>
           </TouchableOpacity>
         </View>
         <Card style={styles.transactionsCard}>
@@ -149,17 +161,28 @@ export default function Earnings() {
             Payout Method
           </Text>
           <TouchableOpacity>
-            <Text style={[styles.seeAllText, { color: colors.primary }]}>Edit</Text>
+            <Text style={[styles.seeAllText, { color: colors.primary }]}>
+              Edit
+            </Text>
           </TouchableOpacity>
         </View>
         <Card style={styles.payoutMethodCard}>
           <View style={styles.payoutMethod}>
-            <View style={[styles.payoutIcon, { backgroundColor: theme.backgroundSecondary }]}>
+            <View
+              style={[
+                styles.payoutIcon,
+                { backgroundColor: theme.backgroundSecondary },
+              ]}
+            >
               <Ionicons name="card-outline" size={20} color={theme.text} />
             </View>
             <View style={styles.payoutDetails}>
-              <Text style={[styles.payoutTitle, { color: theme.text }]}>Bank Account</Text>
-              <Text style={[styles.payoutSubtitle, { color: theme.textSecondary }]}>
+              <Text style={[styles.payoutTitle, { color: theme.text }]}>
+                Bank Account
+              </Text>
+              <Text
+                style={[styles.payoutSubtitle, { color: theme.textSecondary }]}
+              >
                 ••••4567
               </Text>
             </View>
@@ -183,7 +206,7 @@ const styles = StyleSheet.create({
   },
   balanceCard: {
     padding: spacing.lg,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: spacing.md,
   },
   balanceLabel: {
@@ -192,12 +215,12 @@ const styles = StyleSheet.create({
   },
   balanceAmount: {
     fontSize: 40,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: spacing.xs,
   },
   pendingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: spacing.md,
   },
   pendingText: {
@@ -208,7 +231,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   statsRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: spacing.md,
   },
   statCard: {
@@ -222,31 +245,31 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: fontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   section: {
     marginBottom: spacing.md,
   },
   sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: spacing.sm,
   },
   sectionTitle: {
     fontSize: fontSize.lg,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   seeAllText: {
     fontSize: fontSize.sm,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   transactionsCard: {
     padding: 0,
   },
   transactionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
@@ -258,7 +281,7 @@ const styles = StyleSheet.create({
   },
   transactionTitle: {
     fontSize: fontSize.md,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   transactionSubtitle: {
     fontSize: fontSize.sm,
@@ -270,21 +293,21 @@ const styles = StyleSheet.create({
   },
   transactionAmount: {
     fontSize: fontSize.md,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   payoutMethodCard: {
     padding: spacing.md,
   },
   payoutMethod: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   payoutIcon: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: spacing.md,
   },
   payoutDetails: {
@@ -292,7 +315,7 @@ const styles = StyleSheet.create({
   },
   payoutTitle: {
     fontSize: fontSize.md,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   payoutSubtitle: {
     fontSize: fontSize.sm,
@@ -307,6 +330,6 @@ const styles = StyleSheet.create({
   defaultBadgeText: {
     color: colors.primary,
     fontSize: fontSize.xs,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

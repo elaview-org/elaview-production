@@ -1,11 +1,11 @@
-import { View, Text, StyleSheet, FlatList } from 'react-native';
-import { useRouter } from 'expo-router';
-import { useTheme } from '@/contexts/ThemeContext';
-import Avatar from '@/components/ui/Avatar';
-import Card from '@/components/ui/Card';
-import EmptyState from '@/components/ui/EmptyState';
-import { spacing, fontSize, colors } from '@/constants/theme';
-import { Conversation, formatMessageTime } from '@/mocks/messages';
+import { View, Text, StyleSheet, FlatList } from "react-native";
+import { useRouter } from "expo-router";
+import { useTheme } from "@/contexts/ThemeContext";
+import Avatar from "@/components/ui/Avatar";
+import Card from "@/components/ui/Card";
+import EmptyState from "@/components/ui/EmptyState";
+import { spacing, fontSize, colors } from "@/constants/theme";
+import { Conversation, formatMessageTime } from "@/mocks/messages";
 
 interface MessagesListProps {
   conversations: Conversation[];
@@ -43,7 +43,7 @@ export default function MessagesList({
           {item.unreadCount > 0 && (
             <View style={styles.unreadBadge}>
               <Text style={styles.unreadBadgeText}>
-                {item.unreadCount > 9 ? '9+' : item.unreadCount}
+                {item.unreadCount > 9 ? "9+" : item.unreadCount}
               </Text>
             </View>
           )}
@@ -67,7 +67,10 @@ export default function MessagesList({
           </View>
 
           {item.spaceTitle && (
-            <Text style={[styles.spaceTitle, { color: theme.textSecondary }]} numberOfLines={1}>
+            <Text
+              style={[styles.spaceTitle, { color: theme.textSecondary }]}
+              numberOfLines={1}
+            >
               {item.spaceTitle}
             </Text>
           )}
@@ -118,42 +121,42 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   conversationContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   avatarContainer: {
-    position: 'relative',
+    position: "relative",
   },
   unreadBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: -4,
     right: -4,
     backgroundColor: colors.primary,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: 4,
   },
   unreadBadgeText: {
     color: colors.white,
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   textContainer: {
     flex: 1,
     marginLeft: spacing.md,
   },
   headerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 2,
   },
   participantName: {
     fontSize: fontSize.md,
-    fontWeight: '500',
+    fontWeight: "500",
     flex: 1,
     marginRight: spacing.sm,
   },
@@ -168,6 +171,6 @@ const styles = StyleSheet.create({
     fontSize: fontSize.sm,
   },
   unreadText: {
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

@@ -1,5 +1,5 @@
-import { StyleSheet } from 'react-native';
-import { spacing, fontSize, borderRadius } from './theme';
+import { StyleSheet } from "react-native";
+import { spacing, fontSize, borderRadius } from "./theme";
 
 // Reusable style patterns
 export const globalStyles = StyleSheet.create({
@@ -8,17 +8,17 @@ export const globalStyles = StyleSheet.create({
     flex: 1,
   },
   centered: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   spaceBetween: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
 
   // Spacing
@@ -34,7 +34,7 @@ export const globalStyles = StyleSheet.create({
 
   // Typography
   textCenter: {
-    textAlign: 'center',
+    textAlign: "center",
   },
 });
 
@@ -58,35 +58,32 @@ export const createInputStyles = (theme: {
   });
 
 // Helper to create themed button styles
-export const createButtonStyles = (theme: {
-  primary: string;
-  text: string;
-}) =>
+export const createButtonStyles = (theme: { primary: string; text: string }) =>
   StyleSheet.create({
     primary: {
       backgroundColor: theme.primary,
       paddingVertical: spacing.md,
       paddingHorizontal: spacing.lg,
       borderRadius: borderRadius.md,
-      alignItems: 'center',
+      alignItems: "center",
     },
     primaryText: {
-      color: '#FFFFFF',
+      color: "#FFFFFF",
       fontSize: fontSize.md,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     secondary: {
-      backgroundColor: 'transparent',
+      backgroundColor: "transparent",
       paddingVertical: spacing.md,
       paddingHorizontal: spacing.lg,
       borderRadius: borderRadius.md,
       borderWidth: 1,
       borderColor: theme.primary,
-      alignItems: 'center',
+      alignItems: "center",
     },
     secondaryText: {
       color: theme.primary,
       fontSize: fontSize.md,
-      fontWeight: '600',
+      fontWeight: "600",
     },
   });

@@ -7,15 +7,15 @@ import {
   Animated,
   Dimensions,
   Pressable,
-} from 'react-native';
-import { useEffect, useRef } from 'react';
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
-import { useTheme } from '@/contexts/ThemeContext';
-import { useRole } from '@/contexts/RoleContext';
-import { colors, spacing, fontSize } from '@/constants/theme';
+} from "react-native";
+import { useEffect, useRef } from "react";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useRole } from "@/contexts/RoleContext";
+import { colors, spacing, fontSize } from "@/constants/theme";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 const DRAWER_WIDTH = width * 0.75;
 
 interface DrawerMenuProps {
@@ -40,31 +40,40 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
   const handleSwitchRole = async () => {
     onClose();
     await clearRole();
-    router.replace('/(auth)/role-select');
+    router.replace("/(auth)/role-select");
   };
 
   const handleSettings = () => {
     onClose();
-    router.push('/settings');
+    router.push("/settings");
   };
 
   const handleHelp = () => {
     onClose();
-    router.push('/help');
+    router.push("/help");
   };
 
   const handleLogout = async () => {
     onClose();
     await clearRole();
     // TODO: Clear auth session when implemented
-    router.replace('/(auth)/login');
+    router.replace("/(auth)/login");
   };
 
   const menuItems = [
-    { icon: 'settings-outline', label: 'Settings', onPress: handleSettings },
-    { icon: 'help-circle-outline', label: 'Help', onPress: handleHelp },
-    { icon: 'swap-horizontal-outline', label: 'Switch Role', onPress: handleSwitchRole },
-    { icon: 'log-out-outline', label: 'Logout', onPress: handleLogout, danger: true },
+    { icon: "settings-outline", label: "Settings", onPress: handleSettings },
+    { icon: "help-circle-outline", label: "Help", onPress: handleHelp },
+    {
+      icon: "swap-horizontal-outline",
+      label: "Switch Role",
+      onPress: handleSwitchRole,
+    },
+    {
+      icon: "log-out-outline",
+      label: "Logout",
+      onPress: handleLogout,
+      danger: true,
+    },
   ];
 
   return (
@@ -80,7 +89,10 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
         <Animated.View
           style={[
             styles.drawer,
-            { backgroundColor: theme.background, transform: [{ translateX: slideAnim }] },
+            {
+              backgroundColor: theme.background,
+              transform: [{ translateX: slideAnim }],
+            },
           ]}
         >
           <View style={styles.header}>
@@ -122,40 +134,40 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
+    flexDirection: "row",
+    justifyContent: "flex-end",
   },
   backdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   drawer: {
     width: DRAWER_WIDTH,
-    height: '100%',
-    shadowColor: '#000',
+    height: "100%",
+    shadowColor: "#000",
     shadowOffset: { width: -2, height: 0 },
     shadowOpacity: 0.25,
     shadowRadius: 8,
     elevation: 5,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: spacing.lg,
     paddingTop: spacing.xxl + 12,
     paddingBottom: spacing.lg,
   },
   headerText: {
     fontSize: fontSize.xl,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   menuItems: {
     paddingTop: spacing.md,
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md + 4,
     borderBottomWidth: 1,
@@ -163,6 +175,6 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: fontSize.md,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

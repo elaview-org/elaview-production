@@ -1,6 +1,6 @@
-import { View, StyleSheet, ViewStyle, Pressable } from 'react-native';
-import { useTheme } from '@/contexts/ThemeContext';
-import { borderRadius, spacing } from '@/constants/theme';
+import { View, StyleSheet, ViewStyle, Pressable } from "react-native";
+import { useTheme } from "@/contexts/ThemeContext";
+import { borderRadius, spacing } from "@/constants/theme";
 
 interface CardProps {
   children: React.ReactNode;
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.lg,
   },
   shadow: {
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
     shadowRadius: 8,
@@ -67,11 +67,11 @@ const styles = StyleSheet.create({
   },
   darkBorder: {
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: "rgba(255, 255, 255, 0.1)",
   },
   highlighted: {
     borderWidth: 1,
-    borderColor: '#0088FF',
+    borderColor: "#0088FF",
   },
   pressed: {
     opacity: 0.9,

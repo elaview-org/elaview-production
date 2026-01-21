@@ -5,6 +5,7 @@
 # Environments & Secrets
 **/.env*
 !**/.env.example
+**/CLAUDE.local.md
 
 # Devbox
 .devbox

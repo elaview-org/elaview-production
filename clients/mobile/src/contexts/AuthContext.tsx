@@ -11,10 +11,10 @@ import {
   useState,
   useEffect,
   ReactNode,
-} from 'react';
-import * as SecureStore from 'expo-secure-store';
-import * as authService from '@/services/auth';
-import type { User, LoginRequest, SignupRequest } from '@/types/auth';
+} from "react";
+import * as SecureStore from "expo-secure-store";
+import * as authService from "@/services/auth";
+import type { User, LoginRequest, SignupRequest } from "@/types/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -28,7 +28,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const USER_STORAGE_KEY = 'user_data';
+const USER_STORAGE_KEY = "user_data";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUser(JSON.parse(savedUser));
         }
       } catch (error) {
-        console.error('Failed to load user:', error);
+        console.error("Failed to load user:", error);
       } finally {
         setIsLoading(false);
       }
@@ -65,19 +65,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: response.email,
         name: response.name,
         role: response.role,
-        status: 'Active', // Default status
+        status: "Active", // Default status
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
       // Save user data to secure storage
-      await SecureStore.setItemAsync(USER_STORAGE_KEY, JSON.stringify(userData));
+      await SecureStore.setItemAsync(
+        USER_STORAGE_KEY,
+        JSON.stringify(userData)
+      );
       setUser(userData);
 
       // After successful login, we could fetch the full user profile
       // using GraphQL currentUser query, but for now we'll use the login response
     } catch (error) {
-      console.error('Login error:', error);
+      console.error("Login error:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -98,16 +101,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email: response.email,
         name: response.name,
         role: response.role,
-        status: 'Active',
+        status: "Active",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
       // Save user data to secure storage
-      await SecureStore.setItemAsync(USER_STORAGE_KEY, JSON.stringify(userData));
+      await SecureStore.setItemAsync(
+        USER_STORAGE_KEY,
+        JSON.stringify(userData)
+      );
       setUser(userData);
     } catch (error) {
-      console.error('Signup error:', error);
+      console.error("Signup error:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -124,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await SecureStore.deleteItemAsync(USER_STORAGE_KEY);
       setUser(null);
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
       // Even if logout fails, clear local state
       await SecureStore.deleteItemAsync(USER_STORAGE_KEY);
       setUser(null);
@@ -141,11 +147,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const currentUser = await authService.getCurrentUser();
       if (currentUser) {
-        await SecureStore.setItemAsync(USER_STORAGE_KEY, JSON.stringify(currentUser));
+        await SecureStore.setItemAsync(
+          USER_STORAGE_KEY,
+          JSON.stringify(currentUser)
+        );
         setUser(currentUser);
       }
     } catch (error) {
-      console.error('Failed to refresh user:', error);
+      console.error("Failed to refresh user:", error);
     }
   };
 
@@ -171,7 +180,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 }

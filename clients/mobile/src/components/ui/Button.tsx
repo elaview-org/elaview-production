@@ -5,12 +5,12 @@ import {
   ActivityIndicator,
   ViewStyle,
   TextStyle,
-} from 'react-native';
-import { colors, spacing, fontSize, borderRadius } from '@/constants/theme';
-import { useTheme } from '@/contexts/ThemeContext';
+} from "react-native";
+import { colors, spacing, fontSize, borderRadius } from "@/constants/theme";
+import { useTheme } from "@/contexts/ThemeContext";
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
-type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonVariant = "primary" | "secondary" | "outline" | "ghost";
+type ButtonSize = "sm" | "md" | "lg";
 
 interface ButtonProps {
   title: string;
@@ -36,8 +36,8 @@ interface ButtonProps {
 export default function Button({
   title,
   onPress,
-  variant = 'primary',
-  size = 'md',
+  variant = "primary",
+  size = "md",
   disabled = false,
   loading = false,
   fullWidth = false,
@@ -51,31 +51,31 @@ export default function Button({
   const getBackgroundColor = () => {
     if (disabled) return colors.gray300;
     switch (variant) {
-      case 'primary':
+      case "primary":
         return colors.black;
-      case 'secondary':
+      case "secondary":
         return colors.primary;
-      case 'outline':
-      case 'ghost':
-        return 'transparent';
+      case "outline":
+      case "ghost":
+        return "transparent";
     }
   };
 
   const getTextColor = () => {
     if (disabled) return colors.gray500;
     switch (variant) {
-      case 'primary':
-      case 'secondary':
+      case "primary":
+      case "secondary":
         return colors.white;
-      case 'outline':
+      case "outline":
         return colors.primary;
-      case 'ghost':
+      case "ghost":
         return theme.text;
     }
   };
 
   const getBorderStyle = () => {
-    if (variant === 'outline') {
+    if (variant === "outline") {
       return {
         borderWidth: 1,
         borderColor: disabled ? colors.gray300 : colors.primary,
@@ -86,9 +86,9 @@ export default function Button({
 
   const getSizeStyle = () => {
     switch (size) {
-      case 'sm':
+      case "sm":
         return styles.sizeSm;
-      case 'lg':
+      case "lg":
         return styles.sizeLg;
       default:
         return styles.sizeMd;
@@ -97,9 +97,9 @@ export default function Button({
 
   const getTextSize = () => {
     switch (size) {
-      case 'sm':
+      case "sm":
         return styles.textSm;
-      case 'lg':
+      case "lg":
         return styles.textLg;
       default:
         return styles.textMd;
@@ -146,9 +146,9 @@ export default function Button({
 
 const styles = StyleSheet.create({
   button: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     borderRadius: borderRadius.md,
   },
   sizeSm: {
@@ -164,10 +164,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
   },
   fullWidth: {
-    width: '100%',
+    width: "100%",
   },
   text: {
-    fontWeight: '600',
+    fontWeight: "600",
   },
   textSm: {
     fontSize: fontSize.sm,

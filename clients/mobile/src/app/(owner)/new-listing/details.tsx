@@ -1,28 +1,28 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '@/contexts/ThemeContext';
-import Input from '@/components/ui/Input';
-import Button from '@/components/ui/Button';
-import { spacing, fontSize, colors, borderRadius } from '@/constants/theme';
-import { SpaceType, spaceTypeLabels, spaceTypeIcons } from '@/mocks/spaces';
+} from "react-native";
+import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { useTheme } from "@/contexts/ThemeContext";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
+import { SpaceType, spaceTypeLabels, spaceTypeIcons } from "@/mocks/spaces";
 
 const spaceTypes: SpaceType[] = [
-  'window',
-  'storefront',
-  'wall',
-  'poster',
-  'billboard',
-  'digital_screen',
-  'vehicle',
-  'other',
+  "window",
+  "storefront",
+  "wall",
+  "poster",
+  "billboard",
+  "digital_screen",
+  "vehicle",
+  "other",
 ];
 
 /**
@@ -33,20 +33,20 @@ export default function NewListingDetails() {
   const { theme } = useTheme();
   const router = useRouter();
   const [selectedType, setSelectedType] = useState<SpaceType | null>(null);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [errors, setErrors] = useState<{ type?: string; title?: string }>({});
 
   const validateAndContinue = () => {
     const newErrors: typeof errors = {};
 
     if (!selectedType) {
-      newErrors.type = 'Please select a space type';
+      newErrors.type = "Please select a space type";
     }
     if (!title.trim()) {
-      newErrors.title = 'Please enter a title';
+      newErrors.title = "Please enter a title";
     } else if (title.trim().length < 10) {
-      newErrors.title = 'Title should be at least 10 characters';
+      newErrors.title = "Title should be at least 10 characters";
     }
 
     setErrors(newErrors);
@@ -54,7 +54,7 @@ export default function NewListingDetails() {
     if (Object.keys(newErrors).length === 0) {
       // TODO: Store in context/state management
       router.push({
-        pathname: '/(owner)/new-listing/location',
+        pathname: "/(owner)/new-listing/location",
         params: { type: selectedType, title: title.trim() },
       });
     }
@@ -73,11 +73,17 @@ export default function NewListingDetails() {
           <View style={[styles.progressDot, styles.progressDotCompleted]} />
           <View style={[styles.progressLine, styles.progressLineCompleted]} />
           <View style={[styles.progressDot, styles.progressDotActive]} />
-          <View style={[styles.progressLine, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.progressLine, { backgroundColor: theme.border }]}
+          />
           <View style={[styles.progressDot, { borderColor: theme.border }]} />
-          <View style={[styles.progressLine, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.progressLine, { backgroundColor: theme.border }]}
+          />
           <View style={[styles.progressDot, { borderColor: theme.border }]} />
-          <View style={[styles.progressLine, { backgroundColor: theme.border }]} />
+          <View
+            style={[styles.progressLine, { backgroundColor: theme.border }]}
+          />
           <View style={[styles.progressDot, { borderColor: theme.border }]} />
         </View>
 
@@ -85,9 +91,7 @@ export default function NewListingDetails() {
         <Text style={[styles.sectionTitle, { color: theme.text }]}>
           What type of space is this?
         </Text>
-        {errors.type && (
-          <Text style={styles.errorText}>{errors.type}</Text>
-        )}
+        {errors.type && <Text style={styles.errorText}>{errors.type}</Text>}
         <View style={styles.typeGrid}>
           {spaceTypes.map((type) => (
             <TouchableOpacity
@@ -96,7 +100,8 @@ export default function NewListingDetails() {
                 styles.typeCard,
                 {
                   backgroundColor: theme.backgroundSecondary,
-                  borderColor: selectedType === type ? colors.primary : theme.border,
+                  borderColor:
+                    selectedType === type ? colors.primary : theme.border,
                   borderWidth: selectedType === type ? 2 : 1,
                 },
               ]}
@@ -108,14 +113,16 @@ export default function NewListingDetails() {
               <Ionicons
                 name={spaceTypeIcons[type] as keyof typeof Ionicons.glyphMap}
                 size={28}
-                color={selectedType === type ? colors.primary : theme.textSecondary}
+                color={
+                  selectedType === type ? colors.primary : theme.textSecondary
+                }
               />
               <Text
                 style={[
                   styles.typeLabel,
                   {
                     color: selectedType === type ? colors.primary : theme.text,
-                    fontWeight: selectedType === type ? '600' : '400',
+                    fontWeight: selectedType === type ? "600" : "400",
                   },
                 ]}
                 numberOfLines={2}
@@ -127,7 +134,12 @@ export default function NewListingDetails() {
         </View>
 
         {/* Title Input */}
-        <Text style={[styles.sectionTitle, { color: theme.text, marginTop: spacing.lg }]}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            { color: theme.text, marginTop: spacing.lg },
+          ]}
+        >
           Give your space a title
         </Text>
         <Input
@@ -147,7 +159,12 @@ export default function NewListingDetails() {
         </Text>
 
         {/* Description Input */}
-        <Text style={[styles.sectionTitle, { color: theme.text, marginTop: spacing.md }]}>
+        <Text
+          style={[
+            styles.sectionTitle,
+            { color: theme.text, marginTop: spacing.md },
+          ]}
+        >
           Describe your space (optional)
         </Text>
         <Input
@@ -166,11 +183,7 @@ export default function NewListingDetails() {
 
       {/* Bottom Action */}
       <View style={[styles.bottomActions, { borderTopColor: theme.border }]}>
-        <Button
-          title="Continue"
-          onPress={validateAndContinue}
-          fullWidth
-        />
+        <Button title="Continue" onPress={validateAndContinue} fullWidth />
       </View>
     </View>
   );
@@ -188,9 +201,9 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.xxl,
   },
   progressContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: spacing.lg,
   },
   progressDot: {
@@ -199,7 +212,7 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     borderWidth: 2,
     borderColor: colors.primary,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   progressDotActive: {
     backgroundColor: colors.primary,
@@ -218,35 +231,35 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: fontSize.lg,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: spacing.md,
   },
   typeGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: spacing.sm,
   },
   typeCard: {
-    width: '31%',
+    width: "31%",
     aspectRatio: 1,
     borderRadius: borderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: spacing.sm,
   },
   typeLabel: {
     fontSize: fontSize.xs,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: spacing.xs,
   },
   charCount: {
     fontSize: fontSize.xs,
-    textAlign: 'right',
+    textAlign: "right",
     marginTop: spacing.xs,
   },
   descriptionInput: {
     minHeight: 100,
-    textAlignVertical: 'top',
+    textAlignVertical: "top",
   },
   errorText: {
     color: colors.error,

@@ -6,7 +6,7 @@
  * and injected into the app at build time.
  */
 
-import Constants from 'expo-constants';
+import Constants from "expo-constants";
 
 type EnvConfig = {
   // Clerk Authentication
@@ -36,7 +36,7 @@ type EnvConfig = {
   enableAnalytics: boolean;
 
   // Environment & Debug
-  environment: 'development' | 'staging' | 'production';
+  environment: "development" | "staging" | "production";
   debug: boolean;
 };
 
@@ -46,15 +46,15 @@ const env = expoConfig?.extra?.env as EnvConfig | undefined;
 
 if (!env) {
   throw new Error(
-    'Environment configuration not found. Make sure devbox shell is running and variables are exported.'
+    "Environment configuration not found. Make sure devbox shell is running and variables are exported."
   );
 }
 
 // Export individual values for convenience
 export const ENV = env.environment;
-export const IS_DEV = env.environment === 'development';
-export const IS_STAGING = env.environment === 'staging';
-export const IS_PROD = env.environment === 'production';
+export const IS_DEV = env.environment === "development";
+export const IS_STAGING = env.environment === "staging";
+export const IS_PROD = env.environment === "production";
 export const DEBUG = env.debug;
 
 // API Configuration
@@ -67,9 +67,11 @@ export const CLERK_PUBLISHABLE_KEY = env.clerkPublishableKey;
 
 // Cloudinary
 export const CLOUDINARY_CLOUD_NAME = env.cloudinaryCloudName;
-export const CLOUDINARY_UPLOAD_PRESET_CAMPAIGNS = env.cloudinaryUploadPresetCampaigns;
+export const CLOUDINARY_UPLOAD_PRESET_CAMPAIGNS =
+  env.cloudinaryUploadPresetCampaigns;
 export const CLOUDINARY_UPLOAD_PRESET_SPACES = env.cloudinaryUploadPresetSpaces;
-export const CLOUDINARY_UPLOAD_PRESET_VERIFICATION = env.cloudinaryUploadPresetVerification;
+export const CLOUDINARY_UPLOAD_PRESET_VERIFICATION =
+  env.cloudinaryUploadPresetVerification;
 
 // Google Maps
 export const GOOGLE_MAPS_API_KEY = env.googleMapsApiKey;

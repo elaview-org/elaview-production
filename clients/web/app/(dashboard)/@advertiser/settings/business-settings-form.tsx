@@ -14,12 +14,8 @@ import type { User } from "@/types/graphql.generated";
 import { toast } from "sonner";
 
 interface BusinessSettingsFormProps {
-  user: NonNullable<Query["currentUser"]>;
+  user: User;
 }
-
-type Query = {
-  currentUser: User | null;
-};
 
 const INDUSTRY_OPTIONS = [
   "Restaurant & Food Service",
@@ -67,7 +63,7 @@ export function BusinessSettingsForm({ user }: BusinessSettingsFormProps) {
           />
           <FieldDescription>
             The name of your business or organization. This helps space owners
-            understand who they're working with.
+            understand who they&#39;re working with.
           </FieldDescription>
         </Field>
 

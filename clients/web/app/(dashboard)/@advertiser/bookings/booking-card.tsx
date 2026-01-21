@@ -17,7 +17,7 @@ import Image from "next/image";
 export type BookingStatus = "active" | "pending" | "completed" | "cancelled";
 
 interface BookingCardProps {
-  id: string;
+  id: number|string;
   status: BookingStatus;
   spaceName: string;
   location: string;

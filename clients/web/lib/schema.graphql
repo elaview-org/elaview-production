@@ -1,6 +1,7 @@
 schema {
   query: Query
   mutation: Mutation
+  subscription: Subscription
 }
 
 """
@@ -88,23 +89,6 @@ input AdvertiserProfileFilterInput {
   website: StringOperationFilterInput
 }
 
-input AdvertiserProfileInput {
-  campaigns: [CampaignInput!]!
-  companyName: String
-  createdAt: DateTime!
-  id: UUID!
-  industry: String
-  onboardingComplete: Boolean!
-  stripeAccountDisconnectedAt: DateTime
-  stripeAccountDisconnectedNotifiedAt: DateTime
-  stripeAccountId: String
-  stripeAccountStatus: String
-  stripeLastAccountHealthCheck: DateTime
-  user: UserInput!
-  userId: UUID!
-  website: String
-}
-
 input AdvertiserProfileSortInput {
   companyName: SortEnumType
   createdAt: SortEnumType
@@ -131,14 +115,302 @@ enum ApplyPolicy {
   VALIDATION
 }
 
+union ApproveBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input ApproveBookingInput {
+  id: ID!
+  ownerNotes: String
+}
+
+type ApproveBookingPayload {
+  booking: Booking
+  errors: [ApproveBookingError!]
+}
+
+type Booking {
+  advertiserNotes: String
+  campaign: Campaign
+  campaignId: UUID!
+  cancellationReason: String
+  cancelledAt: DateTime
+  cancelledByUser: User
+  cancelledByUserId: UUID
+  createdAt: DateTime!
+  dispute: BookingDispute
+  endDate: DateTime!
+  fileDownloadedAt: DateTime
+  id: UUID!
+  installationFee: Decimal!
+  ownerNotes: String
+  ownerPayoutAmount: Decimal!
+  payments(order: [PaymentSortInput!], where: PaymentFilterInput): [Payment!]!
+  payouts(order: [PayoutSortInput!], where: PayoutFilterInput): [Payout!]!
+  platformFeeAmount: Decimal!
+  platformFeePercent: Decimal!
+  pricePerDay: Decimal!
+  proof: BookingProof
+  rejectedAt: DateTime
+  rejectionReason: String
+  reviews(order: [ReviewSortInput!], where: ReviewFilterInput): [Review!]!
+  space: Space
+  spaceId: UUID!
+  startDate: DateTime!
+  status: BookingStatus!
+  subtotalAmount: Decimal!
+  totalAmount: Decimal!
+  totalDays: Int!
+  updatedAt: DateTime!
+}
+
+type BookingDispute {
+  booking: Booking!
+  bookingId: UUID!
+  createdAt: DateTime!
+  disputedAt: DateTime!
+  disputedByUser: User!
+  disputedByUserId: UUID!
+  id: UUID!
+  issueType: DisputeIssueType!
+  photos: [String!]!
+  reason: String!
+  resolutionAction: String
+  resolutionNotes: String
+  resolvedAt: DateTime
+  resolvedByUser: User
+  resolvedByUserId: UUID
+}
+
+input BookingDisputeFilterInput {
+  and: [BookingDisputeFilterInput!]
+  booking: BookingFilterInput
+  bookingId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  disputedAt: DateTimeOperationFilterInput
+  disputedByUser: UserFilterInput
+  disputedByUserId: UuidOperationFilterInput
+  id: UuidOperationFilterInput
+  issueType: DisputeIssueTypeOperationFilterInput
+  or: [BookingDisputeFilterInput!]
+  photos: ListStringOperationFilterInput
+  reason: StringOperationFilterInput
+  resolutionAction: StringOperationFilterInput
+  resolutionNotes: StringOperationFilterInput
+  resolvedAt: DateTimeOperationFilterInput
+  resolvedByUser: UserFilterInput
+  resolvedByUserId: UuidOperationFilterInput
+}
+
+input BookingDisputeSortInput {
+  booking: BookingSortInput
+  bookingId: SortEnumType
+  createdAt: SortEnumType
+  disputedAt: SortEnumType
+  disputedByUser: UserSortInput
+  disputedByUserId: SortEnumType
+  id: SortEnumType
+  issueType: SortEnumType
+  reason: SortEnumType
+  resolutionAction: SortEnumType
+  resolutionNotes: SortEnumType
+  resolvedAt: SortEnumType
+  resolvedByUser: UserSortInput
+  resolvedByUserId: SortEnumType
+}
+
+input BookingFilterInput {
+  advertiserNotes: StringOperationFilterInput
+  and: [BookingFilterInput!]
+  campaign: CampaignFilterInput
+  campaignId: UuidOperationFilterInput
+  cancellationReason: StringOperationFilterInput
+  cancelledAt: DateTimeOperationFilterInput
+  cancelledByUser: UserFilterInput
+  cancelledByUserId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  dispute: BookingDisputeFilterInput
+  endDate: DateTimeOperationFilterInput
+  fileDownloadedAt: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
+  installationFee: DecimalOperationFilterInput
+  or: [BookingFilterInput!]
+  ownerNotes: StringOperationFilterInput
+  ownerPayoutAmount: DecimalOperationFilterInput
+  payments: ListFilterInputTypeOfPaymentFilterInput
+  payouts: ListFilterInputTypeOfPayoutFilterInput
+  platformFeeAmount: DecimalOperationFilterInput
+  platformFeePercent: DecimalOperationFilterInput
+  pricePerDay: DecimalOperationFilterInput
+  proof: BookingProofFilterInput
+  rejectedAt: DateTimeOperationFilterInput
+  rejectionReason: StringOperationFilterInput
+  reviews: ListFilterInputTypeOfReviewFilterInput
+  space: SpaceFilterInput
+  spaceId: UuidOperationFilterInput
+  startDate: DateTimeOperationFilterInput
+  status: BookingStatusOperationFilterInput
+  subtotalAmount: DecimalOperationFilterInput
+  totalAmount: DecimalOperationFilterInput
+  totalDays: IntOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+type BookingProof {
+  autoApproveAt: DateTime!
+  booking: Booking!
+  bookingId: UUID!
+  createdAt: DateTime!
+  id: UUID!
+  photos: [String!]!
+  rejectionReason: String
+  reviewedAt: DateTime
+  reviewedByUser: User
+  reviewedByUserId: UUID
+  status: ProofStatus!
+  submittedAt: DateTime!
+}
+
+input BookingProofFilterInput {
+  and: [BookingProofFilterInput!]
+  autoApproveAt: DateTimeOperationFilterInput
+  booking: BookingFilterInput
+  bookingId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
+  or: [BookingProofFilterInput!]
+  photos: ListStringOperationFilterInput
+  rejectionReason: StringOperationFilterInput
+  reviewedAt: DateTimeOperationFilterInput
+  reviewedByUser: UserFilterInput
+  reviewedByUserId: UuidOperationFilterInput
+  status: ProofStatusOperationFilterInput
+  submittedAt: DateTimeOperationFilterInput
+}
+
+input BookingProofSortInput {
+  autoApproveAt: SortEnumType
+  booking: BookingSortInput
+  bookingId: SortEnumType
+  createdAt: SortEnumType
+  id: SortEnumType
+  rejectionReason: SortEnumType
+  reviewedAt: SortEnumType
+  reviewedByUser: UserSortInput
+  reviewedByUserId: SortEnumType
+  status: SortEnumType
+  submittedAt: SortEnumType
+}
+
+input BookingSortInput {
+  advertiserNotes: SortEnumType
+  campaign: CampaignSortInput
+  campaignId: SortEnumType
+  cancellationReason: SortEnumType
+  cancelledAt: SortEnumType
+  cancelledByUser: UserSortInput
+  cancelledByUserId: SortEnumType
+  createdAt: SortEnumType
+  dispute: BookingDisputeSortInput
+  endDate: SortEnumType
+  fileDownloadedAt: SortEnumType
+  id: SortEnumType
+  installationFee: SortEnumType
+  ownerNotes: SortEnumType
+  ownerPayoutAmount: SortEnumType
+  platformFeeAmount: SortEnumType
+  platformFeePercent: SortEnumType
+  pricePerDay: SortEnumType
+  proof: BookingProofSortInput
+  rejectedAt: SortEnumType
+  rejectionReason: SortEnumType
+  space: SpaceSortInput
+  spaceId: SortEnumType
+  startDate: SortEnumType
+  status: SortEnumType
+  subtotalAmount: SortEnumType
+  totalAmount: SortEnumType
+  totalDays: SortEnumType
+  updatedAt: SortEnumType
+}
+
+enum BookingStatus {
+  APPROVED
+  CANCELLED
+  COMPLETED
+  DISPUTED
+  FILE_DOWNLOADED
+  INSTALLED
+  PAID
+  PENDING_APPROVAL
+  REJECTED
+  VERIFIED
+}
+
+input BookingStatusOperationFilterInput {
+  eq: BookingStatus
+  in: [BookingStatus!]
+  neq: BookingStatus
+  nin: [BookingStatus!]
+}
+
+"""A connection to a list of items."""
+type BookingsConnection {
+  """A list of edges."""
+  edges: [BookingsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Booking!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type BookingsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Booking!
+}
+
+"""A connection to a list of items."""
+type BookingsRequiringActionConnection {
+  """A list of edges."""
+  edges: [BookingsRequiringActionEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Booking!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type BookingsRequiringActionEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Booking!
+}
+
 input BooleanOperationFilterInput {
   eq: Boolean
   neq: Boolean
 }
 
 type Campaign {
+  advertiser: AdvertiserProfile
   advertiserProfile: AdvertiserProfile!
   advertiserProfileId: UUID!
+  bookings(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [BookingSortInput!]
+    where: BookingFilterInput
+  ): BookingsConnection
   createdAt: DateTime!
   description: String
   endDate: DateTime
@@ -156,6 +428,7 @@ input CampaignFilterInput {
   advertiserProfile: AdvertiserProfileFilterInput
   advertiserProfileId: UuidOperationFilterInput
   and: [CampaignFilterInput!]
+  bookings: ListFilterInputTypeOfBookingFilterInput
   createdAt: DateTimeOperationFilterInput
   description: StringOperationFilterInput
   endDate: DateTimeOperationFilterInput
@@ -168,22 +441,6 @@ input CampaignFilterInput {
   status: CampaignStatusOperationFilterInput
   targetAudience: StringOperationFilterInput
   totalBudget: DecimalOperationFilterInput
-}
-
-input CampaignInput {
-  advertiserProfile: AdvertiserProfileInput!
-  advertiserProfileId: UUID!
-  createdAt: DateTime!
-  description: String
-  endDate: DateTime
-  goals: String
-  id: UUID!
-  imageUrl: String!
-  name: String!
-  startDate: DateTime
-  status: CampaignStatus!
-  targetAudience: String
-  totalBudget: Decimal
 }
 
 input CampaignSortInput {
@@ -235,6 +492,192 @@ type CampaignsEdge {
   node: Campaign!
 }
 
+union CancelBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input CancelBookingInput {
+  id: ID!
+  reason: String!
+}
+
+type CancelBookingPayload {
+  booking: Booking
+  errors: [CancelBookingError!]
+}
+
+union CancelCampaignError = ForbiddenError | NotFoundError
+
+input CancelCampaignInput {
+  id: ID!
+}
+
+type CancelCampaignPayload {
+  campaign: Campaign
+  errors: [CancelCampaignError!]
+}
+
+union ConfirmPaymentError = NotFoundError | PaymentError
+
+input ConfirmPaymentInput {
+  paymentIntentId: String!
+}
+
+type ConfirmPaymentPayload {
+  errors: [ConfirmPaymentError!]
+  payment: Payment
+}
+
+type ConflictError implements Error {
+  code: String!
+  message: String!
+  reason: String!
+  resource: String!
+}
+
+union ConnectStripeAccountError = NotFoundError | PaymentError
+
+type ConnectStripeAccountPayload {
+  accountId: String
+  errors: [ConnectStripeAccountError!]
+  onboardingUrl: String
+}
+
+type Conversation {
+  booking: Booking
+  bookingId: UUID
+  createdAt: DateTime!
+  id: UUID!
+  messages(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [MessageSortInput!]
+    where: MessageFilterInput
+  ): MessagesConnection
+  participants: [ConversationParticipant!]!
+  updatedAt: DateTime!
+}
+
+input ConversationFilterInput {
+  and: [ConversationFilterInput!]
+  booking: BookingFilterInput
+  bookingId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
+  messages: ListFilterInputTypeOfMessageFilterInput
+  or: [ConversationFilterInput!]
+  participants: ListFilterInputTypeOfConversationParticipantFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+type ConversationParticipant {
+  conversation: Conversation!
+  conversationId: UUID!
+  createdAt: DateTime!
+  id: UUID!
+  joinedAt: DateTime!
+  lastReadAt: DateTime
+  user: User!
+  userId: UUID!
+}
+
+input ConversationParticipantFilterInput {
+  and: [ConversationParticipantFilterInput!]
+  conversation: ConversationFilterInput
+  conversationId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
+  joinedAt: DateTimeOperationFilterInput
+  lastReadAt: DateTimeOperationFilterInput
+  or: [ConversationParticipantFilterInput!]
+  user: UserFilterInput
+  userId: UuidOperationFilterInput
+}
+
+input ConversationSortInput {
+  booking: BookingSortInput
+  bookingId: SortEnumType
+  createdAt: SortEnumType
+  id: SortEnumType
+  updatedAt: SortEnumType
+}
+
+union CreateBookingConversationError = NotFoundError
+
+input CreateBookingConversationInput {
+  bookingId: ID!
+}
+
+type CreateBookingConversationPayload {
+  conversation: Conversation
+  errors: [CreateBookingConversationError!]
+}
+
+union CreateBookingError = NotFoundError | ValidationError
+
+input CreateBookingInput {
+  advertiserNotes: String
+  endDate: DateTime!
+  spaceId: UUID!
+  startDate: DateTime!
+}
+
+type CreateBookingPayload {
+  booking: Booking
+  errors: [CreateBookingError!]
+}
+
+union CreateCampaignError = NotFoundError
+
+input CreateCampaignInput {
+  description: String
+  endDate: DateTime
+  goals: String
+  imageUrl: String!
+  name: String!
+  startDate: DateTime
+  targetAudience: String
+  totalBudget: Decimal
+}
+
+type CreateCampaignPayload {
+  campaign: Campaign
+  errors: [CreateCampaignError!]
+}
+
+union CreatePaymentIntentError = InvalidStatusTransitionError | NotFoundError
+
+input CreatePaymentIntentInput {
+  bookingId: ID!
+}
+
+type CreatePaymentIntentPayload {
+  amount: Decimal
+  clientSecret: String
+  errors: [CreatePaymentIntentError!]
+  paymentIntentId: String
+}
+
+union CreateReviewError = ConflictError | ForbiddenError | NotFoundError
+
+input CreateReviewInput {
+  comment: String
+  rating: Int!
+}
+
+type CreateReviewPayload {
+  errors: [CreateReviewError!]
+  review: Review
+}
+
+union CreateSpaceError = NotFoundError
+
 input CreateSpaceInput {
   address: String!
   availableFrom: DateTime
@@ -260,6 +703,7 @@ input CreateSpaceInput {
 }
 
 type CreateSpacePayload {
+  errors: [CreateSpaceError!]
   space: Space
 }
 
@@ -281,6 +725,17 @@ input DateTimeOperationFilterInput {
   nlte: DateTime
 }
 
+union DeactivateSpaceError = ForbiddenError | NotFoundError
+
+input DeactivateSpaceInput {
+  id: ID!
+}
+
+type DeactivateSpacePayload {
+  errors: [DeactivateSpaceError!]
+  space: Space
+}
+
 """The `Decimal` scalar type represents a decimal floating-point number."""
 scalar Decimal
 
@@ -299,12 +754,81 @@ input DecimalOperationFilterInput {
   nlte: Decimal
 }
 
+union DeleteCampaignError = ConflictError | ForbiddenError | NotFoundError
+
+input DeleteCampaignInput {
+  id: ID!
+}
+
+type DeleteCampaignPayload {
+  errors: [DeleteCampaignError!]
+  success: Boolean
+}
+
+input DeleteNotificationInput {
+  id: ID!
+}
+
+type DeleteNotificationPayload {
+  success: Boolean!
+}
+
+input DeleteReviewInput {
+  id: ID!
+}
+
+type DeleteReviewPayload {
+  success: Boolean!
+}
+
+union DeleteSpaceError = ConflictError | ForbiddenError | NotFoundError
+
 input DeleteSpaceInput {
   id: ID!
 }
 
 type DeleteSpacePayload {
-  space: Space
+  errors: [DeleteSpaceError!]
+  success: Boolean
+}
+
+union DeleteUserError = NotFoundError
+
+input DeleteUserInput {
+  id: ID!
+}
+
+type DeleteUserPayload {
+  errors: [DeleteUserError!]
+  success: Boolean
+}
+
+enum DisputeIssueType {
+  DAMAGE_TO_CREATIVE
+  MISLEADING_LISTING
+  NOT_VISIBLE
+  POOR_QUALITY
+  SAFETY_ISSUE
+  WRONG_LOCATION
+}
+
+input DisputeIssueTypeOperationFilterInput {
+  eq: DisputeIssueType
+  in: [DisputeIssueType!]
+  neq: DisputeIssueType
+  nin: [DisputeIssueType!]
+}
+
+type EarningsSummary {
+  availableBalance: Decimal
+  lastMonthEarnings: Decimal
+  pendingPayouts: Decimal
+  thisMonthEarnings: Decimal
+  totalEarnings: Decimal
+}
+
+interface Error {
+  message: String!
 }
 
 input FloatOperationFilterInput {
@@ -322,6 +846,30 @@ input FloatOperationFilterInput {
   nlte: Float
 }
 
+type ForbiddenError implements Error {
+  action: String!
+  code: String!
+  message: String!
+}
+
+"""A connection to a list of items."""
+type IncomingBookingRequestsConnection {
+  """A list of edges."""
+  edges: [IncomingBookingRequestsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Booking!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type IncomingBookingRequestsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Booking!
+}
+
 input IntOperationFilterInput {
   eq: Int
   gt: Int
@@ -337,11 +885,72 @@ input IntOperationFilterInput {
   nlte: Int
 }
 
+type InvalidStatusTransitionError implements Error {
+  code: String!
+  fromStatus: String!
+  message: String!
+  toStatus: String!
+}
+
+type KeyValuePairOfStringAndString__ {
+  key: String!
+  value: [String!]!
+}
+
+input ListFilterInputTypeOfBookingFilterInput {
+  all: BookingFilterInput
+  any: Boolean
+  none: BookingFilterInput
+  some: BookingFilterInput
+}
+
 input ListFilterInputTypeOfCampaignFilterInput {
   all: CampaignFilterInput
   any: Boolean
   none: CampaignFilterInput
   some: CampaignFilterInput
+}
+
+input ListFilterInputTypeOfConversationParticipantFilterInput {
+  all: ConversationParticipantFilterInput
+  any: Boolean
+  none: ConversationParticipantFilterInput
+  some: ConversationParticipantFilterInput
+}
+
+input ListFilterInputTypeOfMessageFilterInput {
+  all: MessageFilterInput
+  any: Boolean
+  none: MessageFilterInput
+  some: MessageFilterInput
+}
+
+input ListFilterInputTypeOfPaymentFilterInput {
+  all: PaymentFilterInput
+  any: Boolean
+  none: PaymentFilterInput
+  some: PaymentFilterInput
+}
+
+input ListFilterInputTypeOfPayoutFilterInput {
+  all: PayoutFilterInput
+  any: Boolean
+  none: PayoutFilterInput
+  some: PayoutFilterInput
+}
+
+input ListFilterInputTypeOfRefundFilterInput {
+  all: RefundFilterInput
+  any: Boolean
+  none: RefundFilterInput
+  some: RefundFilterInput
+}
+
+input ListFilterInputTypeOfReviewFilterInput {
+  all: ReviewFilterInput
+  any: Boolean
+  none: ReviewFilterInput
+  some: ReviewFilterInput
 }
 
 input ListFilterInputTypeOfSpaceFilterInput {
@@ -358,10 +967,421 @@ input ListStringOperationFilterInput {
   some: StringOperationFilterInput
 }
 
+type MarkAllNotificationsReadPayload {
+  count: Int!
+}
+
+union MarkConversationReadError = ForbiddenError
+
+input MarkConversationReadInput {
+  conversationId: ID!
+}
+
+type MarkConversationReadPayload {
+  errors: [MarkConversationReadError!]
+  participant: ConversationParticipant
+}
+
+union MarkFileDownloadedError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input MarkFileDownloadedInput {
+  id: ID!
+}
+
+type MarkFileDownloadedPayload {
+  booking: Booking
+  errors: [MarkFileDownloadedError!]
+}
+
+union MarkInstalledError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input MarkInstalledInput {
+  id: ID!
+}
+
+type MarkInstalledPayload {
+  booking: Booking
+  errors: [MarkInstalledError!]
+}
+
+union MarkNotificationReadError = NotFoundError
+
+input MarkNotificationReadInput {
+  id: ID!
+}
+
+type MarkNotificationReadPayload {
+  errors: [MarkNotificationReadError!]
+  notification: Notification
+}
+
+type Message {
+  attachments: [String!]
+  content: String!
+  conversation: Conversation!
+  conversationId: UUID!
+  createdAt: DateTime!
+  id: UUID!
+  senderUser: User!
+  senderUserId: UUID!
+  type: MessageType!
+}
+
+input MessageFilterInput {
+  and: [MessageFilterInput!]
+  attachments: ListStringOperationFilterInput
+  content: StringOperationFilterInput
+  conversation: ConversationFilterInput
+  conversationId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
+  or: [MessageFilterInput!]
+  senderUser: UserFilterInput
+  senderUserId: UuidOperationFilterInput
+  type: MessageTypeOperationFilterInput
+}
+
+input MessageSortInput {
+  content: SortEnumType
+  conversation: ConversationSortInput
+  conversationId: SortEnumType
+  createdAt: SortEnumType
+  id: SortEnumType
+  senderUser: UserSortInput
+  senderUserId: SortEnumType
+  type: SortEnumType
+}
+
+enum MessageType {
+  CORRECTION_REQUEST
+  PROOF_APPROVED
+  PROOF_DISPUTED
+  PROOF_REJECTED
+  PROOF_SUBMISSION
+  QUALITY_CONCERN
+  SYSTEM
+  TEXT
+}
+
+input MessageTypeOperationFilterInput {
+  eq: MessageType
+  in: [MessageType!]
+  neq: MessageType
+  nin: [MessageType!]
+}
+
+"""A connection to a list of items."""
+type MessagesByConversationConnection {
+  """A list of edges."""
+  edges: [MessagesByConversationEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Message!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MessagesByConversationEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Message!
+}
+
+"""A connection to a list of items."""
+type MessagesConnection {
+  """A list of edges."""
+  edges: [MessagesEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Message!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MessagesEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Message!
+}
+
 type Mutation {
+  approveBooking(input: ApproveBookingInput!): ApproveBookingPayload!
+  cancelBooking(input: CancelBookingInput!): CancelBookingPayload!
+  cancelCampaign(input: CancelCampaignInput!): CancelCampaignPayload!
+  confirmPayment(input: ConfirmPaymentInput!): ConfirmPaymentPayload!
+  connectStripeAccount: ConnectStripeAccountPayload!
+  createBooking(campaignId: ID!, input: CreateBookingInput!): CreateBookingPayload!
+  createBookingConversation(input: CreateBookingConversationInput!): CreateBookingConversationPayload!
+  createCampaign(input: CreateCampaignInput!): CreateCampaignPayload!
+  createPaymentIntent(input: CreatePaymentIntentInput!): CreatePaymentIntentPayload!
+  createReview(bookingId: ID!, input: CreateReviewInput!): CreateReviewPayload!
   createSpace(input: CreateSpaceInput!): CreateSpacePayload!
+  deactivateSpace(input: DeactivateSpaceInput!): DeactivateSpacePayload!
+  deleteCampaign(input: DeleteCampaignInput!): DeleteCampaignPayload!
+  deleteNotification(input: DeleteNotificationInput!): DeleteNotificationPayload!
+  deleteReview(input: DeleteReviewInput!): DeleteReviewPayload!
   deleteSpace(input: DeleteSpaceInput!): DeleteSpacePayload!
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload!
+  markAllNotificationsRead: MarkAllNotificationsReadPayload!
+  markConversationRead(input: MarkConversationReadInput!): MarkConversationReadPayload!
+  markFileDownloaded(input: MarkFileDownloadedInput!): MarkFileDownloadedPayload!
+  markInstalled(input: MarkInstalledInput!): MarkInstalledPayload!
+  markNotificationRead(input: MarkNotificationReadInput!): MarkNotificationReadPayload!
+  processPayout(input: ProcessPayoutInput!): ProcessPayoutPayload!
+  reactivateSpace(input: ReactivateSpaceInput!): ReactivateSpacePayload!
+  refreshStripeAccountStatus: RefreshStripeAccountStatusPayload!
+  rejectBooking(input: RejectBookingInput!): RejectBookingPayload!
+  requestRefund(input: RequestRefundInput!): RequestRefundPayload!
+  retryPayout(input: RetryPayoutInput!): RetryPayoutPayload!
+  sendMessage(input: SendMessageInput!): SendMessagePayload!
+  submitCampaign(input: SubmitCampaignInput!): SubmitCampaignPayload!
+  updateAdvertiserProfile(input: UpdateAdvertiserProfileInput!): UpdateAdvertiserProfilePayload!
+  updateCampaign(id: ID!, input: UpdateCampaignInput!): UpdateCampaignPayload!
   updateCurrentUser(input: UpdateCurrentUserInput!): UpdateCurrentUserPayload!
+  updateNotificationPreference(input: UpdateNotificationPreferenceInput!): UpdateNotificationPreferencePayload!
+  updateReview(id: ID!, input: UpdateReviewInput!): UpdateReviewPayload!
+  updateSpace(id: ID!, input: UpdateSpaceInput!): UpdateSpacePayload!
+  updateSpaceOwnerProfile(input: UpdateSpaceOwnerProfileInput!): UpdateSpaceOwnerProfilePayload!
+}
+
+"""A connection to a list of items."""
+type MyBookingsAsAdvertiserConnection {
+  """A list of edges."""
+  edges: [MyBookingsAsAdvertiserEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Booking!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MyBookingsAsAdvertiserEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Booking!
+}
+
+"""A connection to a list of items."""
+type MyBookingsAsOwnerConnection {
+  """A list of edges."""
+  edges: [MyBookingsAsOwnerEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Booking!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MyBookingsAsOwnerEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Booking!
+}
+
+"""A connection to a list of items."""
+type MyCampaignsConnection {
+  """A list of edges."""
+  edges: [MyCampaignsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Campaign!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MyCampaignsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Campaign!
+}
+
+"""A connection to a list of items."""
+type MyConversationsConnection {
+  """A list of edges."""
+  edges: [MyConversationsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Conversation!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MyConversationsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Conversation!
+}
+
+"""A connection to a list of items."""
+type MyNotificationsConnection {
+  """A list of edges."""
+  edges: [MyNotificationsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Notification!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MyNotificationsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Notification!
+}
+
+"""A connection to a list of items."""
+type MyPayoutsConnection {
+  """A list of edges."""
+  edges: [MyPayoutsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Payout!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MyPayoutsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Payout!
+}
+
+"""A connection to a list of items."""
+type MyReviewsConnection {
+  """A list of edges."""
+  edges: [MyReviewsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Review!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MyReviewsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Review!
+}
+
+"""A connection to a list of items."""
+type MySpacesConnection {
+  """A list of edges."""
+  edges: [MySpacesEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Space!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MySpacesEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Space!
+}
+
+type NotFoundError implements Error {
+  code: String!
+  entityId: UUID!
+  entityType: String!
+  message: String!
+}
+
+type Notification {
+  body: String!
+  createdAt: DateTime!
+  entityId: UUID
+  entityType: String
+  id: UUID!
+  isRead: Boolean!
+  readAt: DateTime
+  title: String!
+  type: NotificationType!
+  user: User!
+  userId: UUID!
+}
+
+input NotificationFilterInput {
+  and: [NotificationFilterInput!]
+  body: StringOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  entityId: UuidOperationFilterInput
+  entityType: StringOperationFilterInput
+  id: UuidOperationFilterInput
+  isRead: BooleanOperationFilterInput
+  or: [NotificationFilterInput!]
+  readAt: DateTimeOperationFilterInput
+  title: StringOperationFilterInput
+  type: NotificationTypeOperationFilterInput
+  user: UserFilterInput
+  userId: UuidOperationFilterInput
+}
+
+type NotificationPreference {
+  createdAt: DateTime!
+  emailEnabled: Boolean!
+  id: UUID!
+  inAppEnabled: Boolean!
+  notificationType: NotificationType!
+  pushEnabled: Boolean!
+  user: User!
+  userId: UUID!
+}
+
+input NotificationSortInput {
+  body: SortEnumType
+  createdAt: SortEnumType
+  entityId: SortEnumType
+  entityType: SortEnumType
+  id: SortEnumType
+  isRead: SortEnumType
+  readAt: SortEnumType
+  title: SortEnumType
+  type: SortEnumType
+  user: UserSortInput
+  userId: SortEnumType
+}
+
+enum NotificationType {
+  BOOKING_APPROVED
+  BOOKING_CANCELLED
+  BOOKING_REJECTED
+  BOOKING_REQUESTED
+  DISPUTE_FILED
+  DISPUTE_RESOLVED
+  MESSAGE_RECEIVED
+  PAYMENT_FAILED
+  PAYMENT_RECEIVED
+  PAYMENT_REMINDER
+  PAYOUT_PROCESSED
+  PROOF_APPROVED
+  PROOF_DISPUTED
+  PROOF_REJECTED
+  PROOF_UPLOADED
+  REFUND_PROCESSED
+  SESSION_EXPIRED
+  SPACE_APPROVED
+  SPACE_REACTIVATED
+  SPACE_REJECTED
+  SPACE_SUSPENDED
+  SYSTEM_UPDATE
+}
+
+input NotificationTypeOperationFilterInput {
+  eq: NotificationType
+  in: [NotificationType!]
+  neq: NotificationType
+  nin: [NotificationType!]
 }
 
 """Information about pagination in a connection."""
@@ -380,6 +1400,157 @@ type PageInfo {
   startCursor: String
 }
 
+type Payment {
+  amount: Decimal!
+  booking: Booking!
+  bookingId: UUID!
+  createdAt: DateTime!
+  failureReason: String
+  id: UUID!
+  paidAt: DateTime
+  refunds(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [RefundSortInput!]
+    where: RefundFilterInput
+  ): RefundsConnection
+  status: PaymentStatus!
+  stripeChargeId: String
+  stripeFee: Decimal
+  stripePaymentIntentId: String!
+  type: PaymentType!
+}
+
+type PaymentError implements Error {
+  code: String!
+  message: String!
+  operation: String!
+  reason: String!
+}
+
+input PaymentFilterInput {
+  amount: DecimalOperationFilterInput
+  and: [PaymentFilterInput!]
+  booking: BookingFilterInput
+  bookingId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  failureReason: StringOperationFilterInput
+  id: UuidOperationFilterInput
+  or: [PaymentFilterInput!]
+  paidAt: DateTimeOperationFilterInput
+  refunds: ListFilterInputTypeOfRefundFilterInput
+  status: PaymentStatusOperationFilterInput
+  stripeChargeId: StringOperationFilterInput
+  stripeFee: DecimalOperationFilterInput
+  stripePaymentIntentId: StringOperationFilterInput
+  type: PaymentTypeOperationFilterInput
+}
+
+input PaymentSortInput {
+  amount: SortEnumType
+  booking: BookingSortInput
+  bookingId: SortEnumType
+  createdAt: SortEnumType
+  failureReason: SortEnumType
+  id: SortEnumType
+  paidAt: SortEnumType
+  status: SortEnumType
+  stripeChargeId: SortEnumType
+  stripeFee: SortEnumType
+  stripePaymentIntentId: SortEnumType
+  type: SortEnumType
+}
+
+enum PaymentStatus {
+  FAILED
+  PARTIALLY_REFUNDED
+  PENDING
+  REFUNDED
+  SUCCEEDED
+}
+
+input PaymentStatusOperationFilterInput {
+  eq: PaymentStatus
+  in: [PaymentStatus!]
+  neq: PaymentStatus
+  nin: [PaymentStatus!]
+}
+
+enum PaymentType {
+  BALANCE
+  DEPOSIT
+  FULL
+}
+
+input PaymentTypeOperationFilterInput {
+  eq: PaymentType
+  in: [PaymentType!]
+  neq: PaymentType
+  nin: [PaymentType!]
+}
+
+"""A connection to a list of items."""
+type PaymentsByBookingConnection {
+  """A list of edges."""
+  edges: [PaymentsByBookingEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Payment!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type PaymentsByBookingEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Payment!
+}
+
+type Payout {
+  amount: Decimal!
+  attemptCount: Int!
+  booking: Booking!
+  bookingId: UUID!
+  createdAt: DateTime!
+  failureReason: String
+  id: UUID!
+  lastAttemptAt: DateTime
+  processedAt: DateTime
+  spaceOwnerProfile: SpaceOwnerProfile!
+  spaceOwnerProfileId: UUID!
+  stage: PayoutStage!
+  status: PayoutStatus!
+  stripeTransferId: String
+}
+
+input PayoutFilterInput {
+  amount: DecimalOperationFilterInput
+  and: [PayoutFilterInput!]
+  attemptCount: IntOperationFilterInput
+  booking: BookingFilterInput
+  bookingId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  failureReason: StringOperationFilterInput
+  id: UuidOperationFilterInput
+  lastAttemptAt: DateTimeOperationFilterInput
+  or: [PayoutFilterInput!]
+  processedAt: DateTimeOperationFilterInput
+  spaceOwnerProfile: SpaceOwnerProfileFilterInput
+  spaceOwnerProfileId: UuidOperationFilterInput
+  stage: PayoutStageOperationFilterInput
+  status: PayoutStatusOperationFilterInput
+  stripeTransferId: StringOperationFilterInput
+}
+
 enum PayoutSchedule {
   BIWEEKLY
   MONTHLY
@@ -391,6 +1562,62 @@ input PayoutScheduleOperationFilterInput {
   in: [PayoutSchedule!]
   neq: PayoutSchedule
   nin: [PayoutSchedule!]
+}
+
+input PayoutSortInput {
+  amount: SortEnumType
+  attemptCount: SortEnumType
+  booking: BookingSortInput
+  bookingId: SortEnumType
+  createdAt: SortEnumType
+  failureReason: SortEnumType
+  id: SortEnumType
+  lastAttemptAt: SortEnumType
+  processedAt: SortEnumType
+  spaceOwnerProfile: SpaceOwnerProfileSortInput
+  spaceOwnerProfileId: SortEnumType
+  stage: SortEnumType
+  status: SortEnumType
+  stripeTransferId: SortEnumType
+}
+
+enum PayoutStage {
+  STAGE1
+  STAGE2
+}
+
+input PayoutStageOperationFilterInput {
+  eq: PayoutStage
+  in: [PayoutStage!]
+  neq: PayoutStage
+  nin: [PayoutStage!]
+}
+
+enum PayoutStatus {
+  COMPLETED
+  FAILED
+  PARTIALLY_PAID
+  PENDING
+  PROCESSING
+}
+
+input PayoutStatusOperationFilterInput {
+  eq: PayoutStatus
+  in: [PayoutStatus!]
+  neq: PayoutStatus
+  nin: [PayoutStatus!]
+}
+
+union ProcessPayoutError = ConflictError | NotFoundError | PaymentError
+
+input ProcessPayoutInput {
+  bookingId: ID!
+  stage: PayoutStage!
+}
+
+type ProcessPayoutPayload {
+  errors: [ProcessPayoutError!]
+  payout: Payout
 }
 
 enum ProfileType {
@@ -405,8 +1632,211 @@ input ProfileTypeOperationFilterInput {
   nin: [ProfileType!]
 }
 
+enum ProofStatus {
+  APPROVED
+  CORRECTION_REQUESTED
+  DISPUTED
+  PENDING
+  REJECTED
+  UNDER_REVIEW
+}
+
+input ProofStatusOperationFilterInput {
+  eq: ProofStatus
+  in: [ProofStatus!]
+  neq: ProofStatus
+  nin: [ProofStatus!]
+}
+
 type Query {
-  currentUser: User
+  bookingById(id: ID!): Booking
+  bookingsRequiringAction(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+  ): BookingsRequiringActionConnection
+  campaignById(id: ID!): Campaign
+  earningsSummary: EarningsSummary!
+  incomingBookingRequests(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [BookingSortInput!]
+  ): IncomingBookingRequestsConnection
+  me: User
+  messagesByConversation(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    conversationId: ID!
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [MessageSortInput!]
+    where: MessageFilterInput
+  ): MessagesByConversationConnection
+  myBookingsAsAdvertiser(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [BookingSortInput!]
+    where: BookingFilterInput
+  ): MyBookingsAsAdvertiserConnection
+  myBookingsAsOwner(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [BookingSortInput!]
+    where: BookingFilterInput
+  ): MyBookingsAsOwnerConnection
+  myCampaigns(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [CampaignSortInput!]
+    where: CampaignFilterInput
+  ): MyCampaignsConnection
+  myConversations(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [ConversationSortInput!]
+    where: ConversationFilterInput
+  ): MyConversationsConnection
+  myNotificationPreferences: [NotificationPreference!]!
+  myNotifications(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [NotificationSortInput!]
+    where: NotificationFilterInput
+  ): MyNotificationsConnection
+  myPayouts(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [PayoutSortInput!]
+    where: PayoutFilterInput
+  ): MyPayoutsConnection
+  myReviews(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [ReviewSortInput!]
+  ): MyReviewsConnection
+  mySpaces(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [SpaceSortInput!]
+    where: SpaceFilterInput
+  ): MySpacesConnection
+  paymentById(id: ID!): Payment
+  paymentsByBooking(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    bookingId: ID!
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [PaymentSortInput!]
+    where: PaymentFilterInput
+  ): PaymentsByBookingConnection
+  payoutById(id: ID!): Payout
+  reviewByBooking(bookingId: ID!, reviewerType: ReviewerType!): Review
+  reviewsBySpace(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [ReviewSortInput!]
+    spaceId: ID!
+  ): ReviewsBySpaceConnection
   spaceById(id: ID!): Space
   spaces(
     """Returns the elements in the list that come after the specified cursor."""
@@ -422,21 +1852,255 @@ type Query {
     order: [SpaceSortInput!]
     where: SpaceFilterInput
   ): SpacesConnection
-  userById(id: ID!): User
-  users(
+  transactionsByBooking(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
+    bookingId: ID!
     """Returns the first _n_ elements from the list."""
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [UserSortInput!]
-    where: UserFilterInput
-  ): UsersConnection
+    order: [TransactionSortInput!]
+    where: TransactionFilterInput
+  ): TransactionsByBookingConnection
+  unreadConversationsCount: Int!
+  unreadNotificationsCount: Int!
+}
+
+union ReactivateSpaceError = ForbiddenError | NotFoundError
+
+input ReactivateSpaceInput {
+  id: ID!
+}
+
+type ReactivateSpacePayload {
+  errors: [ReactivateSpaceError!]
+  space: Space
+}
+
+union RefreshStripeAccountStatusError = NotFoundError | PaymentError | ValidationError
+
+type RefreshStripeAccountStatusPayload {
+  errors: [RefreshStripeAccountStatusError!]
+  profile: SpaceOwnerProfile
+}
+
+type Refund {
+  amount: Decimal!
+  booking: Booking!
+  bookingId: UUID!
+  createdAt: DateTime!
+  id: UUID!
+  payment: Payment!
+  paymentId: UUID!
+  processedAt: DateTime
+  reason: String!
+  status: RefundStatus!
+  stripeRefundId: String
+}
+
+input RefundFilterInput {
+  amount: DecimalOperationFilterInput
+  and: [RefundFilterInput!]
+  booking: BookingFilterInput
+  bookingId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
+  or: [RefundFilterInput!]
+  payment: PaymentFilterInput
+  paymentId: UuidOperationFilterInput
+  processedAt: DateTimeOperationFilterInput
+  reason: StringOperationFilterInput
+  status: RefundStatusOperationFilterInput
+  stripeRefundId: StringOperationFilterInput
+}
+
+input RefundSortInput {
+  amount: SortEnumType
+  booking: BookingSortInput
+  bookingId: SortEnumType
+  createdAt: SortEnumType
+  id: SortEnumType
+  payment: PaymentSortInput
+  paymentId: SortEnumType
+  processedAt: SortEnumType
+  reason: SortEnumType
+  status: SortEnumType
+  stripeRefundId: SortEnumType
+}
+
+enum RefundStatus {
+  FAILED
+  PENDING
+  SUCCEEDED
+}
+
+input RefundStatusOperationFilterInput {
+  eq: RefundStatus
+  in: [RefundStatus!]
+  neq: RefundStatus
+  nin: [RefundStatus!]
+}
+
+"""A connection to a list of items."""
+type RefundsConnection {
+  """A list of edges."""
+  edges: [RefundsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Refund!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type RefundsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Refund!
+}
+
+union RejectBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input RejectBookingInput {
+  id: ID!
+  reason: String!
+}
+
+type RejectBookingPayload {
+  booking: Booking
+  errors: [RejectBookingError!]
+}
+
+union RequestRefundError = InvalidStatusTransitionError | NotFoundError | PaymentError | ValidationError
+
+input RequestRefundInput {
+  amount: Decimal!
+  paymentId: ID!
+  reason: String!
+}
+
+type RequestRefundPayload {
+  errors: [RequestRefundError!]
+  refund: Refund
+}
+
+union RetryPayoutError = InvalidStatusTransitionError | NotFoundError | PaymentError
+
+input RetryPayoutInput {
+  payoutId: ID!
+}
+
+type RetryPayoutPayload {
+  errors: [RetryPayoutError!]
+  payout: Payout
+}
+
+type Review {
+  booking: Booking!
+  bookingId: UUID!
+  comment: String
+  createdAt: DateTime!
+  id: UUID!
+  rating: Int!
+  reviewerProfileId: UUID!
+  reviewerType: ReviewerType!
+  space: Space!
+  spaceId: UUID!
+}
+
+input ReviewFilterInput {
+  and: [ReviewFilterInput!]
+  booking: BookingFilterInput
+  bookingId: UuidOperationFilterInput
+  comment: StringOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
+  or: [ReviewFilterInput!]
+  rating: IntOperationFilterInput
+  reviewerProfileId: UuidOperationFilterInput
+  reviewerType: ReviewerTypeOperationFilterInput
+  space: SpaceFilterInput
+  spaceId: UuidOperationFilterInput
+}
+
+input ReviewSortInput {
+  booking: BookingSortInput
+  bookingId: SortEnumType
+  comment: SortEnumType
+  createdAt: SortEnumType
+  id: SortEnumType
+  rating: SortEnumType
+  reviewerProfileId: SortEnumType
+  reviewerType: SortEnumType
+  space: SpaceSortInput
+  spaceId: SortEnumType
+}
+
+enum ReviewerType {
+  ADVERTISER
+  SPACE_OWNER
+}
+
+input ReviewerTypeOperationFilterInput {
+  eq: ReviewerType
+  in: [ReviewerType!]
+  neq: ReviewerType
+  nin: [ReviewerType!]
+}
+
+"""A connection to a list of items."""
+type ReviewsBySpaceConnection {
+  """A list of edges."""
+  edges: [ReviewsBySpaceEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Review!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ReviewsBySpaceEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Review!
+}
+
+"""A connection to a list of items."""
+type ReviewsConnection {
+  """A list of edges."""
+  edges: [ReviewsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Review!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type ReviewsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Review!
+}
+
+union SendMessageError = ForbiddenError
+
+input SendMessageInput {
+  attachments: [String!]
+  content: String!
+  conversationId: ID!
+  type: MessageType
+}
+
+type SendMessagePayload {
+  errors: [SendMessageError!]
+  message: Message
 }
 
 enum SortEnumType {
@@ -449,6 +2113,20 @@ type Space {
   availableFrom: DateTime
   availableTo: DateTime
   averageRating: Float
+  bookings(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [BookingSortInput!]
+    where: BookingFilterInput
+  ): BookingsConnection
   city: String!
   createdAt: DateTime!
   description: String
@@ -462,8 +2140,23 @@ type Space {
   longitude: Float!
   maxDuration: Int
   minDuration: Int!
+  owner: SpaceOwnerProfile
   pricePerDay: Decimal!
   rejectionReason: String
+  reviews(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [ReviewSortInput!]
+    where: ReviewFilterInput
+  ): ReviewsConnection
   spaceOwnerProfile: SpaceOwnerProfile!
   spaceOwnerProfileId: UUID!
   state: String!
@@ -483,6 +2176,7 @@ input SpaceFilterInput {
   availableFrom: DateTimeOperationFilterInput
   availableTo: DateTimeOperationFilterInput
   averageRating: FloatOperationFilterInput
+  bookings: ListFilterInputTypeOfBookingFilterInput
   city: StringOperationFilterInput
   createdAt: DateTimeOperationFilterInput
   description: StringOperationFilterInput
@@ -499,6 +2193,7 @@ input SpaceFilterInput {
   or: [SpaceFilterInput!]
   pricePerDay: DecimalOperationFilterInput
   rejectionReason: StringOperationFilterInput
+  reviews: ListFilterInputTypeOfReviewFilterInput
   spaceOwnerProfile: SpaceOwnerProfileFilterInput
   spaceOwnerProfileId: UuidOperationFilterInput
   state: StringOperationFilterInput
@@ -512,39 +2207,6 @@ input SpaceFilterInput {
   zipCode: StringOperationFilterInput
 }
 
-input SpaceInput {
-  address: String!
-  availableFrom: DateTime
-  availableTo: DateTime
-  averageRating: Float
-  city: String!
-  createdAt: DateTime!
-  description: String
-  dimensions: String
-  dimensionsText: String
-  height: Float
-  id: UUID!
-  images: [String!]!
-  installationFee: Decimal
-  latitude: Float!
-  longitude: Float!
-  maxDuration: Int
-  minDuration: Int!
-  pricePerDay: Decimal!
-  rejectionReason: String
-  spaceOwnerProfile: SpaceOwnerProfileInput!
-  spaceOwnerProfileId: UUID!
-  state: String!
-  status: SpaceStatus!
-  title: String!
-  totalBookings: Int!
-  totalRevenue: Decimal!
-  traffic: String
-  type: SpaceType!
-  width: Float
-  zipCode: String
-}
-
 type SpaceOwnerProfile {
   businessName: String
   businessType: String
@@ -552,6 +2214,7 @@ type SpaceOwnerProfile {
   id: UUID!
   onboardingComplete: Boolean!
   payoutSchedule: PayoutSchedule!
+  payouts: [Payout!]!
   spaces(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -584,6 +2247,7 @@ input SpaceOwnerProfileFilterInput {
   onboardingComplete: BooleanOperationFilterInput
   or: [SpaceOwnerProfileFilterInput!]
   payoutSchedule: PayoutScheduleOperationFilterInput
+  payouts: ListFilterInputTypeOfPayoutFilterInput
   spaces: ListFilterInputTypeOfSpaceFilterInput
   stripeAccountDisconnectedAt: DateTimeOperationFilterInput
   stripeAccountDisconnectedNotifiedAt: DateTimeOperationFilterInput
@@ -592,23 +2256,6 @@ input SpaceOwnerProfileFilterInput {
   stripeLastAccountHealthCheck: DateTimeOperationFilterInput
   user: UserFilterInput
   userId: UuidOperationFilterInput
-}
-
-input SpaceOwnerProfileInput {
-  businessName: String
-  businessType: String
-  createdAt: DateTime!
-  id: UUID!
-  onboardingComplete: Boolean!
-  payoutSchedule: PayoutSchedule!
-  spaces: [SpaceInput!]!
-  stripeAccountDisconnectedAt: DateTime
-  stripeAccountDisconnectedNotifiedAt: DateTime
-  stripeAccountId: String
-  stripeAccountStatus: String
-  stripeLastAccountHealthCheck: DateTime
-  user: UserInput!
-  userId: UUID!
 }
 
 input SpaceOwnerProfileSortInput {
@@ -724,14 +2371,208 @@ input StringOperationFilterInput {
   startsWith: String
 }
 
+union SubmitCampaignError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input SubmitCampaignInput {
+  id: ID!
+}
+
+type SubmitCampaignPayload {
+  campaign: Campaign
+  errors: [SubmitCampaignError!]
+}
+
+type Subscription {
+  onBookingUpdate(bookingId: ID!): Booking!
+  onMessage(conversationId: ID!): Message!
+  onNotification(userId: ID!): Notification!
+  onProofUpdate(bookingId: ID!): BookingProof!
+}
+
+type Transaction {
+  amount: Decimal!
+  booking: Booking
+  bookingId: UUID
+  createdAt: DateTime!
+  currency: String!
+  description: String!
+  id: UUID!
+  referenceId: UUID!
+  referenceType: String!
+  type: TransactionType!
+  user: User
+  userId: UUID
+}
+
+input TransactionFilterInput {
+  amount: DecimalOperationFilterInput
+  and: [TransactionFilterInput!]
+  booking: BookingFilterInput
+  bookingId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  currency: StringOperationFilterInput
+  description: StringOperationFilterInput
+  id: UuidOperationFilterInput
+  or: [TransactionFilterInput!]
+  referenceId: UuidOperationFilterInput
+  referenceType: StringOperationFilterInput
+  type: TransactionTypeOperationFilterInput
+  user: UserFilterInput
+  userId: UuidOperationFilterInput
+}
+
+input TransactionSortInput {
+  amount: SortEnumType
+  booking: BookingSortInput
+  bookingId: SortEnumType
+  createdAt: SortEnumType
+  currency: SortEnumType
+  description: SortEnumType
+  id: SortEnumType
+  referenceId: SortEnumType
+  referenceType: SortEnumType
+  type: SortEnumType
+  user: UserSortInput
+  userId: SortEnumType
+}
+
+enum TransactionType {
+  PAYMENT
+  PAYOUT
+  PLATFORM_FEE
+  REFUND
+}
+
+input TransactionTypeOperationFilterInput {
+  eq: TransactionType
+  in: [TransactionType!]
+  neq: TransactionType
+  nin: [TransactionType!]
+}
+
+"""A connection to a list of items."""
+type TransactionsByBookingConnection {
+  """A list of edges."""
+  edges: [TransactionsByBookingEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Transaction!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type TransactionsByBookingEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Transaction!
+}
+
 scalar UUID
 
+union UpdateAdvertiserProfileError = NotFoundError
+
+input UpdateAdvertiserProfileInput {
+  companyName: String
+  industry: String
+  website: String
+}
+
+type UpdateAdvertiserProfilePayload {
+  advertiserProfile: AdvertiserProfile
+  errors: [UpdateAdvertiserProfileError!]
+}
+
+union UpdateCampaignError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input UpdateCampaignInput {
+  description: String
+  endDate: DateTime
+  goals: String
+  imageUrl: String
+  name: String
+  startDate: DateTime
+  targetAudience: String
+  totalBudget: Decimal
+}
+
+type UpdateCampaignPayload {
+  campaign: Campaign
+  errors: [UpdateCampaignError!]
+}
+
+union UpdateCurrentUserError = NotFoundError
+
 input UpdateCurrentUserInput {
-  updatedUser: UserInput!
+  input: UpdateUserInput!
 }
 
 type UpdateCurrentUserPayload {
+  errors: [UpdateCurrentUserError!]
   user: User
+}
+
+input UpdateNotificationPreferenceInput {
+  emailEnabled: Boolean
+  inAppEnabled: Boolean
+  notificationType: NotificationType!
+  pushEnabled: Boolean
+}
+
+type UpdateNotificationPreferencePayload {
+  preference: NotificationPreference!
+}
+
+union UpdateReviewError = ForbiddenError | NotFoundError | ValidationError
+
+input UpdateReviewInput {
+  comment: String
+  rating: Int
+}
+
+type UpdateReviewPayload {
+  errors: [UpdateReviewError!]
+  review: Review
+}
+
+union UpdateSpaceError = ForbiddenError | NotFoundError
+
+input UpdateSpaceInput {
+  availableFrom: DateTime
+  availableTo: DateTime
+  description: String
+  images: [String!]
+  installationFee: Decimal
+  maxDuration: Int
+  minDuration: Int
+  pricePerDay: Decimal
+  title: String
+  traffic: String
+}
+
+union UpdateSpaceOwnerProfileError = NotFoundError
+
+input UpdateSpaceOwnerProfileInput {
+  businessName: String
+  businessType: String
+  payoutSchedule: PayoutSchedule
+}
+
+type UpdateSpaceOwnerProfilePayload {
+  errors: [UpdateSpaceOwnerProfileError!]
+  spaceOwnerProfile: SpaceOwnerProfile
+}
+
+type UpdateSpacePayload {
+  errors: [UpdateSpaceError!]
+  space: Space
+}
+
+input UpdateUserInput {
+  activeProfileType: ProfileType
+  avatar: String
+  name: String
+  phone: String
 }
 
 type User {
@@ -766,22 +2607,6 @@ input UserFilterInput {
   role: UserRoleOperationFilterInput
   spaceOwnerProfile: SpaceOwnerProfileFilterInput
   status: UserStatusOperationFilterInput
-}
-
-input UserInput {
-  activeProfileType: ProfileType!
-  advertiserProfile: AdvertiserProfileInput
-  avatar: String
-  createdAt: DateTime!
-  email: String!
-  id: UUID!
-  lastLoginAt: DateTime
-  name: String!
-  password: String!
-  phone: String
-  role: UserRole!
-  spaceOwnerProfile: SpaceOwnerProfileInput
-  status: UserStatus!
 }
 
 enum UserRole {
@@ -826,24 +2651,6 @@ input UserStatusOperationFilterInput {
   nin: [UserStatus!]
 }
 
-"""A connection to a list of items."""
-type UsersConnection {
-  """A list of edges."""
-  edges: [UsersEdge!]
-  """A flattened list of the nodes."""
-  nodes: [User!]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-}
-
-"""An edge in a connection."""
-type UsersEdge {
-  """A cursor for use in pagination."""
-  cursor: String!
-  """The item at the end of the edge."""
-  node: User!
-}
-
 input UuidOperationFilterInput {
   eq: UUID
   gt: UUID
@@ -857,4 +2664,10 @@ input UuidOperationFilterInput {
   nin: [UUID]
   nlt: UUID
   nlte: UUID
+}
+
+type ValidationError implements Error {
+  code: String!
+  errors: [KeyValuePairOfStringAndString__!]!
+  message: String!
 }

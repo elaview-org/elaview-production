@@ -1,4 +1,4 @@
-import getBookingsQuery from "./book-quries";
+import getBookingsQuery from "./book-queries";
 import BookingsPage from "./bookings";
 
 export default async function Page() {

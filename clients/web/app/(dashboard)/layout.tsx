@@ -14,7 +14,6 @@ import {
 import { IconInnerShadowTop } from "@tabler/icons-react";
 import { NavigationSection } from "./navigation-section";
 import { UserSection } from "./user-section";
-
 import { CSSProperties } from "react";
 import ContentHeader from "@/app/(dashboard)/content-header";
 import { redirect } from "next/navigation";
@@ -23,7 +22,7 @@ export default async function Layout(props: LayoutProps<"/">) {
   const { data } = await api.query<Query>({
     query: api.gql`
       query {
-        currentUser {
+        me {
           id,
           email,
           name,
@@ -35,7 +34,7 @@ export default async function Layout(props: LayoutProps<"/">) {
     `,
   });
 
-  if (!data?.currentUser) {
+  if (!data?.me) {
     redirect("/logout");
   }
 
@@ -66,30 +65,31 @@ export default async function Layout(props: LayoutProps<"/">) {
         </SidebarHeader>
         <SidebarContent>
           <NavigationSection
-            userRole={data?.currentUser?.role}
-            activeProfileType={data?.currentUser?.activeProfileType}
+            userRole={data?.me?.role}
+            activeProfileType={data?.me?.activeProfileType}
           />
         </SidebarContent>
         <SidebarFooter>
-          <UserSection {...data?.currentUser} />
+          <UserSection {...data?.me} />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <ContentHeader />
-        {(() => {
-          switch (data.currentUser.role) {
-            case UserRole.Admin:
-              return props.admin;
-            case UserRole.Marketing:
-              return props.marketing;
-            case UserRole.User: {
-              return data.currentUser.activeProfileType ===
-                ProfileType.SpaceOwner
-                ? props.spaceOwner
-                : props.advertiser;
+        <div className="@container/main flex flex-1 flex-col gap-4 px-4 py-4 md:gap-6 md:py-6 lg:px-6">
+          {(() => {
+            switch (data.me.role) {
+              case UserRole.Admin:
+                return props.admin;
+              case UserRole.Marketing:
+                return props.marketing;
+              case UserRole.User: {
+                return data.me.activeProfileType === ProfileType.SpaceOwner
+                  ? props.spaceOwner
+                  : props.advertiser;
+              }
             }
-          }
-        })()}
+          })()}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   );

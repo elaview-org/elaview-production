@@ -4,11 +4,9 @@ import api from "@/api/gql/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type {
-  UpdateCurrentUserInput,
-  UpdateCurrentUserPayload,
+  Query,
   UpdateAdvertiserProfileInput,
-  UpdateAdvertiserProfilePayload,
-  User,
+  UpdateCurrentUserInput,
 } from "@/types/graphql.generated";
 
 interface UpdateProfileState {
@@ -31,74 +29,39 @@ interface UpdateBusinessInfoState {
   };
 }
 
-type GetCurrentUserQuery = {
-  currentUser: {
-    id: string;
-    email: string;
-    name: string;
-    phone: string | null;
-    avatar: string | null;
-    createdAt: string;
-    lastLoginAt: string | null;
-    role: string;
-    activeProfileType: string;
-    status: string;
-    advertiserProfile?: {
-      id: string;
-      companyName: string;
-      industry: string;
-      website: string | null;
-      onboardingComplete: boolean;
-      createdAt: string;
-      userId: string;
-    } | null;
-  };
-};
+async function getCurrentUser() {
+  const { data } = await api.query<Query>({
+    query: api.gql`
+      query GetCurrentUser {
+        me {
+          id
+          avatar
+          advertiserProfile {
+            id
+          }
+        }
+      }
+    `,
+  });
+
+  return data?.me ?? null;
+}
 
 export async function updateProfileAction(
   _prevState: UpdateProfileState,
   formData: FormData
 ): Promise<UpdateProfileState> {
   try {
-    const { data: currentUserData } = await api.query<GetCurrentUserQuery>({
-      query: api.gql`
-        query GetCurrentUser {
-          currentUser {
-            id
-            email
-            name
-            phone
-            avatar
-            createdAt
-            lastLoginAt
-            role
-            activeProfileType
-            status
-            advertiserProfile {
-              id
-              companyName
-              industry
-              website
-              onboardingComplete
-              createdAt
-              userId
-            }
-          }
-        }
-      `,
-    });
+    const user = await getCurrentUser();
 
-    if (!currentUserData?.currentUser) {
+    if (!user) {
       redirect("/logout");
     }
-
-    const user = currentUserData.currentUser;
 
     const name = formData.get("name")?.toString() ?? "";
     const email = formData.get("email")?.toString() ?? "";
     const phone = formData.get("phone")?.toString() ?? "";
 
-    // Validate inputs
     if (!name.trim()) {
       return {
         success: false,
@@ -115,20 +78,14 @@ export async function updateProfileAction(
       };
     }
 
-    // Build the update mutation - UpdateUserInput only supports name, phone, and avatar
-    // Note: email cannot be updated through this mutation
-    const { data } = await api.query<{
-      updateCurrentUser: UpdateCurrentUserPayload;
+    const { data: mutationData } = await api.query<{
+      updateCurrentUser: { user: { id: string } | null };
     }>({
       query: api.gql`
         mutation UpdateCurrentUser($input: UpdateCurrentUserInput!) {
           updateCurrentUser(input: $input) {
             user {
               id
-              name
-              email
-              phone
-              avatar
             }
           }
         }
@@ -144,7 +101,7 @@ export async function updateProfileAction(
       },
     });
 
-    if (!data?.updateCurrentUser?.user) {
+    if (!mutationData?.updateCurrentUser?.user) {
       return {
         success: false,
         message: "Failed to update profile",
@@ -177,43 +134,13 @@ export async function updateBusinessInfoAction(
   formData: FormData
 ): Promise<UpdateBusinessInfoState> {
   try {
-    // Get current user first
-    const { data: currentUserData } = await api.query<User>({
-      query: api.gql`
-        query GetCurrentUser {
-          currentUser {
-            id
-            email
-            name
-            phone
-            avatar
-            createdAt
-            lastLoginAt
-            role
-            activeProfileType
-            status
-            advertiserProfile {
-              id
-              companyName
-              industry
-              website
-              onboardingComplete
-              createdAt
-              userId
-            }
-          }
-        }
-      `,
-    });
+    const user = await getCurrentUser();
 
-    if (!currentUserData) {
+    if (!user) {
       redirect("/logout");
     }
 
-    const user = currentUserData;
-    const advertiserProfile = user.advertiserProfile;
-
-    if (!advertiserProfile) {
+    if (!user.advertiserProfile) {
       return {
         success: false,
         message: "Advertiser profile not found",
@@ -229,17 +156,14 @@ export async function updateBusinessInfoAction(
     const industry = formData.get("industry")?.toString() ?? "";
     const website = formData.get("website")?.toString() ?? "";
 
-    // Use the dedicated updateAdvertiserProfile mutation
-    const { data } = await api.query<{
-      updateAdvertiserProfile: UpdateAdvertiserProfilePayload;
+    const { data: mutationData } = await api.query<{
+      updateAdvertiserProfile: { advertiserProfile: { id: string } | null };
     }>({
       query: api.gql`
         mutation UpdateAdvertiserProfile($input: UpdateAdvertiserProfileInput!) {
           updateAdvertiserProfile(input: $input) {
             advertiserProfile {
-              companyName
-              industry
-              website
+              id
             }
           }
         }
@@ -253,7 +177,7 @@ export async function updateBusinessInfoAction(
       },
     });
 
-    if (!data?.updateAdvertiserProfile?.advertiserProfile) {
+    if (!mutationData?.updateAdvertiserProfile?.advertiserProfile) {
       return {
         success: false,
         message: "Failed to update business information",

@@ -1,123 +1,67 @@
 import {
-  IconCamera,
-  IconChartBar,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
+  IconBuildingStore,
+  IconContract,
+  IconCookie,
+  IconDashboard,
   IconHelp,
-  IconListDetails,
+  IconMessage,
   IconPlus,
-  IconReport,
-  IconSearch,
-  IconSettings,
+  IconShieldCheck,
+  IconWallet,
 } from "@tabler/icons-react";
 
 const spaceOwnerData = {
   quickAction: {
-    title: "New Campaign",
+    title: "New Space",
     url: "#",
     icon: IconPlus,
   },
   navMain: [
     {
+      title: "Overview",
+      url: "/overview",
+      icon: IconDashboard,
+    },
+    {
       title: "Listings",
       url: "/listings",
-      icon: IconListDetails,
+      icon: IconBuildingStore,
     },
     {
       title: "Earnings",
       url: "/earnings",
-      icon: IconChartBar,
+      icon: IconWallet,
     },
     {
       title: "Verification Flow",
       url: "/verification-flow",
-      icon: IconChartBar,
+      icon: IconShieldCheck,
+    },
+    {
+      title: "Messages",
+      url: "/messages",
+      icon: IconMessage,
     },
   ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
+  documents: [],
   navSecondary: [
     {
-      title: "Settings",
-      url: "/settings",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
+      title: "Help & Support",
       url: "/help",
       icon: IconHelp,
     },
     {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
+      title: "Terms of Service",
+      url: "/terms-of-service",
+      icon: IconContract,
+    },
+    {
+      title: "Privacy Policy",
+      url: "/privacy-policy",
+      icon: IconCookie,
     },
   ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
-    },
-  ],
+  navClouds: [],
 };
 
 export default spaceOwnerData;

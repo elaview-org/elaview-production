@@ -104,7 +104,7 @@ export default function NewListingLocation() {
     if (Object.keys(newErrors).length === 0) {
       // TODO: Store in context/state management and geocode address
       router.push({
-        pathname: "/(owner)/new-listing/pricing",
+        pathname: "./pricing",
         params: {
           address: address.trim(),
           city: city.trim(),

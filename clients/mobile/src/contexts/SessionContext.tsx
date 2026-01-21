@@ -40,7 +40,6 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
 const AUTH_FLAG_KEY = "is_authenticated";
 
 export function SessionProvider({ children }: { children: ReactNode }) {
-  const client = api.client();
   const [authFlag, setAuthFlag] = useState<boolean | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
@@ -148,6 +147,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     [switchProfileMutation, refetch]
   );
 
+  const client = api.client();
   const logout = useCallback(async () => {
     try {
       await authService.logout();

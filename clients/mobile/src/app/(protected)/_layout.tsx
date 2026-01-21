@@ -1,12 +1,24 @@
 import { useEffect } from "react";
-import { View, ActivityIndicator, StyleSheet } from "react-native";
-import { Slot, useRouter, useSegments } from "expo-router";
+import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
+import { Slot, useRouter, useSegments, Href } from "expo-router";
 import { useSession } from "@/contexts/SessionContext";
 import { ProfileType } from "@/types/graphql";
-import { colors } from "@/constants/theme";
+import { colors, spacing, fontSize } from "@/constants/theme";
+
+export function ErrorBoundary({ error, retry }: { error: Error; retry: () => void }) {
+  return (
+    <View style={styles.errorContainer}>
+      <Text style={styles.errorTitle}>Something went wrong</Text>
+      <Text style={styles.errorMessage}>{error.message}</Text>
+      <Text style={styles.retryButton} onPress={retry}>
+        Try Again
+      </Text>
+    </View>
+  );
+}
 
 export default function ProtectedLayout() {
-  const { user, isLoading, isAuthenticated, profileType } = useSession();
+  const { isLoading, isAuthenticated, profileType } = useSession();
   const router = useRouter();
   const segments = useSegments();
 
@@ -19,7 +31,7 @@ export default function ProtectedLayout() {
     }
 
     if (!profileType) {
-      router.replace("/(protected)/profile-select" as any);
+      router.replace("/(protected)/profile-select" as Href);
       return;
     }
 
@@ -29,9 +41,9 @@ export default function ProtectedLayout() {
     const shouldBeInOwner = profileType === ProfileType.SpaceOwner;
 
     if (shouldBeInOwner && isInAdvertiser) {
-      router.replace("/(protected)/(owner)/listings" as any);
+      router.replace("/(protected)/(owner)/listings" as Href);
     } else if (!shouldBeInOwner && isInOwner) {
-      router.replace("/(protected)/(advertiser)/discover" as any);
+      router.replace("/(protected)/(advertiser)/discover" as Href);
     }
   }, [isLoading, isAuthenticated, profileType, segments, router]);
 
@@ -55,5 +67,30 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: spacing.lg,
+    backgroundColor: colors.white,
+  },
+  errorTitle: {
+    fontSize: fontSize.xl,
+    fontWeight: "700",
+    color: colors.black,
+    marginBottom: spacing.sm,
+  },
+  errorMessage: {
+    fontSize: fontSize.md,
+    color: colors.gray600,
+    textAlign: "center",
+    marginBottom: spacing.lg,
+  },
+  retryButton: {
+    fontSize: fontSize.md,
+    fontWeight: "600",
+    color: colors.primary,
+    padding: spacing.md,
   },
 });

@@ -82,7 +82,7 @@ export default function NewListingPricing() {
     if (Object.keys(newErrors).length === 0) {
       // TODO: Store in context/state management
       router.push({
-        pathname: "/(owner)/new-listing/preview",
+        pathname: "./preview",
         params: {
           dailyRate,
           weeklyRate: weeklyRate || suggestWeeklyRate(daily).toString(),

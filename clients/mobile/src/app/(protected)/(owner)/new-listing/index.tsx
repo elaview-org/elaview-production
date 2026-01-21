@@ -102,7 +102,7 @@ export default function NewListingPhotos() {
     // TODO: Store photos in context/state management
     // For now, pass via params (limited for demo)
     router.push({
-      pathname: "/(owner)/new-listing/details",
+      pathname: "./details",
       params: { photoCount: photos.length },
     });
   };

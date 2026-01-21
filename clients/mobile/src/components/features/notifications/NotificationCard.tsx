@@ -1,6 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, Href } from "expo-router";
 import { formatDistanceToNow } from "date-fns";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Notification, NotificationType } from "@/types/notifications";
@@ -13,7 +13,7 @@ interface NotificationCardProps {
 
 // Map notification types to icons and colors
 function getNotificationIcon(type: NotificationType): {
-  name: any;
+  name: keyof typeof Ionicons.glyphMap;
   color: string;
   backgroundColor: string;
 } {
@@ -108,7 +108,7 @@ export default function NotificationCard({
 
     // Navigate to route if provided
     if (notification.data.route) {
-      router.push(notification.data.route as any);
+      router.push(notification.data.route as Href);
     }
   };
 

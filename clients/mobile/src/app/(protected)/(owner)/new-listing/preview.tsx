@@ -65,7 +65,7 @@ export default function NewListingPreview() {
         [
           {
             text: "View Listings",
-            onPress: () => router.replace("/(owner)/listings"),
+            onPress: () => router.replace("../"),
           },
         ]
       );
@@ -79,19 +79,18 @@ export default function NewListingPreview() {
   };
 
   const handleEdit = (step: string) => {
-    // Navigate back to specific step to edit
     switch (step) {
       case "photos":
-        router.push("/(owner)/new-listing");
+        router.push("./");
         break;
       case "details":
-        router.push("/(owner)/new-listing/details");
+        router.push("./details");
         break;
       case "location":
-        router.push("/(owner)/new-listing/location");
+        router.push("./location");
         break;
       case "pricing":
-        router.push("/(owner)/new-listing/pricing");
+        router.push("./pricing");
         break;
     }
   };
@@ -275,7 +274,7 @@ export default function NewListingPreview() {
           variant="outline"
           onPress={() => {
             Alert.alert("Saved", "Your listing has been saved as a draft.");
-            router.replace("/(owner)/listings");
+            router.replace("../");
           }}
           style={styles.draftButton}
         />

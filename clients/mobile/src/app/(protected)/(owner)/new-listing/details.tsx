@@ -54,7 +54,7 @@ export default function NewListingDetails() {
     if (Object.keys(newErrors).length === 0) {
       // TODO: Store in context/state management
       router.push({
-        pathname: "/(owner)/new-listing/location",
+        pathname: "./location",
         params: { type: selectedType, title: title.trim() },
       });
     }

@@ -60,7 +60,7 @@ export default function Listings() {
   }, [displayedSpaces.length, isLoadingMore, hasMore]);
 
   const handleAddListing = () => {
-    router.push("/(owner)/new-listing");
+    router.push("./new-listing");
   };
 
   const renderSpace = ({ item }: { item: Space }) => (

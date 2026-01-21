@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useEffect, useRef, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, Href } from "expo-router";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSession } from "@/contexts/SessionContext";
 import { ProfileType } from "@/types/graphql";
@@ -53,7 +53,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
         targetType === ProfileType.SpaceOwner
           ? "/(protected)/(owner)/listings"
           : "/(protected)/(advertiser)/discover";
-      router.replace(route as any);
+      router.replace(route as Href);
     } catch (error) {
       console.error("Failed to switch profile:", error);
     } finally {
@@ -127,7 +127,7 @@ export default function DrawerMenu({ visible, onClose }: DrawerMenuProps) {
                 onPress={item.onPress}
               >
                 <Ionicons
-                  name={item.icon as any}
+                  name={item.icon as keyof typeof Ionicons.glyphMap}
                   size={24}
                   color={item.danger ? colors.error : theme.text}
                 />

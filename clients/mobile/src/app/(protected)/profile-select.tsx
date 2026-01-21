@@ -5,7 +5,7 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSession } from "@/contexts/SessionContext";
 import { ProfileType } from "@/types/graphql";
@@ -25,7 +25,7 @@ export default function ProfileSelect() {
         role === "advertiser"
           ? "/(protected)/(advertiser)/discover"
           : "/(protected)/(owner)/listings";
-      router.replace(route as any);
+      router.replace(route as Href);
     } catch (error) {
       console.error("Failed to save profile:", error);
     }

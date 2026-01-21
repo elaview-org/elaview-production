@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, Href } from "expo-router";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useSession } from "@/contexts/SessionContext";
 import { ProfileType } from "@/types/graphql";
@@ -39,7 +39,7 @@ export default function ProfileContent({
         targetType === ProfileType.Advertiser
           ? "/(protected)/(advertiser)/discover"
           : "/(protected)/(owner)/listings";
-      router.replace(route as any);
+      router.replace(route as Href);
     } catch (error) {
       console.error("Failed to switch profile:", error);
     } finally {

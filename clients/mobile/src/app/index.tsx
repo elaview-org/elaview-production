@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import * as SplashScreen from "expo-splash-screen";
 import ElaviewLogo from "@/components/features/ElaviewLogo";
@@ -29,7 +29,7 @@ export default function WelcomeScreen() {
 
     if (isAuthenticated) {
       if (!profileType) {
-        router.replace("/(protected)/profile-select" as any);
+        router.replace("/(protected)/profile-select" as Href);
         return;
       }
 
@@ -37,7 +37,7 @@ export default function WelcomeScreen() {
         profileType === ProfileType.SpaceOwner
           ? "/(protected)/(owner)/listings"
           : "/(protected)/(advertiser)/discover";
-      router.replace(route as any);
+      router.replace(route as Href);
     }
   }, [isLoading, isAuthenticated, profileType, router]);
 

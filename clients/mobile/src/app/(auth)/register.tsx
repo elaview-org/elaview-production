@@ -10,7 +10,7 @@ import {
   Alert,
 } from "react-native";
 import { SocialIconBar } from "@/components/features/SocialIconBar";
-import { Link, useRouter } from "expo-router";
+import { Link, useRouter, Href } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSession } from "@/contexts/SessionContext";
 import { ProfileType } from "@/types/graphql";
@@ -29,13 +29,13 @@ export default function Register() {
   useEffect(() => {
     if (isAuthenticated) {
       if (!profileType) {
-        router.replace("/(protected)/profile-select" as any);
+        router.replace("/(protected)/profile-select" as Href);
       } else {
         const route =
           profileType === ProfileType.SpaceOwner
             ? "/(protected)/(owner)/listings"
             : "/(protected)/(advertiser)/discover";
-        router.replace(route as any);
+        router.replace(route as Href);
       }
     }
   }, [isAuthenticated, profileType, router]);

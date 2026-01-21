@@ -4,7 +4,8 @@
       "Bash(pnpm typecheck:*)",
       "Bash(tree:*)",
       "Bash(node -c:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []

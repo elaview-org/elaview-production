@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { WebView } from "react-native-webview";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { borderRadius, colors, fontSize, spacing } from "@/constants/theme";
 
@@ -23,6 +22,7 @@ interface MapProps {
 }
 
 let hasNativeMaps: boolean | null = null;
+let hasWebView: boolean | null = null;
 
 function checkNativeMaps(): boolean {
   if (hasNativeMaps !== null) return hasNativeMaps;
@@ -36,7 +36,20 @@ function checkNativeMaps(): boolean {
   return hasNativeMaps;
 }
 
+function checkWebView(): boolean {
+  if (hasWebView !== null) return hasWebView;
+  try {
+    const { TurboModuleRegistry } = require("react-native");
+    TurboModuleRegistry.getEnforcing("RNCWebViewModule");
+    hasWebView = true;
+  } catch {
+    hasWebView = false;
+  }
+  return hasWebView;
+}
+
 function LeafletMap({ markers, initialRegion, onMarkerPress }: MapProps) {
+  const { WebView } = require("react-native-webview");
   const markersJson = JSON.stringify(
     markers.map((m) => ({
       id: m.id,
@@ -159,18 +172,35 @@ function NativeMap({ markers, initialRegion, onMarkerPress }: MapProps) {
   );
 }
 
+function MapPlaceholder() {
+  return (
+    <View style={[StyleSheet.absoluteFillObject, styles.placeholder]}>
+      <FontAwesome name="map" size={48} color={colors.gray500} />
+      <Text style={styles.placeholderText}>Map requires native rebuild</Text>
+    </View>
+  );
+}
+
 export default function Map(props: MapProps) {
-  const [useNative, setUseNative] = useState<boolean | null>(null);
+  const [mapType, setMapType] = useState<"native" | "webview" | "none" | null>(null);
 
   useEffect(() => {
-    setUseNative(checkNativeMaps());
+    if (checkNativeMaps()) {
+      setMapType("native");
+    } else if (checkWebView()) {
+      setMapType("webview");
+    } else {
+      setMapType("none");
+    }
   }, []);
 
-  if (useNative === null) {
+  if (mapType === null) {
     return <View style={StyleSheet.absoluteFillObject} />;
   }
 
-  return useNative ? <NativeMap {...props} /> : <LeafletMap {...props} />;
+  if (mapType === "native") return <NativeMap {...props} />;
+  if (mapType === "webview") return <LeafletMap {...props} />;
+  return <MapPlaceholder />;
 }
 
 const styles = StyleSheet.create({
@@ -193,5 +223,15 @@ const styles = StyleSheet.create({
     fontSize: fontSize.xs,
     fontWeight: "700",
     color: colors.black,
+  },
+  placeholder: {
+    backgroundColor: colors.gray100,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: spacing.md,
+  },
+  placeholderText: {
+    fontSize: fontSize.sm,
+    color: colors.gray600,
   },
 });

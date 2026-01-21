@@ -21,6 +21,9 @@ export default function OwnerLayout() {
             borderTopColor: theme.border,
             borderTopWidth: 1,
           },
+          tabBarItemStyle: {
+            flex: 1,
+          },
           header: () => (
             <TopNavBar onMenuPress={() => setDrawerVisible(true)} />
           ),
@@ -79,9 +82,9 @@ export default function OwnerLayout() {
           }}
         />
         <Tabs.Screen
-          name="space"
+          name="space/[id]"
           options={{
-            tabBarButton: () => null,
+            href: null,
           }}
         />
       </Tabs>

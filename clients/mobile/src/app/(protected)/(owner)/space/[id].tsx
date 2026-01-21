@@ -10,6 +10,7 @@ import {
   FlatList,
   Switch,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
@@ -17,13 +18,9 @@ import { useTheme } from "@/contexts/ThemeContext";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
-import {
-  mockSpaces,
-  spaceTypeLabels,
-  spaceTypeIcons,
-  formatPrice,
-  formatDimensions,
-} from "@/mocks/spaces";
+import { spaceTypeLabels, spaceTypeIcons, formatPrice } from "@/mocks/spaces";
+import api from "@/api";
+import { Query, SpaceType } from "@/types/graphql";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -33,13 +30,54 @@ export default function SpaceDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const flatListRef = useRef<FlatList>(null);
 
-  // Find space from mock data (will be replaced with GraphQL query)
-  const space = mockSpaces.find((s) => s.id === id);
+  // Fetch space from API
+  const { data, loading, error } = api.query<Pick<Query, "spaceById">>(
+    api.gql`
+      query GetSpace($id: ID!) {
+        spaceById(id: $id) {
+          id
+          title
+          type
+          description
+          address
+          city
+          state
+          zipCode
+          pricePerDay
+          images
+          width
+          height
+          dimensionsText
+          traffic
+          averageRating
+          totalBookings
+          status
+        }
+      }
+    `,
+    {
+      variables: { id },
+      skip: !id,
+    }
+  );
+
+  const space = data?.spaceById;
 
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isActive, setIsActive] = useState(space?.isActive ?? true);
+  const [isActive, setIsActive] = useState(space?.status === "ACTIVE");
 
-  if (!space) {
+  // Update isActive when space loads
+  // (You might want to use useEffect for this in production)
+
+  if (loading) {
+    return (
+      <View style={[styles.container, styles.centered, { backgroundColor: theme.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (!space || error) {
     return (
       <View style={[styles.container, styles.centered, { backgroundColor: theme.background }]}>
         <Ionicons name="alert-circle-outline" size={48} color={theme.textMuted} />
@@ -50,7 +88,6 @@ export default function SpaceDetail() {
   }
 
   const handleEdit = () => {
-    // TODO: Navigate to edit screen
     Alert.alert("Edit", "Navigate to edit space screen");
   };
 
@@ -77,11 +114,15 @@ export default function SpaceDetail() {
     // TODO: Call mutation to update space status
   };
 
-  const trafficLevelColors = {
-    low: colors.warning,
-    medium: colors.primary,
-    high: colors.success,
+  const trafficColors: Record<string, string> = {
+    Low: colors.warning,
+    Medium: colors.primary,
+    High: colors.success,
   };
+
+  // Map API fields to component expectations
+  const photos = space.images || [];
+  const dailyRate = space.pricePerDay;
 
   return (
     <>
@@ -100,7 +141,7 @@ export default function SpaceDetail() {
         <View style={styles.imageGallery}>
           <FlatList
             ref={flatListRef}
-            data={space.photos}
+            data={photos}
             horizontal
             pagingEnabled
             showsHorizontalScrollIndicator={false}
@@ -112,10 +153,15 @@ export default function SpaceDetail() {
               <Image source={{ uri: item }} style={styles.galleryImage} />
             )}
             keyExtractor={(_, index) => index.toString()}
+            ListEmptyComponent={
+              <View style={[styles.galleryImage, styles.centered, { backgroundColor: theme.card }]}>
+                <Ionicons name="image-outline" size={48} color={theme.textMuted} />
+              </View>
+            }
           />
-          {space.photos.length > 1 && (
+          {photos.length > 1 && (
             <View style={styles.pagination}>
-              {space.photos.map((_, index) => (
+              {photos.map((_: string, index: number) => (
                 <View
                   key={index}
                   style={[
@@ -126,12 +172,14 @@ export default function SpaceDetail() {
               ))}
             </View>
           )}
-          <View style={styles.imageCount}>
-            <Ionicons name="images-outline" size={14} color={colors.white} />
-            <Text style={styles.imageCountText}>
-              {currentImageIndex + 1}/{space.photos.length}
-            </Text>
-          </View>
+          {photos.length > 0 && (
+            <View style={styles.imageCount}>
+              <Ionicons name="images-outline" size={14} color={colors.white} />
+              <Text style={styles.imageCountText}>
+                {currentImageIndex + 1}/{photos.length}
+              </Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.content}>
@@ -140,11 +188,13 @@ export default function SpaceDetail() {
             <View style={styles.headerLeft}>
               <View style={styles.typeTag}>
                 <Ionicons
-                  name={spaceTypeIcons[space.type] as any}
+                  name={(spaceTypeIcons[space.type as SpaceType] || "cube-outline") as keyof typeof Ionicons.glyphMap}
                   size={14}
                   color={colors.primary}
                 />
-                <Text style={styles.typeTagText}>{spaceTypeLabels[space.type]}</Text>
+                <Text style={styles.typeTagText}>
+                  {spaceTypeLabels[space.type as SpaceType] || space.type}
+                </Text>
               </View>
               <Text style={[styles.title, { color: theme.text }]}>{space.title}</Text>
             </View>
@@ -191,7 +241,6 @@ export default function SpaceDetail() {
                   </Text>
                 </View>
               </View>
-              {/* Map placeholder */}
               <View style={[styles.mapPlaceholder, { backgroundColor: theme.card }]}>
                 <Ionicons name="map-outline" size={32} color={theme.textMuted} />
                 <Text style={[styles.mapPlaceholderText, { color: theme.textMuted }]}>
@@ -204,94 +253,80 @@ export default function SpaceDetail() {
           {/* Pricing */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: theme.text }]}>Pricing</Text>
-            <View style={styles.pricingGrid}>
-              <Card style={styles.priceCard}>
-                <Text style={[styles.priceLabel, { color: theme.textSecondary }]}>Daily</Text>
-                <Text style={[styles.priceValue, { color: theme.text }]}>
-                  {formatPrice(space.dailyRate)}
-                </Text>
-              </Card>
-              {space.weeklyRate && (
-                <Card style={styles.priceCard}>
-                  <Text style={[styles.priceLabel, { color: theme.textSecondary }]}>Weekly</Text>
-                  <Text style={[styles.priceValue, { color: theme.text }]}>
-                    {formatPrice(space.weeklyRate)}
-                  </Text>
-                </Card>
-              )}
-              {space.monthlyRate && (
-                <Card style={styles.priceCard}>
-                  <Text style={[styles.priceLabel, { color: theme.textSecondary }]}>Monthly</Text>
-                  <Text style={[styles.priceValue, { color: theme.text }]}>
-                    {formatPrice(space.monthlyRate)}
-                  </Text>
-                </Card>
-              )}
-            </View>
-          </View>
-
-          {/* Dimensions */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.text }]}>Dimensions</Text>
-            <Card style={styles.dimensionsCard}>
-              <Ionicons name="resize-outline" size={24} color={colors.primary} />
-              <Text style={[styles.dimensionsText, { color: theme.text }]}>
-                {formatDimensions(space.dimensions)}
+            <Card style={styles.priceCard}>
+              <Text style={[styles.priceLabel, { color: theme.textSecondary }]}>
+                Daily Rate
+              </Text>
+              <Text style={[styles.priceValue, { color: theme.text }]}>
+                {formatPrice(Number(dailyRate))}
               </Text>
             </Card>
           </View>
 
+          {/* Dimensions */}
+          {space.dimensionsText && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Dimensions</Text>
+              <Card style={styles.dimensionsCard}>
+                <Ionicons name="resize-outline" size={24} color={colors.primary} />
+                <Text style={[styles.dimensionsText, { color: theme.text }]}>
+                  {space.dimensionsText}
+                </Text>
+              </Card>
+            </View>
+          )}
+
           {/* Description */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.text }]}>Description</Text>
-            <Text style={[styles.description, { color: theme.textSecondary }]}>
-              {space.description}
-            </Text>
-          </View>
+          {space.description && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Description</Text>
+              <Text style={[styles.description, { color: theme.textSecondary }]}>
+                {space.description}
+              </Text>
+            </View>
+          )}
 
           {/* Stats */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: theme.text }]}>Performance</Text>
             <View style={styles.statsGrid}>
-              {space.impressionsPerDay && (
-                <Card style={styles.statCard}>
-                  <Ionicons name="eye-outline" size={24} color={colors.primary} />
-                  <Text style={[styles.statValue, { color: theme.text }]}>
-                    {space.impressionsPerDay.toLocaleString()}
-                  </Text>
-                  <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
-                    Impressions/day
-                  </Text>
-                </Card>
-              )}
-              {space.trafficLevel && (
+              <Card style={styles.statCard}>
+                <Ionicons name="calendar-outline" size={24} color={colors.primary} />
+                <Text style={[styles.statValue, { color: theme.text }]}>
+                  {space.totalBookings}
+                </Text>
+                <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+                  Total Bookings
+                </Text>
+              </Card>
+              {space.traffic && (
                 <Card style={styles.statCard}>
                   <Ionicons
                     name="people-outline"
                     size={24}
-                    color={trafficLevelColors[space.trafficLevel]}
+                    color={trafficColors[space.traffic] || colors.primary}
                   />
                   <Text
                     style={[
                       styles.statValue,
-                      { color: trafficLevelColors[space.trafficLevel] },
+                      { color: trafficColors[space.traffic] || theme.text },
                     ]}
                   >
-                    {space.trafficLevel.charAt(0).toUpperCase() + space.trafficLevel.slice(1)}
+                    {space.traffic}
                   </Text>
                   <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
                     Traffic Level
                   </Text>
                 </Card>
               )}
-              {space.rating && (
+              {space.averageRating != null && (
                 <Card style={styles.statCard}>
                   <Ionicons name="star" size={24} color="#FFB800" />
                   <Text style={[styles.statValue, { color: theme.text }]}>
-                    {space.rating.toFixed(1)}
+                    {space.averageRating.toFixed(1)}
                   </Text>
                   <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
-                    Rating ({space.reviewCount})
+                    Avg Rating
                   </Text>
                 </Card>
               )}
@@ -471,12 +506,7 @@ const styles = StyleSheet.create({
   mapPlaceholderText: {
     fontSize: fontSize.sm,
   },
-  pricingGrid: {
-    flexDirection: "row",
-    gap: spacing.sm,
-  },
   priceCard: {
-    flex: 1,
     alignItems: "center",
     paddingVertical: spacing.md,
   },

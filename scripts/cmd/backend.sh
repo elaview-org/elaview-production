@@ -116,6 +116,17 @@ ev_backend_publish() {
     return $ev_backend_exit
 }
 
+ev_backend_reset() {
+    ev_core_require_cmd "dotnet" || return 1
+    ev_core_log_info "Cleaning backend artifacts..."
+    ev_core_in_backend rm -rf bin obj publish
+    ev_core_log_info "Restoring dependencies..."
+    ev_core_in_backend dotnet restore ElaviewBackend.csproj
+    ev_backend_exit=$?
+    [ $ev_backend_exit -eq 0 ] && ev_core_log_success "Backend reset complete."
+    return $ev_backend_exit
+}
+
 ev_backend_dispatch() {
     cmd="$1"
     shift
@@ -135,9 +146,10 @@ ev_backend_dispatch() {
         test:unit)        ev_backend_test_unit ;;
         test:integration) ev_backend_test_integration ;;
         publish)          ev_backend_publish ;;
+        reset)            ev_backend_reset ;;
         *)
             ev_core_log_error "Unknown backend command: $cmd"
-            echo "Available: start, stop, restart, logs, status, exec, install, build, lint, format, test, test:unit, test:integration, publish"
+            echo "Available: start, stop, restart, logs, status, exec, install, build, lint, format, test, test:unit, test:integration, publish, reset"
             return 1
             ;;
     esac

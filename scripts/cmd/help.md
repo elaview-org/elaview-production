@@ -29,6 +29,23 @@ Backend (backend:*):
     backend:logs            follow logs of backend services
     backend:status          show status of backend services
     backend:exec            execute command in a backend container
+    backend:install         restore .NET dependencies
+    backend:build           build backend in Release mode
+    backend:lint            check code formatting
+    backend:format          format code
+    backend:test            run all tests
+    backend:test:unit       run unit tests only
+    backend:test:integration run integration tests only
+    backend:publish         publish backend to ./publish
+    backend:reset           clean artifacts (bin, obj, publish) and restore dependencies
+
+Web (web:*):
+
+    web:reset               clean artifacts and reinstall dependencies
+
+Mobile (mobile:*):
+
+    mobile:reset            clean artifacts (node_modules, .expo, ios, android) and reinstall dependencies
 
 Infrastructure (infra:*):
 
@@ -49,17 +66,7 @@ Repository (repo:*):
     repo:contributors       contributor statistics
     repo:activity           commit activity patterns
     repo:languages          language breakdown (GitHub-accurate)
-    repo:ui                 interactive git UI
+    repo:ui                 interactive git UI (lazygit)
     repo:secrets            scan working directory for secrets
     repo:secrets:history    scan git history for secrets
     repo:secrets:deep       deep scan with verification
-
-Mobile (mobile:*):
-
-    [no commands yet]
-
-Web (web:*):
-
-    [no commands yet]
-
-Additional help topics:

@@ -87,6 +87,12 @@ export default function OwnerLayout() {
             href: null,
           }}
         />
+        <Tabs.Screen
+          name="listings/edit/[id]"
+          options={{
+            href: null,
+          }}
+        />
       </Tabs>
 
       <DrawerMenu

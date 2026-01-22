@@ -1,10 +1,10 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import TopNavBar from "@/components/ui/TopNavBar";
 import DrawerMenu from "@/components/ui/DrawerMenu";
-import { mockNotifications, getUnreadCount } from "@/mocks/notifications";
+import { getUnreadCount, mockNotifications } from "@/mocks/notifications";
 import { colors } from "@/constants/theme";
 
 export default function AdvertiserLayout() {
@@ -88,6 +88,12 @@ export default function AdvertiserLayout() {
         />
         <Tabs.Screen
           name="space/[id]"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="book/[id]"
           options={{
             href: null,
           }}

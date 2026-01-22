@@ -1,6 +1,7 @@
 using dotenv.net;
 using ElaviewBackend.Data.Seeding;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.Bootstrap;
 
@@ -66,12 +67,18 @@ public static class Config {
     }
 
     public static async Task ConfigureAsync(this WebApplication app) {
-        var isTestOrDev = app.Environment.IsDevelopment() ||
-                          app.Environment.EnvironmentName == "Testing";
+        var isTesting = app.Environment.EnvironmentName == "Testing";
+        var isTestOrDev = app.Environment.IsDevelopment() || isTesting;
 
         using (var scope = app.Services.CreateScope()) {
-            var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-            await seeder.SeedAsync();
+            var dbContext = scope.ServiceProvider.GetRequiredService<Data.AppDbContext>();
+            if (isTestOrDev)
+                await dbContext.Database.MigrateAsync();
+
+            if (!isTesting) {
+                var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+                await seeder.SeedAsync();
+            }
         }
 
         if (!isTestOrDev) {

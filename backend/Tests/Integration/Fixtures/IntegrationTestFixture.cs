@@ -42,12 +42,6 @@ public sealed class IntegrationTestFixture : WebApplicationFactory<Program>,
 
         _ = CreateClient();
 
-        using (var scope = Services.CreateScope()) {
-            var dbContext =
-                scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            await dbContext.Database.MigrateAsync();
-        }
-
         _dbConnection =
             new NpgsqlConnection(_dbContainer.GetConnectionString());
         await _dbConnection.OpenAsync();

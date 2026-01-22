@@ -13,7 +13,7 @@
 - API: GraphQL via Apollo Client
 - Payments: Stripe Connect (two-stage payout)
 - Storage: Cloudflare R2
-- Monorepo: Turborepo + pnpm
+- Monorepo: Turborepo + bun
 
 **Team:**
 - @mike-anderson — Mobile app, frontend lead
@@ -64,7 +64,7 @@ elaview/
 ### Always
 
 ✅ Use TypeScript strict mode
-✅ **ALWAYS use pnpm, never npm or yarn**
+✅ **ALWAYS use bun, never npm, yarn, or pnpm**
 ✅ Write tests alongside features (unit + component minimum)
 ✅ Read space type config from API, never hardcode
 ✅ Use factories for test data (createMockBooking, etc.)
@@ -74,7 +74,7 @@ elaview/
 
 ### Never
 
-❌ **NEVER use npm or yarn - ONLY use pnpm**
+❌ **NEVER use npm, yarn, or pnpm - ONLY use bun**
 ❌ Hardcode space types, fees, or verification requirements
 ❌ Skip tests for new features
 ❌ Commit console.log or debug code
@@ -99,24 +99,24 @@ For detailed context, see `.cursor/rules/`:
 
 ```bash
 # Development
-pnpm dev                 # Start all apps
-pnpm dev:mobile          # Start mobile only
-pnpm dev:web             # Start web only
+bun dev                 # Start all apps
+bun dev:mobile          # Start mobile only
+bun dev:web             # Start web only
 
 # Testing
-pnpm test                # All unit + component tests
-pnpm test:watch          # Watch mode
-pnpm test:coverage       # With coverage
-pnpm test:integration    # Integration tests
-pnpm test:e2e            # E2E tests
+bun test                # All unit + component tests
+bun test:watch          # Watch mode
+bun test:coverage       # With coverage
+bun test:integration    # Integration tests
+bun test:e2e            # E2E tests
 
 # Code Quality
-pnpm lint                # ESLint
-pnpm typecheck           # TypeScript
-pnpm format              # Prettier
+bun lint                # ESLint
+bun typecheck           # TypeScript
+bun format              # Prettier
 
 # Build
-pnpm build               # Build all packages
+bun build               # Build all packages
 ```
 
 ## Environment Configuration

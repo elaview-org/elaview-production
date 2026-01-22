@@ -2,6 +2,11 @@
   "name": "elaview-mobile",
   "version": "1.0.0",
   "main": "expo-router/entry",
+  "engines": {
+    "npm": "use-bun-instead",
+    "yarn": "use-bun-instead",
+    "pnpm": "use-bun-instead"
+  },
   "scripts": {
     "start": "expo start",
     "dev": "expo start --dev-client",

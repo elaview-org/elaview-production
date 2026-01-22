@@ -36,3 +36,16 @@ public record ApproveBookingPayload(BookingNode Booking);
 public record CancelBookingResponse(CancelBookingPayload CancelBooking);
 
 public record CancelBookingPayload(BookingNode Booking);
+
+public record RejectBookingResponse(RejectBookingPayload RejectBooking);
+
+public record RejectBookingPayload(BookingNode Booking);
+
+public record MarkFileDownloadedResponse(
+    MarkFileDownloadedPayload MarkFileDownloaded);
+
+public record MarkFileDownloadedPayload(BookingNode Booking);
+
+public record MarkInstalledResponse(MarkInstalledPayload MarkInstalled);
+
+public record MarkInstalledPayload(BookingNode Booking);

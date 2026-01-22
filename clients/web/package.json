@@ -2,6 +2,11 @@
   "name": "elaview-web",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "npm": "use-bun-instead",
+    "yarn": "use-bun-instead",
+    "pnpm": "use-bun-instead"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",

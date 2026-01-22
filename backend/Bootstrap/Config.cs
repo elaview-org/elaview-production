@@ -1,5 +1,5 @@
 using dotenv.net;
-using ElaviewBackend.Data;
+using ElaviewBackend.Data.Seeding;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace ElaviewBackend.Bootstrap;
@@ -65,16 +65,14 @@ public static class Config {
         }
     }
 
-    public static Task ConfigureAsync(this WebApplication app) {
-        var task = Task.CompletedTask;
+    public static async Task ConfigureAsync(this WebApplication app) {
         var isTestOrDev = app.Environment.IsDevelopment() ||
                           app.Environment.EnvironmentName == "Testing";
 
-        if (app.Environment.IsDevelopment())
-            task = Task.Run(async () => await app.Services.CreateScope()
-                .ServiceProvider
-                .GetRequiredService<DatabaseSeeder>()
-                .SeedDevelopmentAccountsAsync(true));
+        using (var scope = app.Services.CreateScope()) {
+            var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+            await seeder.SeedAsync();
+        }
 
         if (!isTestOrDev) {
             app.MapOpenApi();
@@ -87,7 +85,5 @@ public static class Config {
             .UseAuthorization();
         app.MapControllers();
         app.MapGraphQL("/api/graphql");
-
-        return task;
     }
 }

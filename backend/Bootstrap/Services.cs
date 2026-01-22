@@ -1,4 +1,6 @@
 using ElaviewBackend.Data;
+using ElaviewBackend.Data.Seeding;
+using ElaviewBackend.Data.Seeding.Seeders;
 using ElaviewBackend.Features.Auth;
 using ElaviewBackend.Features.Marketplace;
 using ElaviewBackend.Features.Notifications;
@@ -58,6 +60,9 @@ public static class Services {
             .AddScoped<IMessageService, MessageService>()
             .AddScoped<IMessageRepository, MessageRepository>()
             .AddScoped<DatabaseSeeder>()
+            .AddScoped<ISeeder, AdminSeeder>()
+            .AddScoped<ISeeder, LegacyDevAccountsSeeder>()
+            .AddScoped<ISeeder, DevelopmentDataSeeder>()
             .AddControllers();
 
         var envVars = Environment.GetEnvironmentVariables();

@@ -1,4 +1,30 @@
-# Local TLS Certificate (Let’s Encrypt, DNS-01, HTTP/3)
+# Handy Commands
+
+### Login
+
+```bash
+curl -i -k -X POST http://localhost:7106/api/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"admin@email.com","password":"admin123"}'
+```
+
+### EF Core Migrations
+
+```bash
+dotnet ef migrations add MigrationName --output-dir Shared/Migrations
+dotnet ef database update
+```
+
+### Start with a fresh development database
+
+```bash
+dotnet ef migrations add MyMigrationName --project ElaviewBackend.csproj --output-dir Shared/Migrations
+dotnet ef database drop -f
+dotnet ef database update
+docker compose up -d server
+```
+
+### Local TLS Certificate (Let’s Encrypt, DNS-01, HTTP/3)
 
 This document describes how to generate a **publicly trusted TLS 1.3 certificate**
 for local development using **certbot (DNS-01)**.
@@ -9,7 +35,7 @@ Domain used in this example: `dev.example.com`
 
 ---
 
-## Prerequisites
+#### Prerequisites
 
 - Control over DNS for the domain
 - Ability to add/remove TXT records
@@ -19,7 +45,7 @@ Domain used in this example: `dev.example.com`
 
 ---
 
-## Directory Setup
+#### Directory Setup
 
 ```bash
 mkdir -p TLS
@@ -27,16 +53,16 @@ mkdir -p TLS
 
 ---
 
-## Step 1 — Install certbot
+#### Step 1 — Install certbot
 
-### Ubuntu / Debian / WSL
+##### Ubuntu / Debian / WSL
 
 ```bash
 sudo apt update
 sudo apt install certbot
 ```
 
-### macOS
+##### macOS
 
 ```bash
 brew install certbot
@@ -44,7 +70,7 @@ brew install certbot
 
 ---
 
-## Step 2 — Request Certificate (DNS-01, manual)
+#### Step 2 — Request Certificate (DNS-01, manual)
 
 Run from the project root:
 
@@ -60,7 +86,7 @@ certbot certonly \
 
 ---
 
-## Step 3 — Add DNS TXT Record
+#### Step 3 — Add DNS TXT Record
 
 Certbot will prompt with:
 
@@ -86,7 +112,7 @@ Once visible, return to certbot and press **Enter**.
 
 ---
 
-## Step 4 — Certificate Files
+#### Step 4 — Certificate Files
 
 On success, certificates are created at:
 
@@ -106,7 +132,7 @@ This is a **real Let’s Encrypt certificate**:
 
 ---
 
-## Step 5 — Convert to PFX for .NET / Kestrel
+#### Step 5 — Convert to PFX for .NET / Kestrel
 
 ```bash
 openssl pkcs12 -export \
@@ -125,7 +151,7 @@ Result:
 
 ---
 
-## Step 6 — Local Domain Mapping
+#### Step 6 — Local Domain Mapping
 
 Add to hosts file:
 
@@ -138,7 +164,7 @@ This ensures the domain resolves **locally only**.
 
 ---
 
-## Renewal
+#### Renewal
 
 Manual renewal (same layout):
 
@@ -156,7 +182,7 @@ After renewal, re-run the PFX export step.
 
 ---
 
-## Notes
+#### Notes
 
 * Multiple certificates per domain are normal
 * Production certificates are not reused

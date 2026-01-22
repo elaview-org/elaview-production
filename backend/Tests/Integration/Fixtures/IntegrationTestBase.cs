@@ -122,6 +122,59 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture)
         return spaces;
     }
 
+    protected async Task<Space> SeedSpaceWithPropertiesAsync(
+        Guid spaceOwnerProfileId, string city, decimal pricePerDay,
+        int minDuration = 7) {
+        var space = new Space {
+            Id = Guid.NewGuid(),
+            SpaceOwnerProfileId = spaceOwnerProfileId,
+            Title = "Test Space",
+            Description = "Test Description",
+            Type = SpaceType.Storefront,
+            Status = SpaceStatus.Active,
+            Address = "123 Test St",
+            City = city,
+            State = "NY",
+            Latitude = 40.7128,
+            Longitude = -74.0060,
+            PricePerDay = pricePerDay,
+            InstallationFee = 25.00m,
+            MinDuration = minDuration,
+            CreatedAt = DateTime.UtcNow
+        };
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Spaces.Add(space);
+        await context.SaveChangesAsync();
+        return space;
+    }
+
+    protected async Task<Space> SeedSpaceWithMinDurationAsync(
+        Guid spaceOwnerProfileId, int minDuration) {
+        var space = new Space {
+            Id = Guid.NewGuid(),
+            SpaceOwnerProfileId = spaceOwnerProfileId,
+            Title = "Test Space",
+            Description = "Test Description",
+            Type = SpaceType.Storefront,
+            Status = SpaceStatus.Active,
+            Address = "123 Test St",
+            City = "New York",
+            State = "NY",
+            Latitude = 40.7128,
+            Longitude = -74.0060,
+            PricePerDay = 50.00m,
+            InstallationFee = 25.00m,
+            MinDuration = minDuration,
+            CreatedAt = DateTime.UtcNow
+        };
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Spaces.Add(space);
+        await context.SaveChangesAsync();
+        return space;
+    }
+
     protected async Task<Campaign> SeedCampaignAsync(Guid advertiserProfileId,
         Action<Campaign>? customize = null) {
         var campaign = CampaignFactory.Create(advertiserProfileId, customize);
@@ -146,6 +199,40 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture)
         Guid spaceId, BookingStatus status) {
         var booking =
             BookingFactory.CreateWithStatus(campaignId, spaceId, status);
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Bookings.Add(booking);
+        await context.SaveChangesAsync();
+        return booking;
+    }
+
+    protected async Task<Booking> SeedBookingWithDatesAsync(Guid campaignId,
+        Guid spaceId, DateTime startDate, DateTime endDate,
+        BookingStatus status = BookingStatus.PendingApproval) {
+        var totalDays = (endDate - startDate).Days;
+        var pricePerDay = 50.00m;
+        var installationFee = 25.00m;
+        var subtotal = pricePerDay * totalDays;
+        var platformFeeAmount = subtotal * 0.10m;
+
+        var booking = new Booking {
+            Id = Guid.NewGuid(),
+            CampaignId = campaignId,
+            SpaceId = spaceId,
+            Status = status,
+            StartDate = DateTime.SpecifyKind(startDate, DateTimeKind.Utc),
+            EndDate = DateTime.SpecifyKind(endDate, DateTimeKind.Utc),
+            TotalDays = totalDays,
+            PricePerDay = pricePerDay,
+            InstallationFee = installationFee,
+            SubtotalAmount = subtotal,
+            PlatformFeePercent = 0.10m,
+            PlatformFeeAmount = platformFeeAmount,
+            TotalAmount = subtotal + installationFee + platformFeeAmount,
+            OwnerPayoutAmount = subtotal + installationFee,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
         using var scope = Fixture.Services.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
         context.Bookings.Add(booking);
@@ -190,5 +277,74 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture)
     protected T GetService<T>() where T : notnull {
         var scope = Fixture.Services.CreateScope();
         return scope.ServiceProvider.GetRequiredService<T>();
+    }
+
+    protected async Task<Booking> SeedBookingWithPricingAsync(
+        Guid campaignId, Guid spaceId, decimal subtotal, decimal installationFee,
+        BookingStatus status = BookingStatus.PendingApproval) {
+        var startDate = DateTime.UtcNow.AddDays(7);
+        var endDate = DateTime.UtcNow.AddDays(14);
+        var totalDays = (endDate - startDate).Days;
+        var platformFeeAmount = subtotal * 0.10m;
+
+        var booking = new Booking {
+            Id = Guid.NewGuid(),
+            CampaignId = campaignId,
+            SpaceId = spaceId,
+            Status = status,
+            StartDate = startDate,
+            EndDate = endDate,
+            TotalDays = totalDays,
+            PricePerDay = subtotal / totalDays,
+            InstallationFee = installationFee,
+            SubtotalAmount = subtotal,
+            PlatformFeePercent = 0.10m,
+            PlatformFeeAmount = platformFeeAmount,
+            TotalAmount = subtotal + installationFee + platformFeeAmount,
+            OwnerPayoutAmount = subtotal + installationFee,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Bookings.Add(booking);
+        await context.SaveChangesAsync();
+        return booking;
+    }
+
+    protected async Task<Payment> SeedPaymentAsync(Guid bookingId,
+        PaymentStatus status = PaymentStatus.Pending) {
+        var payment = status == PaymentStatus.Succeeded
+            ? PaymentFactory.CreateSucceeded(bookingId)
+            : PaymentFactory.Create(bookingId, p => p.Status = status);
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Payments.Add(payment);
+        await context.SaveChangesAsync();
+        return payment;
+    }
+
+    protected async Task<Payout> SeedPayoutAsync(Guid bookingId,
+        Guid spaceOwnerProfileId, PayoutStage stage,
+        PayoutStatus status = PayoutStatus.Pending) {
+        Payout payout;
+        if (status == PayoutStatus.Completed) {
+            payout = PayoutFactory.CreateCompleted(bookingId, spaceOwnerProfileId, stage);
+        } else {
+            payout = new Payout {
+                Id = Guid.NewGuid(),
+                BookingId = bookingId,
+                SpaceOwnerProfileId = spaceOwnerProfileId,
+                Stage = stage,
+                Amount = 100.00m,
+                Status = status,
+                CreatedAt = DateTime.UtcNow
+            };
+        }
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Payouts.Add(payout);
+        await context.SaveChangesAsync();
+        return payout;
     }
 }

@@ -713,6 +713,29 @@ public abstract class IntegrationTestBase {
         using var scope = Fixture.Services.CreateScope();
         return scope.ServiceProvider.GetRequiredService<T>();
     }
+
+    // Additional helpers for edge case testing (added 2026-01-22)
+    protected async Task<Booking> SeedBookingWithDatesAsync(
+        Guid campaignId, Guid spaceId, DateTime startDate, DateTime endDate,
+        BookingStatus status = BookingStatus.PendingApproval);
+
+    protected async Task<Booking> SeedBookingWithPricingAsync(
+        Guid campaignId, Guid spaceId, decimal subtotal, decimal installationFee,
+        BookingStatus status = BookingStatus.PendingApproval);
+
+    protected async Task<Space> SeedSpaceWithPropertiesAsync(
+        Guid spaceOwnerProfileId, string city, decimal pricePerDay,
+        int minDuration = 7);
+
+    protected async Task<Space> SeedSpaceWithMinDurationAsync(
+        Guid spaceOwnerProfileId, int minDuration);
+
+    protected async Task<Payment> SeedPaymentAsync(
+        Guid bookingId, PaymentStatus status = PaymentStatus.Pending);
+
+    protected async Task<Payout> SeedPayoutAsync(
+        Guid bookingId, Guid spaceOwnerProfileId, PayoutStage stage,
+        PayoutStatus status = PayoutStatus.Pending);
 }
 ```
 
@@ -851,6 +874,180 @@ public async Task Login_InvalidInput_ReturnsBadRequest(
 
 ---
 
+## Implemented Edge Case Tests
+
+Tests implemented in `Tests/Integration/Marketplace/` and `Tests/Integration/Payments/`.
+
+### Booking Authorization (`BookingAuthorizationTests.cs`)
+
+| Test Case | Status |
+|-----------|--------|
+| `ApproveBooking_AsAdvertiser_ReturnsForbidden` | ✅ Implemented |
+| `RejectBooking_AsAdvertiser_ReturnsForbidden` | ✅ Implemented |
+| `MarkFileDownloaded_AsAdvertiser_ReturnsForbidden` | ✅ Implemented |
+| `MarkInstalled_AsAdvertiser_ReturnsForbidden` | ✅ Implemented |
+| `CancelBooking_AsUnrelatedUser_ReturnsForbidden` | ✅ Implemented |
+
+### Booking Validation (`BookingValidationTests.cs`)
+
+| Test Case | Status |
+|-----------|--------|
+| `CreateBooking_StartDateInPast_ReturnsValidationError` | ✅ Implemented |
+| `CreateBooking_EndBeforeStart_ReturnsValidationError` | ✅ Implemented |
+| `CreateBooking_ZeroDuration_ReturnsValidationError` | ✅ Implemented |
+| `CreateBooking_BelowMinDuration_ReturnsValidationError` | ✅ Implemented |
+| `CreateBooking_NonexistentCampaign_ReturnsNotFound` | ✅ Implemented |
+| `CreateBooking_NonexistentSpace_ReturnsNotFound` | ✅ Implemented |
+
+### Booking Status Transitions (`BookingStatusTransitionTests.cs`)
+
+| Test Case | Status |
+|-----------|--------|
+| `ApproveBooking_NotPendingApproval_ReturnsInvalidStatusTransition` | ✅ Implemented (Theory, 7 statuses) |
+| `RejectBooking_NotPendingApproval_ReturnsInvalidStatusTransition` | ✅ Implemented (Theory, 7 statuses) |
+| `MarkFileDownloaded_NotPaid_ReturnsInvalidStatusTransition` | ✅ Implemented (Theory, 6 statuses) |
+| `MarkInstalled_NotFileDownloaded_ReturnsInvalidStatusTransition` | ✅ Implemented (Theory, 6 statuses) |
+| `CancelBooking_NotCancellable_ReturnsInvalidStatusTransition` | ✅ Implemented (Theory, 5 statuses) |
+
+### Space Authorization (`SpaceAuthorizationTests.cs`)
+
+| Test Case | Status |
+|-----------|--------|
+| `UpdateSpace_AsNonOwner_ReturnsForbidden` | ✅ Implemented |
+| `DeleteSpace_AsNonOwner_ReturnsForbidden` | ✅ Implemented |
+| `DeactivateSpace_AsNonOwner_ReturnsForbidden` | ✅ Implemented |
+
+### Space Validation (`SpaceValidationTests.cs`)
+
+| Test Case | Status |
+|-----------|--------|
+| `DeactivateSpace_WithActiveBooking_ReturnsConflict` | ✅ Implemented |
+| `DeleteSpace_WithActiveBooking_ReturnsConflict` | ✅ Implemented |
+| `CreateBooking_OnInactiveSpace_ReturnsForbidden` | ✅ Implemented |
+| `CreateBooking_OverlappingDates_ReturnsConflict` | ✅ Implemented |
+| `CreateSpace_NegativePrice_ReturnsValidationError` | ✅ Implemented |
+| `UpdateSpace_NegativePrice_ReturnsValidationError` | ✅ Implemented |
+
+### Payment Edge Cases (`PaymentEdgeCaseTests.cs`)
+
+| Test Case | Status |
+|-----------|--------|
+| `CreatePaymentIntent_NotApproved_ReturnsInvalidStatusTransition` | ✅ Implemented |
+| `CreatePaymentIntent_AlreadyPaid_ReturnsConflict` | ✅ Implemented |
+| `CreatePaymentIntent_AsNonAdvertiser_ReturnsForbidden` | ✅ Implemented |
+| `CreatePaymentIntent_NonexistentBooking_ReturnsNotFound` | ✅ Implemented |
+| `RequestRefund_NoPayment_ReturnsNotFound` | ✅ Implemented |
+
+### Pagination Edge Cases (`PaginationEdgeCaseTests.cs`)
+
+| Test Case | Status |
+|-----------|--------|
+| `GetSpaces_NoMatches_ReturnsEmptyConnection` | ✅ Implemented |
+| `GetSpaces_FilterAndSort_CombinesCorrectly` | ✅ Implemented |
+| `GetBookings_AsAdvertiser_ReturnsOnlyOwn` | ✅ Implemented |
+| `GetBookings_AsOwner_ReturnsOnlyOwn` | ✅ Implemented |
+| `GetSpaces_WithPagination_ReturnsCorrectPage` | ✅ Implemented |
+
+---
+
+## Remaining Edge Cases (Not Yet Implemented)
+
+### Booking Lifecycle
+
+| Test Case | Priority | Description |
+|-----------|----------|-------------|
+| `Booking_AutoApprovalAfter48Hours_CompletesAutomatically` | High | System auto-approves verification after timeout |
+| `CancelBooking_AtEachStatus_ReturnsCorrectRefund` | High | Cancellation refund varies by status |
+| `DisputeBooking_ValidReason_TransitionsToDisputed` | Medium | Advertiser disputes after installation |
+| `ResolveDispute_InFavorOfOwner_ReleasesRemainingPayout` | Medium | Dispute resolution payout logic |
+| `ResolveDispute_InFavorOfAdvertiser_RefundsPartial` | Medium | Dispute resolution refund logic |
+
+### Payment Flow
+
+| Test Case | Priority | Description |
+|-----------|----------|-------------|
+| `ProcessPayment_StripeDeclined_ReturnsPaymentError` | High | Card declined handling |
+| `ProcessPayment_DoubleSubmission_ReturnsIdempotent` | High | Prevent duplicate charges |
+| `Stage1Payout_OnFileDownload_TriggersCorrectAmount` | High | Print+install fee payout |
+| `Stage2Payout_OnVerificationApproved_TriggersRemainder` | High | Final payout after approval |
+| `Payout_InvalidStripeAccount_ReturnsPaymentError` | Medium | Owner's Stripe Connect invalid |
+| `Webhook_InvalidSignature_ReturnsUnauthorized` | Medium | Stripe webhook security |
+| `Webhook_DuplicateEvent_IsIdempotent` | Medium | Handle webhook retries |
+| `Refund_PartialAmount_CalculatesCorrectly` | Medium | Partial refund scenarios |
+
+```csharp
+[Fact]
+public async Task ProcessPayment_DoubleSubmission_ChargesOnlyOnce() {
+    var booking = await SeedApprovedBookingAsync();
+    await LoginAsAdvertiserAsync(booking.AdvertiserId);
+
+    var tasks = Enumerable.Range(0, 3).Select(_ =>
+        Client.MutateAsync<PayBookingResponse>("""
+            mutation($id: ID!) {
+                payBooking(id: $id) {
+                    booking { status }
+                    errors { __typename }
+                }
+            }
+            """, new { id = booking.Id })
+    );
+
+    var responses = await Task.WhenAll(tasks);
+
+    responses.Count(r => r.Data?.PayBooking.Booking?.Status == "PAID")
+        .Should().Be(1);
+    responses.Count(r => r.Data?.PayBooking.Errors?.Any() == true)
+        .Should().Be(2);
+}
+
+[Fact]
+public async Task Stage1Payout_OnFileDownload_TriggersCorrectAmount() {
+    var booking = await SeedPaidBookingAsync(b => {
+        b.InstallationFee = 25m;
+        b.SubtotalAmount = 700m;
+    });
+    await LoginAsOwnerAsync(booking.Space.SpaceOwnerProfile.UserId);
+
+    await Client.MutateAsync<DownloadFileResponse>("""
+        mutation($id: ID!) {
+            markFileDownloaded(bookingId: $id) {
+                booking { status }
+            }
+        }
+        """, new { id = booking.Id });
+
+    var payout = await GetLatestPayoutAsync(booking.Id);
+    payout.Amount.Should().Be(235m);
+    payout.Stage.Should().Be(PayoutStage.Stage1);
+}
+```
+
+### Space Management
+
+| Test Case | Priority | Description |
+|-----------|----------|-------------|
+| `UpdateSpace_WhileActiveBooking_AllowsNonCriticalFields` | Medium | Can update description, not price |
+| `CreateSpace_InvalidCoordinates_ReturnsValidationError` | Low | Lat/long bounds check |
+| `GetSpaces_FilterByAvailability_ExcludesBooked` | Medium | Availability filter accuracy |
+
+### File & Verification Flow
+
+| Test Case | Priority | Description |
+|-----------|----------|-------------|
+| `DownloadFile_AlreadyDownloaded_ReturnsIdempotent` | Medium | Track but don't error |
+| `UploadVerification_BeforeDownload_ReturnsForbidden` | High | Enforce flow order |
+| `UploadVerification_ExpiredWindow_ReturnsForbidden` | Medium | Time limit enforcement |
+| `ApproveVerification_WithoutPhotos_ReturnsValidationError` | Medium | Require evidence |
+
+### Authorization
+
+| Test Case | Priority | Description |
+|-----------|----------|-------------|
+| `CreateCampaign_AsSpaceOwner_ReturnsForbidden` | Medium | Profile type enforcement |
+| `SwitchProfile_DuringActiveBooking_Allowed` | Low | Profile switch doesn't break bookings |
+
+---
+
 ## Running Tests
 
 ### Commands
@@ -894,4 +1091,4 @@ test:
 
 ---
 
-**Last Updated**: 2026-01-14
+**Last Updated**: 2026-01-22 (Edge case tests implemented)

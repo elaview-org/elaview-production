@@ -1,6 +1,6 @@
-import { Card, CardContent } from "@/components/card";
-import { Separator } from "@/components/separator";
-import { Skeleton } from "@/components/skeleton";
+import { Card, CardContent } from "@/components/primitives/card";
+import { Separator } from "@/components/primitives/separator";
+import { Skeleton } from "@/components/primitives/skeleton";
 
 export default function Loading() {
   return (

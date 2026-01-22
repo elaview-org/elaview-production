@@ -5,9 +5,9 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/components/dialog";
-import { Button } from "@/components/button";
-import { Badge } from "@/components/badge";
+} from "@/components/primitives/dialog";
+import { Button } from "@/components/primitives/button";
+import { Badge } from "@/components/primitives/badge";
 import { SpaceMarker } from "./types";
 import {
   IconMapPin,
@@ -36,7 +36,7 @@ export default function SpacePreview({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent size="lg" className="gap-0 p-0 overflow-hidden">
+      <DialogContent size="lg" className="gap-0 overflow-hidden p-0">
         <div className="bg-muted relative aspect-video w-full">
           {space.images[0] ? (
             <img

@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/primitives/skeleton";
 import { MapSkeleton } from "./@map/map-wrapper";
 
 export function DiscoverHeaderSkeleton() {

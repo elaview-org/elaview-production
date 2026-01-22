@@ -1,14 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
-import { Button } from "@/components/button";
+import { Button } from "@/components/primitives/button";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/field";
-import { Input } from "@/components/input";
+} from "@/components/primitives/field";
+import { Input } from "@/components/primitives/input";
 import { updateBusinessInfoAction } from "./settings.actions";
 import type { User } from "@/types/graphql.generated";
 import { toast } from "sonner";

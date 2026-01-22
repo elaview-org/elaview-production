@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/components/button";
+import { Button } from "@/components/primitives/button";
 import { IconHeart, IconShare } from "@tabler/icons-react";
-import { Badge } from "@/components/badge";
+import { Badge } from "@/components/primitives/badge";
 import { SpaceMarker } from "../types";
 
 interface SpaceCardProps {

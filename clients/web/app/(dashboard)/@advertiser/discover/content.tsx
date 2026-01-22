@@ -3,8 +3,8 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ReactNode, useCallback, useMemo, useSyncExternalStore } from "react";
 import { IconLayoutGrid, IconMap, IconSearch } from "@tabler/icons-react";
-import { Input } from "@/components/input";
-import { Button } from "@/components/button";
+import { Input } from "@/components/primitives/input";
+import { Button } from "@/components/primitives/button";
 import FilterSheet from "./filter-sheet";
 import { FilterState } from "./types";
 import { SpaceType } from "@/types/graphql.generated";
@@ -16,7 +16,9 @@ interface ContentProps {
 
 function getStoredView(): "grid" | "map" {
   if (typeof window === "undefined") return "map";
-  return (localStorage.getItem("ElaviewDiscoverView") as "grid" | "map") ?? "map";
+  return (
+    (localStorage.getItem("ElaviewDiscoverView") as "grid" | "map") ?? "map"
+  );
 }
 
 const subscribeToStorage = (callback: () => void) => {
@@ -109,9 +111,7 @@ export default function Content({ gridView, mapView }: ContentProps) {
     <>
       <header className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Discover Spaces
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Discover Spaces</h1>
           <p className="text-muted-foreground">
             Find the perfect advertising space for your campaign
           </p>

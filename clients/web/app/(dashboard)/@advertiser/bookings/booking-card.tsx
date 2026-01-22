@@ -9,7 +9,7 @@ import {
   CardDescription,
   CardAction,
   CardContent,
-} from "@/components/card";
+} from "@/components/primitives/card";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -17,7 +17,7 @@ import Image from "next/image";
 export type BookingStatus = "active" | "pending" | "completed" | "cancelled";
 
 interface BookingCardProps {
-  id: number|string;
+  id: number | string;
   status: BookingStatus;
   spaceName: string;
   location: string;

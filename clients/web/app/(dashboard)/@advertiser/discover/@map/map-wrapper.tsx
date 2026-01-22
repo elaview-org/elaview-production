@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { SpaceMarker } from "../types";
 import SpacePreview from "../space-preview";
-import { Skeleton } from "@/components/skeleton";
+import { Skeleton } from "@/components/primitives/skeleton";
 
 export function MapSkeleton() {
   return <Skeleton className="h-[600px] w-full rounded-lg" />;

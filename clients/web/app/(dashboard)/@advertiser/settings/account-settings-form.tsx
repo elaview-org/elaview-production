@@ -1,15 +1,15 @@
 "use client";
 
-import { Button } from "@/components/button";
+import { Button } from "@/components/primitives/button";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/field";
-import { Input } from "@/components/input";
+} from "@/components/primitives/field";
+import { Input } from "@/components/primitives/input";
 import type { User } from "@/types/graphql.generated";
-import { Separator } from "@/components/separator";
+import { Separator } from "@/components/primitives/separator";
 
 interface AccountSettingsFormProps {
   user: User;

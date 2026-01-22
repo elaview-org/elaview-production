@@ -1,14 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/primitives/tabs";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/card";
+} from "@/components/primitives/card";
 import { ProfileSettingsForm } from "./profile-settings-form";
 import { BusinessSettingsForm } from "./business-settings-form";
 import { AccountSettingsForm } from "./account-settings-form";
@@ -17,7 +22,6 @@ import type { User } from "@/types/graphql.generated";
 interface AdvertiserSettingsContentProps {
   user: User;
 }
-
 
 export function AdvertiserSettingsContent({
   user,

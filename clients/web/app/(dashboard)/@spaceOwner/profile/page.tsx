@@ -1,9 +1,13 @@
 import api from "@/api/gql/server";
 import { Query } from "@/types/graphql.generated";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar";
-import { Badge } from "@/components/badge";
-import { Card, CardContent } from "@/components/card";
-import { Separator } from "@/components/separator";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/primitives/avatar";
+import { Badge } from "@/components/primitives/badge";
+import { Card, CardContent } from "@/components/primitives/card";
+import { Separator } from "@/components/primitives/separator";
 import {
   IconBriefcase,
   IconMapPin,
@@ -142,7 +146,8 @@ export default async function Page() {
         reviewerName:
           review.booking.campaign.advertiserProfile.user?.name ??
           review.booking.campaign.advertiserProfile.companyName,
-        reviewerAvatar: review.booking.campaign.advertiserProfile.user?.avatar ?? null,
+        reviewerAvatar:
+          review.booking.campaign.advertiserProfile.user?.avatar ?? null,
       }))
     );
 

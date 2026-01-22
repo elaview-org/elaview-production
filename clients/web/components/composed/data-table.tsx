@@ -54,15 +54,15 @@ import { toast } from "sonner";
 import { z } from "zod";
 
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Badge } from "@/components/badge";
-import { Button } from "@/components/button";
+import { Badge } from "@/components/primitives/badge";
+import { Button } from "@/components/primitives/button";
 import {
   type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/chart";
-import { Checkbox } from "@/components/checkbox";
+} from "@/components/primitives/chart";
+import { Checkbox } from "@/components/primitives/checkbox";
 import {
   Drawer,
   DrawerClose,
@@ -72,7 +72,7 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/drawer";
+} from "@/components/primitives/drawer";
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -80,17 +80,17 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/dropdown-menu";
-import { Input } from "@/components/input";
-import { Label } from "@/components/label";
+} from "@/components/primitives/dropdown-menu";
+import { Input } from "@/components/primitives/input";
+import { Label } from "@/components/primitives/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/select";
-import { Separator } from "@/components/separator";
+} from "@/components/primitives/select";
+import { Separator } from "@/components/primitives/separator";
 import {
   Table,
   TableBody,
@@ -98,8 +98,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/table";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/tabs";
+} from "@/components/primitives/table";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/primitives/tabs";
 
 export const schema = z.object({
   id: z.number(),

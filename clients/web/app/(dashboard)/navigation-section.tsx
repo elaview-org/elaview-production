@@ -9,7 +9,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 
-import { Button } from "@/components/button";
+import { Button } from "@/components/primitives/button";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -19,14 +19,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/sidebar";
+} from "@/components/primitives/sidebar";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/dropdown-menu";
+} from "@/components/primitives/dropdown-menu";
 import { ProfileType, UserRole } from "@/types/graphql.generated";
 import adminData from "./@admin/navigation-bar.data";
 import advertiserData from "./@advertiser/navigation-bar.data";

@@ -1,8 +1,4 @@
-import {
-  Card,
-  CardDescription,
-  CardTitle,
-} from "@/components/card";
+import { Card, CardDescription, CardTitle } from "@/components/primitives/card";
 
 function SpaceInfo() {
   // Dummy data for presentation; replace with real props/data as needed
@@ -23,21 +19,21 @@ function SpaceInfo() {
   return (
     <Card className="p-5">
       <CardTitle className="mb-2 text-lg">Space Information</CardTitle>
-      <div className="mb-4 h-32 w-full overflow-hidden rounded-lg bg-amber-100 flex items-center justify-center">
+      <div className="mb-4 flex h-32 w-full items-center justify-center overflow-hidden rounded-lg bg-amber-100">
         <img
           src={billboard.imageUrl}
           alt={billboard.name}
-          className="object-cover w-full h-full"
+          className="h-full w-full object-cover"
         />
       </div>
       <div className="mb-4">
         <CardTitle className="text-base">Billboard</CardTitle>
         <CardDescription>
           <span className="block font-medium">{billboard.name}</span>
-          <span className="block text-sm text-muted-foreground">
+          <span className="text-muted-foreground block text-sm">
             {billboard.location}
           </span>
-          <span className="block text-sm text-muted-foreground">
+          <span className="text-muted-foreground block text-sm">
             Size: {billboard.size}
           </span>
         </CardDescription>

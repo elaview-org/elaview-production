@@ -8,11 +8,11 @@ import {
   SheetTitle,
   SheetTrigger,
   SheetFooter,
-} from "@/components/sheet";
-import { Button } from "@/components/button";
-import { Slider } from "@/components/slider";
-import { Checkbox } from "@/components/checkbox";
-import { Label } from "@/components/label";
+} from "@/components/primitives/sheet";
+import { Button } from "@/components/primitives/button";
+import { Slider } from "@/components/primitives/slider";
+import { Checkbox } from "@/components/primitives/checkbox";
+import { Label } from "@/components/primitives/label";
 import { IconFilter, IconX } from "@tabler/icons-react";
 import { SpaceType } from "@/types/graphql.generated";
 import { FilterState } from "./types";
@@ -100,7 +100,7 @@ export default function FilterSheet({
           <SheetTitle>Filters</SheetTitle>
         </SheetHeader>
 
-        <div className="flex-1 space-y-8 overflow-y-auto py-6 px-5">
+        <div className="flex-1 space-y-8 overflow-y-auto px-5 py-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Price Range</Label>
@@ -144,11 +144,7 @@ export default function FilterSheet({
         </div>
 
         <SheetFooter className="flex-row gap-3 border-t pt-4">
-          <Button
-            variant="outline"
-            className="flex-1"
-            onClick={handleReset}
-          >
+          <Button variant="outline" className="flex-1" onClick={handleReset}>
             <IconX className="mr-2 h-4 w-4" />
             Reset
           </Button>

@@ -6,7 +6,7 @@ import {
   StepperSeparator,
   StepperTrigger,
   StepperTitle,
-} from "@/components/stepper";
+} from "@/components/primitives/stepper";
 import { Check, Loader2 } from "lucide-react";
 
 export type BookingStepStatus =

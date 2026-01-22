@@ -10,7 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-} from "@/components/sidebar";
+} from "@/components/primitives/sidebar";
 import { IconInnerShadowTop } from "@tabler/icons-react";
 import { NavigationSection } from "./navigation-section";
 import { UserSection } from "./user-section";

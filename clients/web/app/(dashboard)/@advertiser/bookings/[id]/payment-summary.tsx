@@ -1,4 +1,10 @@
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/primitives/card";
 
 function PaymentSummary() {
   // In a real-world scenario, these would come from props or context
@@ -18,16 +24,26 @@ function PaymentSummary() {
       <CardContent className="divide-y px-2 pb-2">
         <div className="flex flex-col gap-3">
           {breakdown.map((item) => (
-            <div key={item.label} className="flex justify-between items-center text-sm">
+            <div
+              key={item.label}
+              className="flex items-center justify-between text-sm"
+            >
               <span className="text-muted-foreground">{item.label}</span>
-              <span>${item.value.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+              <span>
+                $
+                {item.value.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                })}
+              </span>
             </div>
           ))}
         </div>
       </CardContent>
       <CardFooter className="flex justify-between border-t pt-4">
-        <span className="font-semibold text-base">Total Paid</span>
-        <span className="font-bold text-base">${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}</span>
+        <span className="text-base font-semibold">Total Paid</span>
+        <span className="text-base font-bold">
+          ${total.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+        </span>
       </CardFooter>
     </Card>
   );

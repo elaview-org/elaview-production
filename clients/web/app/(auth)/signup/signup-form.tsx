@@ -1,15 +1,15 @@
 "use client";
 
 import signup from "./signup.action";
-import { Button } from "@/components/button";
+import { Button } from "@/components/primitives/button";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/components/field";
-import { Input } from "@/components/input";
+} from "@/components/primitives/field";
+import { Input } from "@/components/primitives/input";
 
 import { useActionState } from "react";
 

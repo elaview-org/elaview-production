@@ -1,21 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/button";
+import { Button } from "@/components/primitives/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-} from "@/components/dialog";
-import { Input } from "@/components/input";
+} from "@/components/primitives/dialog";
+import { Input } from "@/components/primitives/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/select";
+} from "@/components/primitives/select";
 import StatusTimeline from "./status-timeline";
 import SpaceInfo from "./space-info";
 import InstallationReviews from "./installation-review";

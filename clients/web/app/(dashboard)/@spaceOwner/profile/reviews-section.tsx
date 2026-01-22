@@ -1,9 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar";
-import { Button } from "@/components/button";
-import { Card, CardContent } from "@/components/card";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/primitives/avatar";
+import { Button } from "@/components/primitives/button";
+import { Card, CardContent } from "@/components/primitives/card";
 import {
   IconChevronLeft,
   IconChevronRight,
@@ -53,11 +57,17 @@ function renderStars(rating: number) {
 
 const REVIEWS_PER_PAGE = 3;
 
-export function ReviewsSection({ reviews, ownerFirstName }: ReviewsSectionProps) {
+export function ReviewsSection({
+  reviews,
+  ownerFirstName,
+}: ReviewsSectionProps) {
   const [page, setPage] = useState(0);
   const totalPages = Math.ceil(reviews.length / REVIEWS_PER_PAGE);
   const startIndex = page * REVIEWS_PER_PAGE;
-  const visibleReviews = reviews.slice(startIndex, startIndex + REVIEWS_PER_PAGE);
+  const visibleReviews = reviews.slice(
+    startIndex,
+    startIndex + REVIEWS_PER_PAGE
+  );
 
   return (
     <div className="flex flex-col gap-6">
@@ -92,7 +102,9 @@ export function ReviewsSection({ reviews, ownerFirstName }: ReviewsSectionProps)
               <div className="flex items-center gap-3">
                 <Avatar className="size-10">
                   <AvatarImage src={review.reviewerAvatar ?? undefined} />
-                  <AvatarFallback>{getInitials(review.reviewerName)}</AvatarFallback>
+                  <AvatarFallback>
+                    {getInitials(review.reviewerName)}
+                  </AvatarFallback>
                 </Avatar>
                 <span className="font-medium">{review.reviewerName}</span>
               </div>

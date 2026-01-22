@@ -7,7 +7,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/select";
+} from "@/components/primitives/select";
 import { BookingCard, BookingStatus } from "./booking-card";
 import { BookingStatus as GraphQLBookingStatus } from "@/types/graphql.generated";
 import type { Booking } from "@/types/graphql.generated";
@@ -86,9 +86,9 @@ export default function BookingsPage({ bookings }: BookingsPageProps) {
         spaceName: string;
         location: string;
         startDate: string;
-        endDate:string;
-        campaignName:string;
-        thumbnailUrl:string;
+        endDate: string;
+        campaignName: string;
+        thumbnailUrl: string;
       };
     });
   }, [filteredBookings]);

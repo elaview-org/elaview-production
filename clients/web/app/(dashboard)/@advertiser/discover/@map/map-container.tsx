@@ -12,8 +12,8 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { SpaceMarker } from "../types";
-import { Button } from "@/components/button";
-import { Badge } from "@/components/badge";
+import { Button } from "@/components/primitives/button";
+import { Badge } from "@/components/primitives/badge";
 import { IconCurrentLocation } from "@tabler/icons-react";
 
 const subscribe = () => () => {};
@@ -55,7 +55,10 @@ function GeolocationButton() {
   };
 
   return (
-    <div className="leaflet-top leaflet-right" style={{ marginTop: 10, marginRight: 10 }}>
+    <div
+      className="leaflet-top leaflet-right"
+      style={{ marginTop: 10, marginRight: 10 }}
+    >
       <Button
         size="icon"
         variant="secondary"
@@ -88,7 +91,11 @@ export default function MapView({
   center = [38.0293, -78.4767],
   zoom = 13,
 }: MapViewProps) {
-  const mounted = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const mounted = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot
+  );
 
   if (!mounted) {
     return (

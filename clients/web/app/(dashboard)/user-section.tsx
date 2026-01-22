@@ -2,13 +2,21 @@
 
 import { useTransition } from "react";
 import { IconLogout, IconSwitchHorizontal } from "@tabler/icons-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/primitives/avatar";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/sidebar";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/tooltip";
+} from "@/components/primitives/sidebar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/primitives/tooltip";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Maybe, ProfileType } from "@/types/graphql.generated";

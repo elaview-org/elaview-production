@@ -11,21 +11,24 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/card";
+} from "@/components/primitives/card";
 import {
   type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/chart";
+} from "@/components/primitives/chart";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/select";
-import { ToggleGroup, ToggleGroupItem } from "@/components/toggle-group";
+} from "@/components/primitives/select";
+import {
+  ToggleGroup,
+  ToggleGroupItem,
+} from "@/components/primitives/toggle-group";
 
 export const description = "An interactive area chart";
 

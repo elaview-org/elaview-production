@@ -1,4 +1,4 @@
-import { Card, CardContent, CardTitle } from "@/components/card";
+import { Card, CardContent, CardTitle } from "@/components/primitives/card";
 
 const verificationImages = [
   { src: "/images/verification1.jpg", alt: "Verification Photo 1" },
@@ -12,7 +12,7 @@ export default function InstallationReviews() {
       <CardContent>
         <CardTitle>Installation Review</CardTitle>
         <div className="mb-2 font-medium">Owner’s Verification Photos</div>
-        <div className="flex gap-4 max-w-full overflow-hidden">
+        <div className="flex max-w-full gap-4 overflow-hidden">
           {verificationImages.map((img, idx) => (
             <div
               key={idx}

@@ -1,6 +1,6 @@
-import { SectionCards } from "@/components/section-cards";
-import { ChartAreaInteractive } from "@/components/chart-area-interactive";
-import { DataTable } from "@/components/data-table";
+import { SectionCards } from "@/components/composed/section-cards";
+import { ChartAreaInteractive } from "@/components/composed/chart-area-interactive";
+import { DataTable } from "@/components/composed/data-table";
 
 export default function Page() {
   return (

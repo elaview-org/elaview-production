@@ -1,12 +1,12 @@
 "use client";
 
-import { Separator } from "@/components/separator";
-import { SidebarTrigger } from "@/components/sidebar";
+import { Separator } from "@/components/primitives/separator";
+import { SidebarTrigger } from "@/components/primitives/sidebar";
 import { usePathname } from "next/dist/client/components/navigation";
 import * as React from "react";
 import { Fragment } from "react";
 import Link from "next/link";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { ThemeToggle } from "@/components/composed/theme-toggle";
 
 export default function ContentHeader() {
   return (

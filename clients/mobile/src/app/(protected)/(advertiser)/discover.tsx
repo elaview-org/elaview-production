@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import Map from "@/components/ui/Map";
@@ -43,6 +44,7 @@ const filters: { key: FilterType; label: string }[] = [
 
 export default function Discover() {
   const { theme } = useTheme();
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
 
@@ -132,8 +134,11 @@ export default function Discover() {
     });
   }, [spaces, searchQuery, activeFilter]);
 
-  const handleSpacePress = (_space: Space) => {
-    // TODO: Navigate to space detail
+  const handleSpacePress = (space: Space) => {
+    router.push({
+      pathname: "/(protected)/(advertiser)/space/[id]",
+      params: { id: String(space.id) },
+    });
   };
 
   return (

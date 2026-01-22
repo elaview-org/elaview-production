@@ -86,6 +86,12 @@ export default function AdvertiserLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="space/[id]"
+          options={{
+            href: null,
+          }}
+        />
       </Tabs>
 
       <DrawerMenu

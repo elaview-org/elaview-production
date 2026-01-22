@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,23 +15,25 @@ import {
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useSession } from "@/contexts/SessionContext";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
 import { spaceTypeLabels, spaceTypeIcons, formatPrice } from "@/mocks/spaces";
 import api from "@/api";
-import { Query, SpaceType } from "@/types/graphql";
+import { Mutation, Query, SpaceType, ProfileType } from "@/types/graphql";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function SpaceDetail() {
   const { theme } = useTheme();
+  const { profileType, user: currentUser } = useSession();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const flatListRef = useRef<FlatList>(null);
 
-  // Fetch space from API
-  const { data, loading, error } = api.query<Pick<Query, "spaceById">>(
+  // Fetch space from API (includes owner info for advertiser view)
+  const { data, loading, error, refetch } = api.query<Pick<Query, "spaceById">>(
     api.gql`
       query GetSpace($id: ID!) {
         spaceById(id: $id) {
@@ -44,6 +46,9 @@ export default function SpaceDetail() {
           state
           zipCode
           pricePerDay
+          installationFee
+          minDuration
+          maxDuration
           images
           width
           height
@@ -52,6 +57,7 @@ export default function SpaceDetail() {
           averageRating
           totalBookings
           status
+          spaceOwnerProfileId
         }
       }
     `,
@@ -63,11 +69,89 @@ export default function SpaceDetail() {
 
   const space = data?.spaceById;
 
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isActive, setIsActive] = useState(space?.status === "ACTIVE");
+  // Role detection: is current user a space owner viewing their own space?
+  // For now, just check if they're a space owner (backend enforces actual ownership)
+  const isOwner = profileType === ProfileType.SpaceOwner;
 
-  // Update isActive when space loads
-  // (You might want to use useEffect for this in production)
+  // Mutations for owner actions
+  const [deleteSpaceMutation, { loading: deleting }] = api.mutation<
+    Pick<Mutation, "deleteSpace">
+  >(
+    api.gql`
+      mutation DeleteSpace($input: DeleteSpaceInput!) {
+        deleteSpace(input: $input) {
+          success
+          errors {
+            ... on NotFoundError {
+              message
+            }
+            ... on ForbiddenError {
+              message
+            }
+            ... on ActiveBookingsExistError {
+              message
+            }
+          }
+        }
+      }
+    `
+  );
+
+  const [deactivateSpaceMutation] = api.mutation<
+    Pick<Mutation, "deactivateSpace">
+  >(
+    api.gql`
+      mutation DeactivateSpace($input: DeactivateSpaceInput!) {
+        deactivateSpace(input: $input) {
+          space {
+            id
+            status
+          }
+          errors {
+            ... on NotFoundError {
+              message
+            }
+            ... on ForbiddenError {
+              message
+            }
+          }
+        }
+      }
+    `
+  );
+
+  const [reactivateSpaceMutation] = api.mutation<
+    Pick<Mutation, "reactivateSpace">
+  >(
+    api.gql`
+      mutation ReactivateSpace($input: ReactivateSpaceInput!) {
+        reactivateSpace(input: $input) {
+          space {
+            id
+            status
+          }
+          errors {
+            ... on NotFoundError {
+              message
+            }
+            ... on ForbiddenError {
+              message
+            }
+          }
+        }
+      }
+    `
+  );
+
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isActive, setIsActive] = useState(false);
+
+  // Sync isActive state when space data loads
+  useEffect(() => {
+    if (space) {
+      setIsActive(space.status === "ACTIVE");
+    }
+  }, [space]);
 
   if (loading) {
     return (
@@ -88,7 +172,10 @@ export default function SpaceDetail() {
   }
 
   const handleEdit = () => {
-    Alert.alert("Edit", "Navigate to edit space screen");
+    router.push({
+      pathname: "/(protected)/(owner)/listings/edit/[id]",
+      params: { id: id as string },
+    });
   };
 
   const handleDelete = () => {
@@ -100,18 +187,47 @@ export default function SpaceDetail() {
         {
           text: "Delete",
           style: "destructive",
-          onPress: () => {
-            // TODO: Call delete mutation
-            router.back();
+          onPress: async () => {
+            try {
+              const result = await deleteSpaceMutation({
+                variables: { input: { id } },
+              });
+              if (result.data?.deleteSpace.errors?.length) {
+                const errorMessage = (result.data.deleteSpace.errors[0] as { message?: string })?.message || "Failed to delete space";
+                Alert.alert("Error", errorMessage);
+                return;
+              }
+              router.back();
+            } catch (e) {
+              Alert.alert("Error", "Failed to delete space. Please try again.");
+            }
           },
         },
       ]
     );
   };
 
-  const handleToggleActive = (value: boolean) => {
+  const handleToggleActive = async (value: boolean) => {
     setIsActive(value);
-    // TODO: Call mutation to update space status
+    try {
+      if (value) {
+        await reactivateSpaceMutation({ variables: { input: { id } } });
+      } else {
+        await deactivateSpaceMutation({ variables: { input: { id } } });
+      }
+      refetch();
+    } catch (e) {
+      // Revert on error
+      setIsActive(!value);
+      Alert.alert("Error", "Failed to update space status. Please try again.");
+    }
+  };
+
+  const handleRequestBooking = () => {
+    router.push({
+      pathname: "/(protected)/(advertiser)/book/[id]",
+      params: { id: id as string },
+    });
   };
 
   const trafficColors: Record<string, string> = {
@@ -200,33 +316,38 @@ export default function SpaceDetail() {
             </View>
           </View>
 
-          {/* Active Toggle */}
-          <Card style={styles.statusCard}>
-            <View style={styles.statusRow}>
-              <View style={styles.statusLeft}>
-                <View
-                  style={[
-                    styles.statusIndicator,
-                    { backgroundColor: isActive ? colors.success : colors.gray400 },
-                  ]}
+          {/* Owner Info Card - Advertiser View Only (temporarily disabled - needs backend fix) */}
+          {/* TODO: Re-enable when owner resolver is fixed */}
+
+          {/* Active Toggle - Owner View Only */}
+          {isOwner && (
+            <Card style={styles.statusCard}>
+              <View style={styles.statusRow}>
+                <View style={styles.statusLeft}>
+                  <View
+                    style={[
+                      styles.statusIndicator,
+                      { backgroundColor: isActive ? colors.success : colors.gray400 },
+                    ]}
+                  />
+                  <Text style={[styles.statusText, { color: theme.text }]}>
+                    {isActive ? "Active" : "Inactive"}
+                  </Text>
+                </View>
+                <Switch
+                  value={isActive}
+                  onValueChange={handleToggleActive}
+                  trackColor={{ false: colors.gray300, true: colors.primaryLight }}
+                  thumbColor={isActive ? colors.primary : colors.gray100}
                 />
-                <Text style={[styles.statusText, { color: theme.text }]}>
-                  {isActive ? "Active" : "Inactive"}
-                </Text>
               </View>
-              <Switch
-                value={isActive}
-                onValueChange={handleToggleActive}
-                trackColor={{ false: colors.gray300, true: colors.primaryLight }}
-                thumbColor={isActive ? colors.primary : colors.gray100}
-              />
-            </View>
-            <Text style={[styles.statusHint, { color: theme.textMuted }]}>
-              {isActive
-                ? "Your space is visible to advertisers"
-                : "Your space is hidden from advertisers"}
-            </Text>
-          </Card>
+              <Text style={[styles.statusHint, { color: theme.textMuted }]}>
+                {isActive
+                  ? "Your space is visible to advertisers"
+                  : "Your space is hidden from advertisers"}
+              </Text>
+            </Card>
+          )}
 
           {/* Location */}
           <View style={styles.section}>
@@ -286,66 +407,123 @@ export default function SpaceDetail() {
             </View>
           )}
 
-          {/* Stats */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: theme.text }]}>Performance</Text>
-            <View style={styles.statsGrid}>
-              <Card style={styles.statCard}>
-                <Ionicons name="calendar-outline" size={24} color={colors.primary} />
-                <Text style={[styles.statValue, { color: theme.text }]}>
-                  {space.totalBookings}
-                </Text>
-                <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
-                  Total Bookings
-                </Text>
-              </Card>
-              {space.traffic && (
+          {/* Stats - Owner View Only */}
+          {isOwner && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Performance</Text>
+              <View style={styles.statsGrid}>
                 <Card style={styles.statCard}>
-                  <Ionicons
-                    name="people-outline"
-                    size={24}
-                    color={trafficColors[space.traffic] || colors.primary}
-                  />
-                  <Text
-                    style={[
-                      styles.statValue,
-                      { color: trafficColors[space.traffic] || theme.text },
-                    ]}
-                  >
-                    {space.traffic}
-                  </Text>
-                  <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
-                    Traffic Level
-                  </Text>
-                </Card>
-              )}
-              {space.averageRating != null && (
-                <Card style={styles.statCard}>
-                  <Ionicons name="star" size={24} color="#FFB800" />
+                  <Ionicons name="calendar-outline" size={24} color={colors.primary} />
                   <Text style={[styles.statValue, { color: theme.text }]}>
-                    {space.averageRating.toFixed(1)}
+                    {space.totalBookings}
                   </Text>
                   <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
-                    Avg Rating
+                    Total Bookings
                   </Text>
                 </Card>
-              )}
+                {space.traffic && (
+                  <Card style={styles.statCard}>
+                    <Ionicons
+                      name="people-outline"
+                      size={24}
+                      color={trafficColors[space.traffic] || colors.primary}
+                    />
+                    <Text
+                      style={[
+                        styles.statValue,
+                        { color: trafficColors[space.traffic] || theme.text },
+                      ]}
+                    >
+                      {space.traffic}
+                    </Text>
+                    <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+                      Traffic Level
+                    </Text>
+                  </Card>
+                )}
+                {space.averageRating != null && (
+                  <Card style={styles.statCard}>
+                    <Ionicons name="star" size={24} color="#FFB800" />
+                    <Text style={[styles.statValue, { color: theme.text }]}>
+                      {space.averageRating.toFixed(1)}
+                    </Text>
+                    <Text style={[styles.statLabel, { color: theme.textSecondary }]}>
+                      Avg Rating
+                    </Text>
+                  </Card>
+                )}
+              </View>
             </View>
-          </View>
+          )}
+
+          {/* Booking Details - Advertiser View Only */}
+          {!isOwner && (
+            <View style={styles.section}>
+              <Text style={[styles.sectionTitle, { color: theme.text }]}>Booking Details</Text>
+              <Card style={styles.bookingDetailsCard}>
+                <View style={styles.bookingDetailRow}>
+                  <Text style={[styles.bookingDetailLabel, { color: theme.textSecondary }]}>
+                    Minimum Duration
+                  </Text>
+                  <Text style={[styles.bookingDetailValue, { color: theme.text }]}>
+                    {space.minDuration} {space.minDuration === 1 ? "day" : "days"}
+                  </Text>
+                </View>
+                {space.maxDuration && (
+                  <View style={styles.bookingDetailRow}>
+                    <Text style={[styles.bookingDetailLabel, { color: theme.textSecondary }]}>
+                      Maximum Duration
+                    </Text>
+                    <Text style={[styles.bookingDetailValue, { color: theme.text }]}>
+                      {space.maxDuration} days
+                    </Text>
+                  </View>
+                )}
+                {Number(space.installationFee) > 0 && (
+                  <View style={styles.bookingDetailRow}>
+                    <Text style={[styles.bookingDetailLabel, { color: theme.textSecondary }]}>
+                      Installation Fee
+                    </Text>
+                    <Text style={[styles.bookingDetailValue, { color: theme.text }]}>
+                      {formatPrice(Number(space.installationFee))}
+                    </Text>
+                  </View>
+                )}
+              </Card>
+            </View>
+          )}
 
           {/* Actions */}
           <View style={styles.actions}>
-            <Button
-              title="Edit Space"
-              onPress={handleEdit}
-              variant="primary"
-              fullWidth
-              leftIcon={<Ionicons name="create-outline" size={20} color={colors.white} />}
-            />
-            <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-              <Ionicons name="trash-outline" size={20} color={colors.error} />
-              <Text style={styles.deleteButtonText}>Delete Space</Text>
-            </TouchableOpacity>
+            {isOwner ? (
+              <>
+                <Button
+                  title="Edit Space"
+                  onPress={handleEdit}
+                  variant="primary"
+                  fullWidth
+                  leftIcon={<Ionicons name="create-outline" size={20} color={colors.white} />}
+                />
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={handleDelete}
+                  disabled={deleting}
+                >
+                  <Ionicons name="trash-outline" size={20} color={colors.error} />
+                  <Text style={styles.deleteButtonText}>
+                    {deleting ? "Deleting..." : "Delete Space"}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <Button
+                title="Request Booking"
+                onPress={handleRequestBooking}
+                variant="primary"
+                fullWidth
+                leftIcon={<Ionicons name="calendar-outline" size={20} color={colors.white} />}
+              />
+            )}
           </View>
         </View>
       </ScrollView>
@@ -565,6 +743,65 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     color: colors.error,
+    fontSize: fontSize.md,
+    fontWeight: "600",
+  },
+  // Owner info card styles (advertiser view)
+  ownerCard: {
+    marginBottom: spacing.lg,
+  },
+  ownerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  ownerAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.gray100,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: spacing.md,
+    overflow: "hidden",
+  },
+  ownerAvatarImage: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+  ownerInfo: {
+    flex: 1,
+  },
+  ownerName: {
+    fontSize: fontSize.md,
+    fontWeight: "600",
+  },
+  ownerMeta: {
+    fontSize: fontSize.sm,
+    marginTop: 2,
+  },
+  ownerRating: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  ownerRatingText: {
+    fontSize: fontSize.md,
+    fontWeight: "600",
+  },
+  // Booking details card styles (advertiser view)
+  bookingDetailsCard: {
+    gap: spacing.sm,
+  },
+  bookingDetailRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  bookingDetailLabel: {
+    fontSize: fontSize.sm,
+  },
+  bookingDetailValue: {
     fontSize: fontSize.md,
     fontWeight: "600",
   },

@@ -136,7 +136,7 @@ export default function Discover() {
 
   const handleSpacePress = (space: Space) => {
     router.push({
-      pathname: "/(protected)/(advertiser)/space/[id]",
+      pathname: "/(advertiser)/space/[id]" as const,
       params: { id: String(space.id) },
     });
   };

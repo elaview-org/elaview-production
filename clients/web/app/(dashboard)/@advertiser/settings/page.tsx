@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { AdvertiserSettingsContent } from "./advertiser-settings-content";
 import getAdvertiserQuery from "./advertiser-queries";
-import { User } from "@/types/graphql.generated";
+import { User } from "@/types/gql";
 
 export default async function AdvertiserSettingsPage() {
   const { status, user } = await getAdvertiserQuery();

@@ -1,10 +1,10 @@
 import api from "@/api/gql/server";
-import { Query } from "@/types/graphql.generated";
+import { graphql } from "@/types/gql";
 
 export default async function getAdvertiserQuery() {
-  const { data } = await api.query<Query>({
-    query: api.gql`
-      query {
+  const { data } = await api.query({
+    query: graphql(`
+      query AdvertiserSettings {
         me {
           id
           email
@@ -23,7 +23,7 @@ export default async function getAdvertiserQuery() {
           }
         }
       }
-    `,
+    `),
   });
   return {
     status: !data?.me,

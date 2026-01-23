@@ -1,6 +1,6 @@
 "use client";
 
-import { ApolloLink, gql, HttpLink } from "@apollo/client";
+import { ApolloLink, HttpLink } from "@apollo/client";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { getMainDefinition } from "@apollo/client/utilities";
 import {
@@ -10,18 +10,7 @@ import {
 } from "@apollo/client-integration-nextjs";
 import { createClient } from "graphql-ws";
 import React, { Suspense } from "react";
-
-import {
-  useApolloClient,
-  useBackgroundQuery,
-  useFragment,
-  useLoadableQuery,
-  useMutation,
-  useQuery,
-  useReadQuery,
-  useSubscription,
-  useSuspenseQuery,
-} from "@apollo/client/react";
+import * as api from "@apollo/client/react";
 
 function makeClient() {
   const httpLink = new HttpLink({
@@ -72,15 +61,4 @@ export function ApolloWrapper({ children }: React.PropsWithChildren) {
   );
 }
 
-export {
-  gql,
-  useQuery,
-  useMutation,
-  useSubscription,
-  useSuspenseQuery,
-  useFragment,
-  useReadQuery,
-  useBackgroundQuery,
-  useLoadableQuery,
-  useApolloClient,
-};
+export default api;

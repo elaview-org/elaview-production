@@ -1,5 +1,5 @@
 import api from "@/api/gql/server";
-import { Query } from "@/types/graphql.generated";
+import { graphql } from "@/types/gql";
 import {
   Avatar,
   AvatarFallback,
@@ -18,51 +18,6 @@ import {
 } from "@tabler/icons-react";
 import mockData from "./mock-data.json";
 import { ReviewsSection } from "./reviews-section";
-
-const SPACE_OWNER_PROFILE_QUERY = api.gql`
-  query {
-    me {
-      id
-      name
-      email
-      avatar
-      createdAt
-      spaceOwnerProfile {
-        id
-        businessName
-        businessType
-        createdAt
-        onboardingComplete
-        stripeAccountStatus
-        spaces(first: 10) {
-          nodes {
-            id
-            averageRating
-            reviews(first: 3) {
-              nodes {
-                id
-                rating
-                comment
-                createdAt
-                booking {
-                  campaign {
-                    advertiserProfile {
-                      companyName
-                      user {
-                        name
-                        avatar
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-`;
 
 function getInitials(name: string): string {
   return name
@@ -94,7 +49,52 @@ type ReviewData = {
 };
 
 export default async function Page() {
-  const { data } = await api.query<Query>({ query: SPACE_OWNER_PROFILE_QUERY });
+  const { data } = await api.query({
+    query: graphql(`
+      query SpaceOwnerProfile {
+        me {
+          id
+          name
+          email
+          avatar
+          createdAt
+          spaceOwnerProfile {
+            id
+            businessName
+            businessType
+            createdAt
+            onboardingComplete
+            stripeAccountStatus
+            spaces(first: 10) {
+              nodes {
+                id
+                averageRating
+                reviews(first: 3) {
+                  nodes {
+                    id
+                    rating
+                    comment
+                    createdAt
+                    booking {
+                      campaign {
+                        advertiserProfile {
+                          companyName
+                          user {
+                            name
+                            avatar
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `),
+  });
 
   const user = data?.me;
   const profile = user?.spaceOwnerProfile;

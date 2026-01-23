@@ -8,7 +8,7 @@ import {
   FieldLabel,
 } from "@/components/primitives/field";
 import { Input } from "@/components/primitives/input";
-import type { User } from "@/types/graphql.generated";
+import type { User } from "@/types/gql";
 import { Separator } from "@/components/primitives/separator";
 
 interface AccountSettingsFormProps {

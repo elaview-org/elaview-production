@@ -14,7 +14,7 @@ import { Slider } from "@/components/primitives/slider";
 import { Checkbox } from "@/components/primitives/checkbox";
 import { Label } from "@/components/primitives/label";
 import { IconFilter, IconX } from "@tabler/icons-react";
-import { SpaceType } from "@/types/graphql.generated";
+import { SpaceType } from "@/types/gql";
 import { FilterState } from "./types";
 
 const SPACE_TYPE_LABELS: Record<SpaceType, string> = {

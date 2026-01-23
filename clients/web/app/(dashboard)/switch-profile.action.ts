@@ -1,29 +1,27 @@
 "use server";
 
 import api from "@/api/gql/server";
-import { Mutation, ProfileType } from "@/types/graphql.generated";
+import { graphql, type ProfileType } from "@/types/gql";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-const SWITCH_PROFILE_MUTATION = api.gql`
-  mutation SwitchProfile($input: UpdateCurrentUserInput!) {
-    updateCurrentUser(input: $input) {
-      user {
-        id
-        activeProfileType
-      }
-      errors {
-        ... on Error {
-          message
+export async function switchProfile(targetProfileType: ProfileType) {
+  const result = await api.mutate({
+    mutation: graphql(`
+      mutation SwitchProfile($input: UpdateCurrentUserInput!) {
+        updateCurrentUser(input: $input) {
+          user {
+            id
+            activeProfileType
+          }
+          errors {
+            ... on Error {
+              message
+            }
+          }
         }
       }
-    }
-  }
-`;
-
-export async function switchProfile(targetProfileType: ProfileType) {
-  const { data, error } = await api.mutate<Mutation>({
-    mutation: SWITCH_PROFILE_MUTATION,
+    `),
     variables: {
       input: {
         input: {
@@ -33,10 +31,10 @@ export async function switchProfile(targetProfileType: ProfileType) {
     },
   });
 
-  if (error || data?.updateCurrentUser.errors?.length) {
+  if (result.error || result.data?.updateCurrentUser.errors?.length) {
     return {
       success: false,
-      message: error?.message || "Failed to switch profile",
+      message: result.error?.message || "Failed to switch profile",
     };
   }
 

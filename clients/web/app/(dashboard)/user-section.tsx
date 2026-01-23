@@ -19,7 +19,7 @@ import {
 } from "@/components/primitives/tooltip";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Maybe, ProfileType } from "@/types/graphql.generated";
+import { Maybe, ProfileType } from "@/types/gql";
 import { switchProfile } from "./switch-profile.action";
 
 export interface NavUserProps {

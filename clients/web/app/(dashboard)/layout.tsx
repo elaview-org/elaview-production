@@ -1,5 +1,5 @@
 import api from "@/api/gql/server";
-import { ProfileType, Query, UserRole } from "@/types/graphql.generated";
+import { graphql, ProfileType, UserRole } from "@/types/gql";
 import {
   Sidebar,
   SidebarContent,
@@ -19,19 +19,19 @@ import ContentHeader from "@/app/(dashboard)/content-header";
 import { redirect } from "next/navigation";
 
 export default async function Layout(props: LayoutProps<"/">) {
-  const { data } = await api.query<Query>({
-    query: api.gql`
-      query {
+  const { data } = await api.query({
+    query: graphql(`
+      query DashboardUser {
         me {
-          id,
-          email,
-          name,
-          avatar,
-          role,
-          activeProfileType,
+          id
+          email
+          name
+          avatar
+          role
+          activeProfileType
         }
       }
-    `,
+    `),
   });
 
   if (!data?.me) {

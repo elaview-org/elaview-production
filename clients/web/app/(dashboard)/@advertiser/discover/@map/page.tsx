@@ -1,12 +1,12 @@
 import api from "@/api/gql/server";
-import { Query } from "@/types/graphql.generated";
+import { graphql } from "@/types/gql";
 import MapWrapper from "./map-wrapper";
 import { toSpaceMarker } from "../types";
 
 export default async function Page() {
-  const result = await api.query<Query>({
-    query: api.gql`
-      query {
+  const { data } = await api.query({
+    query: graphql(`
+      query DiscoverSpacesMap {
         spaces(first: 32, where: { status: { eq: ACTIVE } }) {
           nodes {
             id
@@ -26,10 +26,10 @@ export default async function Page() {
           }
         }
       }
-    `,
+    `),
   });
 
-  const spaces = result.data?.spaces?.nodes?.map(toSpaceMarker) ?? [];
+  const spaces = data?.spaces?.nodes?.map(toSpaceMarker) ?? [];
 
   return <MapWrapper spaces={spaces} />;
 }

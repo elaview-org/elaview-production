@@ -27,7 +27,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/primitives/dropdown-menu";
-import { ProfileType, UserRole } from "@/types/graphql.generated";
+import { ProfileType, UserRole } from "@/types/gql";
 import adminData from "./@admin/navigation-bar.data";
 import advertiserData from "./@advertiser/navigation-bar.data";
 import marketingData from "./@marketing/navigation-bar.data";

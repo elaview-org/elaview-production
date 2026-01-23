@@ -17,7 +17,7 @@ import {
 import { ProfileSettingsForm } from "./profile-settings-form";
 import { BusinessSettingsForm } from "./business-settings-form";
 import { AccountSettingsForm } from "./account-settings-form";
-import type { User } from "@/types/graphql.generated";
+import type { User } from "@/types/gql";
 
 interface AdvertiserSettingsContentProps {
   user: User;

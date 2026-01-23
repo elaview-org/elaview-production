@@ -2,7 +2,7 @@
 
 import type { BBox } from "geojson";
 import { useCallback, useRef, useState } from "react";
-import { Space } from "@/types/graphql.generated";
+import { Space } from "@/types/gql";
 
 interface MapBounds {
   north: number;

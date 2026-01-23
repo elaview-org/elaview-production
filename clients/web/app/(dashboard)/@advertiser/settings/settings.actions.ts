@@ -3,11 +3,11 @@
 import api from "@/api/gql/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import type {
-  Query,
-  UpdateAdvertiserProfileInput,
-  UpdateCurrentUserInput,
-} from "@/types/graphql.generated";
+import {
+  graphql,
+  type UpdateAdvertiserProfileInput,
+  type UpdateCurrentUserInput,
+} from "@/types/gql";
 
 interface UpdateProfileState {
   success: boolean;
@@ -30,9 +30,9 @@ interface UpdateBusinessInfoState {
 }
 
 async function getCurrentUser() {
-  const { data } = await api.query<Query>({
-    query: api.gql`
-      query GetCurrentUser {
+  const { data } = await api.query({
+    query: graphql(`
+      query GetCurrentUserForSettings {
         me {
           id
           avatar
@@ -41,7 +41,7 @@ async function getCurrentUser() {
           }
         }
       }
-    `,
+    `),
   });
 
   return data?.me ?? null;
@@ -78,18 +78,16 @@ export async function updateProfileAction(
       };
     }
 
-    const { data: mutationData } = await api.query<{
-      updateCurrentUser: { user: { id: string } | null };
-    }>({
-      query: api.gql`
-        mutation UpdateCurrentUser($input: UpdateCurrentUserInput!) {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation UpdateCurrentUserProfile($input: UpdateCurrentUserInput!) {
           updateCurrentUser(input: $input) {
             user {
               id
             }
           }
         }
-      `,
+      `),
       variables: {
         input: {
           input: {
@@ -156,18 +154,16 @@ export async function updateBusinessInfoAction(
     const industry = formData.get("industry")?.toString() ?? "";
     const website = formData.get("website")?.toString() ?? "";
 
-    const { data: mutationData } = await api.query<{
-      updateAdvertiserProfile: { advertiserProfile: { id: string } | null };
-    }>({
-      query: api.gql`
-        mutation UpdateAdvertiserProfile($input: UpdateAdvertiserProfileInput!) {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {
           updateAdvertiserProfile(input: $input) {
             advertiserProfile {
               id
             }
           }
         }
-      `,
+      `),
       variables: {
         input: {
           companyName: companyName || null,

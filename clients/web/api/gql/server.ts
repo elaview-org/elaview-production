@@ -1,6 +1,5 @@
 import {
   ApolloClient,
-  gql,
   HttpLink,
   InMemoryCache,
   type OperationVariables,
@@ -39,10 +38,9 @@ async function mutate<
 }
 
 const api = {
-  gql,
   query,
   mutate,
-  getClient,
+  // getClient,
 };
 
 export default api;

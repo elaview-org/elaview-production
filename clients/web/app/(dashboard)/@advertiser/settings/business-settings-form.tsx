@@ -10,7 +10,7 @@ import {
 } from "@/components/primitives/field";
 import { Input } from "@/components/primitives/input";
 import { updateBusinessInfoAction } from "./settings.actions";
-import type { User } from "@/types/graphql.generated";
+import type { User } from "@/types/gql";
 import { toast } from "sonner";
 
 interface BusinessSettingsFormProps {

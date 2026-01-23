@@ -7,7 +7,7 @@ import { Input } from "@/components/primitives/input";
 import { Button } from "@/components/primitives/button";
 import FilterSheet from "./filter-sheet";
 import { FilterState } from "./types";
-import { SpaceType } from "@/types/graphql.generated";
+import { SpaceType } from "@/types/gql";
 
 interface ContentProps {
   gridView: ReactNode;

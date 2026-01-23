@@ -9,8 +9,8 @@ import {
   SelectValue,
 } from "@/components/primitives/select";
 import { BookingCard, BookingStatus } from "./booking-card";
-import { BookingStatus as GraphQLBookingStatus } from "@/types/graphql.generated";
-import type { Booking } from "@/types/graphql.generated";
+import { BookingStatus as GraphQLBookingStatus } from "@/types/gql";
+import type { Booking } from "@/types/gql";
 
 interface BookingsPageProps {
   bookings: Booking[];

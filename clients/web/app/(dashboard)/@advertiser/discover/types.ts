@@ -1,4 +1,4 @@
-import { Space, SpaceType } from "@/types/graphql.generated";
+import { Space, SpaceType } from "@/types/gql";
 
 export interface SpaceMarker {
   id: string;

@@ -15,7 +15,7 @@ import {
   AvatarImage,
 } from "@/components/primitives/avatar";
 import { updateProfileAction } from "./settings.actions";
-import type { User } from "@/types/graphql.generated";
+import type { User } from "@/types/gql";
 import { toast } from "sonner";
 
 interface ProfileSettingsFormProps {

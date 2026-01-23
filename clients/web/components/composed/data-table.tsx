@@ -338,8 +338,10 @@ function DraggableRow({ row }: { row: Row<z.infer<typeof schema>> }) {
 
 export function DataTable({
   data: initialData,
+  handleAddSectionAction,
 }: {
   data: z.infer<typeof schema>[];
+  handleAddSectionAction?: () => void;
 }) {
   const [data, setData] = React.useState(() => initialData);
   const [rowSelection, setRowSelection] = React.useState({});
@@ -469,7 +471,7 @@ export function DataTable({
                 })}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" size="sm" onClick={handleAddSectionAction}>
             <IconPlus />
             <span className="hidden lg:inline">Add Section</span>
           </Button>

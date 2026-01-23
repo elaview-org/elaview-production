@@ -1,6 +1,6 @@
 import { SectionCards } from "@/components/composed/section-cards";
 import { ChartAreaInteractive } from "@/components/composed/chart-area-interactive";
-import { DataTable } from "@/components/composed/data-table";
+import OverviewTable from "./overview-table";
 
 export default function Page() {
   return (
@@ -11,7 +11,7 @@ export default function Page() {
           <div className="px-4 lg:px-6">
             <ChartAreaInteractive />
           </div>
-          <DataTable data={data} />
+          <OverviewTable data={data} />
         </div>
       </div>
     </div>

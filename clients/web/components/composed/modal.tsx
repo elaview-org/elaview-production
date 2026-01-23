@@ -11,7 +11,7 @@ import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 
 interface ModalProps extends React.ComponentProps<typeof Dialog> {
   title?: string;
-  trigger: ReactNode;
+  trigger?: ReactNode;
   children: ReactNode;
   className?: string;
 }

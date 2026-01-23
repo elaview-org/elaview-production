@@ -5,7 +5,7 @@ import {
   ProfileType,
   UserRole,
 } from "@/types/gql";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 const RoleBasedView_UserFragment = graphql(`
   fragment RoleBasedView_UserFragment on User {
@@ -14,16 +14,24 @@ const RoleBasedView_UserFragment = graphql(`
   }
 `);
 
-export default function RoleBasedView(props: {
-  me: FragmentType<typeof RoleBasedView_UserFragment>;
+type Props = {
+  data: FragmentType<typeof RoleBasedView_UserFragment>;
   admin: ReactNode;
   marketing: ReactNode;
   spaceOwner: ReactNode;
   advertiser: ReactNode;
-}) {
+};
+
+export default function RoleBasedView({
+  data,
+  admin,
+  marketing,
+  spaceOwner,
+  advertiser,
+}: Props) {
   const { role, activeProfileType } = getFragmentData(
     RoleBasedView_UserFragment,
-    props.me
+    data,
   );
 
   return (
@@ -31,14 +39,13 @@ export default function RoleBasedView(props: {
       {(() => {
         switch (role) {
           case UserRole.Admin:
-            return props.admin;
+            return admin;
           case UserRole.Marketing:
-            return props.marketing;
-          case UserRole.User: {
+            return marketing;
+          case UserRole.User:
             return activeProfileType === ProfileType.SpaceOwner
-              ? props.spaceOwner
-              : props.advertiser;
-          }
+              ? spaceOwner
+              : advertiser;
         }
       })()}
     </div>

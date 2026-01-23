@@ -47,17 +47,19 @@ const NavigationSection_UserFragment = graphql(`
   }
 `);
 
-export function NavigationSection(
-  props: FragmentType<typeof NavigationSection_UserFragment>
-) {
+type Props = {
+  data: FragmentType<typeof NavigationSection_UserFragment>;
+};
+
+export function NavigationSection({ data }: Props) {
   const { role, activeProfileType } = getFragmentData(
     NavigationSection_UserFragment,
-    props
+    data
   );
 
   const { isMobile } = useSidebar();
 
-  const data = useMemo(() => {
+  const roleData = useMemo(() => {
     switch (role) {
       case UserRole.Admin:
         return adminData;
@@ -79,12 +81,12 @@ export function NavigationSection(
             <SidebarMenuItem className="flex items-center gap-2">
               <SidebarMenuButton
                 asChild
-                tooltip={data.quickAction.title}
+                tooltip={roleData.quickAction.title}
                 className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
               >
-                <Link href={data.quickAction.url}>
-                  <data.quickAction.icon />
-                  <span>{data.quickAction.title}</span>
+                <Link href={roleData.quickAction.url}>
+                  <roleData.quickAction.icon />
+                  <span>{roleData.quickAction.title}</span>
                 </Link>
               </SidebarMenuButton>
               <Button
@@ -101,7 +103,7 @@ export function NavigationSection(
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarMenu>
-            {data.navMain.map((item) => (
+            {roleData.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild tooltip={item.title}>
                   <Link href={item.url}>
@@ -117,7 +119,7 @@ export function NavigationSection(
       <SidebarGroup className="group-data-[collapsible=icon]:hidden">
         <SidebarGroupLabel>Documents</SidebarGroupLabel>
         <SidebarMenu>
-          {data.documents.map((item) => (
+          {roleData.documents.map((item) => (
             <SidebarMenuItem key={item.name}>
               <SidebarMenuButton asChild>
                 <a href={item.url}>
@@ -162,7 +164,7 @@ export function NavigationSection(
       <SidebarGroup className={"mt-auto"}>
         <SidebarGroupContent>
           <SidebarMenu>
-            {data.navSecondary.map((item) => (
+            {roleData.navSecondary.map((item) => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild>
                   <a href={item.url}>

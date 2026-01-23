@@ -36,12 +36,14 @@ export const UserSection_UserFragment = graphql(`
   }
 `);
 
-export function UserSection(
-  props: FragmentType<typeof UserSection_UserFragment>
-) {
+type Props = {
+  data: FragmentType<typeof UserSection_UserFragment>;
+};
+
+export function UserSection({ data }: Props) {
   const { email, name, avatar, activeProfileType } = getFragmentData(
     UserSection_UserFragment,
-    props
+    data
   );
 
   const [isPending, startTransition] = useTransition();

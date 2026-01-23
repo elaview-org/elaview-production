@@ -16,8 +16,8 @@ import { NavigationSection } from "./navigation-section";
 import { UserSection } from "./user-section";
 import { CSSProperties } from "react";
 import ContentHeader from "@/app/(dashboard)/content-header";
-import { redirect } from "next/navigation";
 import RoleBasedView from "@/app/(dashboard)/role-based-view";
+import assert from "node:assert";
 
 export default async function Layout(props: LayoutProps<"/">) {
   const { data } = await api.query({
@@ -32,9 +32,7 @@ export default async function Layout(props: LayoutProps<"/">) {
     `),
   });
 
-  if (!data?.me) {
-    redirect("/logout");
-  }
+  assert(data?.me, "data?.me");
 
   return (
     <SidebarProvider
@@ -62,15 +60,15 @@ export default async function Layout(props: LayoutProps<"/">) {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <NavigationSection {...data.me} />
+          <NavigationSection data={data.me} />
         </SidebarContent>
         <SidebarFooter>
-          <UserSection {...data.me} />
+          <UserSection data={data.me} />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <ContentHeader />
-        <RoleBasedView me={data.me} {...props} />
+        <RoleBasedView data={data.me} {...props} />
       </SidebarInset>
     </SidebarProvider>
   );

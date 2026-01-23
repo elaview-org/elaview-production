@@ -51,7 +51,7 @@ export default function Listings() {
   }, [data]);
 
   const handleAddListing = () => {
-    router.push("/(protected)/(owner)/new-listing");
+    router.push("./(owner)/new-listing");
   };
 
   const renderSpace = ({ item }: { item: Space }) => (
@@ -60,8 +60,9 @@ export default function Listings() {
       compact={viewMode === "list"}
       gridMode={viewMode === "grid"}
       onPress={() => {
+        console.log("Navigating to space ID:", item.id);
         router.push({
-          pathname: "/(owner)/space/[id]" as const,
+          pathname: "/(protected)/(owner)/space/[id]" as const,
           params: { id: String(item.id) },
         });
       }}

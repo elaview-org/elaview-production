@@ -8,6 +8,13 @@ curl -i -k -X POST http://localhost:7106/api/auth/login \
     -d '{"email":"admin@email.com","password":"admin123"}'
 ```
 
+
+```bash
+curl -i -k -X POST http://localhost:7106/api/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email":"user1@email.com","password":"user123"}'
+```
+
 ### EF Core Migrations
 
 ```bash

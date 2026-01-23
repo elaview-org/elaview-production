@@ -94,7 +94,7 @@ pnpm dev:mobile
 # Backend only (if working on .NET)
 cd backend
 dotnet run
-# → http://localhost:5000/graphql
+# → 
 ```
 
 ### First-Time Mobile Setup (IMPORTANT!)

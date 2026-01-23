@@ -61,7 +61,7 @@ export default function Listings() {
       gridMode={viewMode === "grid"}
       onPress={() => {
         router.push({
-          pathname: "/(owner)/space/[id]" as const,
+          pathname: "/(protected)/(owner)/space/[id]" as const,
           params: { id: String(item.id) },
         });
       }}

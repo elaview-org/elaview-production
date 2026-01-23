@@ -28,7 +28,9 @@ export default function NewListingPhotos() {
   const [photos, setPhotos] = useState<string[]>([]);
 
   const pickImage = async () => {
+    
     if (photos.length >= MAX_PHOTOS) {
+      
       Alert.alert(
         "Maximum Photos",
         `You can upload up to ${MAX_PHOTOS} photos.`
@@ -36,14 +38,18 @@ export default function NewListingPhotos() {
       return;
     }
 
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== "granted") {
-      Alert.alert(
-        "Permission Required",
-        "Please allow access to your photo library to upload images."
-      );
-      return;
-    }
+
+    // TODO: Fix perissions crashes on asking for permission from ios and android 
+
+    // const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    // if (status !== "granted") {
+    //   Alert.alert(
+    //     "Permission Required",
+    //     "Please allow access to your photo library to upload images."
+    //   );
+    //   return;
+    // }
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -102,7 +108,7 @@ export default function NewListingPhotos() {
     // TODO: Store photos in context/state management
     // For now, pass via params (limited for demo)
     router.push({
-      pathname: "./details",
+      pathname: "/(protected)/(owner)/new-listing/details",
       params: { photoCount: photos.length },
     });
   };

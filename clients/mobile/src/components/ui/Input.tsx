@@ -7,18 +7,21 @@ import {
   TextInputProps,
   TouchableOpacity,
   ViewStyle,
+  StyleProp,
+  TextStyle,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import { colors, spacing, fontSize, borderRadius } from "@/constants/theme";
 
-interface InputProps extends TextInputProps {
+interface InputProps extends Omit<TextInputProps, "style"> {
   label?: string;
   error?: string;
   leftIcon?: keyof typeof Ionicons.glyphMap;
   rightIcon?: keyof typeof Ionicons.glyphMap;
   onRightIconPress?: () => void;
   containerStyle?: ViewStyle;
+  style?: StyleProp<TextStyle>;
 }
 
 /**
@@ -33,6 +36,7 @@ export default function Input({
   onRightIconPress,
   containerStyle,
   secureTextEntry,
+  style,
   ...props
 }: InputProps) {
   const { theme } = useTheme();
@@ -76,6 +80,7 @@ export default function Input({
             { color: theme.text },
             leftIcon && styles.inputWithLeftIcon,
             (rightIcon || isPassword) && styles.inputWithRightIcon,
+            style,
           ]}
           placeholderTextColor={theme.textMuted}
           onFocus={() => setIsFocused(true)}

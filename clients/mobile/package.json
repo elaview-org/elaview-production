@@ -30,6 +30,7 @@
     "expo-auth-session": "~7.0.10",
     "expo-constants": "~18.0.13",
     "expo-dev-client": "^6.0.20",
+    "expo-image-loader": "^6.0.0",
     "expo-image-picker": "^17.0.10",
     "expo-linear-gradient": "~15.0.8",
     "expo-linking": "~8.0.11",

@@ -22,8 +22,11 @@ type Documents = {
     "\n        mutation UpdateCurrentUserProfile($input: UpdateCurrentUserInput!) {\n          updateCurrentUser(input: $input) {\n            user {\n              id\n            }\n          }\n        }\n      ": typeof types.UpdateCurrentUserProfileDocument,
     "\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      ": typeof types.UpdateAdvertiserProfileInfoDocument,
     "\n      query SpaceOwnerProfile {\n        me {\n          id\n          name\n          email\n          avatar\n          createdAt\n          spaceOwnerProfile {\n            id\n            businessName\n            businessType\n            createdAt\n            onboardingComplete\n            stripeAccountStatus\n            spaces(first: 10) {\n              nodes {\n                id\n                averageRating\n                reviews(first: 3) {\n                  nodes {\n                    id\n                    rating\n                    comment\n                    createdAt\n                    booking {\n                      campaign {\n                        advertiserProfile {\n                          companyName\n                          user {\n                            name\n                            avatar\n                          }\n                        }\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    ": typeof types.SpaceOwnerProfileDocument,
-    "\n      query DashboardUser {\n        me {\n          id\n          email\n          name\n          avatar\n          role\n          activeProfileType\n        }\n      }\n    ": typeof types.DashboardUserDocument,
+    "\n      query DashboardUser {\n        me {\n          ...NavigationSection_UserFragment\n          ...UserSection_UserFragment\n          ...RoleBasedView_UserFragment\n        }\n      }\n    ": typeof types.DashboardUserDocument,
+    "\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n": typeof types.NavigationSection_UserFragmentFragmentDoc,
+    "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n": typeof types.RoleBasedView_UserFragmentFragmentDoc,
     "\n      mutation SwitchProfile($input: UpdateCurrentUserInput!) {\n        updateCurrentUser(input: $input) {\n          user {\n            id\n            activeProfileType\n          }\n          errors {\n            ... on Error {\n              message\n            }\n          }\n        }\n      }\n    ": typeof types.SwitchProfileDocument,
+    "\n  fragment UserSection_UserFragment on User {\n    email\n    name\n    avatar\n    activeProfileType\n  }\n": typeof types.UserSection_UserFragmentFragmentDoc,
 };
 const documents: Documents = {
     "\n        query GetMyBookingsAsAdvertiser($first: Int!) {\n          myBookingsAsAdvertiser(first: $first) {\n            nodes {\n              id\n              status\n              startDate\n              endDate\n              createdAt\n              space {\n                title\n                city\n                state\n              }\n              campaign {\n                name\n              }\n            }\n          }\n        }\n      ": types.GetMyBookingsAsAdvertiserDocument,
@@ -34,8 +37,11 @@ const documents: Documents = {
     "\n        mutation UpdateCurrentUserProfile($input: UpdateCurrentUserInput!) {\n          updateCurrentUser(input: $input) {\n            user {\n              id\n            }\n          }\n        }\n      ": types.UpdateCurrentUserProfileDocument,
     "\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      ": types.UpdateAdvertiserProfileInfoDocument,
     "\n      query SpaceOwnerProfile {\n        me {\n          id\n          name\n          email\n          avatar\n          createdAt\n          spaceOwnerProfile {\n            id\n            businessName\n            businessType\n            createdAt\n            onboardingComplete\n            stripeAccountStatus\n            spaces(first: 10) {\n              nodes {\n                id\n                averageRating\n                reviews(first: 3) {\n                  nodes {\n                    id\n                    rating\n                    comment\n                    createdAt\n                    booking {\n                      campaign {\n                        advertiserProfile {\n                          companyName\n                          user {\n                            name\n                            avatar\n                          }\n                        }\n                      }\n                    }\n                  }\n                }\n              }\n            }\n          }\n        }\n      }\n    ": types.SpaceOwnerProfileDocument,
-    "\n      query DashboardUser {\n        me {\n          id\n          email\n          name\n          avatar\n          role\n          activeProfileType\n        }\n      }\n    ": types.DashboardUserDocument,
+    "\n      query DashboardUser {\n        me {\n          ...NavigationSection_UserFragment\n          ...UserSection_UserFragment\n          ...RoleBasedView_UserFragment\n        }\n      }\n    ": types.DashboardUserDocument,
+    "\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n": types.NavigationSection_UserFragmentFragmentDoc,
+    "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n": types.RoleBasedView_UserFragmentFragmentDoc,
     "\n      mutation SwitchProfile($input: UpdateCurrentUserInput!) {\n        updateCurrentUser(input: $input) {\n          user {\n            id\n            activeProfileType\n          }\n          errors {\n            ... on Error {\n              message\n            }\n          }\n        }\n      }\n    ": types.SwitchProfileDocument,
+    "\n  fragment UserSection_UserFragment on User {\n    email\n    name\n    avatar\n    activeProfileType\n  }\n": types.UserSection_UserFragmentFragmentDoc,
 };
 
 /**
@@ -87,11 +93,23 @@ export function graphql(source: "\n      query SpaceOwnerProfile {\n        me {
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n      query DashboardUser {\n        me {\n          id\n          email\n          name\n          avatar\n          role\n          activeProfileType\n        }\n      }\n    "): (typeof documents)["\n      query DashboardUser {\n        me {\n          id\n          email\n          name\n          avatar\n          role\n          activeProfileType\n        }\n      }\n    "];
+export function graphql(source: "\n      query DashboardUser {\n        me {\n          ...NavigationSection_UserFragment\n          ...UserSection_UserFragment\n          ...RoleBasedView_UserFragment\n        }\n      }\n    "): (typeof documents)["\n      query DashboardUser {\n        me {\n          ...NavigationSection_UserFragment\n          ...UserSection_UserFragment\n          ...RoleBasedView_UserFragment\n        }\n      }\n    "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n"): (typeof documents)["\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n"): (typeof documents)["\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n      mutation SwitchProfile($input: UpdateCurrentUserInput!) {\n        updateCurrentUser(input: $input) {\n          user {\n            id\n            activeProfileType\n          }\n          errors {\n            ... on Error {\n              message\n            }\n          }\n        }\n      }\n    "): (typeof documents)["\n      mutation SwitchProfile($input: UpdateCurrentUserInput!) {\n        updateCurrentUser(input: $input) {\n          user {\n            id\n            activeProfileType\n          }\n          errors {\n            ... on Error {\n              message\n            }\n          }\n        }\n      }\n    "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment UserSection_UserFragment on User {\n    email\n    name\n    avatar\n    activeProfileType\n  }\n"): (typeof documents)["\n  fragment UserSection_UserFragment on User {\n    email\n    name\n    avatar\n    activeProfileType\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

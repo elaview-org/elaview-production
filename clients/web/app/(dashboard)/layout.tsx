@@ -1,5 +1,5 @@
 import api from "@/api/gql/server";
-import { graphql, ProfileType, UserRole } from "@/types/gql";
+import { graphql } from "@/types/gql";
 import {
   Sidebar,
   SidebarContent,
@@ -17,18 +17,16 @@ import { UserSection } from "./user-section";
 import { CSSProperties } from "react";
 import ContentHeader from "@/app/(dashboard)/content-header";
 import { redirect } from "next/navigation";
+import RoleBasedView from "@/app/(dashboard)/role-based-view";
 
 export default async function Layout(props: LayoutProps<"/">) {
   const { data } = await api.query({
     query: graphql(`
       query DashboardUser {
         me {
-          id
-          email
-          name
-          avatar
-          role
-          activeProfileType
+          ...NavigationSection_UserFragment
+          ...UserSection_UserFragment
+          ...RoleBasedView_UserFragment
         }
       }
     `),
@@ -64,32 +62,15 @@ export default async function Layout(props: LayoutProps<"/">) {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <NavigationSection
-            userRole={data?.me?.role}
-            activeProfileType={data?.me?.activeProfileType}
-          />
+          <NavigationSection {...data.me} />
         </SidebarContent>
         <SidebarFooter>
-          <UserSection {...data?.me} />
+          <UserSection {...data.me} />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <ContentHeader />
-        <div className="@container/main flex flex-1 flex-col gap-4 px-4 py-4 md:gap-6 md:py-6 lg:px-6">
-          {(() => {
-            switch (data.me.role) {
-              case UserRole.Admin:
-                return props.admin;
-              case UserRole.Marketing:
-                return props.marketing;
-              case UserRole.User: {
-                return data.me.activeProfileType === ProfileType.SpaceOwner
-                  ? props.spaceOwner
-                  : props.advertiser;
-              }
-            }
-          })()}
-        </div>
+        <RoleBasedView me={data.me} {...props} />
       </SidebarInset>
     </SidebarProvider>
   );

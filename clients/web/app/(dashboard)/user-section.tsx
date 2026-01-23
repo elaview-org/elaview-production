@@ -19,22 +19,31 @@ import {
 } from "@/components/primitives/tooltip";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Maybe, ProfileType } from "@/types/gql";
+import {
+  FragmentType,
+  getFragmentData,
+  graphql,
+  ProfileType,
+} from "@/types/gql";
 import { switchProfile } from "./switch-profile.action";
 
-export interface NavUserProps {
-  email: string;
-  name: Maybe<string>;
-  avatar: Maybe<string>;
-  activeProfileType: ProfileType;
-}
+export const UserSection_UserFragment = graphql(`
+  fragment UserSection_UserFragment on User {
+    email
+    name
+    avatar
+    activeProfileType
+  }
+`);
 
-export function UserSection({
-  email,
-  name,
-  avatar,
-  activeProfileType,
-}: NavUserProps) {
+export function UserSection(
+  props: FragmentType<typeof UserSection_UserFragment>
+) {
+  const { email, name, avatar, activeProfileType } = getFragmentData(
+    UserSection_UserFragment,
+    props
+  );
+
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 

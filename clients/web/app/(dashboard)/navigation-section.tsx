@@ -27,26 +27,38 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/primitives/dropdown-menu";
-import { ProfileType, UserRole } from "@/types/gql";
+import {
+  FragmentType,
+  getFragmentData,
+  graphql,
+  ProfileType,
+  UserRole,
+} from "@/types/gql";
 import adminData from "./@admin/navigation-bar.data";
 import advertiserData from "./@advertiser/navigation-bar.data";
 import marketingData from "./@marketing/navigation-bar.data";
 import spaceOwnerData from "./@spaceOwner/navigation-bar.data";
 import Link from "next/link";
 
-export interface NavigationSectionProps {
-  userRole: UserRole;
-  activeProfileType: ProfileType;
-}
+const NavigationSection_UserFragment = graphql(`
+  fragment NavigationSection_UserFragment on User {
+    role
+    activeProfileType
+  }
+`);
 
-export function NavigationSection({
-  userRole,
-  activeProfileType,
-}: NavigationSectionProps) {
+export function NavigationSection(
+  props: FragmentType<typeof NavigationSection_UserFragment>
+) {
+  const { role, activeProfileType } = getFragmentData(
+    NavigationSection_UserFragment,
+    props
+  );
+
   const { isMobile } = useSidebar();
 
   const data = useMemo(() => {
-    switch (userRole) {
+    switch (role) {
       case UserRole.Admin:
         return adminData;
       case UserRole.Marketing:
@@ -57,7 +69,7 @@ export function NavigationSection({
           : advertiserData;
       }
     }
-  }, [userRole, activeProfileType]);
+  }, [role, activeProfileType]);
 
   return (
     <>

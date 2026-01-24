@@ -18,9 +18,10 @@ import { CSSProperties } from "react";
 import ContentHeader from "@/app/(dashboard)/content-header";
 import RoleBasedView from "@/app/(dashboard)/role-based-view";
 import assert from "node:assert";
+import { redirect } from "next/navigation";
 
 export default async function Layout(props: LayoutProps<"/">) {
-  const { data } = await api.query({
+  const { data, error } = await api.query({
     query: graphql(`
       query DashboardUser {
         me {
@@ -31,6 +32,10 @@ export default async function Layout(props: LayoutProps<"/">) {
       }
     `),
   });
+
+  if (error || !data?.me) {
+    redirect("/logout");
+  }
 
   assert(data?.me, "data?.me");
 

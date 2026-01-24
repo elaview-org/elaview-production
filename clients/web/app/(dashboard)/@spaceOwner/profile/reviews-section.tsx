@@ -27,13 +27,12 @@ type Props = {
   data: FragmentType<typeof ReviewsSection_UserFragment>;
 };
 
-const REVIEWS_PER_PAGE = 3;
-
 export default function ReviewsSection({ data }: Props) {
   const user = getFragmentData(ReviewsSection_UserFragment, data);
 
   const [page, setPage] = useState(0);
 
+  const REVIEWS_PER_PAGE = 3;
   const reviews = (user.spaceOwnerProfile?.spaces?.nodes ?? []).flatMap(
     (space) => space?.reviews?.nodes ?? []
   );

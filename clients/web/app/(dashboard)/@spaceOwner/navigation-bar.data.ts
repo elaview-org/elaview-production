@@ -1,19 +1,26 @@
 import {
   IconBuildingStore,
+  IconCalendar,
+  IconCalendarEvent,
+  IconCamera,
+  IconChartBar,
   IconContract,
   IconCookie,
+  IconCurrencyDollar,
   IconDashboard,
+  IconFileText,
+  IconHammer,
   IconHelp,
   IconMessage,
-  IconPlus,
-  IconShieldCheck,
+  IconQuestionMark,
+  IconReceipt,
 } from "@tabler/icons-react";
 
 const spaceOwnerData = {
   quickAction: {
-    title: "New Space",
-    url: "#",
-    icon: IconPlus,
+    title: "Messages",
+    url: "/messages",
+    icon: IconMessage,
   },
   navMain: [
     {
@@ -27,17 +34,53 @@ const spaceOwnerData = {
       icon: IconBuildingStore,
     },
     {
-      title: "Verification Flow",
-      url: "/verification-flow",
-      icon: IconShieldCheck,
+      title: "Bookings",
+      url: "/bookings",
+      icon: IconCalendarEvent,
     },
     {
-      title: "Messages",
-      url: "/messages",
-      icon: IconMessage,
+      title: "Earnings",
+      url: "/earnings",
+      icon: IconCurrencyDollar,
+    },
+    {
+      title: "Analytics",
+      url: "/analytics",
+      icon: IconChartBar,
+    },
+    {
+      title: "Calendar",
+      url: "/calendar",
+      icon: IconCalendar,
     },
   ],
-  documents: [],
+  documents: [
+    {
+      name: "Installation Guide",
+      url: "/documents/installation-guide",
+      icon: IconHammer,
+    },
+    {
+      name: "Verification Guide",
+      url: "/documents/verification-guide",
+      icon: IconCamera,
+    },
+    {
+      name: "Payout FAQ",
+      url: "/documents/payout-faq",
+      icon: IconQuestionMark,
+    },
+    {
+      name: "Tax Documents",
+      url: "/documents/tax-documents",
+      icon: IconReceipt,
+    },
+    {
+      name: "Platform Terms",
+      url: "/documents/platform-terms",
+      icon: IconFileText,
+    },
+  ],
   navSecondary: [
     {
       title: "Help & Support",

@@ -4,6 +4,7 @@ import { graphql } from "@/types/gql";
 import AboutSection from "./about-section";
 import ProfileCard from "./profile-card";
 import ReviewsSection from "./reviews-section";
+import { redirect } from "next/navigation";
 
 export default async function Page() {
   const { data, error } = await api.query({
@@ -19,7 +20,7 @@ export default async function Page() {
   });
 
   if (error || !data?.me) {
-    throw new Error(error?.message ?? "Failed to load profile");
+    redirect("/logout");
   }
 
   return (

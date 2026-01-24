@@ -21,6 +21,13 @@ type Documents = {
     "\n      query GetCurrentUserForSettings {\n        me {\n          id\n          avatar\n          advertiserProfile {\n            id\n          }\n        }\n      }\n    ": typeof types.GetCurrentUserForSettingsDocument,
     "\n        mutation UpdateCurrentUserProfile($input: UpdateCurrentUserInput!) {\n          updateCurrentUser(input: $input) {\n            user {\n              id\n            }\n          }\n        }\n      ": typeof types.UpdateCurrentUserProfileDocument,
     "\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      ": typeof types.UpdateAdvertiserProfileInfoDocument,
+    "\n  fragment Details_SpaceFragment on Space {\n    id\n    description\n    type\n    address\n    city\n    state\n    zipCode\n    traffic\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n    width\n    height\n    dimensionsText\n    availableFrom\n    availableTo\n  }\n": typeof types.Details_SpaceFragmentFragmentDoc,
+    "\n  fragment Gallery_SpaceFragment on Space {\n    id\n    title\n    images\n  }\n": typeof types.Gallery_SpaceFragmentFragmentDoc,
+    "\n  fragment Header_SpaceFragment on Space {\n    title\n    status\n  }\n": typeof types.Header_SpaceFragmentFragmentDoc,
+    "\n      query SpaceDetail($id: ID!) {\n        spaceById(id: $id) {\n          id\n          ...Header_SpaceFragment\n          ...Gallery_SpaceFragment\n          ...Details_SpaceFragment\n          ...Performance_SpaceFragment\n        }\n      }\n    ": typeof types.SpaceDetailDocument,
+    "\n  fragment Performance_SpaceFragment on Space {\n    totalBookings\n    totalRevenue\n    averageRating\n  }\n": typeof types.Performance_SpaceFragmentFragmentDoc,
+    "\n      query SpaceOwnerListings {\n        mySpaces {\n          nodes {\n            id\n            ...SpaceCard_SpaceFragment\n          }\n        }\n      }\n    ": typeof types.SpaceOwnerListingsDocument,
+    "\n  fragment SpaceCard_SpaceFragment on Space {\n    id\n    title\n    description\n    city\n    state\n    images\n    type\n    status\n    createdAt\n  }\n": typeof types.SpaceCard_SpaceFragmentFragmentDoc,
     "\n  fragment AboutSection_UserFragment on User {\n    name\n    spaceOwnerProfile {\n      businessName\n      businessType\n      onboardingComplete\n      spaces(first: 10) {\n        nodes {\n          id\n        }\n      }\n    }\n  }\n": typeof types.AboutSection_UserFragmentFragmentDoc,
     "\n      query SpaceOwnerProfile {\n        me {\n          ...ProfileCard_UserFragment\n          ...AboutSection_UserFragment\n          ...ReviewsSection_UserFragment\n        }\n      }\n    ": typeof types.SpaceOwnerProfileDocument,
     "\n  fragment ProfileCard_UserFragment on User {\n    name\n    avatar\n    spaceOwnerProfile {\n      createdAt\n      spaces(first: 10) {\n        nodes {\n          averageRating\n          reviews(first: 10) {\n            nodes {\n              id\n            }\n          }\n        }\n      }\n    }\n  }\n": typeof types.ProfileCard_UserFragmentFragmentDoc,
@@ -40,6 +47,13 @@ const documents: Documents = {
     "\n      query GetCurrentUserForSettings {\n        me {\n          id\n          avatar\n          advertiserProfile {\n            id\n          }\n        }\n      }\n    ": types.GetCurrentUserForSettingsDocument,
     "\n        mutation UpdateCurrentUserProfile($input: UpdateCurrentUserInput!) {\n          updateCurrentUser(input: $input) {\n            user {\n              id\n            }\n          }\n        }\n      ": types.UpdateCurrentUserProfileDocument,
     "\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      ": types.UpdateAdvertiserProfileInfoDocument,
+    "\n  fragment Details_SpaceFragment on Space {\n    id\n    description\n    type\n    address\n    city\n    state\n    zipCode\n    traffic\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n    width\n    height\n    dimensionsText\n    availableFrom\n    availableTo\n  }\n": types.Details_SpaceFragmentFragmentDoc,
+    "\n  fragment Gallery_SpaceFragment on Space {\n    id\n    title\n    images\n  }\n": types.Gallery_SpaceFragmentFragmentDoc,
+    "\n  fragment Header_SpaceFragment on Space {\n    title\n    status\n  }\n": types.Header_SpaceFragmentFragmentDoc,
+    "\n      query SpaceDetail($id: ID!) {\n        spaceById(id: $id) {\n          id\n          ...Header_SpaceFragment\n          ...Gallery_SpaceFragment\n          ...Details_SpaceFragment\n          ...Performance_SpaceFragment\n        }\n      }\n    ": types.SpaceDetailDocument,
+    "\n  fragment Performance_SpaceFragment on Space {\n    totalBookings\n    totalRevenue\n    averageRating\n  }\n": types.Performance_SpaceFragmentFragmentDoc,
+    "\n      query SpaceOwnerListings {\n        mySpaces {\n          nodes {\n            id\n            ...SpaceCard_SpaceFragment\n          }\n        }\n      }\n    ": types.SpaceOwnerListingsDocument,
+    "\n  fragment SpaceCard_SpaceFragment on Space {\n    id\n    title\n    description\n    city\n    state\n    images\n    type\n    status\n    createdAt\n  }\n": types.SpaceCard_SpaceFragmentFragmentDoc,
     "\n  fragment AboutSection_UserFragment on User {\n    name\n    spaceOwnerProfile {\n      businessName\n      businessType\n      onboardingComplete\n      spaces(first: 10) {\n        nodes {\n          id\n        }\n      }\n    }\n  }\n": types.AboutSection_UserFragmentFragmentDoc,
     "\n      query SpaceOwnerProfile {\n        me {\n          ...ProfileCard_UserFragment\n          ...AboutSection_UserFragment\n          ...ReviewsSection_UserFragment\n        }\n      }\n    ": types.SpaceOwnerProfileDocument,
     "\n  fragment ProfileCard_UserFragment on User {\n    name\n    avatar\n    spaceOwnerProfile {\n      createdAt\n      spaces(first: 10) {\n        nodes {\n          averageRating\n          reviews(first: 10) {\n            nodes {\n              id\n            }\n          }\n        }\n      }\n    }\n  }\n": types.ProfileCard_UserFragmentFragmentDoc,
@@ -94,6 +108,34 @@ export function graphql(source: "\n        mutation UpdateCurrentUserProfile($in
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      "): (typeof documents)["\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment Details_SpaceFragment on Space {\n    id\n    description\n    type\n    address\n    city\n    state\n    zipCode\n    traffic\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n    width\n    height\n    dimensionsText\n    availableFrom\n    availableTo\n  }\n"): (typeof documents)["\n  fragment Details_SpaceFragment on Space {\n    id\n    description\n    type\n    address\n    city\n    state\n    zipCode\n    traffic\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n    width\n    height\n    dimensionsText\n    availableFrom\n    availableTo\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment Gallery_SpaceFragment on Space {\n    id\n    title\n    images\n  }\n"): (typeof documents)["\n  fragment Gallery_SpaceFragment on Space {\n    id\n    title\n    images\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment Header_SpaceFragment on Space {\n    title\n    status\n  }\n"): (typeof documents)["\n  fragment Header_SpaceFragment on Space {\n    title\n    status\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n      query SpaceDetail($id: ID!) {\n        spaceById(id: $id) {\n          id\n          ...Header_SpaceFragment\n          ...Gallery_SpaceFragment\n          ...Details_SpaceFragment\n          ...Performance_SpaceFragment\n        }\n      }\n    "): (typeof documents)["\n      query SpaceDetail($id: ID!) {\n        spaceById(id: $id) {\n          id\n          ...Header_SpaceFragment\n          ...Gallery_SpaceFragment\n          ...Details_SpaceFragment\n          ...Performance_SpaceFragment\n        }\n      }\n    "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment Performance_SpaceFragment on Space {\n    totalBookings\n    totalRevenue\n    averageRating\n  }\n"): (typeof documents)["\n  fragment Performance_SpaceFragment on Space {\n    totalBookings\n    totalRevenue\n    averageRating\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n      query SpaceOwnerListings {\n        mySpaces {\n          nodes {\n            id\n            ...SpaceCard_SpaceFragment\n          }\n        }\n      }\n    "): (typeof documents)["\n      query SpaceOwnerListings {\n        mySpaces {\n          nodes {\n            id\n            ...SpaceCard_SpaceFragment\n          }\n        }\n      }\n    "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment SpaceCard_SpaceFragment on Space {\n    id\n    title\n    description\n    city\n    state\n    images\n    type\n    status\n    createdAt\n  }\n"): (typeof documents)["\n  fragment SpaceCard_SpaceFragment on Space {\n    id\n    title\n    description\n    city\n    state\n    images\n    type\n    status\n    createdAt\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

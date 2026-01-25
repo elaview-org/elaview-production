@@ -1,9 +1,16 @@
-function Page() {
-  return (
-    <div>
-      Message
-    </div>
-  )
-}
+import getConversationsQuery from "./messages-queries";
+import MessagesClient from "./messages-client";
+import MessagesHeader from "./messages-header";
 
-export default Page
+export default async function MessagesPage() {
+  const { conversations } = await getConversationsQuery();
+
+  return (
+    <MessagesClient
+      conversations={conversations}
+      initialSelectedBookingId={undefined}
+    >
+      <MessagesHeader conversationCount={conversations.length} />
+    </MessagesClient>
+  );
+}

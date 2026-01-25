@@ -83,6 +83,7 @@ export function BookingCard({
               src={thumbnailUrl}
               alt={spaceName}
               className="h-full w-full object-cover"
+              fill
             />
           </div>
 

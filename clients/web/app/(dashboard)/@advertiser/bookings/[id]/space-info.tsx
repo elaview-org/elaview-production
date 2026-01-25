@@ -6,7 +6,7 @@ function SpaceInfo() {
     name: "Downtown Billboard",
     location: "123 Main St, Springfield",
     imageUrl:
-      "https://images.unsplash.com/photo-1511974035430-5de47d3b95da?auto=format&fit=crop&w=800&q=80",
+      "/components/assets/images/still-b742de551ffe7ebf2eda37f96ab92d00.webp",
     size: "14 ft x 48 ft",
   };
 

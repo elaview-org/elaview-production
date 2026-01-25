@@ -21,6 +21,8 @@ type Documents = {
     "\n      query GetCurrentUserForSettings {\n        me {\n          id\n          avatar\n          advertiserProfile {\n            id\n          }\n        }\n      }\n    ": typeof types.GetCurrentUserForSettingsDocument,
     "\n        mutation UpdateCurrentUserProfile($input: UpdateCurrentUserInput!) {\n          updateCurrentUser(input: $input) {\n            user {\n              id\n            }\n          }\n        }\n      ": typeof types.UpdateCurrentUserProfileDocument,
     "\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      ": typeof types.UpdateAdvertiserProfileInfoDocument,
+    "\n  fragment BookingsTable_BookingFragment on Booking {\n    id\n    status\n    startDate\n    endDate\n    ownerPayoutAmount\n    space {\n      title\n      images\n    }\n    campaign {\n      name\n      advertiserProfile {\n        companyName\n      }\n    }\n  }\n": typeof types.BookingsTable_BookingFragmentFragmentDoc,
+    "\n      query SpaceOwnerBookings {\n        myBookingsAsOwner {\n          nodes {\n            id\n            ...BookingsTable_BookingFragment\n          }\n        }\n      }\n    ": typeof types.SpaceOwnerBookingsDocument,
     "\n  fragment Details_SpaceFragment on Space {\n    id\n    description\n    type\n    address\n    city\n    state\n    zipCode\n    traffic\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n    width\n    height\n    dimensionsText\n    availableFrom\n    availableTo\n  }\n": typeof types.Details_SpaceFragmentFragmentDoc,
     "\n  fragment Gallery_SpaceFragment on Space {\n    id\n    title\n    images\n  }\n": typeof types.Gallery_SpaceFragmentFragmentDoc,
     "\n  fragment Header_SpaceFragment on Space {\n    title\n    status\n  }\n": typeof types.Header_SpaceFragmentFragmentDoc,
@@ -47,6 +49,8 @@ const documents: Documents = {
     "\n      query GetCurrentUserForSettings {\n        me {\n          id\n          avatar\n          advertiserProfile {\n            id\n          }\n        }\n      }\n    ": types.GetCurrentUserForSettingsDocument,
     "\n        mutation UpdateCurrentUserProfile($input: UpdateCurrentUserInput!) {\n          updateCurrentUser(input: $input) {\n            user {\n              id\n            }\n          }\n        }\n      ": types.UpdateCurrentUserProfileDocument,
     "\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      ": types.UpdateAdvertiserProfileInfoDocument,
+    "\n  fragment BookingsTable_BookingFragment on Booking {\n    id\n    status\n    startDate\n    endDate\n    ownerPayoutAmount\n    space {\n      title\n      images\n    }\n    campaign {\n      name\n      advertiserProfile {\n        companyName\n      }\n    }\n  }\n": types.BookingsTable_BookingFragmentFragmentDoc,
+    "\n      query SpaceOwnerBookings {\n        myBookingsAsOwner {\n          nodes {\n            id\n            ...BookingsTable_BookingFragment\n          }\n        }\n      }\n    ": types.SpaceOwnerBookingsDocument,
     "\n  fragment Details_SpaceFragment on Space {\n    id\n    description\n    type\n    address\n    city\n    state\n    zipCode\n    traffic\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n    width\n    height\n    dimensionsText\n    availableFrom\n    availableTo\n  }\n": types.Details_SpaceFragmentFragmentDoc,
     "\n  fragment Gallery_SpaceFragment on Space {\n    id\n    title\n    images\n  }\n": types.Gallery_SpaceFragmentFragmentDoc,
     "\n  fragment Header_SpaceFragment on Space {\n    title\n    status\n  }\n": types.Header_SpaceFragmentFragmentDoc,
@@ -108,6 +112,14 @@ export function graphql(source: "\n        mutation UpdateCurrentUserProfile($in
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      "): (typeof documents)["\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment BookingsTable_BookingFragment on Booking {\n    id\n    status\n    startDate\n    endDate\n    ownerPayoutAmount\n    space {\n      title\n      images\n    }\n    campaign {\n      name\n      advertiserProfile {\n        companyName\n      }\n    }\n  }\n"): (typeof documents)["\n  fragment BookingsTable_BookingFragment on Booking {\n    id\n    status\n    startDate\n    endDate\n    ownerPayoutAmount\n    space {\n      title\n      images\n    }\n    campaign {\n      name\n      advertiserProfile {\n        companyName\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n      query SpaceOwnerBookings {\n        myBookingsAsOwner {\n          nodes {\n            id\n            ...BookingsTable_BookingFragment\n          }\n        }\n      }\n    "): (typeof documents)["\n      query SpaceOwnerBookings {\n        myBookingsAsOwner {\n          nodes {\n            id\n            ...BookingsTable_BookingFragment\n          }\n        }\n      }\n    "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

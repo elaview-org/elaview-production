@@ -48,18 +48,13 @@ export default async function Layout(props: LayoutProps<"/">) {
         } as CSSProperties
       }
     >
-      <Sidebar variant={"inset"} collapsible="offcanvas">
+      <Sidebar collapsible="icon">
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton
-                asChild
-                className="data-[slot=sidebar-menu-button]:p-1.5!"
-              >
-                <a href="#">
-                  <IconInnerShadowTop className="size-5!" />
-                  <span className="text-base font-semibold">Elaview</span>
-                </a>
+              <SidebarMenuButton className="hover:bg-inherit active:bg-inherit data-[slot=sidebar-menu-button]:p-1.5!">
+                <IconInnerShadowTop className="size-5!" />
+                <span className="text-base font-semibold">Elaview</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

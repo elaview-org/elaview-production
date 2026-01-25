@@ -5,18 +5,13 @@ import {
   IconFileDescription,
   IconFileWord,
   IconHelp,
-  IconPlus,
   IconReport,
   IconSearch,
   IconSettings,
 } from "@tabler/icons-react";
 
 const adminData = {
-  quickAction: {
-    title: "New Campaign",
-    url: "#",
-    icon: IconPlus,
-  },
+  title: "Administrator",
   navMain: [],
   navClouds: [
     {

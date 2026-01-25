@@ -40,7 +40,25 @@ export default async function Page() {
     <div className="flex flex-col gap-6">
       <Toolbar />
       {spaces.length === 0 ? (
-        <EmptyState />
+        <Empty className="border py-16">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <IconBuildingStore />
+            </EmptyMedia>
+            <EmptyTitle>No spaces yet</EmptyTitle>
+            <EmptyDescription>
+              Create your first listing to start earning
+            </EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button asChild>
+              <Link href="/listings/new">
+                <IconPlus />
+                Create Listing
+              </Link>
+            </Button>
+          </EmptyContent>
+        </Empty>
       ) : (
         <div className="grid grid-cols-1 gap-6 @md/main:grid-cols-2 @3xl/main:grid-cols-3">
           {spaces.map((space) => (
@@ -50,29 +68,5 @@ export default async function Page() {
       )}
       <PageNav />
     </div>
-  );
-}
-
-function EmptyState() {
-  return (
-    <Empty className="border py-16">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <IconBuildingStore />
-        </EmptyMedia>
-        <EmptyTitle>No spaces yet</EmptyTitle>
-        <EmptyDescription>
-          Create your first listing to start earning
-        </EmptyDescription>
-      </EmptyHeader>
-      <EmptyContent>
-        <Button asChild>
-          <Link href="/listings/new">
-            <IconPlus />
-            Create Listing
-          </Link>
-        </Button>
-      </EmptyContent>
-    </Empty>
   );
 }

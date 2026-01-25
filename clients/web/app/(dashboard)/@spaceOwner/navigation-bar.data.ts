@@ -11,17 +11,12 @@ import {
   IconFileText,
   IconHammer,
   IconHelp,
-  IconMessage,
   IconQuestionMark,
   IconReceipt,
 } from "@tabler/icons-react";
 
 const spaceOwnerData = {
-  quickAction: {
-    title: "Messages",
-    url: "/messages",
-    icon: IconMessage,
-  },
+  title: "Space Owner",
   navMain: [
     {
       title: "Overview",

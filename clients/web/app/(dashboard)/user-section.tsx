@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { IconLogout, IconSwitchHorizontal } from "@tabler/icons-react";
+import { IconMessage, IconSwitchHorizontal } from "@tabler/icons-react";
 import {
   Avatar,
   AvatarFallback,
@@ -11,14 +11,17 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/primitives/sidebar";
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/primitives/tooltip";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/primitives/dropdown-menu";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   FragmentType,
   getFragmentData,
@@ -26,6 +29,7 @@ import {
   ProfileType,
 } from "@/types/gql";
 import { switchProfile } from "./switch-profile.action";
+import { BadgeCheck, Bell, LogOut, Settings } from "lucide-react";
 
 export const UserSection_UserFragment = graphql(`
   fragment UserSection_UserFragment on User {
@@ -47,7 +51,7 @@ export function UserSection({ data }: Props) {
   );
 
   const [isPending, startTransition] = useTransition();
-  const router = useRouter();
+  const { isMobile } = useSidebar();
 
   const targetProfile =
     activeProfileType === ProfileType.SpaceOwner
@@ -66,53 +70,85 @@ export function UserSection({ data }: Props) {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <SidebarMenuButton size="lg" asChild>
-          <Link href="/profile">
-            <Avatar className="h-8 w-8 rounded-[50%] grayscale">
-              <AvatarImage
-                src={avatar as string | undefined}
-                alt={name as string | undefined}
-              />
-              <AvatarFallback>A</AvatarFallback>
-            </Avatar>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-medium">{name}</span>
-              <span className="text-muted-foreground truncate text-xs">
-                {email}
-              </span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleSwitchProfile();
-                    }}
-                    disabled={isPending}
-                    className="text-muted-foreground hover:text-foreground disabled:opacity-50"
-                  >
-                    <IconSwitchHorizontal
-                      className={isPending ? "animate-pulse" : ""}
-                    />
-                  </button>
-                </TooltipTrigger>
-                <TooltipContent side="top">
-                  Switch to {targetLabel}
-                </TooltipContent>
-              </Tooltip>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <SidebarMenuButton size="lg" asChild>
+              <Link href="/profile">
+                <Avatar className="h-8 w-8 rounded-[50%] grayscale">
+                  <AvatarImage
+                    src={avatar as string | undefined}
+                    alt={name as string | undefined}
+                  />
+                  <AvatarFallback>A</AvatarFallback>
+                </Avatar>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-medium">{name}</span>
+                  <span className="text-muted-foreground truncate text-xs">
+                    {email}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1"></div>
+              </Link>
+            </SidebarMenuButton>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
+            side={isMobile ? "bottom" : "right"}
+            align="end"
+            sideOffset={4}
+          >
+            <DropdownMenuGroup>
+              <Link href="/profile">
+                <DropdownMenuItem>
+                  <BadgeCheck />
+                  Profile
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/notifications">
+                <DropdownMenuItem>
+                  <Bell />
+                  Notifications
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/messages">
+                <DropdownMenuItem>
+                  <IconMessage />
+                  Messages
+                </DropdownMenuItem>
+              </Link>
+              <Link href="/settings">
+                <DropdownMenuItem>
+                  <Settings />
+                  Settings
+                </DropdownMenuItem>
+              </Link>
+            </DropdownMenuGroup>
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  router.push("/logout");
+                  handleSwitchProfile();
                 }}
-                className="text-muted-foreground hover:text-foreground"
+                disabled={isPending}
+                className={"w-full"}
               >
-                <IconLogout />
+                <DropdownMenuItem>
+                  <IconSwitchHorizontal
+                    className={isPending ? "animate-pulse" : ""}
+                  />
+                  Switch to {targetLabel}
+                </DropdownMenuItem>
               </button>
-            </div>
-          </Link>
-        </SidebarMenuButton>
+              <Link href="/logout">
+                <DropdownMenuItem>
+                  <LogOut />
+                  Logout
+                </DropdownMenuItem>
+              </Link>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
   );

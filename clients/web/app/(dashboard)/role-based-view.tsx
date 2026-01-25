@@ -31,7 +31,7 @@ export default function RoleBasedView({
 }: Props) {
   const { role, activeProfileType } = getFragmentData(
     RoleBasedView_UserFragment,
-    data,
+    data
   );
 
   return (

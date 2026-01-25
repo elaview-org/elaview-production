@@ -2,14 +2,12 @@
 
 import { useMemo } from "react";
 import {
-  IconBell,
   IconDots,
   IconFolder,
   IconShare3,
   IconTrash,
+  IconUserScan,
 } from "@tabler/icons-react";
-
-import { Button } from "@/components/primitives/button";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -58,7 +56,6 @@ export function NavigationSection({ data }: Props) {
   );
 
   const { isMobile } = useSidebar();
-
   const roleData = useMemo(() => {
     switch (role) {
       case UserRole.Admin:
@@ -81,25 +78,14 @@ export function NavigationSection({ data }: Props) {
             <SidebarMenuItem className="flex items-center gap-2">
               <SidebarMenuButton
                 asChild
-                tooltip={roleData.quickAction.title}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground min-w-8 duration-200 ease-linear"
+                tooltip={roleData.title}
+                className="bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground active:bg-primary active:text-primary-foreground min-w-8"
               >
-                <Link href={roleData.quickAction.url}>
-                  <roleData.quickAction.icon />
-                  <span>{roleData.quickAction.title}</span>
-                </Link>
+                <div>
+                  <IconUserScan />
+                  <span>{roleData.title}</span>
+                </div>
               </SidebarMenuButton>
-              <Button
-                size="icon"
-                className="size-8 group-data-[collapsible=icon]:opacity-0"
-                variant="outline"
-                asChild
-              >
-                <Link href={"#"}>
-                  <IconBell />
-                  <span className="sr-only">Inbox</span>
-                </Link>
-              </Button>
             </SidebarMenuItem>
           </SidebarMenu>
           <SidebarMenu>

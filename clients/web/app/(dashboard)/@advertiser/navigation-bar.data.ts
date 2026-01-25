@@ -5,16 +5,11 @@ import {
   IconDashboard,
   IconHelp,
   IconMessage,
-  IconPlus,
   IconSearch,
 } from "@tabler/icons-react";
 
 const advertiserData = {
-  quickAction: {
-    title: "New Campaign",
-    url: "#",
-    icon: IconPlus,
-  },
+  title: "Advertiser",
   navMain: [
     {
       title: "Overview",

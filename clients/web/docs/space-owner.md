@@ -56,7 +56,7 @@ The sidebar navigation is defined in `navigation-bar.data.ts`:
 | Calendar  | ⚠️ Partial    | Mock JSON      | Month/week/day views, needs GraphQL      |
 | Messages  | ❌ Not Started | —              | Minimal stub component                   |
 | Profile   | ✅ Functional  | GraphQL        | Fully integrated                         |
-| Settings  | ❌ Not Started | —              | Under construction placeholder           |
+| Settings  | ✅ Functional  | GraphQL        | Profile, business, notifications tabs    |
 
 ---
 
@@ -592,24 +592,25 @@ subscription OnMessage($conversationId: ID!) {
 
 **Profile Tab:**
 
-- [ ] Name field
-- [ ] Email field (read-only)
-- [ ] Phone field
+- [x] Name field
+- [x] Email field (read-only)
+- [x] Phone field
+- [x] Avatar display
 - [ ] Avatar upload
 - [ ] Save changes button
 - [ ] `updateCurrentUser` mutation
 
 **Business Tab:**
 
-- [ ] Business name field
-- [ ] Business type selector
-- [ ] Payout schedule selector (Weekly, Biweekly, Monthly)
+- [x] Business name field
+- [x] Business type selector
+- [x] Payout schedule selector (Weekly, Biweekly, Monthly)
 - [ ] Save changes button
 - [ ] `updateSpaceOwnerProfile` mutation
 
 **Payout Tab:**
 
-- [ ] Stripe Connect status display
+- [x] Stripe Connect status display
 - [ ] Bank account info (masked)
 - [ ] Connect/Reconnect Stripe button
 - [ ] Disconnect Stripe button
@@ -619,8 +620,8 @@ subscription OnMessage($conversationId: ID!) {
 
 **Notifications Tab:**
 
-- [ ] Notification type toggles
-- [ ] In-app, Email, Push columns
+- [x] Notification type toggles
+- [x] In-app, Email, Push columns
 - [ ] Save preferences
 - [ ] `updateNotificationPreference` mutation
 

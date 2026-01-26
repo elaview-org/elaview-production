@@ -2,17 +2,12 @@ import {
   IconBuildingStore,
   IconCalendar,
   IconCalendarEvent,
-  IconCamera,
   IconChartBar,
   IconContract,
   IconCookie,
   IconCurrencyDollar,
   IconDashboard,
-  IconFileText,
-  IconHammer,
   IconHelp,
-  IconQuestionMark,
-  IconReceipt,
 } from "@tabler/icons-react";
 
 const spaceOwnerData = {
@@ -49,33 +44,7 @@ const spaceOwnerData = {
       icon: IconCalendar,
     },
   ],
-  documents: [
-    {
-      name: "Installation Guide",
-      url: "/documents/installation-guide",
-      icon: IconHammer,
-    },
-    {
-      name: "Verification Guide",
-      url: "/documents/verification-guide",
-      icon: IconCamera,
-    },
-    {
-      name: "Payout FAQ",
-      url: "/documents/payout-faq",
-      icon: IconQuestionMark,
-    },
-    {
-      name: "Tax Documents",
-      url: "/documents/tax-documents",
-      icon: IconReceipt,
-    },
-    {
-      name: "Platform Terms",
-      url: "/documents/platform-terms",
-      icon: IconFileText,
-    },
-  ],
+  documents: [],
   navSecondary: [
     {
       title: "Help & Support",

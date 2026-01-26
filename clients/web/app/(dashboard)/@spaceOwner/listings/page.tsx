@@ -30,8 +30,6 @@ export default async function Page() {
 
   const spaces = data?.mySpaces?.nodes ?? [];
 
-  console.log(__dirname);
-
   return (
     <div className="flex flex-col gap-6">
       <Toolbar {...TOOLBAR_PROPS} action={<CreateSpace />} />

@@ -3,7 +3,7 @@ import { graphql } from "@/types/gql";
 import BookingsTable from "./bookings-table";
 import { type FilterTabKey, getStatusFilter, TOOLBAR_PROPS } from "./constants";
 import Toolbar from "@/components/composed/toolbar";
-import mockData from "./mock-data.json";
+import mockData from "./mock.json";
 import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import Placeholder from "@/app/(dashboard)/@spaceOwner/bookings/placeholder";
 

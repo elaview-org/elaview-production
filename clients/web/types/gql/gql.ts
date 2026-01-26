@@ -23,6 +23,9 @@ type Documents = {
     "\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      ": typeof types.UpdateAdvertiserProfileInfoDocument,
     "\n  fragment BookingsTable_BookingFragment on Booking {\n    id\n    status\n    startDate\n    endDate\n    ownerPayoutAmount\n    space {\n      title\n      images\n    }\n    campaign {\n      name\n      advertiserProfile {\n        companyName\n      }\n    }\n  }\n": typeof types.BookingsTable_BookingFragmentFragmentDoc,
     "\n      query SpaceOwnerBookings {\n        myBookingsAsOwner {\n          nodes {\n            id\n            ...BookingsTable_BookingFragment\n          }\n        }\n      }\n    ": typeof types.SpaceOwnerBookingsDocument,
+    "\n  fragment BalanceCards_EarningsSummaryFragment on EarningsSummary {\n    availableBalance\n    pendingPayouts\n    thisMonthEarnings\n    lastMonthEarnings\n    totalEarnings\n  }\n": typeof types.BalanceCards_EarningsSummaryFragmentFragmentDoc,
+    "\n      query SpaceOwnerEarnings {\n        earningsSummary {\n          ...BalanceCards_EarningsSummaryFragment\n        }\n        myPayouts {\n          nodes {\n            id\n            amount\n            processedAt\n            ...PayoutsTable_PayoutFragment\n          }\n        }\n      }\n    ": typeof types.SpaceOwnerEarningsDocument,
+    "\n  fragment PayoutsTable_PayoutFragment on Payout {\n    id\n    amount\n    stage\n    status\n    processedAt\n    booking {\n      id\n      space {\n        title\n      }\n    }\n  }\n": typeof types.PayoutsTable_PayoutFragmentFragmentDoc,
     "\n  fragment Details_SpaceFragment on Space {\n    id\n    description\n    type\n    address\n    city\n    state\n    zipCode\n    traffic\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n    width\n    height\n    dimensionsText\n    availableFrom\n    availableTo\n  }\n": typeof types.Details_SpaceFragmentFragmentDoc,
     "\n  fragment Gallery_SpaceFragment on Space {\n    id\n    title\n    images\n  }\n": typeof types.Gallery_SpaceFragmentFragmentDoc,
     "\n  fragment Header_SpaceFragment on Space {\n    title\n    status\n  }\n": typeof types.Header_SpaceFragmentFragmentDoc,
@@ -51,6 +54,9 @@ const documents: Documents = {
     "\n        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {\n          updateAdvertiserProfile(input: $input) {\n            advertiserProfile {\n              id\n            }\n          }\n        }\n      ": types.UpdateAdvertiserProfileInfoDocument,
     "\n  fragment BookingsTable_BookingFragment on Booking {\n    id\n    status\n    startDate\n    endDate\n    ownerPayoutAmount\n    space {\n      title\n      images\n    }\n    campaign {\n      name\n      advertiserProfile {\n        companyName\n      }\n    }\n  }\n": types.BookingsTable_BookingFragmentFragmentDoc,
     "\n      query SpaceOwnerBookings {\n        myBookingsAsOwner {\n          nodes {\n            id\n            ...BookingsTable_BookingFragment\n          }\n        }\n      }\n    ": types.SpaceOwnerBookingsDocument,
+    "\n  fragment BalanceCards_EarningsSummaryFragment on EarningsSummary {\n    availableBalance\n    pendingPayouts\n    thisMonthEarnings\n    lastMonthEarnings\n    totalEarnings\n  }\n": types.BalanceCards_EarningsSummaryFragmentFragmentDoc,
+    "\n      query SpaceOwnerEarnings {\n        earningsSummary {\n          ...BalanceCards_EarningsSummaryFragment\n        }\n        myPayouts {\n          nodes {\n            id\n            amount\n            processedAt\n            ...PayoutsTable_PayoutFragment\n          }\n        }\n      }\n    ": types.SpaceOwnerEarningsDocument,
+    "\n  fragment PayoutsTable_PayoutFragment on Payout {\n    id\n    amount\n    stage\n    status\n    processedAt\n    booking {\n      id\n      space {\n        title\n      }\n    }\n  }\n": types.PayoutsTable_PayoutFragmentFragmentDoc,
     "\n  fragment Details_SpaceFragment on Space {\n    id\n    description\n    type\n    address\n    city\n    state\n    zipCode\n    traffic\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n    width\n    height\n    dimensionsText\n    availableFrom\n    availableTo\n  }\n": types.Details_SpaceFragmentFragmentDoc,
     "\n  fragment Gallery_SpaceFragment on Space {\n    id\n    title\n    images\n  }\n": types.Gallery_SpaceFragmentFragmentDoc,
     "\n  fragment Header_SpaceFragment on Space {\n    title\n    status\n  }\n": types.Header_SpaceFragmentFragmentDoc,
@@ -120,6 +126,18 @@ export function graphql(source: "\n  fragment BookingsTable_BookingFragment on B
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n      query SpaceOwnerBookings {\n        myBookingsAsOwner {\n          nodes {\n            id\n            ...BookingsTable_BookingFragment\n          }\n        }\n      }\n    "): (typeof documents)["\n      query SpaceOwnerBookings {\n        myBookingsAsOwner {\n          nodes {\n            id\n            ...BookingsTable_BookingFragment\n          }\n        }\n      }\n    "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment BalanceCards_EarningsSummaryFragment on EarningsSummary {\n    availableBalance\n    pendingPayouts\n    thisMonthEarnings\n    lastMonthEarnings\n    totalEarnings\n  }\n"): (typeof documents)["\n  fragment BalanceCards_EarningsSummaryFragment on EarningsSummary {\n    availableBalance\n    pendingPayouts\n    thisMonthEarnings\n    lastMonthEarnings\n    totalEarnings\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n      query SpaceOwnerEarnings {\n        earningsSummary {\n          ...BalanceCards_EarningsSummaryFragment\n        }\n        myPayouts {\n          nodes {\n            id\n            amount\n            processedAt\n            ...PayoutsTable_PayoutFragment\n          }\n        }\n      }\n    "): (typeof documents)["\n      query SpaceOwnerEarnings {\n        earningsSummary {\n          ...BalanceCards_EarningsSummaryFragment\n        }\n        myPayouts {\n          nodes {\n            id\n            amount\n            processedAt\n            ...PayoutsTable_PayoutFragment\n          }\n        }\n      }\n    "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment PayoutsTable_PayoutFragment on Payout {\n    id\n    amount\n    stage\n    status\n    processedAt\n    booking {\n      id\n      space {\n        title\n      }\n    }\n  }\n"): (typeof documents)["\n  fragment PayoutsTable_PayoutFragment on Payout {\n    id\n    amount\n    stage\n    status\n    processedAt\n    booking {\n      id\n      space {\n        title\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

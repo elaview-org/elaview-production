@@ -1,0 +1,163 @@
+{
+  "spaces": [
+    {
+      "id": "space-1",
+      "title": "Downtown Storefront",
+      "colorIndex": 0
+    },
+    {
+      "id": "space-2",
+      "title": "Main St Window",
+      "colorIndex": 1
+    },
+    {
+      "id": "space-3",
+      "title": "Corner Billboard",
+      "colorIndex": 2
+    },
+    {
+      "id": "space-4",
+      "title": "Mall Entrance",
+      "colorIndex": 3
+    },
+    {
+      "id": "space-5",
+      "title": "Park View Wall",
+      "colorIndex": 4
+    }
+  ],
+  "bookings": [
+    {
+      "id": "booking-1",
+      "spaceId": "space-1",
+      "status": "PAID",
+      "startDate": "2026-01-20",
+      "endDate": "2026-02-03",
+      "advertiserName": "Fitness First",
+      "campaignName": "New Year Fitness",
+      "amount": 450.0,
+      "installationDeadline": "2026-01-25"
+    },
+    {
+      "id": "booking-2",
+      "spaceId": "space-2",
+      "status": "FILE_DOWNLOADED",
+      "startDate": "2026-01-15",
+      "endDate": "2026-01-29",
+      "advertiserName": "Coffee Corner",
+      "campaignName": "Winter Blend Promo",
+      "amount": 320.0,
+      "installationDeadline": "2026-01-20"
+    },
+    {
+      "id": "booking-3",
+      "spaceId": "space-4",
+      "status": "INSTALLED",
+      "startDate": "2026-01-10",
+      "endDate": "2026-01-31",
+      "advertiserName": "Tech Solutions",
+      "campaignName": "Product Launch",
+      "amount": 580.0,
+      "installationDeadline": null
+    },
+    {
+      "id": "booking-4",
+      "spaceId": "space-3",
+      "status": "PENDING_APPROVAL",
+      "startDate": "2026-02-01",
+      "endDate": "2026-02-14",
+      "advertiserName": "Local Gym Co",
+      "campaignName": "Valentine's Special",
+      "amount": 420.0,
+      "installationDeadline": null
+    },
+    {
+      "id": "booking-5",
+      "spaceId": "space-1",
+      "status": "PENDING_APPROVAL",
+      "startDate": "2026-02-05",
+      "endDate": "2026-02-19",
+      "advertiserName": "Pizza Palace",
+      "campaignName": "Super Bowl Week",
+      "amount": 380.0,
+      "installationDeadline": null
+    },
+    {
+      "id": "booking-6",
+      "spaceId": "space-5",
+      "status": "APPROVED",
+      "startDate": "2026-02-10",
+      "endDate": "2026-02-24",
+      "advertiserName": "Sunset Realty",
+      "campaignName": "Open House Event",
+      "amount": 520.0,
+      "installationDeadline": null
+    },
+    {
+      "id": "booking-7",
+      "spaceId": "space-2",
+      "status": "COMPLETED",
+      "startDate": "2026-01-01",
+      "endDate": "2026-01-14",
+      "advertiserName": "Green Gardens",
+      "campaignName": "New Year Sale",
+      "amount": 290.0,
+      "installationDeadline": null
+    },
+    {
+      "id": "booking-8",
+      "spaceId": "space-3",
+      "status": "VERIFIED",
+      "startDate": "2026-01-18",
+      "endDate": "2026-02-01",
+      "advertiserName": "Art Gallery",
+      "campaignName": "Winter Exhibition",
+      "amount": 650.0,
+      "installationDeadline": null
+    },
+    {
+      "id": "booking-9",
+      "spaceId": "space-1",
+      "status": "COMPLETED",
+      "startDate": "2025-12-15",
+      "endDate": "2026-01-05",
+      "advertiserName": "Holiday Shop",
+      "campaignName": "Christmas Sale",
+      "amount": 720.0,
+      "installationDeadline": null
+    },
+    {
+      "id": "booking-10",
+      "spaceId": "space-4",
+      "status": "PAID",
+      "startDate": "2026-02-15",
+      "endDate": "2026-02-28",
+      "advertiserName": "Spa & Wellness",
+      "campaignName": "Spring Refresh",
+      "amount": 480.0,
+      "installationDeadline": "2026-02-20"
+    }
+  ],
+  "blockedDates": [
+    {
+      "spaceId": "space-1",
+      "date": "2026-02-25"
+    },
+    {
+      "spaceId": "space-1",
+      "date": "2026-02-26"
+    },
+    {
+      "spaceId": "space-1",
+      "date": "2026-02-27"
+    },
+    {
+      "spaceId": "space-2",
+      "date": "2026-02-01"
+    },
+    {
+      "spaceId": "space-3",
+      "date": "2026-02-20"
+    }
+  ]
+}

@@ -1,7 +1,6 @@
 # Space Owner Dashboard Implementation Guide
 
-This document serves as the comprehensive reference for implementing the Space Owner dashboard in the Elaview web
-client.
+Comprehensive reference for implementing the Space Owner dashboard in the Elaview web client.
 
 ## Overview
 
@@ -17,39 +16,19 @@ advertising spaces, handle booking requests, track earnings, and communicate wit
 app/(dashboard)/@spaceOwner/
 ├── default.ts                    # Required parallel route default
 ├── navigation-bar.data.ts        # Sidebar navigation configuration
-├── overview/
-│   └── page.tsx                  # Dashboard landing page
-├── listings/
-│   ├── page.tsx                  # Space listings grid
-│   ├── new/
-│   │   └── page.tsx              # Create new space form
-│   └── [id]/
-│       ├── page.tsx              # Space detail view
-│       └── edit/
-│           └── page.tsx          # Edit space form
-├── bookings/
-│   ├── page.tsx                  # Bookings list with filters
-│   └── [id]/
-│       └── page.tsx              # Booking detail with timeline
-├── earnings/
-│   ├── page.tsx                  # Earnings dashboard
-│   └── payouts/
-│       └── page.tsx              # Payout history
-├── analytics/
-│   └── page.tsx                  # Performance analytics
-├── calendar/
-│   └── page.tsx                  # Availability calendar
-├── messages/
-│   └── page.tsx                  # Conversation threads
-├── profile/
-│   ├── page.tsx                  # Public profile view
-│   ├── loading.tsx               # Route-level skeleton
-│   ├── profile-card.tsx          # Avatar, stats card
-│   ├── about-section.tsx         # Business info section
-│   ├── reviews-section.tsx       # Reviews carousel
-│   └── review-card.tsx           # Individual review card
-└── settings/
-    └── page.tsx                  # Account settings
+├── overview/                     # Dashboard landing page
+├── listings/                     # Space management
+│   └── [id]/                     # Space detail view
+├── bookings/                     # Booking management
+│   └── [id]/                     # Booking detail view
+├── earnings/                     # Financial dashboard
+│   └── payouts/                  # Payout history
+├── analytics/                    # Performance insights
+├── calendar/                     # Availability calendar
+├── messages/                     # Conversation threads
+│   └── [id]/                     # Conversation detail
+├── profile/                      # Public profile view
+└── settings/                     # Account settings
 ```
 
 ### Navigation Configuration
@@ -65,31 +44,80 @@ The sidebar navigation is defined in `navigation-bar.data.ts`:
 
 ---
 
+## Implementation Status
+
+| Route     | Status        | Data Source    | Notes                                    |
+|-----------|---------------|----------------|------------------------------------------|
+| Overview  | ✅ Functional  | Mock JSON      | Needs GraphQL migration                  |
+| Listings  | ⚠️ Partial    | GraphQL + Mock | Detail page has upload/mutation TODOs    |
+| Bookings  | ⚠️ Partial    | GraphQL + Mock | Filtering disabled, mock fallback active |
+| Earnings  | ✅ Functional  | GraphQL        | Fully integrated                         |
+| Analytics | ⚠️ Partial    | Mock JSON      | Needs GraphQL implementation             |
+| Calendar  | ⚠️ Partial    | Mock JSON      | Month/week/day views, needs GraphQL      |
+| Messages  | ❌ Not Started | —              | Minimal stub component                   |
+| Profile   | ✅ Functional  | GraphQL        | Fully integrated                         |
+| Settings  | ❌ Not Started | —              | Under construction placeholder           |
+
+---
+
 ## Route Specifications
 
 ### 1. Overview (`/overview`)
 
 **Purpose:** At-a-glance dashboard showing key metrics and pending actions.
 
+#### Implementation Checklist
+
+**Core Components:**
+
+- [x] Stats cards (Available Balance, Pending Payouts, This Month, Active Bookings)
+- [x] Pending requests section with action cards (Accept/Decline)
+- [x] Active bookings section with progress timeline
+- [x] Top spaces section with performance metrics
+- [x] Activity chart with time range selector
+- [x] Recent activity table
+
+**GraphQL Migration:**
+
+- [ ] Replace mock stats with `earningsSummary` query
+- [ ] Replace mock pending requests with `incomingBookingRequests` query
+- [ ] Replace mock active bookings with `myBookingsAsOwner` (status filter)
+- [ ] Replace mock top spaces with `mySpaces` (sorted by revenue)
+- [ ] Replace mock chart data with aggregated booking/payout data
+- [ ] Replace mock activity with `myNotifications` or custom activity query
+
+**Additional Features:**
+
+- [ ] Quick action buttons (Create Space, Withdraw Funds)
+- [ ] Installation deadline warnings
+- [ ] Stripe Connect status indicator
+- [ ] Upcoming payouts preview
+- [ ] Performance comparison vs previous period
+
 **Data Requirements:**
 
-- `earningsSummary` - Available balance, pending payouts, monthly earnings
-- `mySpaces(first: 5)` - Quick access to top spaces
-- `incomingBookingRequests(first: 5)` - Pending requests requiring action
-- `myBookingsAsOwner(first: 5, where: { status: { in: [PAID, FILE_DOWNLOADED, INSTALLED] } })` - Active bookings
-
-**UI Components:**
-
-- Section cards displaying: Total Earnings, Pending Payouts, Active Bookings, Total Spaces
-- Interactive area chart showing earnings over time
-- Data table with recent booking activity
-- Quick action cards for pending requests
-
-**GraphQL Queries:**
-
-- `earningsSummary` (EarningsSummary type)
-- `mySpaces` (MySpacesConnection)
-- `incomingBookingRequests` (IncomingBookingRequestsConnection)
+```graphql
+query OverviewData {
+    earningsSummary {
+        availableBalance
+        pendingPayouts
+        thisMonthEarnings
+        lastMonthEarnings
+    }
+    incomingBookingRequests(first: 5) {
+        nodes { ...PendingRequestFragment }
+    }
+    myBookingsAsOwner(
+        first: 5
+        where: { status: { in: [PAID, FILE_DOWNLOADED, INSTALLED] } }
+    ) {
+        nodes { ...ActiveBookingFragment }
+    }
+    mySpaces(first: 5, order: { totalRevenue: DESC }) {
+        nodes { ...TopSpaceFragment }
+    }
+}
+```
 
 ---
 
@@ -97,126 +125,68 @@ The sidebar navigation is defined in `navigation-bar.data.ts`:
 
 **Purpose:** Manage all advertising spaces owned by the user.
 
-**Files:**
+#### Implementation Checklist
 
-```
-listings/
-├── page.tsx              # Grid of space cards
-├── loading.tsx           # Route-level skeleton
-├── toolbar.tsx           # Search, filters, "New Space" button
-├── page-nav.tsx          # Pagination
-├── space-card.tsx        # Card component with fragment
-├── create-space.tsx      # Modal wizard for creating spaces
-├── constants.ts          # STEPS, SPACE_TYPES, DIMENSION_UNITS, STATUS_INDICATORS, TYPE_LABELS
-└── [id]/
-    ├── page.tsx          # Space detail with inline editing
-    ├── loading.tsx       # Route-level skeleton
-    ├── header.tsx        # Title + status badge
-    ├── gallery.tsx       # Photo grid with file picker
-    ├── details.tsx       # Editable form fields
-    └── performance.tsx   # Read-only stats
-```
+**Main Page (`/listings`):**
 
-**Query:**
+- [x] Space cards grid with responsive layout
+- [x] Real GraphQL query (`mySpaces`)
+- [x] Fragment masking (`SpaceCard_SpaceFragment`)
+- [x] Create space modal wizard
+- [x] Empty state placeholder
+- [x] Loading skeleton
+- [ ] Status filter tabs (Active, Inactive, Pending, Rejected)
+- [ ] Search by title
+- [ ] Sort options (Revenue, Rating, Bookings, Created)
+- [ ] Bulk actions (Deactivate, Delete)
+- [ ] Pagination
 
-```graphql
-query SpaceOwnerListings {
-  mySpaces {
-    nodes {
-      id
-      ...SpaceCard_SpaceFragment
-    }
-  }
-}
-```
+**Create Space Modal:**
 
-**UI Components:**
+- [x] Step 1: Photos upload UI
+- [x] Step 2: Details form (type, title, description)
+- [x] Step 3: Location fields + map preview
+- [x] Step 4: Pricing and duration settings
+- [x] Step 5: Preview before publish
+- [ ] Photo upload to server (TODO in code)
+- [ ] `createSpace` mutation integration
+- [ ] Validation with error messages
+- [ ] Draft saving to localStorage
 
-- Toolbar with "New Space" button (opens modal)
-- Grid of space cards (thumbnail, title, type, location, status indicator)
-- Empty state with CTA to create first listing
-- Pagination
+**Detail Page (`/listings/[id]`):**
 
-#### 2a. Create Space (Modal)
+- [x] Header with title and status badge
+- [x] Photo gallery UI
+- [x] Details form UI
+- [x] Performance stats section
+- [x] Real GraphQL query (`spaceById`)
+- [x] Fragment composition
+- [ ] Photo upload to server (TODO: gallery.tsx:34)
+- [ ] Photo delete from server (TODO: gallery.tsx:40)
+- [ ] `updateSpace` mutation (TODO: details.tsx:43)
+- [ ] Availability calendar integration
+- [ ] Booking history for this space
+- [ ] Reviews for this space
+- [ ] Deactivate/Reactivate toggle
+- [ ] Delete with confirmation
 
-**Purpose:** Multi-step modal wizard to create a new advertising space.
+**Additional Features:**
 
-**Component:** `create-space.tsx` (client component)
+- [ ] Duplicate space functionality
+- [ ] Space analytics preview
+- [ ] Competitor pricing suggestions
+- [ ] Photo optimization recommendations
+- [ ] SEO preview (title, description length)
 
-**Steps:**
+**Mutations:**
 
-1. Photos - Upload 1-5 photos, first is cover
-2. Details - Space type, title, description
-3. Location - Address fields + map preview
-4. Pricing - Daily rate, dimensions, booking duration
-5. Preview - Review all fields before publishing
-
-**Form Fields:**
-
-| Field       | Type           | Required | Step     |
-|-------------|----------------|----------|----------|
-| images      | string[]       | No       | Photos   |
-| type        | SpaceType enum | Yes      | Details  |
-| title       | string         | Yes      | Details  |
-| description | string         | No       | Details  |
-| address     | string         | Yes      | Location |
-| city        | string         | Yes      | Location |
-| state       | string         | Yes      | Location |
-| zipCode     | string         | No       | Location |
-| pricePerDay | decimal        | Yes      | Pricing  |
-| width       | float          | No       | Pricing  |
-| height      | float          | No       | Pricing  |
-| minDuration | int            | Yes      | Pricing  |
-| maxDuration | int            | No       | Pricing  |
-
-**Mutation:**
-
-- `createSpace(input: CreateSpaceInput!)` - Returns CreateSpacePayload
-
-#### 2b. Space Detail (`/listings/[id]`)
-
-**Purpose:** View and edit space details inline.
-
-**Pattern:** Server component page with client component children for interactivity.
-
-**Query:**
-
-```graphql
-query SpaceDetail($id: ID!) {
-  spaceById(id: $id) {
-    id
-    ...Header_SpaceFragment
-    ...Gallery_SpaceFragment
-    ...Details_SpaceFragment
-    ...Performance_SpaceFragment
-  }
-}
-```
-
-**Layout:**
-
-- Header: Back button, title, status badge
-- Gallery + Performance: Side by side (2 columns on lg)
-- Details: Full-width editable form
-
-**Components:**
-
-| Component       | Type   | Purpose                                      |
-|-----------------|--------|----------------------------------------------|
-| header.tsx      | Server | Title, status badge, back navigation         |
-| gallery.tsx     | Client | Photo grid with file picker, add/remove      |
-| details.tsx     | Client | Editable form with all space fields          |
-| performance.tsx | Server | Read-only stats (bookings, revenue, rating)  |
-
-**Editable Fields (in details.tsx):**
-
-- type, description, address, city, state, zipCode, traffic
-- pricePerDay, installationFee, width, height
-- minDuration, maxDuration
-
-**Mutation:**
-
-- `updateSpace(id: ID!, input: UpdateSpaceInput!)` - Partial update
+| Mutation          | Status | Purpose                  |
+|-------------------|--------|--------------------------|
+| `createSpace`     | ❌      | Create new space         |
+| `updateSpace`     | ❌      | Edit space details       |
+| `deactivateSpace` | ❌      | Set space inactive       |
+| `reactivateSpace` | ❌      | Reactivate space         |
+| `deleteSpace`     | ❌      | Remove space permanently |
 
 ---
 
@@ -224,77 +194,73 @@ query SpaceDetail($id: ID!) {
 
 **Purpose:** Manage all bookings for owned spaces.
 
-**Data Requirements:**
+#### Implementation Checklist
 
-- `myBookingsAsOwner` with pagination and status filtering
-- `incomingBookingRequests` for pending approval queue
+**Main Page (`/bookings`):**
 
-**Booking Statuses:**
-
-| Status           | Description                | Owner Actions              |
-|------------------|----------------------------|----------------------------|
-| PENDING_APPROVAL | Awaiting owner decision    | Accept, Reject             |
-| APPROVED         | Accepted, awaiting payment | Cancel                     |
-| PAID             | Payment received           | Download File              |
-| FILE_DOWNLOADED  | Creative downloaded        | Mark Installed             |
-| INSTALLED        | Installation complete      | Upload Verification        |
-| VERIFIED         | Proof submitted            | None (awaiting advertiser) |
-| COMPLETED        | Fully complete             | None                       |
-| DISPUTED         | Under dispute              | Respond to dispute         |
-| REJECTED         | Owner declined             | None                       |
-| CANCELLED        | Cancelled                  | None                       |
+- [x] Bookings table with TanStack Table
+- [x] Real GraphQL query (`myBookingsAsOwner`)
+- [x] Fragment masking
+- [x] Status badges with colors
+- [x] Action dropdowns
+- [x] Empty state placeholder
+- [x] Loading skeleton
+- [ ] Tab filters (Incoming, Active, Completed, All) - currently disabled
+- [ ] Search by advertiser or space name
+- [ ] Date range filter
+- [ ] Bulk actions (Accept, Reject selected)
+- [ ] Export to CSV
 
 **Filter Tabs:**
 
-- Incoming Requests (PENDING_APPROVAL)
-- Active (PAID, FILE_DOWNLOADED, INSTALLED, VERIFIED)
-- Completed (COMPLETED)
-- All
+| Tab       | Status Filter                                      |
+|-----------|----------------------------------------------------|
+| Incoming  | `PENDING_APPROVAL`                                 |
+| Active    | `PAID`, `FILE_DOWNLOADED`, `INSTALLED`, `VERIFIED` |
+| Completed | `COMPLETED`                                        |
+| All       | No filter                                          |
 
-**UI Components:**
+**Detail Page (`/bookings/[id]`):**
 
-- Booking card showing: space thumbnail, advertiser info, dates, status badge, action buttons
-- Status timeline component
-- Filter tabs with counts
-
-**Mutations:**
-
-- `approveBooking(input: ApproveBookingInput!)` - Accept request
-- `rejectBooking(input: RejectBookingInput!)` - Decline with reason
-- `cancelBooking(input: CancelBookingInput!)` - Cancel booking
-- `markFileDownloaded(input: MarkFileDownloadedInput!)` - Record download
-- `markInstalled(input: MarkInstalledInput!)` - Mark installation complete
-
-#### 3a. Booking Detail (`/bookings/[id]`)
-
-**Purpose:** Detailed view of a single booking with timeline and actions.
-
-**Data Requirements:**
-
-- `bookingById(id: ID!)` - Full booking with relations
-
-**Sections:**
-
-1. **Header:** Status badge, dates, space info
-2. **Timeline:** Visual progress through booking lifecycle
-3. **Campaign Info:** Advertiser details, campaign name, creative preview
-4. **Space Info:** Quick reference to the booked space
-5. **Financial Summary:** Price breakdown, payout amounts
-6. **Actions:** Context-appropriate buttons based on status
-7. **Verification Photos:** Display/upload verification proof
-8. **Messages:** Link to conversation thread
+- [ ] Header with status and dates
+- [ ] Status timeline visualization
+- [ ] Campaign info (advertiser, creative preview)
+- [ ] Space info card
+- [ ] Financial summary (price breakdown, payouts)
+- [ ] Context-appropriate action buttons
+- [ ] Verification photos display/upload
+- [ ] Message thread link
+- [ ] Dispute handling UI
 
 **Status-Based Actions:**
 
 | Status           | Primary Action      | Secondary Actions          |
 |------------------|---------------------|----------------------------|
 | PENDING_APPROVAL | Accept              | Reject, Message Advertiser |
-| APPROVED         | None                | Cancel, Message            |
+| APPROVED         | —                   | Cancel, Message            |
 | PAID             | Download File       | Message                    |
 | FILE_DOWNLOADED  | Mark Installed      | Message                    |
 | INSTALLED        | Upload Verification | Message                    |
-| VERIFIED         | None                | Message                    |
+| VERIFIED         | —                   | Message                    |
 | DISPUTED         | Respond             | Message                    |
+
+**Mutations:**
+
+| Mutation             | Status | Purpose                    |
+|----------------------|--------|----------------------------|
+| `approveBooking`     | ❌      | Accept booking request     |
+| `rejectBooking`      | ❌      | Decline booking request    |
+| `cancelBooking`      | ❌      | Cancel booking             |
+| `markFileDownloaded` | ❌      | Record creative download   |
+| `markInstalled`      | ❌      | Mark installation complete |
+
+**Additional Features:**
+
+- [ ] Booking calendar view toggle
+- [ ] Deadline countdown timer
+- [ ] Installation checklist with tips
+- [ ] Photo upload with GPS validation
+- [ ] Auto-save verification draft
 
 ---
 
@@ -302,62 +268,63 @@ query SpaceDetail($id: ID!) {
 
 **Purpose:** Financial dashboard showing earnings and payout management.
 
-**Data Requirements:**
+#### Implementation Checklist
 
-- `earningsSummary` - Aggregated financial data
-- `myPayouts` - Payout history with pagination
+**Main Page (`/earnings`):**
 
-**EarningsSummary Fields:**
+- [x] Balance cards (Available, Pending, This Month, Total)
+- [x] Real GraphQL query (`earningsSummary`, `myPayouts`)
+- [x] Fragment masking
+- [x] Earnings chart with daily aggregation
+- [x] Payouts table with stage badges
+- [x] Loading skeleton
+- [ ] Stripe Connect status indicator
+- [ ] "Withdraw" button integration
+- [ ] Date range filter for chart
+- [ ] Export payouts to CSV
 
-- availableBalance: Funds ready for withdrawal
-- pendingPayouts: Funds in escrow awaiting release
-- thisMonthEarnings: Current month total
-- lastMonthEarnings: Previous month total
-- totalEarnings: Lifetime earnings
+**Payout History (`/earnings/payouts`):**
 
-**Sections:**
-
-1. **Balance Cards:** Available, Pending, This Month, Total
-2. **Payout Chart:** Earnings over time (bar/line chart)
-3. **Payout History Table:** List of all payouts with status
-4. **Stripe Connect Status:** Account health indicator
+- [ ] Full payout history with pagination
+- [ ] Filter by stage (Stage 1, Stage 2)
+- [ ] Filter by status (Pending, Processing, Completed, Failed)
+- [ ] Filter by date range
+- [ ] Retry failed payout button
+- [ ] Export to CSV/PDF
 
 **Payout Types:**
 
-- STAGE1: Print + installation fee (released on file download)
-- STAGE2: Rental fee (released on verification approval)
+| Stage  | Description                       | Trigger               |
+|--------|-----------------------------------|-----------------------|
+| STAGE1 | Print + installation fee ($10-35) | File downloaded       |
+| STAGE2 | Rental fee (remainder)            | Verification approved |
 
 **Payout Statuses:**
 
-- PENDING: Awaiting processing
-- PROCESSING: Transfer initiated
-- COMPLETED: Successfully paid
-- FAILED: Transfer failed
-- PARTIALLY_PAID: Partial amount transferred
+| Status         | Description         | Actions |
+|----------------|---------------------|---------|
+| PENDING        | Awaiting processing | —       |
+| PROCESSING     | Transfer initiated  | —       |
+| COMPLETED      | Successfully paid   | —       |
+| FAILED         | Transfer failed     | Retry   |
+| PARTIALLY_PAID | Partial amount sent | —       |
 
-**UI Components:**
+**Additional Features:**
 
-- Balance summary cards
-- Area/bar chart for earnings visualization
-- Data table with payout history
-- Stripe account status indicator with link to Stripe Dashboard
+- [ ] Monthly earnings breakdown chart
+- [ ] Revenue by space comparison
+- [ ] Tax document generation (1099-K)
+- [ ] Payout schedule settings
+- [ ] Earning projections/forecast
+- [ ] Failed payout notifications
 
 **Mutations:**
 
-- `connectStripeAccount` - Initiate Stripe Connect onboarding
-- `refreshStripeAccountStatus` - Update account health
-
-#### 4a. Payout History (`/earnings/payouts`)
-
-**Purpose:** Detailed transaction history with filters.
-
-**Data Requirements:**
-
-- `myPayouts` with filters for stage, status, date range
-
-**Table Columns:**
-
-- Date, Booking Reference, Space, Amount, Stage (1 or 2), Status, Actions
+| Mutation                     | Status | Purpose                 |
+|------------------------------|--------|-------------------------|
+| `connectStripeAccount`       | ❌      | Start Stripe onboarding |
+| `refreshStripeAccountStatus` | ❌      | Update account health   |
+| `retryPayout`                | ❌      | Retry failed payout     |
 
 ---
 
@@ -365,26 +332,51 @@ query SpaceDetail($id: ID!) {
 
 **Purpose:** Performance insights for spaces and bookings.
 
-**Data Requirements:**
+#### Implementation Checklist
 
-- `mySpaces` with totalBookings, totalRevenue, averageRating per space
-- Booking trends over time (aggregated from bookings)
+**Summary Cards:**
 
-**Metrics:**
-
-- Total views per listing (requires backend support)
-- Booking conversion rate
-- Average booking duration
-- Revenue by space
-- Revenue by month
-- Rating trends
+- [x] Total bookings with trend
+- [x] Total revenue with trend
+- [x] Average rating with trend
+- [x] Completion rate
+- [x] Average booking duration
+- [x] Occupancy rate
+- [x] Repeat advertisers rate
+- [x] Revenue forecast
+- [ ] Replace mock data with real queries
 
 **Charts:**
 
-- Line chart: Bookings over time
-- Bar chart: Revenue by space
-- Pie chart: Booking status distribution
-- Heatmap: Popular booking periods
+- [x] Bookings over time (area chart with time range)
+- [x] Status distribution (pie chart)
+- [x] Revenue by space (bar chart)
+- [x] Monthly revenue (bar chart with range selector)
+- [x] Rating trends (composed chart with review volume)
+- [x] Booking heatmap (day × hour activity)
+- [x] Period comparison card
+- [ ] Replace mock data with real queries
+
+**Tables:**
+
+- [x] Space performance table with occupancy
+- [x] Top performers section
+- [ ] Replace mock data with real queries
+
+**GraphQL Migration:**
+
+- [ ] Create analytics query aggregating from `mySpaces`, `myBookingsAsOwner`, `myPayouts`
+- [ ] Add backend support for aggregated metrics (views, occupancy calculations)
+- [ ] Implement date range filtering
+
+**Additional Features:**
+
+- [ ] Date range picker (custom range)
+- [ ] Export reports to PDF
+- [ ] Competitor benchmarking (anonymous)
+- [ ] Goal setting and tracking
+- [ ] Seasonal trend predictions
+- [ ] Recommendations engine
 
 ---
 
@@ -392,24 +384,58 @@ query SpaceDetail($id: ID!) {
 
 **Purpose:** Visual availability and booking management.
 
+#### Implementation Checklist
+
+**Core Features:**
+
+- [x] Month view calendar
+- [x] Week view calendar
+- [x] Day view calendar
+- [x] Multi-space color coding
+- [x] Booking events display
+- [x] Blocked dates display
+- [x] Installation deadlines markers
+- [x] Click to view booking details
+
+**Interactivity:**
+
+- [ ] Drag to block dates
+- [ ] Click to unblock dates
+- [x] Filter by space
+- [ ] Filter by booking status
+- [ ] Bulk block date ranges
+
 **Data Requirements:**
 
-- `mySpaces` - All spaces for multi-calendar view
-- `myBookingsAsOwner` - All bookings to display on calendar
+```graphql
+query CalendarData($start: DateTime!, $end: DateTime!) {
+    mySpaces {
+        nodes {
+            id
+            title
+            bookings(where: {
+                startDate: { lte: $end }
+                endDate: { gte: $start }
+            }) {
+                nodes {
+                    id
+                    status
+                    startDate
+                    endDate
+                }
+            }
+        }
+    }
+}
+```
 
-**Features:**
+**Additional Features:**
 
-- Month/week/day views
-- Color-coded by space or status
-- Click to view booking details
-- Drag to block dates (availability management)
-- Filter by space
-
-**Calendar Events:**
-
-- Booked periods (by status color)
-- Blocked dates (owner unavailability)
-- Installation deadlines
+- [ ] Sync with Google Calendar
+- [ ] iCal export
+- [ ] Recurring availability patterns
+- [ ] Holiday markers
+- [ ] Pricing calendar (dynamic pricing)
 
 ---
 
@@ -417,27 +443,96 @@ query SpaceDetail($id: ID!) {
 
 **Purpose:** Communication with advertisers about bookings.
 
-**Data Requirements:**
+#### Implementation Checklist
 
-- `myConversations` - All conversation threads
-- `messagesByConversation(conversationId: ID!)` - Messages in a thread
-- `unreadConversationsCount` - Badge count
+**Conversation List:**
 
-**Features:**
+- [ ] List of all conversations
+- [ ] Unread indicators
+- [ ] Last message preview
+- [ ] Booking context link
+- [ ] Advertiser avatar and name
+- [ ] Search conversations
+- [ ] Sort by recent/unread
 
-- Conversation list with unread indicators
-- Real-time updates via subscription
-- Attach images to messages
-- Link conversations to specific bookings
+**Conversation Detail (`/messages/[id]`):**
+
+- [ ] Message thread display
+- [ ] Send message input
+- [ ] Image attachments
+- [ ] Booking reference card
+- [ ] Real-time updates (subscription)
+- [ ] Read receipts
+- [ ] Typing indicators
+
+**GraphQL Operations:**
+
+```graphql
+query MyConversations {
+    myConversations(first: 20, order: { updatedAt: DESC }) {
+        nodes {
+            id
+            booking { id, space { title } }
+            participants { user { name, avatar } }
+            messages(first: 1, order: { createdAt: DESC }) {
+                nodes { content, createdAt }
+            }
+        }
+    }
+    unreadConversationsCount
+}
+
+query ConversationMessages($id: ID!) {
+    messagesByConversation(conversationId: $id, first: 50) {
+        nodes {
+            id
+            content
+            attachments
+            createdAt
+            senderUser { id, name, avatar }
+            type
+        }
+    }
+}
+
+mutation SendMessage($input: SendMessageInput!) {
+    sendMessage(input: $input) {
+        message { id, content, createdAt }
+        errors { ... }
+    }
+}
+
+subscription OnMessage($conversationId: ID!) {
+    onMessage(conversationId: $conversationId) {
+        id
+        content
+        createdAt
+        senderUser { id, name }
+    }
+}
+```
 
 **Mutations:**
 
-- `sendMessage(input: SendMessageInput!)` - Send a message
-- `markConversationRead(input: MarkConversationReadInput!)` - Clear unread
+| Mutation                    | Status | Purpose             |
+|-----------------------------|--------|---------------------|
+| `sendMessage`               | ❌      | Send a message      |
+| `markConversationRead`      | ❌      | Mark thread as read |
+| `createBookingConversation` | ❌      | Start conversation  |
 
 **Subscriptions:**
 
-- `onMessage(conversationId: ID!)` - Real-time message updates
+| Subscription | Status | Purpose            |
+|--------------|--------|--------------------|
+| `onMessage`  | ❌      | Real-time messages |
+
+**Additional Features:**
+
+- [ ] Message templates (quick replies)
+- [ ] File sharing (PDFs, documents)
+- [ ] Voice messages
+- [ ] Message reactions
+- [ ] Archive conversations
 
 ---
 
@@ -445,20 +540,47 @@ query SpaceDetail($id: ID!) {
 
 **Purpose:** Public-facing profile page showing owner information.
 
-**Current Implementation:** Complete with fragment colocation pattern.
+#### Implementation Checklist
 
-**Sections:**
+**Core Components:**
 
-1. **Profile Card:** Avatar, name, verification badge, stats (reviews, rating, years hosting)
-2. **About Section:** Business name, business type, verification status, space count
-3. **Reviews Section:** Paginated reviews from advertisers
+- [x] Profile card (avatar, name, stats)
+- [x] About section (business info)
+- [x] Reviews section with pagination
+- [x] Real GraphQL query (`me`)
+- [x] Fragment colocation pattern
+- [x] Loading skeleton
 
-**Fragments:**
+**Profile Card:**
 
-- `ProfileCard_UserFragment`
-- `AboutSection_UserFragment`
-- `ReviewsSection_UserFragment`
-- `ReviewCard_ReviewFragment`
+- [x] Avatar with fallback
+- [x] Name display
+- [x] Verification badge
+- [x] Total reviews count
+- [x] Average rating with stars
+- [x] Years hosting
+
+**About Section:**
+
+- [x] Business name
+- [x] Business type
+- [x] Verification status
+- [x] Space count
+
+**Reviews Section:**
+
+- [x] Paginated reviews (3 per page)
+- [x] Review cards with rating, comment, date
+- [x] Navigation arrows
+
+**Additional Features:**
+
+- [ ] Edit profile link to settings
+- [ ] Share profile button
+- [ ] Response rate metric
+- [ ] Response time metric
+- [ ] Featured spaces showcase
+- [ ] Advertiser testimonials
 
 ---
 
@@ -466,98 +588,132 @@ query SpaceDetail($id: ID!) {
 
 **Purpose:** Account and business settings management.
 
-**Tabs:**
+#### Implementation Checklist
 
-#### Profile Tab
+**Profile Tab:**
 
-- Name, email, phone, avatar
-- Uses `updateCurrentUser(input: UpdateCurrentUserInput!)`
+- [ ] Name field
+- [ ] Email field (read-only)
+- [ ] Phone field
+- [ ] Avatar upload
+- [ ] Save changes button
+- [ ] `updateCurrentUser` mutation
 
-#### Business Tab
+**Business Tab:**
 
-- Business name, business type, payout schedule
-- Uses `updateSpaceOwnerProfile(input: UpdateSpaceOwnerProfileInput!)`
+- [ ] Business name field
+- [ ] Business type selector
+- [ ] Payout schedule selector (Weekly, Biweekly, Monthly)
+- [ ] Save changes button
+- [ ] `updateSpaceOwnerProfile` mutation
 
-**SpaceOwnerProfile Editable Fields:**
+**Payout Tab:**
 
-- businessName: string
-- businessType: string
-- payoutSchedule: WEEKLY | BIWEEKLY | MONTHLY
+- [ ] Stripe Connect status display
+- [ ] Bank account info (masked)
+- [ ] Connect/Reconnect Stripe button
+- [ ] Disconnect Stripe button
+- [ ] View Stripe Dashboard link
+- [ ] `connectStripeAccount` mutation
+- [ ] `refreshStripeAccountStatus` mutation
 
-#### Payout Tab
+**Notifications Tab:**
 
-- Stripe Connect account status
-- Bank account information (via Stripe)
-- Connect/disconnect Stripe account
-
-#### Notifications Tab
-
-- `myNotificationPreferences` - Current preferences
-- `updateNotificationPreference(input: UpdateNotificationPreferenceInput!)` - Toggle preferences
+- [ ] Notification type toggles
+- [ ] In-app, Email, Push columns
+- [ ] Save preferences
+- [ ] `updateNotificationPreference` mutation
 
 **Notification Types for Space Owners:**
 
-- BOOKING_REQUESTED - New booking request
-- PAYMENT_RECEIVED - Payment confirmation
-- PROOF_APPROVED - Verification approved
-- PROOF_DISPUTED - Verification disputed
-- PROOF_REJECTED - Verification rejected
-- DISPUTE_FILED - Dispute opened
-- DISPUTE_RESOLVED - Dispute resolved
-- MESSAGE_RECEIVED - New message
-- PAYOUT_PROCESSED - Payout completed
+| Type              | Description                  |
+|-------------------|------------------------------|
+| BOOKING_REQUESTED | New booking request received |
+| BOOKING_APPROVED  | Booking was approved         |
+| BOOKING_REJECTED  | Booking was rejected         |
+| BOOKING_CANCELLED | Booking was cancelled        |
+| PAYMENT_RECEIVED  | Payment confirmation         |
+| PAYOUT_PROCESSED  | Payout completed             |
+| PROOF_APPROVED    | Verification approved        |
+| PROOF_DISPUTED    | Verification disputed        |
+| PROOF_REJECTED    | Verification rejected        |
+| DISPUTE_FILED     | Dispute opened               |
+| DISPUTE_RESOLVED  | Dispute resolved             |
+| MESSAGE_RECEIVED  | New message                  |
+| SPACE_APPROVED    | Space listing approved       |
+| SPACE_REJECTED    | Space listing rejected       |
+| SPACE_SUSPENDED   | Space listing suspended      |
+
+**Additional Features:**
+
+- [ ] Account deletion with confirmation
+- [ ] Data export (GDPR compliance)
+- [ ] Two-factor authentication
+- [ ] Login history
+- [ ] Connected devices management
 
 ---
 
 ## GraphQL Reference
 
-### Queries for Space Owners
+### Queries
 
-| Query                        | Returns                           | Purpose                             |
-|------------------------------|-----------------------------------|-------------------------------------|
-| `me`                         | User                              | Current user with spaceOwnerProfile |
-| `mySpaces`                   | MySpacesConnection                | Owner's spaces                      |
-| `spaceById(id)`              | Space                             | Single space details                |
-| `myBookingsAsOwner`          | MyBookingsAsOwnerConnection       | Bookings on owner's spaces          |
-| `bookingById(id)`            | Booking                           | Single booking details              |
-| `incomingBookingRequests`    | IncomingBookingRequestsConnection | Pending approval queue              |
-| `earningsSummary`            | EarningsSummary                   | Financial summary                   |
-| `myPayouts`                  | MyPayoutsConnection               | Payout history                      |
-| `myConversations`            | MyConversationsConnection         | Message threads                     |
-| `messagesByConversation(id)` | MessagesByConversationConnection  | Messages in thread                  |
-| `myNotificationPreferences`  | [NotificationPreference]          | Notification settings               |
-| `reviewsBySpace(spaceId)`    | ReviewsBySpaceConnection          | Reviews for a space                 |
+| Query                        | Returns                           | Purpose                             | Implemented |
+|------------------------------|-----------------------------------|-------------------------------------|-------------|
+| `me`                         | User                              | Current user with spaceOwnerProfile | ✅           |
+| `mySpaces`                   | MySpacesConnection                | Owner's spaces                      | ✅           |
+| `spaceById(id)`              | Space                             | Single space details                | ✅           |
+| `myBookingsAsOwner`          | MyBookingsAsOwnerConnection       | Bookings on owner's spaces          | ✅           |
+| `bookingById(id)`            | Booking                           | Single booking details              | ❌           |
+| `incomingBookingRequests`    | IncomingBookingRequestsConnection | Pending approval queue              | ❌           |
+| `bookingsRequiringAction`    | BookingsRequiringActionConnection | Bookings needing owner action       | ❌           |
+| `earningsSummary`            | EarningsSummary                   | Financial summary                   | ✅           |
+| `myPayouts`                  | MyPayoutsConnection               | Payout history                      | ✅           |
+| `payoutById(id)`             | Payout                            | Single payout details               | ❌           |
+| `myConversations`            | MyConversationsConnection         | Message threads                     | ❌           |
+| `messagesByConversation(id)` | MessagesByConversationConnection  | Messages in thread                  | ❌           |
+| `unreadConversationsCount`   | Int                               | Unread message count                | ❌           |
+| `myNotifications`            | MyNotificationsConnection         | User notifications                  | ❌           |
+| `unreadNotificationsCount`   | Int                               | Unread notification count           | ❌           |
+| `myNotificationPreferences`  | [NotificationPreference]          | Notification settings               | ❌           |
+| `reviewsBySpace(spaceId)`    | ReviewsBySpaceConnection          | Reviews for a space                 | ✅           |
+| `transactionsByBooking(id)`  | TransactionsByBookingConnection   | Financial transactions              | ❌           |
 
-### Mutations for Space Owners
+### Mutations
 
-| Mutation                       | Purpose                    |
-|--------------------------------|----------------------------|
-| `createSpace`                  | Create new space           |
-| `updateSpace`                  | Edit space details         |
-| `deactivateSpace`              | Set space inactive         |
-| `reactivateSpace`              | Reactivate space           |
-| `deleteSpace`                  | Remove space               |
-| `approveBooking`               | Accept booking request     |
-| `rejectBooking`                | Decline booking request    |
-| `cancelBooking`                | Cancel booking             |
-| `markFileDownloaded`           | Record creative download   |
-| `markInstalled`                | Mark installation complete |
-| `updateSpaceOwnerProfile`      | Update business info       |
-| `updateCurrentUser`            | Update profile info        |
-| `connectStripeAccount`         | Start Stripe onboarding    |
-| `refreshStripeAccountStatus`   | Update Stripe status       |
-| `sendMessage`                  | Send message               |
-| `markConversationRead`         | Mark thread as read        |
-| `updateNotificationPreference` | Toggle notification        |
+| Mutation                       | Purpose                        | Implemented |
+|--------------------------------|--------------------------------|-------------|
+| `createSpace`                  | Create new space               | ❌           |
+| `updateSpace`                  | Edit space details             | ❌           |
+| `deactivateSpace`              | Set space inactive             | ❌           |
+| `reactivateSpace`              | Reactivate space               | ❌           |
+| `deleteSpace`                  | Remove space                   | ❌           |
+| `approveBooking`               | Accept booking request         | ❌           |
+| `rejectBooking`                | Decline booking request        | ❌           |
+| `cancelBooking`                | Cancel booking                 | ❌           |
+| `markFileDownloaded`           | Record creative download       | ❌           |
+| `markInstalled`                | Mark installation complete     | ❌           |
+| `updateSpaceOwnerProfile`      | Update business info           | ❌           |
+| `updateCurrentUser`            | Update profile info            | ❌           |
+| `connectStripeAccount`         | Start Stripe onboarding        | ❌           |
+| `refreshStripeAccountStatus`   | Update Stripe status           | ❌           |
+| `retryPayout`                  | Retry failed payout            | ❌           |
+| `sendMessage`                  | Send message                   | ❌           |
+| `markConversationRead`         | Mark thread as read            | ❌           |
+| `createBookingConversation`    | Start conversation for booking | ❌           |
+| `updateNotificationPreference` | Toggle notification            | ❌           |
+| `markNotificationRead`         | Mark notification as read      | ❌           |
+| `markAllNotificationsRead`     | Mark all as read               | ❌           |
+| `deleteNotification`           | Delete a notification          | ❌           |
 
 ### Subscriptions
 
-| Subscription                 | Purpose                     |
-|------------------------------|-----------------------------|
-| `onBookingUpdate(bookingId)` | Real-time booking changes   |
-| `onMessage(conversationId)`  | Real-time messages          |
-| `onNotification(userId)`     | Real-time notifications     |
-| `onProofUpdate(bookingId)`   | Verification status changes |
+| Subscription                 | Purpose                     | Implemented |
+|------------------------------|-----------------------------|-------------|
+| `onBookingUpdate(bookingId)` | Real-time booking changes   | ❌           |
+| `onMessage(conversationId)`  | Real-time messages          | ❌           |
+| `onNotification(userId)`     | Real-time notifications     | ❌           |
+| `onProofUpdate(bookingId)`   | Verification status changes | ❌           |
 
 ---
 
@@ -565,57 +721,85 @@ query SpaceDetail($id: ID!) {
 
 ### Space
 
-| Field                         | Type        | Description                                             |
-|-------------------------------|-------------|---------------------------------------------------------|
-| id                            | UUID        | Unique identifier                                       |
-| title                         | String      | Display name                                            |
-| description                   | String?     | Detailed description                                    |
-| type                          | SpaceType   | STOREFRONT, WINDOW_DISPLAY, etc.                        |
-| status                        | SpaceStatus | ACTIVE, INACTIVE, PENDING_APPROVAL, REJECTED, SUSPENDED |
-| address, city, state, zipCode | String      | Location                                                |
-| latitude, longitude           | Float       | Coordinates                                             |
-| pricePerDay                   | Decimal     | Daily rate                                              |
-| installationFee               | Decimal?    | Custom installation fee                                 |
-| minDuration, maxDuration      | Int         | Booking duration limits                                 |
-| availableFrom, availableTo    | DateTime?   | Availability window                                     |
-| dimensions, dimensionsText    | String?     | Size specifications                                     |
-| width, height                 | Float?      | Dimensions in inches                                    |
-| traffic                       | String?     | Foot traffic info                                       |
-| images                        | [String]    | Image URLs                                              |
-| averageRating                 | Float?      | Computed rating                                         |
-| totalBookings                 | Int         | Booking count                                           |
-| totalRevenue                  | Decimal     | Lifetime revenue                                        |
-| rejectionReason               | String?     | If rejected by admin                                    |
+| Field           | Type        | Description                      |
+|-----------------|-------------|----------------------------------|
+| id              | UUID        | Unique identifier                |
+| title           | String      | Display name                     |
+| description     | String?     | Detailed description             |
+| type            | SpaceType   | STOREFRONT, WINDOW_DISPLAY, etc. |
+| status          | SpaceStatus | ACTIVE, INACTIVE, PENDING, etc.  |
+| address         | String      | Street address                   |
+| city            | String      | City                             |
+| state           | String      | State                            |
+| zipCode         | String?     | ZIP code                         |
+| latitude        | Float       | Coordinate                       |
+| longitude       | Float       | Coordinate                       |
+| pricePerDay     | Decimal     | Daily rate                       |
+| installationFee | Decimal?    | Custom installation fee          |
+| minDuration     | Int         | Minimum booking days             |
+| maxDuration     | Int?        | Maximum booking days             |
+| width           | Float?      | Width in inches                  |
+| height          | Float?      | Height in inches                 |
+| images          | [String]    | Image URLs                       |
+| averageRating   | Float?      | Computed rating                  |
+| totalBookings   | Int         | Booking count                    |
+| totalRevenue    | Decimal     | Lifetime revenue                 |
+
+**SpaceType Enum:**
+
+- STOREFRONT
+- WINDOW_DISPLAY
+- BILLBOARD
+- DIGITAL_DISPLAY
+- VEHICLE_WRAP
+- TRANSIT
+- OTHER
+
+**SpaceStatus Enum:**
+
+- ACTIVE
+- INACTIVE
+- PENDING_APPROVAL
+- REJECTED
+- SUSPENDED
 
 ### Booking
 
-| Field              | Type            | Description             |
-|--------------------|-----------------|-------------------------|
-| id                 | UUID            | Unique identifier       |
-| status             | BookingStatus   | Current lifecycle stage |
-| startDate, endDate | DateTime        | Booking period          |
-| totalDays          | Int             | Duration                |
-| pricePerDay        | Decimal         | Agreed rate             |
-| installationFee    | Decimal         | Installation cost       |
-| subtotalAmount     | Decimal         | Before fees             |
-| platformFeeAmount  | Decimal         | Platform cut            |
-| platformFeePercent | Decimal         | Fee percentage          |
-| ownerPayoutAmount  | Decimal         | Owner's total           |
-| totalAmount        | Decimal         | Advertiser pays         |
-| advertiserNotes    | String?         | From advertiser         |
-| ownerNotes         | String?         | From owner              |
-| fileDownloadedAt   | DateTime?       | When downloaded         |
-| rejectedAt         | DateTime?       | When rejected           |
-| rejectionReason    | String?         | Why rejected            |
-| cancelledAt        | DateTime?       | When cancelled          |
-| cancellationReason | String?         | Why cancelled           |
-| space              | Space           | Booked space            |
-| campaign           | Campaign        | Advertiser's campaign   |
-| proof              | BookingProof?   | Verification submission |
-| dispute            | BookingDispute? | If disputed             |
-| payments           | [Payment]       | Payment records         |
-| payouts            | [Payout]        | Payout records          |
-| reviews            | [Review]        | Associated reviews      |
+| Field             | Type            | Description             |
+|-------------------|-----------------|-------------------------|
+| id                | UUID            | Unique identifier       |
+| status            | BookingStatus   | Current lifecycle stage |
+| startDate         | DateTime        | Start date              |
+| endDate           | DateTime        | End date                |
+| totalDays         | Int             | Duration                |
+| pricePerDay       | Decimal         | Agreed rate             |
+| installationFee   | Decimal         | Installation cost       |
+| subtotalAmount    | Decimal         | Before fees             |
+| platformFeeAmount | Decimal         | Platform cut            |
+| ownerPayoutAmount | Decimal         | Owner's total           |
+| totalAmount       | Decimal         | Advertiser pays         |
+| advertiserNotes   | String?         | From advertiser         |
+| ownerNotes        | String?         | From owner              |
+| fileDownloadedAt  | DateTime?       | When file downloaded    |
+| space             | Space           | Booked space            |
+| campaign          | Campaign        | Advertiser's campaign   |
+| proof             | BookingProof?   | Verification submission |
+| dispute           | BookingDispute? | If disputed             |
+| payments          | [Payment]       | Payment records         |
+| payouts           | [Payout]        | Payout records          |
+
+**BookingStatus Enum:**
+
+- PENDING_APPROVAL
+- APPROVED
+- PAID
+- FILE_DOWNLOADED
+- INSTALLED
+- VERIFIED
+- COMPLETED
+- DISPUTED
+- REJECTED
+- CANCELLED
 
 ### Payout
 
@@ -632,17 +816,25 @@ query SpaceDetail($id: ID!) {
 
 ### SpaceOwnerProfile
 
-| Field               | Type             | Description               |
-|---------------------|------------------|---------------------------|
-| id                  | UUID             | Unique identifier         |
-| businessName        | String?          | Business name             |
-| businessType        | String?          | Type of business          |
-| payoutSchedule      | PayoutSchedule   | WEEKLY, BIWEEKLY, MONTHLY |
-| onboardingComplete  | Boolean          | Setup finished            |
-| stripeAccountId     | String?          | Stripe Connect ID         |
-| stripeAccountStatus | String?          | Account health            |
-| spaces              | SpacesConnection | Owner's spaces            |
-| payouts             | [Payout]         | All payouts               |
+| Field               | Type           | Description               |
+|---------------------|----------------|---------------------------|
+| id                  | UUID           | Unique identifier         |
+| businessName        | String?        | Business name             |
+| businessType        | String?        | Type of business          |
+| payoutSchedule      | PayoutSchedule | WEEKLY, BIWEEKLY, MONTHLY |
+| onboardingComplete  | Boolean        | Setup finished            |
+| stripeAccountId     | String?        | Stripe Connect ID         |
+| stripeAccountStatus | String?        | Account health            |
+
+### EarningsSummary
+
+| Field             | Type    | Description          |
+|-------------------|---------|----------------------|
+| availableBalance  | Decimal | Ready to withdraw    |
+| pendingPayouts    | Decimal | In escrow            |
+| thisMonthEarnings | Decimal | Current month total  |
+| lastMonthEarnings | Decimal | Previous month total |
+| totalEarnings     | Decimal | Lifetime earnings    |
 
 ---
 
@@ -657,27 +849,6 @@ Follow the established pattern in `/profile`:
 3. Pass fragment-typed data to children
 4. Children unmask with `getFragmentData()`
 
-### Query File Pattern
-
-For complex pages, create a separate queries file:
-
-```
-feature/
-├── page.tsx
-├── feature-queries.ts    # Export async query functions
-├── feature-content.tsx   # Main content component
-└── sub-component.tsx     # Child components
-```
-
-### Client Components
-
-Only use `"use client"` when necessary:
-
-- useState, useEffect, useContext hooks
-- Event handlers (onClick, onChange)
-- Browser APIs
-- Third-party client libraries
-
 ### Loading States
 
 Create `loading.tsx` files for route-level skeletons. Export skeleton components from the same file as the component for
@@ -688,34 +859,40 @@ reuse.
 Use try/catch with redirect to `/logout` for auth errors. Display inline errors for form submissions using ActionState
 pattern.
 
+### Mock Data Pattern
+
+For development, use `mock.json` files with realistic data. Structure should match expected GraphQL response shape.
+
 ---
 
 ## Implementation Priority
 
-### Phase 1: Core Functionality
+### Phase 1: Core Mutations (Critical Path)
 
-1. Listings (create, edit, view, manage)
-2. Bookings (list, detail, accept/reject)
-3. Settings (profile, business, notifications)
+1. Space mutations (create, update, delete)
+2. Booking actions (approve, reject, mark downloaded/installed)
+3. Settings mutations (profile, business)
 
-### Phase 2: Financial
+### Phase 2: GraphQL Migration
 
-1. Earnings dashboard
-2. Payout history
-3. Stripe Connect integration
+1. Overview → Replace all mock data with real queries
+2. Analytics → Build aggregation queries
+3. Bookings → Enable filtering, remove mock fallback
 
 ### Phase 3: Communication
 
 1. Messages (conversation list, thread view)
 2. Real-time subscriptions
+3. Notification preferences
 
-### Phase 4: Insights
+### Phase 4: Advanced Features
 
-1. Analytics
-2. Calendar view
+1. Calendar view
+2. Stripe Connect integration
+3. Export functionality
 
 ### Phase 5: Polish
 
-1. Overview dashboard with real data
-2. Empty states and loading skeletons
-3. Error handling refinement
+1. Empty states refinement
+2. Error handling improvements
+3. Performance optimization

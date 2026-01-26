@@ -1,32 +1,150 @@
 {
-  "stats": [
+  "stats": {
+    "availableBalance": 3400.0,
+    "pendingPayouts": 850.0,
+    "thisMonthEarnings": 1950.0,
+    "lastMonthEarnings": 1680.0,
+    "activeBookings": 8,
+    "previousActiveBookings": 6,
+    "totalSpaces": 5,
+    "pendingApprovalSpaces": 0
+  },
+  "pendingRequests": [
     {
-      "label": "Total Earnings",
-      "value": "$4,250.00",
-      "change": 12.5,
-      "footer": "Trending up this month",
-      "description": "Compared to last month"
+      "id": "req-1",
+      "advertiserName": "Local Gym Co",
+      "advertiserAvatar": null,
+      "spaceName": "Downtown Storefront",
+      "spaceId": "space-1",
+      "startDate": "2026-02-01",
+      "endDate": "2026-02-14",
+      "totalAmount": 450.0,
+      "createdAt": "2026-01-25T10:30:00Z"
     },
     {
-      "label": "Active Bookings",
-      "value": "12",
-      "change": 8.3,
-      "footer": "Strong booking activity",
-      "description": "Across all your spaces"
+      "id": "req-2",
+      "advertiserName": "Pizza Palace",
+      "advertiserAvatar": null,
+      "spaceName": "Main St Window",
+      "spaceId": "space-2",
+      "startDate": "2026-02-05",
+      "endDate": "2026-02-19",
+      "totalAmount": 380.0,
+      "createdAt": "2026-01-24T14:15:00Z"
     },
     {
-      "label": "Total Spaces",
-      "value": "5",
-      "change": 0,
-      "footer": "All spaces active",
-      "description": "No pending approvals"
+      "id": "req-3",
+      "advertiserName": "Sunset Realty",
+      "advertiserAvatar": null,
+      "spaceName": "Corner Billboard",
+      "spaceId": "space-3",
+      "startDate": "2026-02-10",
+      "endDate": "2026-02-24",
+      "totalAmount": 520.0,
+      "createdAt": "2026-01-23T09:45:00Z"
+    }
+  ],
+  "activeBookings": [
+    {
+      "id": "booking-1",
+      "status": "PAID",
+      "advertiserName": "Fitness First",
+      "spaceName": "Downtown Storefront",
+      "spaceId": "space-1",
+      "startDate": "2026-01-20",
+      "endDate": "2026-02-03",
+      "nextAction": "Download File",
+      "daysRemaining": 8
     },
     {
-      "label": "Pending Payouts",
-      "value": "$850.00",
-      "change": -15.2,
-      "footer": "Processing normally",
-      "description": "Expected within 3-5 days"
+      "id": "booking-2",
+      "status": "FILE_DOWNLOADED",
+      "advertiserName": "Coffee Corner",
+      "spaceName": "Main St Window",
+      "spaceId": "space-2",
+      "startDate": "2026-01-15",
+      "endDate": "2026-01-29",
+      "nextAction": "Mark Installed",
+      "daysRemaining": 3
+    },
+    {
+      "id": "booking-3",
+      "status": "INSTALLED",
+      "advertiserName": "Tech Solutions",
+      "spaceName": "Mall Entrance",
+      "spaceId": "space-4",
+      "startDate": "2026-01-10",
+      "endDate": "2026-01-24",
+      "nextAction": "Upload Verification",
+      "daysRemaining": 0
+    },
+    {
+      "id": "booking-4",
+      "status": "FILE_DOWNLOADED",
+      "advertiserName": "Green Gardens",
+      "spaceName": "Corner Billboard",
+      "spaceId": "space-3",
+      "startDate": "2026-01-18",
+      "endDate": "2026-02-01",
+      "nextAction": "Mark Installed",
+      "daysRemaining": 6
+    }
+  ],
+  "topSpaces": [
+    {
+      "id": "space-1",
+      "title": "Downtown Storefront",
+      "image": "https://picsum.photos/seed/space1/400/225",
+      "totalBookings": 18,
+      "totalRevenue": 5400.0,
+      "averageRating": 4.8,
+      "views": 1240,
+      "occupancyRate": 78,
+      "status": "ACTIVE"
+    },
+    {
+      "id": "space-2",
+      "title": "Main St Window",
+      "image": "https://picsum.photos/seed/space2/400/225",
+      "totalBookings": 12,
+      "totalRevenue": 3200.0,
+      "averageRating": 4.6,
+      "views": 890,
+      "occupancyRate": 65,
+      "status": "ACTIVE"
+    },
+    {
+      "id": "space-3",
+      "title": "Corner Billboard",
+      "image": "https://picsum.photos/seed/space3/400/225",
+      "totalBookings": 9,
+      "totalRevenue": 2400.0,
+      "averageRating": 4.9,
+      "views": 720,
+      "occupancyRate": 52,
+      "status": "ACTIVE"
+    },
+    {
+      "id": "space-4",
+      "title": "Mall Entrance",
+      "image": "https://picsum.photos/seed/space4/400/225",
+      "totalBookings": 5,
+      "totalRevenue": 980.0,
+      "averageRating": 4.5,
+      "views": 450,
+      "occupancyRate": 38,
+      "status": "ACTIVE"
+    },
+    {
+      "id": "space-5",
+      "title": "Park View Wall",
+      "image": "https://picsum.photos/seed/space5/400/225",
+      "totalBookings": 3,
+      "totalRevenue": 470.0,
+      "averageRating": null,
+      "views": 280,
+      "occupancyRate": 22,
+      "status": "ACTIVE"
     }
   ],
   "chart": [

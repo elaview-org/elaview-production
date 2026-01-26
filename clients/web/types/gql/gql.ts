@@ -38,6 +38,7 @@ type Documents = {
     "\n  fragment ProfileCard_UserFragment on User {\n    name\n    avatar\n    spaceOwnerProfile {\n      createdAt\n      spaces(first: 10) {\n        nodes {\n          averageRating\n          reviews(first: 10) {\n            nodes {\n              id\n            }\n          }\n        }\n      }\n    }\n  }\n": typeof types.ProfileCard_UserFragmentFragmentDoc,
     "\n  fragment ReviewCard_ReviewFragment on Review {\n    id\n    rating\n    comment\n    createdAt\n    booking {\n      campaign {\n        advertiserProfile {\n          companyName\n          user {\n            name\n            avatar\n          }\n        }\n      }\n    }\n  }\n": typeof types.ReviewCard_ReviewFragmentFragmentDoc,
     "\n  fragment ReviewsSection_UserFragment on User {\n    name\n    spaceOwnerProfile {\n      spaces(first: 10) {\n        nodes {\n          reviews(first: 10) {\n            nodes {\n              ...ReviewCard_ReviewFragment\n            }\n          }\n        }\n      }\n    }\n  }\n": typeof types.ReviewsSection_UserFragmentFragmentDoc,
+    "\n  fragment VerificationsSection_UserFragment on User {\n    email\n    phone\n    spaceOwnerProfile {\n      onboardingComplete\n    }\n  }\n": typeof types.VerificationsSection_UserFragmentFragmentDoc,
     "\n      query DashboardUser {\n        me {\n          ...NavigationSection_UserFragment\n          ...UserSection_UserFragment\n          ...RoleBasedView_UserFragment\n        }\n      }\n    ": typeof types.DashboardUserDocument,
     "\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n": typeof types.NavigationSection_UserFragmentFragmentDoc,
     "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n": typeof types.RoleBasedView_UserFragmentFragmentDoc,
@@ -69,6 +70,7 @@ const documents: Documents = {
     "\n  fragment ProfileCard_UserFragment on User {\n    name\n    avatar\n    spaceOwnerProfile {\n      createdAt\n      spaces(first: 10) {\n        nodes {\n          averageRating\n          reviews(first: 10) {\n            nodes {\n              id\n            }\n          }\n        }\n      }\n    }\n  }\n": types.ProfileCard_UserFragmentFragmentDoc,
     "\n  fragment ReviewCard_ReviewFragment on Review {\n    id\n    rating\n    comment\n    createdAt\n    booking {\n      campaign {\n        advertiserProfile {\n          companyName\n          user {\n            name\n            avatar\n          }\n        }\n      }\n    }\n  }\n": types.ReviewCard_ReviewFragmentFragmentDoc,
     "\n  fragment ReviewsSection_UserFragment on User {\n    name\n    spaceOwnerProfile {\n      spaces(first: 10) {\n        nodes {\n          reviews(first: 10) {\n            nodes {\n              ...ReviewCard_ReviewFragment\n            }\n          }\n        }\n      }\n    }\n  }\n": types.ReviewsSection_UserFragmentFragmentDoc,
+    "\n  fragment VerificationsSection_UserFragment on User {\n    email\n    phone\n    spaceOwnerProfile {\n      onboardingComplete\n    }\n  }\n": types.VerificationsSection_UserFragmentFragmentDoc,
     "\n      query DashboardUser {\n        me {\n          ...NavigationSection_UserFragment\n          ...UserSection_UserFragment\n          ...RoleBasedView_UserFragment\n        }\n      }\n    ": types.DashboardUserDocument,
     "\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n": types.NavigationSection_UserFragmentFragmentDoc,
     "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n": types.RoleBasedView_UserFragmentFragmentDoc,
@@ -186,6 +188,10 @@ export function graphql(source: "\n  fragment ReviewCard_ReviewFragment on Revie
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  fragment ReviewsSection_UserFragment on User {\n    name\n    spaceOwnerProfile {\n      spaces(first: 10) {\n        nodes {\n          reviews(first: 10) {\n            nodes {\n              ...ReviewCard_ReviewFragment\n            }\n          }\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  fragment ReviewsSection_UserFragment on User {\n    name\n    spaceOwnerProfile {\n      spaces(first: 10) {\n        nodes {\n          reviews(first: 10) {\n            nodes {\n              ...ReviewCard_ReviewFragment\n            }\n          }\n        }\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment VerificationsSection_UserFragment on User {\n    email\n    phone\n    spaceOwnerProfile {\n      onboardingComplete\n    }\n  }\n"): (typeof documents)["\n  fragment VerificationsSection_UserFragment on User {\n    email\n    phone\n    spaceOwnerProfile {\n      onboardingComplete\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

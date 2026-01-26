@@ -1,20 +1,11 @@
 import api from "@/api/gql/server";
-import { Button } from "@/components/primitives/button";
-import {
-  Empty,
-  EmptyContent,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/primitives/empty";
 import { graphql } from "@/types/gql";
-import { IconCalendar } from "@tabler/icons-react";
-import Link from "next/link";
 import BookingsTable from "./bookings-table";
-import { type FilterTabKey, getStatusFilter } from "./constants";
-import Toolbar from "./toolbar";
+import { type FilterTabKey, getStatusFilter, TOOLBAR_PROPS } from "./constants";
+import Toolbar from "@/components/composed/toolbar";
 import mockData from "./mock-data.json";
+import MaybePlaceholder from "@/components/status/maybe-placeholder";
+import Placeholder from "@/app/(dashboard)/@spaceOwner/bookings/placeholder";
 
 export default async function Page({
   searchParams,
@@ -58,33 +49,15 @@ export default async function Page({
 
   return (
     <div className="flex flex-col gap-6">
-      <Toolbar />
-      {bookings.length === 0 ? (
-        <Empty className="border py-16">
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <IconCalendar />
-            </EmptyMedia>
-            <EmptyTitle>No bookings yet</EmptyTitle>
-            <EmptyDescription>
-              {tabKey === "incoming"
-                ? "No pending booking requests at the moment"
-                : tabKey === "active"
-                  ? "No active bookings right now"
-                  : tabKey === "completed"
-                    ? "No completed bookings yet"
-                    : "Bookings will appear here once advertisers book your spaces"}
-            </EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
-            <Button variant="outline" asChild>
-              <Link href="/listings">View Your Listings</Link>
-            </Button>
-          </EmptyContent>
-        </Empty>
-      ) : (
-        <BookingsTable data={bookings as Parameters<typeof BookingsTable>[0]["data"]} />
-      )}
+      <Toolbar {...TOOLBAR_PROPS} />
+      <MaybePlaceholder
+        data={bookings as Parameters<typeof BookingsTable>[0]["data"]}
+        placeholder={<Placeholder tabKey={tabKey} />}
+      >
+        <BookingsTable
+          data={bookings as Parameters<typeof BookingsTable>[0]["data"]}
+        />
+      </MaybePlaceholder>
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { BookingStatus } from "@/types/gql/graphql";
+import { ViewOptions } from "@/types/constants";
 
 export const STATUS_LABELS: Record<BookingStatus, string> = {
   [BookingStatus.PendingApproval]: "Pending",
@@ -64,3 +65,27 @@ export function getStatusFilter(tabKey: FilterTabKey) {
   if (!tab || tab.statuses === null) return undefined;
   return { status: { in: [...tab.statuses] } };
 }
+
+export const TOOLBAR_PROPS = {
+  searchTarget: "spaces",
+  filters: [
+    {
+      placeholder: "Status",
+      fields: [
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" },
+        { value: "pending", label: "Pending Approval" },
+        { value: "rejected", label: "Rejected" },
+        { value: "suspended", label: "Suspended" },
+      ],
+    },
+  ],
+  sort: {
+    fields: [
+      { value: "createdAt", label: "Posted Date" },
+      { value: "price", label: "Price" },
+      { value: "bookings", label: "Most bookings" },
+    ],
+  },
+  views: new Set([ViewOptions.Grid, ViewOptions.Table]),
+};

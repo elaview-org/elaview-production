@@ -6,6 +6,7 @@ import {
   IconSquare,
 } from "@tabler/icons-react";
 import { SpaceStatus, SpaceType } from "@/types/gql/graphql";
+import { ViewOptions } from "@/types/constants";
 
 export const STEPS = [
   { id: 1, label: "Photos", icon: IconPhoto },
@@ -48,4 +49,28 @@ export const TYPE_LABELS: Record<SpaceType, string> = {
   [SpaceType.VehicleWrap]: "Vehicle Wrap",
   [SpaceType.WindowDisplay]: "Window Display",
   [SpaceType.Other]: "Other",
+};
+
+export const TOOLBAR_PROPS = {
+  searchTarget: "spaces",
+  filters: [
+    {
+      placeholder: "Status",
+      fields: [
+        { value: "active", label: "Active" },
+        { value: "inactive", label: "Inactive" },
+        { value: "pending", label: "Pending Approval" },
+        { value: "rejected", label: "Rejected" },
+        { value: "suspended", label: "Suspended" },
+      ],
+    },
+  ],
+  sort: {
+    fields: [
+      { value: "createdAt", label: "Posted Date" },
+      { value: "price", label: "Price" },
+      { value: "bookings", label: "Most bookings" },
+    ],
+  },
+  views: new Set([ViewOptions.Table, ViewOptions.Map, ViewOptions.Grid]),
 };

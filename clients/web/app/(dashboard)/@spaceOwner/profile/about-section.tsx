@@ -1,9 +1,12 @@
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import {
   IconBriefcase,
+  IconClock,
   IconMapPin,
+  IconMessageCircle,
   IconShieldCheck,
 } from "@tabler/icons-react";
+import mockData from "./mock.json";
 
 export const AboutSection_UserFragment = graphql(`
   fragment AboutSection_UserFragment on User {
@@ -56,6 +59,16 @@ export default function AboutSection({ data }: Props) {
               ? "Identity verified"
               : "Identity not verified"}
           </span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <IconMessageCircle className="text-muted-foreground size-5" />
+          <span>Response rate: {mockData.responseRate}%</span>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <IconClock className="text-muted-foreground size-5" />
+          <span>Responds {mockData.responseTime}</span>
         </div>
       </div>
 

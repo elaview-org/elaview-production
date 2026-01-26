@@ -1,0 +1,72 @@
+{
+  "responseRate": 98,
+  "responseTime": "within an hour",
+  "reviews": [
+    {
+      "id": "rev-1",
+      "rating": 5,
+      "comment": "Amazing space for our grand opening promotion! The foot traffic was exactly what we needed, and Sarah was incredibly helpful with the installation process. Would definitely book again.",
+      "createdAt": "2025-11-15T10:00:00Z",
+      "reviewer": {
+        "name": "Michael Chen",
+        "avatar": null,
+        "companyName": "Chen's Kitchen"
+      }
+    },
+    {
+      "id": "rev-2",
+      "rating": 5,
+      "comment": "Perfect location for our gym membership drive. Great visibility and the owner was very accommodating with our schedule.",
+      "createdAt": "2025-10-22T14:30:00Z",
+      "reviewer": {
+        "name": "Jessica Rodriguez",
+        "avatar": null,
+        "companyName": "FitLife Studios"
+      }
+    },
+    {
+      "id": "rev-3",
+      "rating": 4,
+      "comment": "Good experience overall. The space was exactly as described and we saw a noticeable increase in walk-in customers during our campaign.",
+      "createdAt": "2025-09-18T09:15:00Z",
+      "reviewer": {
+        "name": "David Park",
+        "avatar": null,
+        "companyName": "Park Dental Care"
+      }
+    },
+    {
+      "id": "rev-4",
+      "rating": 5,
+      "comment": "Exceeded our expectations! Sarah was professional and made the entire booking process seamless. The window display brought us great results.",
+      "createdAt": "2025-08-05T16:45:00Z",
+      "reviewer": {
+        "name": "Amanda Foster",
+        "avatar": null,
+        "companyName": "Foster Real Estate"
+      }
+    },
+    {
+      "id": "rev-5",
+      "rating": 4,
+      "comment": "Solid experience. Quick response times and the location had steady foot traffic. Will consider for future campaigns.",
+      "createdAt": "2025-07-12T11:00:00Z",
+      "reviewer": {
+        "name": "Robert Kim",
+        "avatar": null,
+        "companyName": "Kim's Auto Repair"
+      }
+    },
+    {
+      "id": "rev-6",
+      "rating": 5,
+      "comment": "Outstanding! This was our first time using the platform and Sarah made it so easy. The ad placement was perfect for our target audience.",
+      "createdAt": "2025-06-28T13:20:00Z",
+      "reviewer": {
+        "name": "Emily Watson",
+        "avatar": null,
+        "companyName": "Bloom Salon"
+      }
+    }
+  ]
+}

@@ -1,9 +1,7 @@
 import api from "@/api/gql/server";
 import { graphql } from "@/types/gql";
-import { redirect } from "next/navigation";
-import SettingsContent from "./settings-content";
 
-export default async function Page() {
+export default async function getSpaceOwnerSettingsQuery() {
   const { data, error } = await api.query({
     query: graphql(`
       query SpaceOwnerSettings {
@@ -37,14 +35,9 @@ export default async function Page() {
     `),
   });
 
-  if (error || !data?.me) {
-    redirect("/logout");
-  }
-
-  return (
-    <SettingsContent
-      user={data.me}
-      notificationPreferences={data.myNotificationPreferences}
-    />
-  );
+  return {
+    error: error || !data?.me,
+    user: data?.me,
+    notificationPreferences: data?.myNotificationPreferences ?? [],
+  };
 }

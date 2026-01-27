@@ -20,79 +20,86 @@ export type MonthRange = (typeof MONTH_RANGES)[number]["value"];
 export const BOOKINGS_CHART_CONFIG = {
   bookings: {
     label: "Bookings",
-    color: "var(--primary)",
+    color: "var(--chart-bookings)",
   },
 } satisfies ChartConfig;
 
 export const REVENUE_CHART_CONFIG = {
   revenue: {
     label: "Revenue",
-    color: "var(--primary)",
+    color: "var(--chart-revenue)",
+  },
+} satisfies ChartConfig;
+
+export const SPACE_REVENUE_CHART_CONFIG = {
+  revenue: {
+    label: "Revenue",
+    color: "var(--chart-spaces)",
   },
 } satisfies ChartConfig;
 
 export const MONTHLY_CHART_CONFIG = {
   revenue: {
     label: "Revenue",
-    color: "var(--primary)",
+    color: "var(--chart-revenue)",
   },
   bookings: {
     label: "Bookings",
-    color: "var(--chart-2)",
+    color: "var(--chart-bookings)",
   },
 } satisfies ChartConfig;
 
 export const RATING_CHART_CONFIG = {
   rating: {
     label: "Rating",
-    color: "var(--chart-1)",
+    color: "var(--chart-rating)",
   },
   reviews: {
     label: "Reviews",
-    color: "var(--chart-2)",
+    color: "var(--chart-reviews)",
   },
 } satisfies ChartConfig;
 
 export const STATUS_CHART_CONFIG = {
   [BookingStatus.PendingApproval]: {
     label: "Pending",
-    color: "var(--chart-1)",
+    color: "oklch(0.795 0.184 86.047)",
   },
   [BookingStatus.Approved]: {
     label: "Approved",
-    color: "var(--chart-2)",
+    color: "oklch(0.685 0.169 237.323)",
   },
   [BookingStatus.Paid]: {
     label: "Paid",
-    color: "var(--chart-3)",
+    color: "oklch(0.723 0.219 149.579)",
   },
   [BookingStatus.FileDownloaded]: {
     label: "Downloaded",
-    color: "var(--chart-4)",
+    color: "oklch(0.752 0.177 215.221)",
   },
   [BookingStatus.Installed]: {
     label: "Installed",
-    color: "var(--chart-5)",
+    color: "oklch(0.702 0.183 293.541)",
   },
   [BookingStatus.Verified]: {
     label: "Verified",
-    color: "var(--primary)",
+    color: "oklch(0.765 0.177 163.223)",
   },
   [BookingStatus.Completed]: {
     label: "Completed",
-    color: "var(--chart-2)",
+    color: "oklch(0.696 0.17 162.48)",
   },
   [BookingStatus.Disputed]: {
     label: "Disputed",
-    color: "var(--destructive)",
+    color: "oklch(0.637 0.237 25.331)",
   },
   [BookingStatus.Rejected]: {
     label: "Rejected",
-    color: "var(--muted)",
+    color: "oklch(0.645 0.246 16.439)",
   },
   [BookingStatus.Cancelled]: {
     label: "Cancelled",
-    color: "var(--muted)",
+    color: "oklch(0.553 0.013 285.938)",
   },
 } satisfies ChartConfig;
 

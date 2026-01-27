@@ -13,7 +13,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/primitives/chart";
-import { REVENUE_CHART_CONFIG } from "./constants";
+import { SPACE_REVENUE_CHART_CONFIG } from "./constants";
 import mock from "./mock.json";
 
 export default function RevenueChart() {
@@ -32,7 +32,7 @@ export default function RevenueChart() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={REVENUE_CHART_CONFIG} className="h-[300px] w-full">
+        <ChartContainer config={SPACE_REVENUE_CHART_CONFIG} className="h-[300px] w-full">
           <BarChart
             data={chartData}
             layout="vertical"

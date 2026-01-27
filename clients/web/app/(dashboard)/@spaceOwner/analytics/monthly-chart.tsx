@@ -128,6 +128,12 @@ export default function MonthlyChart() {
               fill="var(--color-revenue)"
               radius={[4, 4, 0, 0]}
             />
+            <Bar
+              yAxisId="bookings"
+              dataKey="bookings"
+              fill="var(--color-bookings)"
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ChartContainer>
       </CardContent>

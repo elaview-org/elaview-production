@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 import mock from "./mock.json";
 
 type TopSpace = {
@@ -24,18 +24,6 @@ type TopSpace = {
   occupancyRate: number;
   status: string;
 };
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    notation: "compact",
-  }).format(amount);
-}
-
-function formatNumber(num: number) {
-  return new Intl.NumberFormat("en-US", { notation: "compact" }).format(num);
-}
 
 const RANK_STYLES = [
   "bg-yellow-500 text-yellow-950",
@@ -71,7 +59,7 @@ function SpaceCard({ space, rank }: { space: TopSpace; rank: number }) {
         <span className="line-clamp-1 font-medium">{space.title}</span>
         <div className="flex items-center justify-between text-sm">
           <span className="font-semibold text-primary">
-            {formatCurrency(space.totalRevenue)}
+            {formatCurrency(space.totalRevenue, { compact: true })}
           </span>
           {space.averageRating !== null && (
             <span className="flex items-center gap-1 text-muted-foreground">

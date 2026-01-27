@@ -1,7 +1,7 @@
 import { Badge } from "@/components/primitives/badge";
 import { Button } from "@/components/primitives/button";
+import { SPACE_STATUS } from "@/lib/constants";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
-import { SpaceStatus } from "@/types/gql/graphql";
 import { IconChevronLeft } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -16,22 +16,6 @@ type Props = {
   data: FragmentType<typeof Header_SpaceFragment>;
 };
 
-const STATUS_LABELS: Record<SpaceStatus, string> = {
-  [SpaceStatus.Active]: "Active",
-  [SpaceStatus.Inactive]: "Inactive",
-  [SpaceStatus.PendingApproval]: "Pending",
-  [SpaceStatus.Rejected]: "Rejected",
-  [SpaceStatus.Suspended]: "Suspended",
-};
-
-const STATUS_VARIANTS: Record<SpaceStatus, "default" | "secondary" | "destructive" | "outline"> = {
-  [SpaceStatus.Active]: "default",
-  [SpaceStatus.Inactive]: "secondary",
-  [SpaceStatus.PendingApproval]: "outline",
-  [SpaceStatus.Rejected]: "destructive",
-  [SpaceStatus.Suspended]: "destructive",
-};
-
 export default function Header({ data }: Props) {
   const space = getFragmentData(Header_SpaceFragment, data);
 
@@ -43,8 +27,8 @@ export default function Header({ data }: Props) {
         </Link>
       </Button>
       <h1 className="text-2xl font-semibold">{space.title}</h1>
-      <Badge variant={STATUS_VARIANTS[space.status]}>
-        {STATUS_LABELS[space.status]}
+      <Badge variant={SPACE_STATUS.variants[space.status]}>
+        {SPACE_STATUS.labels[space.status]}
       </Badge>
     </div>
   );

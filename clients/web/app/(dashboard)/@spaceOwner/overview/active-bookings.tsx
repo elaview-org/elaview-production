@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { cn } from "@/lib/utils";
+import { cn, formatDateRange } from "@/lib/utils";
 import {
   BOOKING_STATUS_CONFIG,
   NEXT_ACTION_CONFIG,
@@ -31,12 +31,6 @@ type ActiveBooking = {
   nextAction: NextAction;
   daysRemaining: number;
 };
-
-function formatDateRange(start: string, end: string) {
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  return `${startDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${endDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
-}
 
 function ProgressSteps({ currentStep }: { currentStep: number }) {
   const steps = ["Paid", "Downloaded", "Installed", "Verified"];

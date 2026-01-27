@@ -37,6 +37,7 @@ import advertiserData from "./@advertiser/navigation-bar.data";
 import marketingData from "./@marketing/navigation-bar.data";
 import spaceOwnerData from "./@spaceOwner/navigation-bar.data";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const NavigationSection_UserFragment = graphql(`
   fragment NavigationSection_UserFragment on User {
@@ -55,7 +56,6 @@ export function NavigationSection({ data }: Props) {
     data
   );
 
-  const { isMobile } = useSidebar();
   const roleData = useMemo(() => {
     switch (role) {
       case UserRole.Admin:
@@ -69,6 +69,9 @@ export function NavigationSection({ data }: Props) {
       }
     }
   }, [role, activeProfileType]);
+
+  const { isMobile } = useSidebar();
+  const pathname = usePathname();
 
   return (
     <>
@@ -91,11 +94,26 @@ export function NavigationSection({ data }: Props) {
           <SidebarMenu>
             {roleData.navMain.map((item) => (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild tooltip={item.title}>
-                  <Link href={item.url}>
-                    {item.icon && <item.icon />}
-                    <span>{item.title}</span>
-                  </Link>
+                <SidebarMenuButton
+                  asChild
+                  tooltip={item.title}
+                  className={
+                    item.url === pathname
+                      ? "text-chart-2 pointer-events-none"
+                      : ""
+                  }
+                >
+                  {item.url !== pathname ? (
+                    <Link href={item.url}>
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </Link>
+                  ) : (
+                    <div className={"text-chart-2"}>
+                      {item.icon && <item.icon />}
+                      <span>{item.title}</span>
+                    </div>
+                  )}
                 </SidebarMenuButton>
               </SidebarMenuItem>
             ))}

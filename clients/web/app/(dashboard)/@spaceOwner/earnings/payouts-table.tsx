@@ -15,13 +15,8 @@ import TableView, {
   stackColumn,
   textColumn,
 } from "@/components/composed/table-view";
+import { PAYOUT_STAGE, PAYOUT_STATUS } from "@/lib/constants";
 import { PayoutStage, PayoutStatus, graphql } from "@/types/gql";
-import {
-  PAYOUT_STATUS_LABELS,
-  PAYOUT_STATUS_VARIANTS,
-  PAYOUT_STAGE_LABELS,
-  PAYOUT_STAGE_DESCRIPTIONS,
-} from "./constants";
 
 export const PayoutsTable_PayoutFragment = graphql(`
   fragment PayoutsTable_PayoutFragment on Payout {
@@ -88,8 +83,8 @@ const columns = [
   stackColumn<PayoutData>({
     key: "stage",
     header: "Stage",
-    primary: (row) => PAYOUT_STAGE_LABELS[row.stage as PayoutStage] ?? row.stage,
-    secondary: (row) => PAYOUT_STAGE_DESCRIPTIONS[row.stage as PayoutStage] ?? "",
+    primary: (row) => PAYOUT_STAGE.labels[row.stage as PayoutStage] ?? row.stage,
+    secondary: (row) => PAYOUT_STAGE.descriptions[row.stage as PayoutStage] ?? "",
   }),
   currencyColumn<PayoutData>({
     key: "amount",
@@ -100,9 +95,9 @@ const columns = [
     key: "status",
     header: "Status",
     value: (row) => row.status as PayoutStatus,
-    labels: PAYOUT_STATUS_LABELS,
+    labels: PAYOUT_STATUS.labels,
     icon: (status) => <StatusIcon status={status} />,
-    variant: (status) => PAYOUT_STATUS_VARIANTS[status] ?? "outline",
+    variant: (status) => PAYOUT_STATUS.variants[status] ?? "outline",
   }),
 ];
 

@@ -1,20 +1,8 @@
 import SummaryCard, {
   SummaryCardGrid,
 } from "@/components/composed/summary-card";
+import { calculateTrend, formatCurrency } from "@/lib/utils";
 import mock from "./mock.json";
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
-
-function calculateTrend(current: number, previous: number) {
-  if (previous === 0) return 0;
-  return Math.round(((current - previous) / previous) * 100);
-}
 
 export default function StatsCards() {
   const { stats } = mock;

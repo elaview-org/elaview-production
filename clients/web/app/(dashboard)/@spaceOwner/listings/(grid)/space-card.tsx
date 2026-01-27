@@ -1,6 +1,6 @@
 import MediaCard, { MediaCardSkeleton } from "@/components/composed/media-card";
+import { SPACE_STATUS, SPACE_TYPE } from "@/lib/constants";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
-import { STATUS_INDICATORS, TYPE_LABELS } from "../constants";
 
 export const SpaceCard_SpaceFragment = graphql(`
   fragment SpaceCard_SpaceFragment on Space {
@@ -31,13 +31,13 @@ export default function SpaceCard({ data }: Props) {
       title={space.title}
       description={space.description}
       indicator={{
-        className: STATUS_INDICATORS[space.status],
-        title: space.status.replace("_", " "),
+        className: SPACE_STATUS.indicators[space.status],
+        title: SPACE_STATUS.labels[space.status],
       }}
       badges={[
         {
           position: "top-right",
-          content: TYPE_LABELS[space.type],
+          content: SPACE_TYPE.labels[space.type],
           className:
             "text-muted-foreground bg-background p-1 tracking-wide uppercase",
         },

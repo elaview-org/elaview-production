@@ -1,42 +1,29 @@
 import SummaryCard, {
   SummaryCardGrid,
 } from "@/components/composed/summary-card";
+import { calculateTrend, formatCurrency } from "@/lib/utils";
 import mock from "./mock.json";
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-function calculateChange(current: number, previous: number): number {
-  if (previous === 0) return current > 0 ? 100 : 0;
-  return ((current - previous) / previous) * 100;
-}
 
 export default function SummaryCards() {
   const { summary } = mock;
 
-  const bookingsChange = calculateChange(
+  const bookingsChange = calculateTrend(
     summary.totalBookings,
     summary.previousTotalBookings
   );
-  const revenueChange = calculateChange(
+  const revenueChange = calculateTrend(
     summary.totalRevenue,
     summary.previousTotalRevenue
   );
-  const durationChange = calculateChange(
+  const durationChange = calculateTrend(
     summary.averageBookingDuration,
     summary.previousAverageBookingDuration
   );
-  const occupancyChange = calculateChange(
+  const occupancyChange = calculateTrend(
     summary.occupancyRate,
     summary.previousOccupancyRate
   );
-  const repeatChange = calculateChange(
+  const repeatChange = calculateTrend(
     summary.repeatAdvertiserRate,
     summary.previousRepeatAdvertiserRate
   );

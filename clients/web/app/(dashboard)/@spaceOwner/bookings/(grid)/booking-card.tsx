@@ -1,6 +1,6 @@
 import MediaCard from "@/components/composed/media-card";
+import { BOOKING_STATUS } from "@/lib/constants";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
-import { STATUS_INDICATORS, STATUS_LABELS } from "../constants";
 
 export const BookingCard_BookingFragment = graphql(`
   fragment BookingCard_BookingFragment on Booking {
@@ -40,13 +40,13 @@ export default function BookingCard({ data }: Props) {
       title={booking.space?.title ?? "Untitled Space"}
       description={booking.campaign?.advertiserProfile?.companyName}
       indicator={{
-        className: STATUS_INDICATORS[booking.status],
-        title: STATUS_LABELS[booking.status],
+        className: BOOKING_STATUS.indicators[booking.status],
+        title: BOOKING_STATUS.labels[booking.status],
       }}
       badges={[
         {
           position: "top-right",
-          content: STATUS_LABELS[booking.status],
+          content: BOOKING_STATUS.labels[booking.status],
           className:
             "text-muted-foreground bg-background p-1 tracking-wide uppercase",
         },

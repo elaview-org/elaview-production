@@ -25,7 +25,8 @@ import {
   graphql,
 } from "@/types/gql";
 import type { BookingsTable_BookingFragmentFragment } from "@/types/gql/graphql";
-import { STATUS_LABELS, type FilterTabKey } from "../constants";
+import { BOOKING_STATUS } from "@/lib/constants";
+import { type FilterTabKey } from "../constants";
 import Placeholder from "./placeholder";
 
 export const BookingsTable_BookingFragment = graphql(`
@@ -121,7 +122,7 @@ const columns = [
     key: "status",
     header: "Status",
     value: (row) => row.status,
-    labels: STATUS_LABELS,
+    labels: BOOKING_STATUS.labels,
     icon: (status) => <StatusIcon status={status} />,
   }),
   actionsColumn<BookingData>({

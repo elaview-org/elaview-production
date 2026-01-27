@@ -1,3 +1,4 @@
+import { BOOKING_STATUS } from "@/lib/constants";
 import { BookingStatus } from "@/types/gql/graphql";
 
 export const CALENDAR_VIEWS = [
@@ -8,18 +9,7 @@ export const CALENDAR_VIEWS = [
 
 export type CalendarView = (typeof CALENDAR_VIEWS)[number]["value"];
 
-export const STATUS_LABELS: Record<BookingStatus, string> = {
-  [BookingStatus.PendingApproval]: "Pending",
-  [BookingStatus.Approved]: "Approved",
-  [BookingStatus.Paid]: "Paid",
-  [BookingStatus.FileDownloaded]: "Downloaded",
-  [BookingStatus.Installed]: "Installed",
-  [BookingStatus.Verified]: "Verified",
-  [BookingStatus.Completed]: "Completed",
-  [BookingStatus.Disputed]: "Disputed",
-  [BookingStatus.Rejected]: "Rejected",
-  [BookingStatus.Cancelled]: "Cancelled",
-};
+export const STATUS_LABELS = BOOKING_STATUS.labels;
 
 export const STATUS_COLORS: Record<BookingStatus, string> = {
   [BookingStatus.PendingApproval]: "bg-amber-500",

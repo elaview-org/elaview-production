@@ -38,3 +38,55 @@ export function formatTime(dateString: string): string {
 
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
+
+export function formatCurrency(
+  amount: number,
+  options?: { decimals?: boolean; compact?: boolean }
+): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    notation: options?.compact ? "compact" : "standard",
+    minimumFractionDigits: options?.decimals ? 2 : 0,
+    maximumFractionDigits: options?.decimals ? 2 : 0,
+  }).format(amount);
+}
+
+export function formatDateRange(start: string | Date, end: string | Date): string {
+  const startDate = typeof start === "string" ? new Date(start) : start;
+  const endDate = typeof end === "string" ? new Date(end) : end;
+  const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
+  return `${startDate.toLocaleDateString("en-US", opts)} - ${endDate.toLocaleDateString("en-US", opts)}`;
+}
+
+export function formatDate(
+  date: string | Date | null | undefined,
+  options?: Intl.DateTimeFormatOptions
+): string {
+  if (!date) return "—";
+  const d = typeof date === "string" ? new Date(date) : date;
+  return d.toLocaleDateString(
+    "en-US",
+    options ?? { year: "numeric", month: "long", day: "numeric" }
+  );
+}
+
+export function formatNumber(num: number): string {
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
+  return num.toLocaleString();
+}
+
+export function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+export function calculateTrend(current: number, previous: number): number {
+  if (previous === 0) return 0;
+  return Math.round(((current - previous) / previous) * 100);
+}

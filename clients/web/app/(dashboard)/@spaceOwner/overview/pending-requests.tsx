@@ -13,6 +13,12 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { Skeleton } from "@/components/primitives/skeleton";
+import {
+  formatCurrency,
+  formatDateRange,
+  formatTime,
+  getInitials,
+} from "@/lib/utils";
 import mock from "./mock.json";
 
 type PendingRequest = {
@@ -26,41 +32,6 @@ type PendingRequest = {
   totalAmount: number;
   createdAt: string;
 };
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
-
-function formatDateRange(start: string, end: string) {
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  return `${startDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${endDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })}`;
-}
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
-}
-
-function getTimeAgo(dateString: string) {
-  const date = new Date(dateString);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffDays > 0) return `${diffDays}d ago`;
-  if (diffHours > 0) return `${diffHours}h ago`;
-  return "Just now";
-}
 
 function RequestCard({ request }: { request: PendingRequest }) {
   return (
@@ -81,7 +52,7 @@ function RequestCard({ request }: { request: PendingRequest }) {
         </div>
         <Badge variant="outline" className="text-muted-foreground gap-1">
           <IconClock className="size-3" />
-          {getTimeAgo(request.createdAt)}
+          {formatTime(request.createdAt)}
         </Badge>
       </div>
 

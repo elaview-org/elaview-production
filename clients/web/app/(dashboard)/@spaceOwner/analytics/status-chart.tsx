@@ -17,8 +17,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/primitives/chart";
-import { STATUS_CHART_CONFIG, STATUS_LABELS } from "./constants";
+import { BOOKING_STATUS } from "@/lib/constants";
 import { BookingStatus } from "@/types/gql/graphql";
+import { STATUS_CHART_CONFIG } from "./constants";
 import mock from "./mock.json";
 
 export function StatusChartSkeleton() {
@@ -65,7 +66,7 @@ export default function StatusChart() {
                   hideLabel
                   formatter={(value, name) => {
                     const statusKey = name as BookingStatus;
-                    const label = STATUS_LABELS[statusKey] ?? name;
+                    const label = BOOKING_STATUS.labels[statusKey] ?? name;
                     return (
                       <div className="flex items-center gap-2">
                         <span className="text-muted-foreground">{label}</span>

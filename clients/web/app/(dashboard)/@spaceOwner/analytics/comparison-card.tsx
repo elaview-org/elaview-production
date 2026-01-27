@@ -7,22 +7,8 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { cn } from "@/lib/utils";
+import { calculateTrend, cn, formatCurrency } from "@/lib/utils";
 import mock from "./mock.json";
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
-
-function calculateChange(current: number, previous: number): number {
-  if (previous === 0) return current > 0 ? 100 : 0;
-  return ((current - previous) / previous) * 100;
-}
 
 type MetricRowProps = {
   label: string;
@@ -105,10 +91,10 @@ export default function ComparisonCard() {
   const { comparison } = mock;
   const { current, previous } = comparison;
 
-  const bookingsChange = calculateChange(current.bookings, previous.bookings);
-  const revenueChange = calculateChange(current.revenue, previous.revenue);
-  const ratingChange = calculateChange(current.avgRating, previous.avgRating);
-  const completionChange = calculateChange(current.completionRate, previous.completionRate);
+  const bookingsChange = calculateTrend(current.bookings, previous.bookings);
+  const revenueChange = calculateTrend(current.revenue, previous.revenue);
+  const ratingChange = calculateTrend(current.avgRating, previous.avgRating);
+  const completionChange = calculateTrend(current.completionRate, previous.completionRate);
 
   return (
     <Card>

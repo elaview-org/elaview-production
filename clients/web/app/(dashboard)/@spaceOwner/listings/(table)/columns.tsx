@@ -8,8 +8,8 @@ import {
   dateColumn,
   actionsColumn,
 } from "@/components/composed/table-view";
+import { SPACE_STATUS, SPACE_TYPE } from "@/lib/constants";
 import { SpaceStatus, SpaceType } from "@/types/gql/graphql";
-import { TYPE_LABELS } from "../constants";
 import {
   IconEdit,
   IconEye,
@@ -26,25 +26,6 @@ export type SpaceRow = {
   type: SpaceType;
   status: SpaceStatus;
   createdAt: string;
-};
-
-const STATUS_LABELS: Record<SpaceStatus, string> = {
-  [SpaceStatus.Active]: "Active",
-  [SpaceStatus.Inactive]: "Inactive",
-  [SpaceStatus.PendingApproval]: "Pending",
-  [SpaceStatus.Rejected]: "Rejected",
-  [SpaceStatus.Suspended]: "Suspended",
-};
-
-const STATUS_VARIANTS: Record<
-  SpaceStatus,
-  "default" | "secondary" | "destructive" | "outline"
-> = {
-  [SpaceStatus.Active]: "default",
-  [SpaceStatus.Inactive]: "secondary",
-  [SpaceStatus.PendingApproval]: "outline",
-  [SpaceStatus.Rejected]: "destructive",
-  [SpaceStatus.Suspended]: "destructive",
 };
 
 export const columns = [
@@ -64,14 +45,14 @@ export const columns = [
   textColumn<SpaceRow>({
     key: "type",
     header: "Type",
-    value: (row) => TYPE_LABELS[row.type],
+    value: (row) => SPACE_TYPE.labels[row.type],
   }),
   badgeColumn<SpaceRow, SpaceStatus>({
     key: "status",
     header: "Status",
     value: "status",
-    labels: STATUS_LABELS,
-    variant: (status) => STATUS_VARIANTS[status],
+    labels: SPACE_STATUS.labels,
+    variant: (status) => SPACE_STATUS.variants[status],
   }),
   dateColumn<SpaceRow>({
     key: "createdAt",

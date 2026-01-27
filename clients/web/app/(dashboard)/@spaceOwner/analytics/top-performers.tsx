@@ -15,17 +15,8 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { Badge } from "@/components/primitives/badge";
-import { cn } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/utils";
 import mock from "./mock.json";
-
-function formatCurrency(amount: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 type PerformerCardProps = {
   icon: React.ReactNode;

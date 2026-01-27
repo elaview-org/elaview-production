@@ -25,13 +25,13 @@ type HeatmapCell = {
 };
 
 function getIntensityClass(count: number, max: number): string {
-  if (count === 0) return "bg-muted/30";
+  if (count === 0) return "bg-[var(--chart-heatmap-0)]";
   const ratio = count / max;
-  if (ratio < 0.2) return "bg-primary/20";
-  if (ratio < 0.4) return "bg-primary/40";
-  if (ratio < 0.6) return "bg-primary/60";
-  if (ratio < 0.8) return "bg-primary/80";
-  return "bg-primary";
+  if (ratio < 0.2) return "bg-[var(--chart-heatmap-1)]";
+  if (ratio < 0.4) return "bg-[var(--chart-heatmap-2)]";
+  if (ratio < 0.6) return "bg-[var(--chart-heatmap-3)]";
+  if (ratio < 0.8) return "bg-[var(--chart-heatmap-4)]";
+  return "bg-[var(--chart-heatmap-5)]";
 }
 
 export function HeatmapChartSkeleton() {
@@ -127,12 +127,12 @@ export default function HeatmapChart() {
               <div className="mt-4 flex items-center justify-end gap-2">
                 <span className="text-muted-foreground text-xs">Less</span>
                 <div className="flex gap-1">
-                  <div className="bg-muted/30 size-3 rounded-sm" />
-                  <div className="bg-primary/20 size-3 rounded-sm" />
-                  <div className="bg-primary/40 size-3 rounded-sm" />
-                  <div className="bg-primary/60 size-3 rounded-sm" />
-                  <div className="bg-primary/80 size-3 rounded-sm" />
-                  <div className="bg-primary size-3 rounded-sm" />
+                  <div className="size-3 rounded-sm bg-[var(--chart-heatmap-0)]" />
+                  <div className="size-3 rounded-sm bg-[var(--chart-heatmap-1)]" />
+                  <div className="size-3 rounded-sm bg-[var(--chart-heatmap-2)]" />
+                  <div className="size-3 rounded-sm bg-[var(--chart-heatmap-3)]" />
+                  <div className="size-3 rounded-sm bg-[var(--chart-heatmap-4)]" />
+                  <div className="size-3 rounded-sm bg-[var(--chart-heatmap-5)]" />
                 </div>
                 <span className="text-muted-foreground text-xs">More</span>
               </div>

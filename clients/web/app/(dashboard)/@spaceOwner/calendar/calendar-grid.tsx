@@ -7,7 +7,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/primitives/tooltip";
-import { cn } from "@/lib/utils";
+import { cn, formatDateRange } from "@/lib/utils";
 import { BookingStatus } from "@/types/gql/graphql";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import {
@@ -65,13 +65,6 @@ function getSpaceColor(spaceId: string): (typeof SPACE_COLORS)[number] {
   const space = mock.spaces.find((s) => s.id === spaceId);
   const colorIndex = space?.colorIndex ?? 0;
   return SPACE_COLORS[colorIndex % SPACE_COLORS.length];
-}
-
-function formatDateRange(startDate: string, endDate: string): string {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
-  return `${start.toLocaleDateString("en-US", opts)} - ${end.toLocaleDateString("en-US", opts)}`;
 }
 
 function BookingEvent({

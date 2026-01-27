@@ -10,7 +10,6 @@ interface PageProps {
 export default async function MessagesPage({ params }: PageProps) {
   const { id: bookingId } = await params;
 
-  // Fetch data in parallel
   const [{ conversations }, { messages, threadContext }] = await Promise.all([
     getConversationsQuery(),
     getMessagesQuery(bookingId),

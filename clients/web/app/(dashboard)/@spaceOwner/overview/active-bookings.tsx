@@ -1,15 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "@/components/primitives/button";
 import { Badge } from "@/components/primitives/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/primitives/card";
+import ProgressSteps, { ProgressStepsSkeleton } from "@/components/composed/progress-steps";
+import SectionCard, { SectionCardSkeleton } from "@/components/composed/section-card";
 import { Skeleton } from "@/components/primitives/skeleton";
 import { cn, formatDateRange } from "@/lib/utils";
 import {
@@ -32,38 +26,7 @@ type ActiveBooking = {
   daysRemaining: number;
 };
 
-function ProgressSteps({ currentStep }: { currentStep: number }) {
-  const steps = ["Paid", "Downloaded", "Installed", "Verified"];
-
-  return (
-    <div className="flex items-center gap-1">
-      {steps.map((step, index) => (
-        <div key={step} className="flex items-center">
-          <div
-            className={cn(
-              "flex size-5 items-center justify-center rounded-full text-xs font-medium",
-              index < currentStep
-                ? "bg-primary text-primary-foreground"
-                : index === currentStep
-                  ? "bg-primary/20 text-primary ring-2 ring-primary"
-                  : "bg-muted text-muted-foreground"
-            )}
-          >
-            {index + 1}
-          </div>
-          {index < steps.length - 1 && (
-            <div
-              className={cn(
-                "h-0.5 w-4",
-                index < currentStep ? "bg-primary" : "bg-muted"
-              )}
-            />
-          )}
-        </div>
-      ))}
-    </div>
-  );
-}
+const BOOKING_STEPS = ["Paid", "Downloaded", "Installed", "Verified"];
 
 function BookingCard({ booking }: { booking: ActiveBooking }) {
   const statusConfig = BOOKING_STATUS_CONFIG[booking.status];
@@ -89,7 +52,7 @@ function BookingCard({ booking }: { booking: ActiveBooking }) {
         )}
       </div>
 
-      <ProgressSteps currentStep={statusConfig.step} />
+      <ProgressSteps steps={BOOKING_STEPS} currentStep={statusConfig.step} />
 
       <div className="flex items-center justify-between">
         <span className="text-muted-foreground text-xs">
@@ -118,69 +81,42 @@ export default function ActiveBookings() {
   }
 
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="flex-row items-center justify-between">
-        <div>
-          <CardTitle className="flex items-center gap-2">
-            Active Bookings
-            <Badge variant="secondary" className="tabular-nums">
-              {bookings.length}
-            </Badge>
-          </CardTitle>
-          <CardDescription>Bookings in progress</CardDescription>
-        </div>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/bookings?tab=active">View All</Link>
-        </Button>
-      </CardHeader>
-      <CardContent className="flex-1">
-        <div className="flex flex-col gap-3">
-          {bookings.slice(0, 4).map((booking) => (
-            <BookingCard key={booking.id} booking={booking} />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <SectionCard
+      title="Active Bookings"
+      description="Bookings in progress"
+      count={bookings.length}
+      viewAllHref="/bookings?tab=active"
+    >
+      <div className="flex flex-col gap-3">
+        {bookings.slice(0, 4).map((booking) => (
+          <BookingCard key={booking.id} booking={booking} />
+        ))}
+      </div>
+    </SectionCard>
   );
 }
 
 export function ActiveBookingsSkeleton() {
   return (
-    <Card className="flex flex-col">
-      <CardHeader className="flex-row items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-4 w-40" />
-        </div>
-        <Skeleton className="h-9 w-20" />
-      </CardHeader>
-      <CardContent className="flex-1">
-        <div className="flex flex-col gap-3">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-3 rounded-lg border p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex flex-col gap-1">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-3 w-24" />
-                </div>
-                <Skeleton className="h-5 w-16 rounded-full" />
+    <SectionCardSkeleton>
+      <div className="flex flex-col gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="flex flex-col gap-3 rounded-lg border p-4">
+            <div className="flex items-start justify-between">
+              <div className="flex flex-col gap-1">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-3 w-24" />
               </div>
-              <div className="flex items-center gap-1">
-                {Array.from({ length: 4 }).map((_, j) => (
-                  <div key={j} className="flex items-center">
-                    <Skeleton className="size-5 rounded-full" />
-                    {j < 3 && <Skeleton className="h-0.5 w-4" />}
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-3 w-28" />
-                <Skeleton className="h-6 w-28 rounded-md" />
-              </div>
+              <Skeleton className="h-5 w-16 rounded-full" />
             </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+            <ProgressStepsSkeleton count={4} />
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-3 w-28" />
+              <Skeleton className="h-6 w-28 rounded-md" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </SectionCardSkeleton>
   );
 }

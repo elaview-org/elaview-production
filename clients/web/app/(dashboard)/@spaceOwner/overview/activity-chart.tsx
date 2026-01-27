@@ -16,18 +16,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/primitives/chart";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/primitives/select";
-import {
-  ToggleGroup,
-  ToggleGroupItem,
-} from "@/components/primitives/toggle-group";
-import { CHART_CONFIG, TIME_RANGES, type TimeRange } from "./constants";
+import TimeRangeSelector from "@/components/composed/time-range-selector";
+import { TIME_RANGES, type TimeRange } from "@/lib/constants";
+import { CHART_CONFIG } from "./constants";
 import mock from "./mock.json";
 
 export default function ActivityChart() {
@@ -62,35 +53,7 @@ export default function ActivityChart() {
           <span className="@[540px]/card:hidden">Activity trend</span>
         </CardDescription>
         <CardAction>
-          <ToggleGroup
-            type="single"
-            value={timeRange}
-            onValueChange={(v) => v && setTimeRange(v as TimeRange)}
-            variant="outline"
-            className="hidden *:data-[slot=toggle-group-item]:px-4! @[767px]/card:flex"
-          >
-            {TIME_RANGES.map((range) => (
-              <ToggleGroupItem key={range.value} value={range.value}>
-                {range.label}
-              </ToggleGroupItem>
-            ))}
-          </ToggleGroup>
-          <Select value={timeRange} onValueChange={(v) => setTimeRange(v as TimeRange)}>
-            <SelectTrigger
-              className="flex w-40 **:data-[slot=select-value]:block **:data-[slot=select-value]:truncate @[767px]/card:hidden"
-              size="sm"
-              aria-label="Select time range"
-            >
-              <SelectValue placeholder="Last 3 months" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              {TIME_RANGES.map((range) => (
-                <SelectItem key={range.value} value={range.value} className="rounded-lg">
-                  {range.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <TimeRangeSelector value={timeRange} onChange={setTimeRange} />
         </CardAction>
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">

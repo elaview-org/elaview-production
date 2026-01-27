@@ -1,23 +1,13 @@
 "use client";
 
-import { IconCheck, IconX, IconClock } from "@tabler/icons-react";
-import Link from "next/link";
+import { IconCheck, IconX } from "@tabler/icons-react";
 import { Button } from "@/components/primitives/button";
-import { Avatar, AvatarFallback } from "@/components/primitives/avatar";
-import { Badge } from "@/components/primitives/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/primitives/card";
-import { Skeleton } from "@/components/primitives/skeleton";
+import ActionCard, { ActionCardSkeleton } from "@/components/composed/action-card";
+import SectionCard, { SectionCardSkeleton } from "@/components/composed/section-card";
 import {
   formatCurrency,
   formatDateRange,
   formatTime,
-  getInitials,
 } from "@/lib/utils";
 import mock from "./mock.json";
 
@@ -35,47 +25,26 @@ type PendingRequest = {
 
 function RequestCard({ request }: { request: PendingRequest }) {
   return (
-    <div className="flex flex-col gap-3 rounded-lg border p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <Avatar className="size-10">
-            <AvatarFallback className="bg-primary/10 text-primary text-sm">
-              {getInitials(request.advertiserName)}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="font-medium">{request.advertiserName}</span>
-            <span className="text-muted-foreground text-sm">
-              {request.spaceName}
-            </span>
-          </div>
-        </div>
-        <Badge variant="outline" className="text-muted-foreground gap-1">
-          <IconClock className="size-3" />
-          {formatTime(request.createdAt)}
-        </Badge>
-      </div>
-
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground">
-          {formatDateRange(request.startDate, request.endDate)}
-        </span>
-        <span className="font-semibold tabular-nums">
-          {formatCurrency(request.totalAmount)}
-        </span>
-      </div>
-
-      <div className="flex gap-2">
-        <Button size="sm" className="flex-1 gap-1">
-          <IconCheck className="size-4" />
-          Accept
-        </Button>
-        <Button size="sm" variant="outline" className="flex-1 gap-1">
-          <IconX className="size-4" />
-          Decline
-        </Button>
-      </div>
-    </div>
+    <ActionCard
+      avatar={request.advertiserAvatar}
+      name={request.advertiserName}
+      subtitle={request.spaceName}
+      timestamp={formatTime(request.createdAt)}
+      metaLeft={formatDateRange(request.startDate, request.endDate)}
+      metaRight={formatCurrency(request.totalAmount)}
+      actions={
+        <>
+          <Button size="sm" className="flex-1 gap-1">
+            <IconCheck className="size-4" />
+            Accept
+          </Button>
+          <Button size="sm" variant="outline" className="flex-1 gap-1">
+            <IconX className="size-4" />
+            Decline
+          </Button>
+        </>
+      }
+    />
   );
 }
 
@@ -87,68 +56,29 @@ export default function PendingRequests() {
   }
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between">
-        <div>
-          <CardTitle className="flex items-center gap-2">
-            Pending Requests
-            <Badge variant="secondary" className="tabular-nums">
-              {requests.length}
-            </Badge>
-          </CardTitle>
-          <CardDescription>Booking requests awaiting your approval</CardDescription>
-        </div>
-        <Button variant="outline" size="sm" asChild>
-          <Link href="/bookings?tab=incoming">View All</Link>
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 gap-4 @lg/main:grid-cols-2 @3xl/main:grid-cols-3">
-          {requests.slice(0, 3).map((request) => (
-            <RequestCard key={request.id} request={request} />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <SectionCard
+      title="Pending Requests"
+      description="Booking requests awaiting your approval"
+      count={requests.length}
+      viewAllHref="/bookings?tab=incoming"
+    >
+      <div className="grid grid-cols-1 gap-4 @lg/main:grid-cols-2 @3xl/main:grid-cols-3">
+        {requests.slice(0, 3).map((request) => (
+          <RequestCard key={request.id} request={request} />
+        ))}
+      </div>
+    </SectionCard>
   );
 }
 
 export function PendingRequestsSkeleton() {
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <Skeleton className="h-5 w-36" />
-          <Skeleton className="h-4 w-56" />
-        </div>
-        <Skeleton className="h-9 w-20" />
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 gap-4 @lg/main:grid-cols-2 @3xl/main:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="flex flex-col gap-3 rounded-lg border p-4">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <Skeleton className="size-10 rounded-full" />
-                  <div className="flex flex-col gap-1">
-                    <Skeleton className="h-4 w-28" />
-                    <Skeleton className="h-3 w-24" />
-                  </div>
-                </div>
-                <Skeleton className="h-5 w-16 rounded-full" />
-              </div>
-              <div className="flex items-center justify-between">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-16" />
-              </div>
-              <div className="flex gap-2">
-                <Skeleton className="h-9 flex-1" />
-                <Skeleton className="h-9 flex-1" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <SectionCardSkeleton>
+      <div className="grid grid-cols-1 gap-4 @lg/main:grid-cols-2 @3xl/main:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <ActionCardSkeleton key={i} />
+        ))}
+      </div>
+    </SectionCardSkeleton>
   );
 }

@@ -1,5 +1,7 @@
 import {
   BookingStatus,
+  CampaignStatus,
+  PaymentStatus,
   PayoutStage,
   PayoutStatus,
   SpaceStatus,
@@ -123,6 +125,58 @@ export const PAYOUT_STAGE = {
     [PayoutStage.Stage1]: "Print & Install",
     [PayoutStage.Stage2]: "Rental Fee",
   } as Record<PayoutStage, string>,
+} as const;
+
+export const CAMPAIGN_STATUS = {
+  labels: {
+    [CampaignStatus.Draft]: "Draft",
+    [CampaignStatus.Submitted]: "Submitted",
+    [CampaignStatus.Active]: "Active",
+    [CampaignStatus.Completed]: "Completed",
+    [CampaignStatus.Cancelled]: "Cancelled",
+  } as Record<CampaignStatus, string>,
+
+  variants: {
+    [CampaignStatus.Draft]: "outline",
+    [CampaignStatus.Submitted]: "secondary",
+    [CampaignStatus.Active]: "default",
+    [CampaignStatus.Completed]: "default",
+    [CampaignStatus.Cancelled]: "secondary",
+  } as Record<CampaignStatus, BadgeVariant>,
+
+  indicators: {
+    [CampaignStatus.Draft]: "bg-muted-foreground",
+    [CampaignStatus.Submitted]: "bg-amber-500",
+    [CampaignStatus.Active]: "bg-emerald-500",
+    [CampaignStatus.Completed]: "bg-blue-500",
+    [CampaignStatus.Cancelled]: "bg-muted-foreground",
+  } as Record<CampaignStatus, string>,
+} as const;
+
+export const PAYMENT_STATUS = {
+  labels: {
+    [PaymentStatus.Pending]: "Pending",
+    [PaymentStatus.Succeeded]: "Succeeded",
+    [PaymentStatus.Failed]: "Failed",
+    [PaymentStatus.Refunded]: "Refunded",
+    [PaymentStatus.PartiallyRefunded]: "Partial Refund",
+  } as Record<PaymentStatus, string>,
+
+  variants: {
+    [PaymentStatus.Pending]: "outline",
+    [PaymentStatus.Succeeded]: "default",
+    [PaymentStatus.Failed]: "destructive",
+    [PaymentStatus.Refunded]: "secondary",
+    [PaymentStatus.PartiallyRefunded]: "secondary",
+  } as Record<PaymentStatus, BadgeVariant>,
+
+  indicators: {
+    [PaymentStatus.Pending]: "bg-amber-500",
+    [PaymentStatus.Succeeded]: "bg-emerald-500",
+    [PaymentStatus.Failed]: "bg-destructive",
+    [PaymentStatus.Refunded]: "bg-blue-500",
+    [PaymentStatus.PartiallyRefunded]: "bg-blue-500",
+  } as Record<PaymentStatus, string>,
 } as const;
 
 export const TIME_RANGES = [

@@ -94,11 +94,3 @@ export const CHART_CONFIG = {
     color: "var(--chart-2)",
   },
 } as const;
-
-export const TIME_RANGES = [
-  { value: "90d", label: "Last 3 months", days: 90 },
-  { value: "30d", label: "Last 30 days", days: 30 },
-  { value: "7d", label: "Last 7 days", days: 7 },
-] as const;
-
-export type TimeRange = (typeof TIME_RANGES)[number]["value"];

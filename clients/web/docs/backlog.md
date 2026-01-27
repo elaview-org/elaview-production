@@ -93,6 +93,8 @@ Advertiser dashboards.
 - [x] `PAYOUT_STATUS` - labels, variants, indicators
 - [x] `PAYOUT_STAGE` - labels, descriptions
 - [x] `TIME_RANGES` - chart time range options (90d, 30d, 7d)
+- [x] `CAMPAIGN_STATUS` - labels, variants, indicators
+- [x] `PAYMENT_STATUS` - labels, variants, indicators
 
 ### Refactored @spaceOwner Files
 
@@ -121,14 +123,29 @@ The following files now use shared utilities and constants:
 
 ### High Priority Components
 
-- [ ] **ProgressSteps** - Numbered steps showing workflow progress (from `overview/active-bookings.tsx`)
-- [ ] **ActionCard** - Avatar + user info + action buttons (from `overview/pending-requests.tsx`)
-- [ ] **PerformerCard** - Icon + title + item name + value badge (from `analytics/top-performers.tsx`)
-- [ ] **TimeRangeChart** - Chart with 90d/30d/7d toggle (from `overview/activity-chart.tsx`)
-- [ ] **SettingsSection** - Accordion with icon + title + description (from `settings/settings-content.tsx`)
-- [ ] **ProfileCard** - Avatar + name + badge + stats grid (from `profile/profile-card.tsx`)
+- [x] **ProgressSteps** - Numbered workflow steps (`components/composed/progress-steps.tsx`)
+- [x] **ActionCard** - Avatar + info + actions (`components/composed/action-card.tsx`)
+- [x] **PerformerCard** - Icon + title + value badge (`components/composed/performer-card.tsx`)
+- [x] **TimeRangeSelector** - Responsive 90d/30d/7d toggle (`components/composed/time-range-selector.tsx`)
+- [x] **ComparisonTable** - Previous/current/change rows (`components/composed/comparison-table.tsx`)
+- [x] **SettingsSection** - Accordion with icon + description (`components/composed/settings-section.tsx`)
+- [x] **SectionCard** - Card header with count badge + "View All" link (`components/composed/section-card.tsx`)
 
 ### Medium Priority Components
 
-- [ ] **StatusIndicator** - Colored dot with tooltip for status display
-- [ ] **ReviewCard** - Rating stars + comment + author + date (from `profile/review-card.tsx`)
+- [x] **RankedCard** - Card with rank badge overlay (`components/composed/ranked-card.tsx`)
+- [x] **ReviewCard** - Star rating + comment + author (`components/composed/review-card.tsx`)
+- [x] **StarRating** - Star rating display primitive (`components/primitives/star-rating.tsx`)
+- [x] **ProfileCard** - Avatar + name + stats grid (`components/composed/profile-card.tsx`)
+
+### Refactored @spaceOwner Files (Components)
+
+- `overview/active-bookings.tsx` → ProgressSteps, SectionCard
+- `overview/pending-requests.tsx` → ActionCard, SectionCard
+- `overview/activity-chart.tsx` → TimeRangeSelector
+- `overview/top-spaces.tsx` → RankedCard, SectionCard
+- `analytics/top-performers.tsx` → PerformerCard, SectionCard
+- `analytics/comparison-card.tsx` → ComparisonTable
+- `settings/settings-content.tsx` → SettingsSection
+- `profile/reviews-section.tsx` → ReviewCard
+- `profile/profile-card.tsx` → ProfileCard

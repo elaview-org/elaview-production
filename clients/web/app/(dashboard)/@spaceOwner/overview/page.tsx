@@ -6,7 +6,6 @@ import ActivityChart from "./activity-chart";
 import RecentActivity from "./recent-activity";
 
 export default function Page() {
-  console.log("[PARALLEL ROUTE TEST] @spaceOwner/overview rendered");
   return (
     <div className="flex flex-col gap-4 md:gap-6">
       <StatsCards />

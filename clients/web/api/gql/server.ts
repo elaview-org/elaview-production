@@ -7,12 +7,13 @@ import {
 } from "@apollo/client";
 import { registerApolloClient } from "@apollo/client-integration-nextjs";
 import { cookies } from "next/headers";
+import env from "@/lib/env";
 
 const { getClient, query, PreloadQuery } = registerApolloClient(async () => {
   return new ApolloClient({
     cache: new InMemoryCache(),
     link: new HttpLink({
-      uri: `${process.env.NEXT_PUBLIC_API_URL!}/graphql`,
+      uri: `${env.client.apiUrl}/graphql`,
       headers: {
         cookie: (await cookies()).toString(),
       },

@@ -11,10 +11,10 @@ import { cn, formatDateRange } from "@/lib/utils";
 import { BookingStatus } from "@/types/gql/graphql";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import {
+  type CalendarView,
   DAYS_OF_WEEK,
   SPACE_COLORS,
   STATUS_LABELS,
-  type CalendarView,
 } from "./constants";
 import mock from "./mock.json";
 
@@ -228,8 +228,8 @@ function MonthView({
   }
 
   return (
-    <div className="relative flex min-w-[700px] flex-col rounded-xl border bg-card">
-      <div className="grid grid-cols-7 border-b bg-muted/30 py-2">
+    <div className="bg-card relative flex min-w-175 flex-col rounded-xl border">
+      <div className="bg-muted/30 grid grid-cols-7 border-b py-2">
         {DAYS_OF_WEEK.map((day) => (
           <div
             key={day}
@@ -279,7 +279,7 @@ function WeekView({
   }
 
   return (
-    <div className="relative flex min-w-[700px] flex-col rounded-xl border bg-card">
+    <div className="bg-card relative flex min-w-175 flex-col rounded-xl border">
       <div className="grid grid-cols-7 divide-x border-b">
         {days.map((date, i) => {
           const isToday = date.toDateString() === today.toDateString();
@@ -309,7 +309,7 @@ function WeekView({
           );
         })}
       </div>
-      <div className="grid min-h-[400px] grid-cols-7 divide-x">
+      <div className="grid min-h-100 grid-cols-7 divide-x">
         {days.map((date, i) => {
           const dayBookings = getBookingsForDate(
             date,
@@ -366,7 +366,7 @@ function DayView({
   const isToday = currentDate.toDateString() === today.toDateString();
 
   return (
-    <div className="flex min-w-[400px] flex-col rounded-xl border bg-card">
+    <div className="bg-card flex min-w-100 flex-col rounded-xl border">
       <div
         className={cn(
           "flex items-center justify-between border-b px-4 py-3",
@@ -412,7 +412,7 @@ function DayView({
               <button
                 key={booking.id}
                 onClick={() => onBookingClick?.(booking)}
-                className="flex items-start gap-4 rounded-lg border p-4 text-left transition-colors hover:bg-muted/50"
+                className="hover:bg-muted/50 flex items-start gap-4 rounded-lg border p-4 text-left transition-colors"
               >
                 <div className={cn("mt-1 h-14 w-1 rounded-full", color.bg)} />
                 <div className="flex-1">

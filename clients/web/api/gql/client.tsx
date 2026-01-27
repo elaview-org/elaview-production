@@ -11,16 +11,17 @@ import {
 import { createClient } from "graphql-ws";
 import React, { Suspense } from "react";
 import * as api from "@apollo/client/react";
+import env from "@/lib/env";
 
 function makeClient() {
   const httpLink = new HttpLink({
-    uri: `${process.env.NEXT_PUBLIC_API_URL!}/graphql`,
+    uri: `${env.client.apiUrl}/graphql`,
     fetchOptions: {
       credentials: "include",
     },
   });
 
-  const wsUrl = process.env.NEXT_PUBLIC_API_URL!.replace(/^http/, "ws");
+  const wsUrl = env.client.apiUrl.replace(/^http/, "ws");
   const wsLink =
     typeof window !== "undefined"
       ? new GraphQLWsLink(

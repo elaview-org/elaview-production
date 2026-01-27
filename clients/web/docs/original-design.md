@@ -20,7 +20,7 @@ This document combines the original development playbook, sitemap, and design gu
 
 ### Environment & Configuration
 
-- [ ] Create `.env.local` and `.env.example` with required variables (NEXT_PUBLIC_API_URL, NEXT_PUBLIC_STRIPE_KEY,
+- [ ] Create `.env.local` and `.env.example` with required variables (API_URL, NEXT_PUBLIC_STRIPE_KEY,
   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY, CLERK_SECRET_KEY)
 - [ ] Configure Clerk middleware for protected routes
 - [ ] Set up Vercel deployment with environment variables for staging and production

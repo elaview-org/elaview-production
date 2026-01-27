@@ -1,6 +1,8 @@
 "use server";
 
 import { ActionState } from "@/types/actions";
+import env from "@/lib/env";
+import storageKey from "@/lib/storage-keys";
 
 import assert from "node:assert";
 import { redirect } from "next/navigation";
@@ -36,16 +38,13 @@ export default async function signup(
   }
 
   try {
-    const res = await fetch(
-      `${process.env.ELAVIEW_WEB_NEXT_PUBLIC_API_URL!}/auth/signup`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify({ name, email, password }),
-      }
-    );
+    const res = await fetch(`${env.client.apiUrl}/auth/signup`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({ name, email, password }),
+    });
 
     if (!res.ok) {
       return {
@@ -55,12 +54,9 @@ export default async function signup(
       } as SignupState;
     }
 
-    assert(!!process.env.ELAVIEW_WEB_AUTH_COOKIE_NAME);
     const authCookie: Cookie = setCookieParser
       .parse(res.headers.getSetCookie())
-      .find(
-        (cookie) => cookie.name === process.env.ELAVIEW_WEB_AUTH_COOKIE_NAME
-      )!;
+      .find((cookie) => cookie.name === storageKey.authentication.token)!;
     (await cookies()).set({
       name: authCookie.name,
       value: authCookie.value,

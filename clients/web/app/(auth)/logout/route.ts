@@ -1,16 +1,16 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import assert from "node:assert";
+import env from "@/lib/env";
+import storageKey from "@/lib/storage-keys";
 
 export async function GET() {
-  assert(!!process.env.AUTH_COOKIE_NAME);
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL!}/auth/logout`, {
+  const res = await fetch(`${env.client.apiUrl}/auth/logout`, {
     headers: {
       "Content-Type": "application/json",
     },
     method: "POST",
   });
-  assert(res.ok); // may fail if user fakes a cookie
-  (await cookies()).delete(process.env.AUTH_COOKIE_NAME!);
+  if (!res.ok) throw new Error("Logout failed");
+  (await cookies()).delete(storageKey.authentication.token);
   redirect("/login");
 }

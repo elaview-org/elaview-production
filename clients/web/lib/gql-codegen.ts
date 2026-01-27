@@ -1,11 +1,8 @@
 import { CodegenConfig } from "@graphql-codegen/cli";
-import { config as dotenvConfig } from "dotenv";
-
-dotenvConfig();
 
 const config: CodegenConfig = {
   overwrite: true,
-  schema: `${process.env.ELAVIEW_WEB_NEXT_PUBLIC_API_URL!}/graphql`,
+  schema: `${process.env.ELAVIEW_WEB_API_URL}/graphql`,
   documents: [
     "app/**/*.{ts,tsx}",
     "components/**/*.{ts,tsx}",

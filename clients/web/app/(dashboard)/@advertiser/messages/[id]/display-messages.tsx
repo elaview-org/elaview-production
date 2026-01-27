@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MessageThread } from "./message-thread";
-import { GuideMessage } from "./guide-message";
 import type {
   Conversation,
   Message,
@@ -15,6 +14,8 @@ import { mockMessages } from "@/app/(dashboard)/@advertiser/messages/mock-data";
 import ConditionalRender from "@/components/composed/conditionally-render";
 import MessagesHeader from "../messages-header";
 import InboxPanel from "@/components/composed/inbox-panel";
+
+
 type ViewState = "list" | "thread";
 
 interface MessagesClientProps {
@@ -24,7 +25,7 @@ interface MessagesClientProps {
   bookingId: string;
 }
 
-export default function MessagesClient({
+export default function DisplayMessages({
   conversations,
   initialMessages,
   initialThreadContext,
@@ -167,22 +168,23 @@ export default function MessagesClient({
           </InboxPanel>
         }
       />
-      {showThread && threadContext ? (
-        <div className="flex flex-1 flex-col">
-          <MessageThread
-            context={threadContext}
-            messages={messages}
-            currentUserId="advertiser-1"
-            isLoading={isLoading}
-            onSendMessage={handleSendMessage}
-            onBack={handleBack}
-            showBackButton={isMobile}
-            disabled={false}
-          />
-        </div>
-      ) : (
-        !isMobile && <GuideMessage />
-      )}
+      <ConditionalRender
+        condition={(showThread && threadContext) as boolean}
+        show={
+          <div className="flex flex-1 flex-col">
+            <MessageThread
+              context={threadContext as ThreadContext}
+              messages={messages}
+              currentUserId="advertiser-1"
+              isLoading={isLoading}
+              onSendMessage={handleSendMessage}
+              onBack={handleBack}
+              showBackButton={isMobile}
+              disabled={false}
+            />
+          </div>
+        }
+      />
     </div>
   );
 }

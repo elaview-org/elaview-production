@@ -5,21 +5,13 @@ import { useState, useRef, KeyboardEvent } from "react";
 import { Button } from "@/components/primitives/button";
 import { cn } from "@/lib/utils";
 import { PaperclipIcon, SendIcon } from "lucide-react";
-import type { MessageAttachment } from "../../../../../types/types";
-
-// ============================================
-// Types
-// ============================================
+import type { MessageAttachment } from "@/types/types";
 
 interface MessageComposerProps {
   onSend: (content: string, attachments?: MessageAttachment[]) => void;
   disabled?: boolean;
   placeholder?: string;
 }
-
-// ============================================
-// Constants
-// ============================================
 
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 const ALLOWED_FILE_TYPES = [
@@ -198,7 +190,7 @@ export function MessageComposer({
       )}
 
       {/* Input area */}
-      <div className="flex items-end gap-2 px-4 py-3">
+      <div className="flex items-center gap-2 px-4 py-3">
         <input
           ref={fileInputRef}
           type="file"

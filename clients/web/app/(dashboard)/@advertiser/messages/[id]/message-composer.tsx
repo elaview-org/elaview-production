@@ -1,11 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { useState, useRef, KeyboardEvent } from "react";
+import { KeyboardEvent, useRef, useState } from "react";
 import { Button } from "@/components/primitives/button";
 import { cn } from "@/lib/utils";
 import { PaperclipIcon, SendIcon } from "lucide-react";
-import type { MessageAttachment } from "@/types/types";
+import type { MessageAttachment } from "@/types/messages";
 
 interface MessageComposerProps {
   onSend: (content: string, attachments?: MessageAttachment[]) => void;

@@ -6,8 +6,8 @@ import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import { columns, type SpaceRow } from "./columns";
 import TablePlaceholder from "./placeholder";
 
-export const TableView_SpaceFragment = graphql(`
-  fragment TableView_SpaceFragment on Space {
+export const ListingsTable_SpaceFragment = graphql(`
+  fragment ListingsTable_SpaceFragment on Space {
     id
     title
     city
@@ -20,12 +20,12 @@ export const TableView_SpaceFragment = graphql(`
 `);
 
 type Props = {
-  data: FragmentType<typeof TableView_SpaceFragment>[];
+  data: FragmentType<typeof ListingsTable_SpaceFragment>[];
 };
 
-export default function ListingsTableView({ data }: Props) {
+export default function ListingsTable({ data }: Props) {
   const spaces: SpaceRow[] = data.map((d) => {
-    const space = getFragmentData(TableView_SpaceFragment, d);
+    const space = getFragmentData(ListingsTable_SpaceFragment, d);
     return {
       id: space.id as string,
       title: space.title,

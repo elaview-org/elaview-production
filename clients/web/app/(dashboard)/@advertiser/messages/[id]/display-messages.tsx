@@ -9,7 +9,7 @@ import type {
   Message,
   MessageAttachment,
   ThreadContext,
-} from "@/types/types";
+} from "@/types/messages";
 import { mockMessages } from "@/app/(dashboard)/@advertiser/messages/mock-data";
 import ConditionalRender from "@/components/composed/conditionally-render";
 import MessagesHeader from "../messages-header";

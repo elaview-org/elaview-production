@@ -8,7 +8,7 @@ type Props = {
   data: FragmentType<typeof SpaceCard_SpaceFragment>[];
 };
 
-export default function ListingsGridView({ data }: Props) {
+export default function ListingsGrid({ data }: Props) {
   return (
     <MaybePlaceholder data={data} placeholder={<GridPlaceholder />}>
       <GridView columns={4}>

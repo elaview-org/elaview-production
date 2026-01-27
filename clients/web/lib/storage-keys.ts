@@ -9,6 +9,9 @@ const storageKey = {
     listings: {
       view: createKey("preferences", "listings", "view"),
     },
+    bookings: {
+      view: createKey("preferences", "bookings", "view"),
+    },
     sidebar: {
       open: createKey("preferences", "sidebar", "open"),
     },

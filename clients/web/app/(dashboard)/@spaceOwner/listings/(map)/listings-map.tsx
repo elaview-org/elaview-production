@@ -5,7 +5,7 @@ type Props = {
   data: unknown[];
 };
 
-export default function ListingsMapView({ data }: Props) {
+export default function ListingsMap({ data }: Props) {
   return (
     <MaybePlaceholder data={data} placeholder={<MapPlaceholder />}>
       <div className="flex h-150 items-center justify-center rounded-lg border">

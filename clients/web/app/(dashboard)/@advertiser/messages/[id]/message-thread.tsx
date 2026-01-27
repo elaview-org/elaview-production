@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/primitives/skeleton";
 import { Button } from "@/components/primitives/button";
@@ -11,7 +11,7 @@ import type {
   Message,
   MessageAttachment,
   ThreadContext,
-} from "../../../../../types/types";
+} from "@/types/messages";
 import ConditionalRender from "@/components/composed/conditionally-render";
 
 interface MessageThreadProps {

@@ -30,6 +30,19 @@ export const STATUS_VARIANTS: Record<
   [BookingStatus.Cancelled]: "secondary",
 };
 
+export const STATUS_INDICATORS: Record<BookingStatus, string> = {
+  [BookingStatus.PendingApproval]: "bg-amber-500",
+  [BookingStatus.Approved]: "bg-blue-500",
+  [BookingStatus.Paid]: "bg-blue-500",
+  [BookingStatus.FileDownloaded]: "bg-blue-500",
+  [BookingStatus.Installed]: "bg-blue-500",
+  [BookingStatus.Verified]: "bg-emerald-500",
+  [BookingStatus.Completed]: "bg-emerald-500",
+  [BookingStatus.Disputed]: "bg-destructive",
+  [BookingStatus.Rejected]: "bg-destructive",
+  [BookingStatus.Cancelled]: "bg-muted-foreground",
+};
+
 export const FILTER_TABS = [
   {
     key: "incoming",

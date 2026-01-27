@@ -2,7 +2,7 @@ import { ExternalLinkIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/primitives/button";
 import { Badge } from "@/components/primitives/badge";
-import type { ThreadContext } from "../../../../../types/messages";
+import type { ThreadContext } from "@/types/messages";
 
 interface ThreadHeaderProps {
   context: ThreadContext;

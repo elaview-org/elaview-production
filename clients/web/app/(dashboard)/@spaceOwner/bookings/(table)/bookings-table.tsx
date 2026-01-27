@@ -8,7 +8,6 @@ import {
   IconPhotoCheck,
 } from "@tabler/icons-react";
 import TableView, {
-  TableViewSkeleton,
   actionsColumn,
   badgeColumn,
   createSelectColumn,
@@ -16,7 +15,9 @@ import TableView, {
   dateRangeColumn,
   imageTextColumn,
   stackColumn,
+  TableViewSkeleton,
 } from "@/components/composed/table-view";
+import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import {
   BookingStatus,
   FragmentType,
@@ -24,7 +25,8 @@ import {
   graphql,
 } from "@/types/gql";
 import type { BookingsTable_BookingFragmentFragment } from "@/types/gql/graphql";
-import { STATUS_LABELS } from "./constants";
+import { STATUS_LABELS, type FilterTabKey } from "../constants";
+import Placeholder from "./placeholder";
 
 export const BookingsTable_BookingFragment = graphql(`
   fragment BookingsTable_BookingFragment on Booking {
@@ -48,18 +50,20 @@ export const BookingsTable_BookingFragment = graphql(`
 
 type Props = {
   data: FragmentType<typeof BookingsTable_BookingFragment>[];
+  tabKey: FilterTabKey;
 };
 
-export default function BookingsTable({ data }: Props) {
+export default function BookingsTable({ data, tabKey }: Props) {
   const bookings = getFragmentData(BookingsTable_BookingFragment, data);
 
   return (
-    <TableView
-      data={bookings}
-      columns={columns}
-      getRowId={(row) => row.id as string}
-      emptyMessage="No bookings found."
-    />
+    <MaybePlaceholder data={data} placeholder={<Placeholder tabKey={tabKey} />}>
+      <TableView
+        data={bookings}
+        columns={columns}
+        getRowId={(row) => row.id as string}
+      />
+    </MaybePlaceholder>
   );
 }
 

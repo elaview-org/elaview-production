@@ -4,15 +4,16 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MessageThread } from "./message-thread";
-import { InboxPanel } from "./inbox-panel";
-import { GuideMessage } from "./guide-message";
 import type {
   Conversation,
   Message,
   MessageAttachment,
   ThreadContext,
-} from "@/types/messages";
+} from "@/types/types";
 import { mockMessages } from "@/app/(dashboard)/@advertiser/messages/mock-data";
+import ConditionalRender from "@/components/composed/conditionally-render";
+import MessagesHeader from "../messages-header";
+import InboxPanel from "@/app/(dashboard)/@advertiser/messages/inbox-panel";
 
 type ViewState = "list" | "thread";
 
@@ -23,11 +24,7 @@ interface MessagesClientProps {
   bookingId: string;
 }
 
-/**
- * Client component that handles all interactive logic
- * Receives server-fetched data as props
- */
-export default function MessagesClient({
+export default function DisplayMessages({
   conversations,
   initialMessages,
   initialThreadContext,
@@ -159,30 +156,34 @@ export default function MessagesClient({
 
   return (
     <div className="flex h-full overflow-hidden">
-      {showList && (
-        <InboxPanel
-          isLoading={isLoading}
-          conversations={conversations}
-          selectedBookingId={selectedBookingId}
-        />
-      )}
-
-      {showThread && threadContext ? (
-        <div className="flex flex-1 flex-col">
-          <MessageThread
-            context={threadContext}
-            messages={messages}
-            currentUserId="advertiser-1"
-            isLoading={isLoading}
-            onSendMessage={handleSendMessage}
-            onBack={handleBack}
-            showBackButton={isMobile}
-            disabled={false}
-          />
-        </div>
-      ) : (
-        !isMobile && <GuideMessage />
-      )}
+      <ConditionalRender
+        condition={showList}
+        show={
+          <InboxPanel
+            conversations={conversations}
+            initialSelectedBookingId={selectedBookingId}
+          >
+            <MessagesHeader conversationCount={conversations.length} />
+          </InboxPanel>
+        }
+      />
+      <ConditionalRender
+        condition={(showThread && threadContext) as boolean}
+        show={
+          <div className="flex flex-1 flex-col">
+            <MessageThread
+              context={threadContext as ThreadContext}
+              messages={messages}
+              currentUserId="advertiser-1"
+              isLoading={isLoading}
+              onSendMessage={handleSendMessage}
+              onBack={handleBack}
+              showBackButton={isMobile}
+              disabled={false}
+            />
+          </div>
+        }
+      />
     </div>
   );
 }

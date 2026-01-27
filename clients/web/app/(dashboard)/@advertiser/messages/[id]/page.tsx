@@ -1,5 +1,5 @@
 import { getConversationsQuery, getMessagesQuery } from "./messages-queries";
-import MessagesClient from "./messages-client";
+import DisplayMessages from "./display-messages";
 
 interface PageProps {
   params: {
@@ -7,17 +7,16 @@ interface PageProps {
   };
 }
 
-export default async function MessagesPage({ params }: PageProps) {
+export default async function Page({ params }: PageProps) {
   const { id: bookingId } = await params;
 
-  // Fetch data in parallel
   const [{ conversations }, { messages, threadContext }] = await Promise.all([
     getConversationsQuery(),
     getMessagesQuery(bookingId),
   ]);
 
   return (
-    <MessagesClient
+    <DisplayMessages
       conversations={conversations}
       initialMessages={messages}
       initialThreadContext={threadContext}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/primitives/skeleton";
 import { Button } from "@/components/primitives/button";
@@ -11,7 +11,8 @@ import type {
   Message,
   MessageAttachment,
   ThreadContext,
-} from "../../../../../types/messages";
+} from "../../../../../types/types";
+import ConditionalRender from "@/components/composed/conditionally-render";
 
 interface MessageThreadProps {
   context: ThreadContext;
@@ -176,81 +177,82 @@ export function MessageThread({
     return groups;
   }, [messages]);
 
-  if (isLoading) {
-    return (
-      <div className="flex h-full flex-col">
-        <MessageThreadSkeleton />
-      </div>
-    );
-  }
   return (
     <div className="flex h-full flex-col">
-      <ThreadHeader
-        context={context}
-        onBack={onBack}
-        showBackButton={showBackButton}
-      />
+      <ConditionalRender
+        condition={isLoading}
+        show={<MessageThreadSkeleton />}
+        elseShow={
+          <>
+            <ThreadHeader
+              context={context}
+              onBack={onBack}
+              showBackButton={showBackButton}
+            />
 
-      {/* Messages area */}
-      <div
-        ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto"
-        role="log"
-        aria-label="Message thread"
-      >
-        {messages.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="py-4">
-            {groupedMessages.map((group, groupIndex) => (
-              <div key={group.date}>
-                {/* Date separator */}
-                {groupIndex > 0 && (
-                  <div className="flex items-center gap-4 px-4 py-2">
-                    <div className="bg-border h-px flex-1" />
-                    <span className="text-muted-foreground text-xs font-medium">
-                      {group.date}
-                    </span>
-                    <div className="bg-border h-px flex-1" />
-                  </div>
-                )}
+            {/* Messages area */}
+            <div
+              ref={messagesContainerRef}
+              className="flex-1 overflow-y-auto"
+              role="log"
+              aria-label="Message thread"
+            >
+              {messages.length === 0 ? (
+                <EmptyState />
+              ) : (
+                <div className="py-4">
+                  {groupedMessages.map((group, groupIndex) => (
+                    <div key={group.date}>
+                      {/* Date separator */}
+                      {groupIndex > 0 && (
+                        <div className="flex items-center gap-4 px-4 py-2">
+                          <div className="bg-border h-px flex-1" />
+                          <span className="text-muted-foreground text-xs font-medium">
+                            {group.date}
+                          </span>
+                          <div className="bg-border h-px flex-1" />
+                        </div>
+                      )}
 
-                {/* Messages in this group */}
-                {group.messages.map((message, index) => {
-                  const prevMessage =
-                    index > 0 ? group.messages[index - 1] : null;
-                  const showAvatar =
-                    prevMessage === null ||
-                    prevMessage.sender !== message.sender ||
-                    new Date(message.createdAt).getTime() -
-                      new Date(prevMessage.createdAt).getTime() >
-                      5 * 60 * 1000; // 5 minutes
+                      {/* Messages in this group */}
+                      {group.messages.map((message, index) => {
+                        const prevMessage =
+                          index > 0 ? group.messages[index - 1] : null;
+                        const showAvatar =
+                          prevMessage === null ||
+                          prevMessage.sender !== message.sender ||
+                          new Date(message.createdAt).getTime() -
+                            new Date(prevMessage.createdAt).getTime() >
+                            5 * 60 * 1000; // 5 minutes
 
-                  const isCurrentUser = message.sender === "ADVERTISER"; // In real app, check against current user
+                        const isCurrentUser = message.sender === "ADVERTISER"; // In real app, check against current user
 
-                  return (
-                    <MessageBubble
-                      key={message.id}
-                      message={message}
-                      isCurrentUser={isCurrentUser}
-                      showAvatar={showAvatar}
-                    />
-                  );
-                })}
-              </div>
-            ))}
-            <div ref={messagesEndRef} />
-          </div>
-        )}
-      </div>
+                        return (
+                          <MessageBubble
+                            key={message.id}
+                            message={message}
+                            isCurrentUser={isCurrentUser}
+                            showAvatar={showAvatar}
+                          />
+                        );
+                      })}
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
+            </div>
 
-      <MessageComposer
-        onSend={onSendMessage}
-        disabled={disabled || isArchived}
-        placeholder={
-          isArchived
-            ? "This booking is closed. Messaging is disabled."
-            : "Type a message..."
+            <MessageComposer
+              onSend={onSendMessage}
+              disabled={disabled || isArchived}
+              placeholder={
+                isArchived
+                  ? "This booking is closed. Messaging is disabled."
+                  : "Type a message..."
+              }
+            />
+          </>
         }
       />
     </div>

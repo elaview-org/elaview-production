@@ -1,4 +1,6 @@
-import type { Conversation } from "@/types/messages";
+// import api from "@/api/gql/server";
+// import { graphql } from "@/types/gql";
+import type { Conversation } from "@/types/types";
 
 export default async function getConversationsQuery(): Promise<{
   conversations: Conversation[];

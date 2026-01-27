@@ -1,9 +1,9 @@
 import api from "@/api/gql/server";
-import { graphql } from "@/types/gql";
+import { Booking, graphql } from "@/types/gql";
 
 const BOOKINGS_LIMIT = 10;
 
-export default async function getBookingsQuery() {
+export default async function getBookingsQuery(): Promise<{bookings: Booking[]}> {
   try {
     const { data } = await api.query({
       query: graphql(`
@@ -31,7 +31,7 @@ export default async function getBookingsQuery() {
     });
 
     const bookings = data?.myBookingsAsAdvertiser?.nodes || [];
-    return { bookings };
+    return { bookings: bookings as Booking[] };
   } catch {
     return { bookings: [] };
   }

@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
-import { ConversationList } from "@/components/composed/conversation-list";
+import { ConversationList } from "./conversation-list";
 import type { Conversation } from "@/types/types";
 
 interface MessagesClientProps {

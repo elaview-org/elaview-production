@@ -18,9 +18,14 @@ import { CSSProperties } from "react";
 import ContentHeader from "@/app/(dashboard)/content-header";
 import RoleBasedView from "@/app/(dashboard)/role-based-view";
 import assert from "node:assert";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import storageKey from "@/lib/storage-keys";
 
 export default async function Layout(props: LayoutProps<"/">) {
+  const cookieStore = await cookies();
+  const sidebarOpen = cookieStore.get(storageKey.preferences.sidebar.open)?.value !== "false";
+
   const { data, error } = await api.query({
     query: graphql(`
       query DashboardUser {
@@ -41,6 +46,7 @@ export default async function Layout(props: LayoutProps<"/">) {
 
   return (
     <SidebarProvider
+      defaultOpen={sidebarOpen}
       style={
         {
           "--sidebar-width": "calc(var(--spacing) * 72)",

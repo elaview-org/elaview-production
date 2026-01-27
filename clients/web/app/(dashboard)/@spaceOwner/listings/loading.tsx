@@ -1,17 +1,21 @@
-import { Skeleton } from "@/components/primitives/skeleton";
+import { cookies } from "next/headers";
+import { ViewOptions } from "@/types/constants";
+import storageKey from "@/lib/storage-keys";
 import { GridViewSkeleton } from "@/components/composed/grid-view";
+import { TableViewSkeleton } from "@/components/composed/table-view";
+import { MapViewSkeleton } from "@/components/composed/map-view";
+import { columns } from "./(table)/columns";
 
-export default function Loading() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-2">
-          <Skeleton className="h-8 w-32" />
-          <Skeleton className="h-4 w-48" />
-        </div>
-        <Skeleton className="h-9 w-28" />
-      </div>
-      <GridViewSkeleton count={6} columns={3} />
-    </div>
-  );
+export default async function Loading() {
+  const cookieStore = await cookies();
+  const view = cookieStore.get(storageKey.preferences.listings.view)?.value as ViewOptions | undefined;
+
+  switch (view) {
+    case ViewOptions.Table:
+      return <TableViewSkeleton columns={columns} rows={8} />;
+    case ViewOptions.Map:
+      return <MapViewSkeleton height={600} />;
+    default:
+      return <GridViewSkeleton count={8} columns={4} />;
+  }
 }

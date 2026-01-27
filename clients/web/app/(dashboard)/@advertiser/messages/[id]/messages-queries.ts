@@ -1,6 +1,4 @@
-import api from "@/api/gql/server";
-import { graphql } from "@/types/gql";
-import type { Conversation, Message, ThreadContext } from "@/types/types";
+import type { Conversation, Message, ThreadContext } from "@/types/messages";
 
 /**
  * Fetches all conversations for the current user
@@ -22,9 +20,7 @@ export async function getConversationsQuery(): Promise<{
 /**
  * Fetches messages for a specific booking
  */
-export async function getMessagesQuery(
-  bookingId: string
-): Promise<{
+export async function getMessagesQuery(bookingId: string): Promise<{
   messages: Message[];
   threadContext: ThreadContext | null;
 }> {

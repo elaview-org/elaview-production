@@ -1,9 +1,6 @@
 import MediaCard, { MediaCardSkeleton } from "@/components/composed/media-card";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
-import {
-  STATUS_INDICATORS,
-  TYPE_LABELS,
-} from "@/app/(dashboard)/@spaceOwner/listings/constants";
+import { STATUS_INDICATORS, TYPE_LABELS } from "../constants";
 
 export const SpaceCard_SpaceFragment = graphql(`
   fragment SpaceCard_SpaceFragment on Space {
@@ -41,7 +38,8 @@ export default function SpaceCard({ data }: Props) {
         {
           position: "top-right",
           content: TYPE_LABELS[space.type],
-          className: "text-muted-foreground bg-background p-1 tracking-wide uppercase",
+          className:
+            "text-muted-foreground bg-background p-1 tracking-wide uppercase",
         },
       ]}
       metaLeft={`${space.city}, ${space.state}`}

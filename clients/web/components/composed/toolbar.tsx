@@ -1,6 +1,6 @@
 "use client";
 
-import { ComponentType, ReactNode, useState } from "react";
+import { ComponentType, ReactNode, useState, useTransition } from "react";
 import { Button } from "@/components/primitives/button";
 import { Input } from "@/components/primitives/input";
 import {
@@ -45,6 +45,8 @@ type Props = {
   filters: ToolbarFilterProps[];
   sort: ToolbarSortProps;
   views?: Set<ViewOptions>;
+  currentView?: ViewOptions;
+  onViewChangeAction?: (view: ViewOptions) => void;
   action?: ReactNode;
 };
 
@@ -77,7 +79,11 @@ export default function Toolbar(props: Props) {
           label="Sort"
         />
 
-        <ViewGroup views={props.views} />
+        <ViewGroup
+          views={props.views}
+          currentView={props.currentView}
+          onViewChangeAction={props.onViewChangeAction}
+        />
         {props.action}
       </div>
 
@@ -227,8 +233,14 @@ const viewGroupConfig = [
   { key: ViewOptions.Grid, icon: IconLayoutGrid, title: "Grid View" },
 ] as const;
 
-function ViewGroup({ views }: { views?: ViewSet }) {
-  const [view, setView] = useState(ViewOptions.Grid);
+type ViewGroupProps = {
+  views?: ViewSet;
+  currentView?: ViewOptions;
+  onViewChangeAction?: (view: ViewOptions) => void;
+};
+
+function ViewGroup({ views, currentView = ViewOptions.Grid, onViewChangeAction }: ViewGroupProps) {
+  const [isPending, startTransition] = useTransition();
 
   const visibleViews = viewGroupConfig.filter(
     (v) => views?.has(v.key) ?? false
@@ -246,15 +258,24 @@ function ViewGroup({ views }: { views?: ViewSet }) {
     return "rounded-none";
   };
 
+  const handleViewChange = (view: ViewOptions) => {
+    if (onViewChangeAction) {
+      startTransition(() => {
+        onViewChangeAction(view);
+      });
+    }
+  };
+
   return (
     <div className="flex rounded-md border">
       {visibleViews.map(({ key, icon: Icon, title }, index) => (
         <Button
           key={key}
           className={`${getRadius(index)} border-0`}
-          variant={view === key ? "default" : "ghost"}
+          variant={currentView === key ? "default" : "ghost"}
           size="icon"
-          onClick={() => setView(key)}
+          onClick={() => handleViewChange(key)}
+          disabled={isPending}
           title={title}
         >
           <Icon className="h-4 w-4" />

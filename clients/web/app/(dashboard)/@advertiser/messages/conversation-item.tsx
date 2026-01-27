@@ -1,10 +1,8 @@
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, formatTime, truncateText } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/primitives/avatar";
 import { Badge } from "@/components/primitives/badge";
-import type { Conversation } from "../../../../types/types";
-import { formatTime } from "../../../../lib/time-format";
-import { truncateText } from "../../../../utils";
+import type { Conversation } from "@/types/messages";
 
 interface ConversationItemProps {
   conversation: Conversation;

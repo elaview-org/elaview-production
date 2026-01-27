@@ -1,23 +1,27 @@
 "use client";
 
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/primitives/skeleton";
 import { Button } from "@/components/primitives/button";
 import { MessageBubble } from "./message-bubble";
 import { MessageComposer } from "./message-composer";
 import { ThreadHeader } from "./thread-header";
-import type { Message, MessageAttachment, ThreadContext } from "../../../../../types/types";
+import type {
+  Message,
+  MessageAttachment,
+  ThreadContext,
+} from "../../../../../types/messages";
 
 interface MessageThreadProps {
   context: ThreadContext;
   messages: Message[];
-  currentUserId: string; 
+  currentUserId: string;
   isLoading?: boolean;
   onSendMessage: (content: string, attachments?: MessageAttachment[]) => void;
   onBack?: () => void;
   showBackButton?: boolean;
-  disabled?: boolean; 
+  disabled?: boolean;
 }
 
 // ============================================

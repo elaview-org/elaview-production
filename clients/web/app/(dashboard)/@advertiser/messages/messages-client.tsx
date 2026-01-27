@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { ConversationList } from "./conversation-list";
-import type { Conversation } from "@/types/types";
+import type { Conversation } from "@/types/messages";
 
 interface MessagesClientProps {
   conversations: Conversation[];

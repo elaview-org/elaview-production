@@ -2,7 +2,7 @@ import type {
   Conversation,
   Message,
   ThreadContext,
-} from "../../../../types/types";
+} from "../../../../types/messages";
 
 // ============================================
 // Mock Data

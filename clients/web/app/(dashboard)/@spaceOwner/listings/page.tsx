@@ -1,28 +1,32 @@
-import api from "@/api/gql/server";
-
-import Toolbar from "@/components/composed/toolbar";
-import { graphql } from "@/types/gql";
-
 import { redirect } from "next/navigation";
-import SpaceCard from "./space-card";
+import api from "@/api/gql/server";
+import { graphql } from "@/types/gql";
+import { ViewOptions } from "@/types/constants";
+import Toolbar from "@/components/composed/toolbar";
 import CreateSpace from "./create-space";
 import { TOOLBAR_PROPS } from "./constants";
-import MaybePlaceholder from "@/components/status/maybe-placeholder";
-import Placeholder from "./placeholder";
+import { getListingsView, setListingsView } from "./actions";
+import ListingsGridView from "./(grid)/grid-view";
+import ListingsTableView from "./(table)/table-view";
+import ListingsMapView from "./(map)/map-view";
 
 export default async function Page() {
-  const { data, error } = await api.query({
-    query: graphql(`
-      query SpaceOwnerListings {
-        mySpaces {
-          nodes {
-            id
-            ...SpaceCard_SpaceFragment
+  const [view, { data, error }] = await Promise.all([
+    getListingsView(),
+    api.query({
+      query: graphql(`
+        query SpaceOwnerListings {
+          mySpaces {
+            nodes {
+              id
+              ...SpaceCard_SpaceFragment
+              ...TableView_SpaceFragment
+            }
           }
         }
-      }
-    `),
-  });
+      `),
+    }),
+  ]);
 
   if (error) {
     redirect("/logout");
@@ -32,14 +36,15 @@ export default async function Page() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Toolbar {...TOOLBAR_PROPS} action={<CreateSpace />} />
-      <MaybePlaceholder data={spaces} placeholder={<Placeholder />}>
-        <div className="grid grid-cols-1 gap-6 @md/main:grid-cols-2 @3xl/main:grid-cols-4">
-          {spaces.map((space) => (
-            <SpaceCard key={space.id as string} data={space} />
-          ))}
-        </div>
-      </MaybePlaceholder>
+      <Toolbar
+        {...TOOLBAR_PROPS}
+        currentView={view}
+        onViewChangeAction={setListingsView}
+        action={<CreateSpace />}
+      />
+      {view === ViewOptions.Table && <ListingsTableView data={spaces} />}
+      {view === ViewOptions.Map && <ListingsMapView data={spaces} />}
+      {view === ViewOptions.Grid && <ListingsGridView data={spaces} />}
     </div>
   );
 }

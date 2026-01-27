@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { cn } from "@/lib/utils";
+import { ReactNode } from "react";
 
 type TrendBadge = {
   type: "trend";
@@ -89,7 +90,7 @@ export default function SummaryCard({
 }
 
 type GridProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 };
 

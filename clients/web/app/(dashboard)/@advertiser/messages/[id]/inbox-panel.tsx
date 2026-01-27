@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { ConversationList } from "@/app/(dashboard)/@advertiser/messages/conversation-list";
-import type { Conversation } from "@/types/types";
+import type { Conversation } from "@/types/messages";
 
 interface InboxPanelProps {
   isLoading: boolean;

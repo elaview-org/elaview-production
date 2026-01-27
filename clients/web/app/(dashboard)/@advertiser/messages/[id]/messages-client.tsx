@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MessageThread } from "./message-thread";
@@ -11,8 +11,9 @@ import type {
   Message,
   MessageAttachment,
   ThreadContext,
-} from "@/types/types";
+} from "@/types/messages";
 import { mockMessages } from "@/app/(dashboard)/@advertiser/messages/mock-data";
+
 type ViewState = "list" | "thread";
 
 interface MessagesClientProps {

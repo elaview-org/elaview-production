@@ -34,7 +34,7 @@ export default async function Page() {
     <div className="flex flex-col gap-6">
       <Toolbar {...TOOLBAR_PROPS} action={<CreateSpace />} />
       <MaybePlaceholder data={spaces} placeholder={<Placeholder />}>
-        <div className="grid grid-cols-1 gap-6 @md/main:grid-cols-2 @3xl/main:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 @md/main:grid-cols-2 @3xl/main:grid-cols-4">
           {spaces.map((space) => (
             <SpaceCard key={space.id as string} data={space} />
           ))}

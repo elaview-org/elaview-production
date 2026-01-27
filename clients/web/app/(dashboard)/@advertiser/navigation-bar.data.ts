@@ -1,10 +1,11 @@
 import {
+  IconBadgeAd,
+  IconChartBar,
   IconClipboardText,
   IconContract,
   IconCookie,
   IconDashboard,
   IconHelp,
-  IconMessage,
   IconSearch,
 } from "@tabler/icons-react";
 
@@ -22,14 +23,24 @@ const advertiserData = {
       icon: IconSearch,
     },
     {
+      title: "Campaigns",
+      url: "/campaigns",
+      icon: IconBadgeAd,
+    },
+    {
       title: "Bookings",
       url: "/bookings",
       icon: IconClipboardText,
     },
     {
-      title: "Messages",
-      url: "/messages",
-      icon: IconMessage,
+      title: "Spending",
+      url: "/spending",
+      icon: IconSearch,
+    },
+    {
+      title: "Analytics",
+      url: "/analytics",
+      icon: IconChartBar,
     },
   ],
   documents: [],

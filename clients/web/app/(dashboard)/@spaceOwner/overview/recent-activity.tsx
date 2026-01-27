@@ -1,7 +1,5 @@
 "use client";
 
-import { type ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/primitives/badge";
 import {
   Card,
   CardContent,
@@ -9,8 +7,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
-import DataTable from "@/components/composed/data-table";
-import { ACTIVITY_TYPES, ACTIVITY_STATUS, type ActivityType, type ActivityStatus } from "./constants";
+import TableView, {
+  badgeColumn,
+  currencyColumn,
+  dateColumn,
+  textColumn,
+} from "@/components/composed/table-view";
+import {
+  ACTIVITY_TYPES,
+  ACTIVITY_STATUS,
+  type ActivityType,
+  type ActivityStatus,
+} from "./constants";
 import mock from "./mock.json";
 
 type ActivityData = {
@@ -23,70 +31,48 @@ type ActivityData = {
   amount?: string;
 };
 
-const columns: ColumnDef<ActivityData>[] = [
-  {
-    accessorKey: "date",
+const columns = [
+  dateColumn<ActivityData>({
+    key: "date",
     header: "Date",
-    cell: ({ row }) => (
-      <span className="text-muted-foreground whitespace-nowrap text-sm">
-        {new Date(row.original.date).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-        })}
-      </span>
-    ),
-  },
-  {
-    accessorKey: "type",
+    value: (row) => row.date,
+  }),
+  badgeColumn<ActivityData, ActivityType>({
+    key: "type",
     header: "Type",
-    cell: ({ row }) => (
-      <Badge variant="outline" className="text-muted-foreground">
-        {ACTIVITY_TYPES[row.original.type]}
-      </Badge>
-    ),
-  },
-  {
-    accessorKey: "description",
+    value: (row) => row.type,
+    labels: ACTIVITY_TYPES,
+  }),
+  textColumn<ActivityData>({
+    key: "description",
     header: "Description",
-    cell: ({ row }) => (
-      <span className="font-medium">{row.original.description}</span>
-    ),
-  },
-  {
-    accessorKey: "space",
+    value: (row) => row.description,
+    truncate: false,
+  }),
+  textColumn<ActivityData>({
+    key: "space",
     header: "Space",
-    cell: ({ row }) => (
-      <span className="text-muted-foreground truncate">
-        {row.original.space}
-      </span>
-    ),
-  },
-  {
-    accessorKey: "amount",
-    header: () => <div className="text-right">Amount</div>,
-    cell: ({ row }) =>
-      row.original.amount ? (
-        <div className="text-right font-medium tabular-nums">
-          {row.original.amount}
-        </div>
-      ) : (
-        <div className="text-muted-foreground text-right">—</div>
-      ),
-  },
-  {
-    accessorKey: "status",
+    value: (row) => row.space,
+    muted: true,
+  }),
+  currencyColumn<ActivityData>({
+    key: "amount",
+    header: "Amount",
+    value: (row) => row.amount ? parseFloat(row.amount.replace(/[$,]/g, "")) : null,
+  }),
+  badgeColumn<ActivityData, ActivityStatus>({
+    key: "status",
     header: "Status",
-    cell: ({ row }) => {
-      const config = ACTIVITY_STATUS[row.original.status];
+    value: (row) => row.status,
+    labels: Object.fromEntries(
+      Object.entries(ACTIVITY_STATUS).map(([k, v]) => [k, v.label])
+    ) as Record<ActivityStatus, string>,
+    icon: (status) => {
+      const config = ACTIVITY_STATUS[status];
       const Icon = config.icon;
-      return (
-        <Badge variant="outline" className="text-muted-foreground gap-1 px-1.5">
-          <Icon className={config.className} />
-          {config.label}
-        </Badge>
-      );
+      return <Icon className={config.className} />;
     },
-  },
+  }),
 ];
 
 export default function RecentActivity() {
@@ -97,7 +83,7 @@ export default function RecentActivity() {
         <CardDescription>Latest bookings and transactions</CardDescription>
       </CardHeader>
       <CardContent>
-        <DataTable
+        <TableView
           data={mock.activity as ActivityData[]}
           columns={columns}
           getRowId={(row) => row.id}

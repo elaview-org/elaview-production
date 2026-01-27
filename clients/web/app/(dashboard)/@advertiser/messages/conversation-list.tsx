@@ -1,5 +1,5 @@
 import { memo } from "react";
-import type { Conversation } from "../../types/types";
+import type { Conversation } from "../../../../types/types";
 import { ConversationItem } from "./conversation-item";
 import { ConversationListSkeleton } from "./conversation-list-skeleton";
 import { ConversationListEmpty } from "./conversation-list-empty";

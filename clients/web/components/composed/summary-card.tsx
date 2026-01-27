@@ -1,5 +1,6 @@
 import { IconTrendingDown, IconTrendingUp } from "@tabler/icons-react";
 import { Badge } from "@/components/primitives/badge";
+import { Skeleton } from "@/components/primitives/skeleton";
 import {
   Card,
   CardAction,
@@ -101,6 +102,22 @@ export function SummaryCardGrid({ children, className }: GridProps) {
       )}
     >
       {children}
+    </div>
+  );
+}
+
+export function SummaryCardSkeleton() {
+  return (
+    <div className="flex flex-col gap-3 rounded-xl border p-6">
+      <Skeleton className="h-4 w-24" />
+      <Skeleton className="h-8 w-32" />
+      <div className="flex items-center gap-2">
+        <Skeleton className="h-5 w-16 rounded-full" />
+      </div>
+      <div className="mt-2 flex flex-col gap-1">
+        <Skeleton className="h-4 w-40" />
+        <Skeleton className="h-3 w-32" />
+      </div>
     </div>
   );
 }

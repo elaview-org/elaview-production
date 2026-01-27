@@ -6,6 +6,7 @@ import {
   IconAlertTriangle,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { Skeleton } from "@/components/primitives/skeleton";
 import {
   Card,
   CardContent,
@@ -75,6 +76,29 @@ function PerformerCard({
         </div>
       </div>
     </Link>
+  );
+}
+
+export function TopPerformersSkeleton() {
+  return (
+    <div className="flex flex-col gap-4 rounded-xl border p-6">
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-4 w-64" />
+      </div>
+      <div className="grid grid-cols-1 gap-4 @lg/main:grid-cols-2 @3xl/main:grid-cols-3">
+        {Array.from({ length: 5 }).map((_, i) => (
+          <div key={i} className="flex items-start gap-3 rounded-lg border p-4">
+            <Skeleton className="size-10 rounded-lg" />
+            <div className="flex flex-1 flex-col gap-2">
+              <Skeleton className="h-3 w-20" />
+              <Skeleton className="h-4 w-32" />
+              <Skeleton className="h-6 w-16" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

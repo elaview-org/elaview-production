@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ConversationList } from "@/components/composed/conversation-list";
+import { ConversationList } from "@/app/(dashboard)/@advertiser/messages/conversation-list";
 import type { Conversation } from "@/types/types";
 
 interface InboxPanelProps {

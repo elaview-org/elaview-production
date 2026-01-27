@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
+import { Skeleton } from "@/components/primitives/skeleton";
 import {
   ChartContainer,
   ChartLegend,
@@ -19,6 +20,18 @@ import {
 import { STATUS_CHART_CONFIG, STATUS_LABELS } from "./constants";
 import { BookingStatus } from "@/types/gql/graphql";
 import mock from "./mock.json";
+
+export function StatusChartSkeleton() {
+  return (
+    <div className="flex flex-col gap-4 rounded-xl border p-6">
+      <div className="flex flex-col items-center gap-1">
+        <Skeleton className="h-5 w-48" />
+        <Skeleton className="h-4 w-40" />
+      </div>
+      <Skeleton className="mx-auto size-[250px] rounded-full" />
+    </div>
+  );
+}
 
 export default function StatusChart() {
   const chartData = React.useMemo(() => {

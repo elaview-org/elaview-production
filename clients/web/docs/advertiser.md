@@ -24,7 +24,7 @@ app/(dashboard)/@advertiser/
 │   └── [id]/                     # Campaign detail view
 ├── bookings/                     # Booking management
 │   └── [id]/                     # Booking detail view
-├── spendings/                    # Financial dashboard
+├── spending/                     # Financial dashboard
 ├── analytics/                    # Campaign performance insights
 ├── messages/                     # Conversation threads
 │   └── [id]/                     # Conversation detail
@@ -48,17 +48,17 @@ The sidebar navigation is defined in `navigation-bar.data.ts`:
 
 ## Implementation Status
 
-| Route      | Status        | Data Source    | Notes                                       |
-|------------|---------------|----------------|---------------------------------------------|
-| Overview   | ❌ Not Started | —              | Under construction placeholder              |
-| Discover   | ✅ Functional  | GraphQL        | Grid and map views working                  |
-| Campaigns  | ❌ Not Started | —              | Route not implemented                       |
-| Bookings   | ⚠️ Partial    | GraphQL + Mock | List working, detail page needs mutations   |
-| Spendings  | ❌ Not Started | —              | Route not implemented                       |
-| Analytics  | ❌ Not Started | —              | Route not implemented                       |
-| Messages   | ⚠️ Partial    | GraphQL        | Basic conversation list, needs detail view  |
-| Profile    | ❌ Not Started | —              | Under construction placeholder              |
-| Settings   | ⚠️ Partial    | GraphQL        | Basic structure, needs mutations            |
+| Route     | Status        | Data Source    | Notes                                      |
+|-----------|---------------|----------------|--------------------------------------------|
+| Overview  | ❌ Not Started | —              | Under construction placeholder             |
+| Discover  | ✅ Functional  | GraphQL        | Grid and map views working                 |
+| Campaigns | ❌ Not Started | —              | Route not implemented                      |
+| Bookings  | ⚠️ Partial    | GraphQL + Mock | List working, detail page needs mutations  |
+| Spendings | ❌ Not Started | —              | Route not implemented                      |
+| Analytics | ❌ Not Started | —              | Route not implemented                      |
+| Messages  | ⚠️ Partial    | GraphQL        | Basic conversation list, needs detail view |
+| Profile   | ❌ Not Started | —              | Under construction placeholder             |
+| Settings  | ⚠️ Partial    | GraphQL        | Basic structure, needs mutations           |
 
 ---
 
@@ -216,23 +216,23 @@ query DiscoverSpaces($where: SpaceFilterInput, $first: Int) {
 
 **Campaign Statuses:**
 
-| Status    | Description                          |
-|-----------|--------------------------------------|
-| DRAFT     | Not yet submitted                    |
-| SUBMITTED | Awaiting booking confirmations       |
-| ACTIVE    | Has active bookings                  |
-| COMPLETED | All bookings completed               |
-| CANCELLED | Campaign cancelled                   |
+| Status    | Description                    |
+|-----------|--------------------------------|
+| DRAFT     | Not yet submitted              |
+| SUBMITTED | Awaiting booking confirmations |
+| ACTIVE    | Has active bookings            |
+| COMPLETED | All bookings completed         |
+| CANCELLED | Campaign cancelled             |
 
 **Mutations:**
 
-| Mutation          | Status | Purpose                  |
-|-------------------|--------|--------------------------|
-| `createCampaign`  | ❌      | Create new campaign      |
-| `updateCampaign`  | ❌      | Edit campaign details    |
-| `submitCampaign`  | ❌      | Submit for booking       |
-| `cancelCampaign`  | ❌      | Cancel campaign          |
-| `deleteCampaign`  | ❌      | Remove draft campaign    |
+| Mutation         | Status | Purpose               |
+|------------------|--------|-----------------------|
+| `createCampaign` | ❌      | Create new campaign   |
+| `updateCampaign` | ❌      | Edit campaign details |
+| `submitCampaign` | ❌      | Submit for booking    |
+| `cancelCampaign` | ❌      | Cancel campaign       |
+| `deleteCampaign` | ❌      | Remove draft campaign |
 
 ---
 
@@ -280,15 +280,15 @@ query DiscoverSpaces($where: SpaceFilterInput, $first: Int) {
 
 **Status-Based Actions:**
 
-| Status           | Primary Action          | Secondary Actions     |
-|------------------|-------------------------|-----------------------|
-| PENDING_APPROVAL | —                       | Cancel, Message Owner |
-| APPROVED         | Pay Now                 | Cancel, Message       |
-| PAID             | —                       | Message               |
-| FILE_DOWNLOADED  | —                       | Message               |
-| INSTALLED        | —                       | Message               |
-| VERIFIED         | Approve / Dispute       | Message               |
-| DISPUTED         | View Dispute            | Message               |
+| Status           | Primary Action    | Secondary Actions     |
+|------------------|-------------------|-----------------------|
+| PENDING_APPROVAL | —                 | Cancel, Message Owner |
+| APPROVED         | Pay Now           | Cancel, Message       |
+| PAID             | —                 | Message               |
+| FILE_DOWNLOADED  | —                 | Message               |
+| INSTALLED        | —                 | Message               |
+| VERIFIED         | Approve / Dispute | Message               |
+| DISPUTED         | View Dispute      | Message               |
 
 **Mutations:**
 
@@ -525,19 +525,19 @@ mutation SendMessage($input: SendMessageInput!) {
 
 **Notification Types for Advertisers:**
 
-| Type              | Description                    |
-|-------------------|--------------------------------|
-| BOOKING_APPROVED  | Booking request accepted       |
-| BOOKING_REJECTED  | Booking request declined       |
-| BOOKING_CANCELLED | Booking was cancelled          |
-| PAYMENT_RECEIVED  | Payment confirmation           |
-| PAYMENT_REMINDER  | Payment due reminder           |
-| PROOF_UPLOADED    | Verification photos ready      |
-| PROOF_APPROVED    | Verification auto-approved     |
-| DISPUTE_FILED     | Dispute opened                 |
-| DISPUTE_RESOLVED  | Dispute resolved               |
-| MESSAGE_RECEIVED  | New message                    |
-| REFUND_PROCESSED  | Refund completed               |
+| Type              | Description                |
+|-------------------|----------------------------|
+| BOOKING_APPROVED  | Booking request accepted   |
+| BOOKING_REJECTED  | Booking request declined   |
+| BOOKING_CANCELLED | Booking was cancelled      |
+| PAYMENT_RECEIVED  | Payment confirmation       |
+| PAYMENT_REMINDER  | Payment due reminder       |
+| PROOF_UPLOADED    | Verification photos ready  |
+| PROOF_APPROVED    | Verification auto-approved |
+| DISPUTE_FILED     | Dispute opened             |
+| DISPUTE_RESOLVED  | Dispute resolved           |
+| MESSAGE_RECEIVED  | New message                |
+| REFUND_PROCESSED  | Refund completed           |
 
 ---
 
@@ -545,23 +545,23 @@ mutation SendMessage($input: SendMessageInput!) {
 
 ### Queries
 
-| Query                        | Returns                           | Purpose                             | Implemented |
-|------------------------------|-----------------------------------|-------------------------------------|-------------|
-| `me`                         | User                              | Current user with advertiserProfile | ✅           |
-| `spaces`                     | SpacesConnection                  | Browse available spaces             | ✅           |
-| `spaceById(id)`              | Space                             | Single space details                | ✅           |
-| `myCampaigns`                | MyCampaignsConnection             | Advertiser's campaigns              | ❌           |
-| `campaignById(id)`           | Campaign                          | Single campaign details             | ❌           |
-| `myBookingsAsAdvertiser`     | MyBookingsAsAdvertiserConnection  | Advertiser's bookings               | ✅           |
-| `bookingById(id)`            | Booking                           | Single booking details              | ❌           |
-| `myConversations`            | MyConversationsConnection         | Message threads                     | ⚠️          |
-| `messagesByConversation(id)` | MessagesByConversationConnection  | Messages in thread                  | ❌           |
-| `unreadConversationsCount`   | Int                               | Unread message count                | ❌           |
-| `myNotifications`            | MyNotificationsConnection         | User notifications                  | ❌           |
-| `unreadNotificationsCount`   | Int                               | Unread notification count           | ❌           |
-| `myNotificationPreferences`  | [NotificationPreference]          | Notification settings               | ❌           |
-| `paymentsByBooking(id)`      | PaymentsByBookingConnection       | Payments for a booking              | ❌           |
-| `transactionsByBooking(id)`  | TransactionsByBookingConnection   | Financial transactions              | ❌           |
+| Query                        | Returns                          | Purpose                             | Implemented |
+|------------------------------|----------------------------------|-------------------------------------|-------------|
+| `me`                         | User                             | Current user with advertiserProfile | ✅           |
+| `spaces`                     | SpacesConnection                 | Browse available spaces             | ✅           |
+| `spaceById(id)`              | Space                            | Single space details                | ✅           |
+| `myCampaigns`                | MyCampaignsConnection            | Advertiser's campaigns              | ❌           |
+| `campaignById(id)`           | Campaign                         | Single campaign details             | ❌           |
+| `myBookingsAsAdvertiser`     | MyBookingsAsAdvertiserConnection | Advertiser's bookings               | ✅           |
+| `bookingById(id)`            | Booking                          | Single booking details              | ❌           |
+| `myConversations`            | MyConversationsConnection        | Message threads                     | ⚠️          |
+| `messagesByConversation(id)` | MessagesByConversationConnection | Messages in thread                  | ❌           |
+| `unreadConversationsCount`   | Int                              | Unread message count                | ❌           |
+| `myNotifications`            | MyNotificationsConnection        | User notifications                  | ❌           |
+| `unreadNotificationsCount`   | Int                              | Unread notification count           | ❌           |
+| `myNotificationPreferences`  | [NotificationPreference]         | Notification settings               | ❌           |
+| `paymentsByBooking(id)`      | PaymentsByBookingConnection      | Payments for a booking              | ❌           |
+| `transactionsByBooking(id)`  | TransactionsByBookingConnection  | Financial transactions              | ❌           |
 
 ### Mutations
 
@@ -627,22 +627,22 @@ mutation SendMessage($input: SendMessageInput!) {
 
 ### Booking (Advertiser Perspective)
 
-| Field             | Type            | Description             |
-|-------------------|-----------------|-------------------------|
-| id                | UUID            | Unique identifier       |
-| status            | BookingStatus   | Current lifecycle stage |
-| startDate         | DateTime        | Start date              |
-| endDate           | DateTime        | End date                |
-| totalDays         | Int             | Duration                |
-| pricePerDay       | Decimal         | Agreed rate             |
-| installationFee   | Decimal         | Installation cost       |
-| totalAmount       | Decimal         | Total to pay            |
-| advertiserNotes   | String?         | Notes for owner         |
-| space             | Space           | Booked space            |
-| campaign          | Campaign        | Parent campaign         |
-| proof             | BookingProof?   | Verification submission |
-| dispute           | BookingDispute? | If disputed             |
-| payments          | [Payment]       | Payment records         |
+| Field           | Type            | Description             |
+|-----------------|-----------------|-------------------------|
+| id              | UUID            | Unique identifier       |
+| status          | BookingStatus   | Current lifecycle stage |
+| startDate       | DateTime        | Start date              |
+| endDate         | DateTime        | End date                |
+| totalDays       | Int             | Duration                |
+| pricePerDay     | Decimal         | Agreed rate             |
+| installationFee | Decimal         | Installation cost       |
+| totalAmount     | Decimal         | Total to pay            |
+| advertiserNotes | String?         | Notes for owner         |
+| space           | Space           | Booked space            |
+| campaign        | Campaign        | Parent campaign         |
+| proof           | BookingProof?   | Verification submission |
+| dispute         | BookingDispute? | If disputed             |
+| payments        | [Payment]       | Payment records         |
 
 **BookingStatus Enum:**
 
@@ -672,13 +672,13 @@ mutation SendMessage($input: SendMessageInput!) {
 
 ### AdvertiserProfile
 
-| Field              | Type    | Description          |
-|--------------------|---------|----------------------|
-| id                 | UUID    | Unique identifier    |
-| companyName        | String? | Company name         |
-| industry           | String? | Business industry    |
-| website            | String? | Company website      |
-| onboardingComplete | Boolean | Setup finished       |
+| Field              | Type    | Description       |
+|--------------------|---------|-------------------|
+| id                 | UUID    | Unique identifier |
+| companyName        | String? | Company name      |
+| industry           | String? | Business industry |
+| website            | String? | Company website   |
+| onboardingComplete | Boolean | Setup finished    |
 
 ---
 
@@ -706,6 +706,7 @@ pattern.
 ### Payment Integration
 
 For payment flows:
+
 1. Create PaymentIntent via `createPaymentIntent` mutation
 2. Use Stripe Elements for card input
 3. Confirm payment via `confirmPayment` mutation

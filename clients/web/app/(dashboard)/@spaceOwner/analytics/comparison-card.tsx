@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
+import { Skeleton } from "@/components/primitives/skeleton";
 import { cn } from "@/lib/utils";
 import mock from "./mock.json";
 
@@ -72,6 +73,29 @@ function MetricRow({ label, current, previous, change, format = "number" }: Metr
           {isNeutral && <IconMinus className="size-3" />}
           {Math.abs(change).toFixed(1)}%
         </div>
+      </div>
+    </div>
+  );
+}
+
+export function ComparisonCardSkeleton() {
+  return (
+    <div className="flex flex-col gap-4 rounded-xl border p-6">
+      <div className="flex flex-col gap-1">
+        <Skeleton className="h-5 w-36" />
+        <Skeleton className="h-4 w-48" />
+      </div>
+      <div className="flex flex-col gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="flex items-center justify-between border-b pb-3">
+            <Skeleton className="h-4 w-24" />
+            <div className="flex items-center gap-4">
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-16" />
+              <Skeleton className="h-4 w-14" />
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

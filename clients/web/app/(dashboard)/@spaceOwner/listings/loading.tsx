@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/primitives/skeleton";
-import { SpaceCardSkeleton } from "./space-card";
+import { GridViewSkeleton } from "@/components/composed/grid-view";
 
 export default function Loading() {
   return (
@@ -11,12 +11,7 @@ export default function Loading() {
         </div>
         <Skeleton className="h-9 w-28" />
       </div>
-
-      <div className="grid grid-cols-1 gap-6 @md/main:grid-cols-2 @3xl/main:grid-cols-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <SpaceCardSkeleton key={i} />
-        ))}
-      </div>
+      <GridViewSkeleton count={6} columns={3} />
     </div>
   );
 }

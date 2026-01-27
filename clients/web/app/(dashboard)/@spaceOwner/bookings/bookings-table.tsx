@@ -1,37 +1,22 @@
 "use client";
 
-import { type ColumnDef } from "@tanstack/react-table";
 import {
   IconCircleCheckFilled,
   IconClock,
-  IconDotsVertical,
   IconDownload,
   IconLoader,
   IconPhotoCheck,
 } from "@tabler/icons-react";
-import Image from "next/image";
-import Link from "next/link";
-import { Badge } from "@/components/primitives/badge";
-import { Button } from "@/components/primitives/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/primitives/dropdown-menu";
-import { Skeleton } from "@/components/primitives/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/primitives/table";
-import DataTable, {
+import TableView, {
+  TableViewSkeleton,
+  actionsColumn,
+  badgeColumn,
   createSelectColumn,
-} from "@/components/composed/data-table";
+  currencyColumn,
+  dateRangeColumn,
+  imageTextColumn,
+  stackColumn,
+} from "@/components/composed/table-view";
 import {
   BookingStatus,
   FragmentType,
@@ -69,7 +54,7 @@ export default function BookingsTable({ data }: Props) {
   const bookings = getFragmentData(BookingsTable_BookingFragment, data);
 
   return (
-    <DataTable
+    <TableView
       data={bookings}
       columns={columns}
       getRowId={(row) => row.id as string}
@@ -78,23 +63,13 @@ export default function BookingsTable({ data }: Props) {
   );
 }
 
+export function BookingsTableSkeleton() {
+  return <TableViewSkeleton columns={columns} rows={5} />;
+}
+
 type BookingData = BookingsTable_BookingFragmentFragment;
 
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-  });
-}
-
-function formatCurrency(amount: string | number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-  }).format(Number(amount));
-}
-
-function StatusIcon({ status }: { status: BookingStatus | string }) {
+function StatusIcon({ status }: { status: BookingStatus }) {
   switch (status) {
     case BookingStatus.Completed:
       return (
@@ -113,180 +88,70 @@ function StatusIcon({ status }: { status: BookingStatus | string }) {
   }
 }
 
-const columns: ColumnDef<BookingData>[] = [
+const columns = [
   createSelectColumn<BookingData>(),
-  {
-    accessorKey: "space",
+  imageTextColumn<BookingData>({
+    key: "space",
     header: "Space",
-    cell: ({ row }) => {
-      const space = row.original.space;
-      return (
-        <div className="flex items-center gap-3">
-          <div className="bg-muted relative size-10 shrink-0 overflow-hidden rounded">
-            {space?.images[0] ? (
-              <Image
-                src={space.images[0]}
-                alt={space.title}
-                fill
-                className="object-cover"
-                sizes="40px"
-              />
-            ) : (
-              <div className="bg-muted size-full" />
-            )}
-          </div>
-          <span className="truncate font-medium">
-            {space?.title ?? "Unknown"}
-          </span>
-        </div>
-      );
-    },
-    enableHiding: false,
-  },
-  {
-    accessorKey: "campaign",
+    image: (row) => row.space?.images[0],
+    text: (row) => row.space?.title,
+  }),
+  stackColumn<BookingData>({
+    key: "advertiser",
     header: "Advertiser",
-    cell: ({ row }) => {
-      const campaign = row.original.campaign;
-      return (
-        <div className="flex flex-col">
-          <span className="truncate">
-            {campaign?.advertiserProfile?.companyName ?? "Unknown"}
-          </span>
-          <span className="text-muted-foreground truncate text-xs">
-            {campaign?.name ?? "Unknown Campaign"}
-          </span>
-        </div>
-      );
-    },
-  },
-  {
-    accessorKey: "startDate",
+    primary: (row) => row.campaign?.advertiserProfile?.companyName,
+    secondary: (row) => row.campaign?.name,
+  }),
+  dateRangeColumn<BookingData>({
+    key: "dates",
     header: "Dates",
-    cell: ({ row }) => (
-      <span className="text-muted-foreground text-sm whitespace-nowrap">
-        {formatDate(row.original.startDate as string)} –{" "}
-        {formatDate(row.original.endDate as string)}
-      </span>
-    ),
-  },
-  {
-    accessorKey: "ownerPayoutAmount",
-    header: () => <div className="text-right">Payout</div>,
-    cell: ({ row }) => (
-      <div className="text-right font-medium tabular-nums">
-        {formatCurrency(row.original.ownerPayoutAmount as string)}
-      </div>
-    ),
-  },
-  {
-    accessorKey: "status",
+    start: (row) => row.startDate as string,
+    end: (row) => row.endDate as string,
+  }),
+  currencyColumn<BookingData>({
+    key: "payout",
+    header: "Payout",
+    value: (row) => row.ownerPayoutAmount as string,
+  }),
+  badgeColumn<BookingData, BookingStatus>({
+    key: "status",
     header: "Status",
-    cell: ({ row }) => {
-      const status = row.original.status as BookingStatus;
-      return (
-        <Badge variant="outline" className="text-muted-foreground gap-1 px-1.5">
-          <StatusIcon status={status} />
-          {STATUS_LABELS[status] ?? status}
-        </Badge>
-      );
-    },
-  },
-  {
-    id: "actions",
-    cell: ({ row }) => {
-      const status = row.original.status as BookingStatus;
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="data-[state=open]:bg-muted text-muted-foreground flex size-8"
-              size="icon"
-            >
-              <IconDotsVertical />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-40">
-            <DropdownMenuItem asChild>
-              <Link href={`/bookings/${row.original.id}`}>View Details</Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>Message</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            {status === BookingStatus.PendingApproval && (
-              <>
-                <DropdownMenuItem>Accept</DropdownMenuItem>
-                <DropdownMenuItem variant="destructive">
-                  Reject
-                </DropdownMenuItem>
-              </>
-            )}
-            {status === BookingStatus.Paid && (
-              <DropdownMenuItem>
-                <IconDownload className="mr-2 size-4" />
-                Download File
-              </DropdownMenuItem>
-            )}
-            {status === BookingStatus.FileDownloaded && (
-              <DropdownMenuItem>Mark Installed</DropdownMenuItem>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
-  },
-];
+    value: (row) => row.status,
+    labels: STATUS_LABELS,
+    icon: (status) => <StatusIcon status={status} />,
+  }),
+  actionsColumn<BookingData>({
+    items: (row) => {
+      const status = row.status;
+      const baseItems = [
+        { label: "View Details", href: () => `/bookings/${row.id}` },
+        { label: "Message" },
+        { separator: true as const },
+      ];
 
-export function BookingsTableSkeleton() {
-  return (
-    <div className="overflow-hidden rounded-lg border">
-      <Table>
-        <TableHeader className="bg-muted">
-          <TableRow>
-            <TableHead className="w-8" />
-            <TableHead>Space</TableHead>
-            <TableHead>Advertiser</TableHead>
-            <TableHead>Dates</TableHead>
-            <TableHead className="text-right">Payout</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead className="w-8" />
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <TableRow key={i}>
-              <TableCell>
-                <Skeleton className="size-4" />
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-3">
-                  <Skeleton className="size-10 rounded" />
-                  <Skeleton className="h-4 w-32" />
-                </div>
-              </TableCell>
-              <TableCell>
-                <div className="flex flex-col gap-1">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-3 w-20" />
-                </div>
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-4 w-28" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="ml-auto h-4 w-16" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="h-5 w-20 rounded-full" />
-              </TableCell>
-              <TableCell>
-                <Skeleton className="size-8" />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
+      if (status === BookingStatus.PendingApproval) {
+        return [
+          ...baseItems,
+          { label: "Accept" },
+          { label: "Reject", variant: "destructive" as const },
+        ];
+      }
+
+      if (status === BookingStatus.Paid) {
+        return [
+          ...baseItems,
+          {
+            label: "Download File",
+            icon: <IconDownload className="mr-2 size-4" />,
+          },
+        ];
+      }
+
+      if (status === BookingStatus.FileDownloaded) {
+        return [...baseItems, { label: "Mark Installed" }];
+      }
+
+      return baseItems.slice(0, -1);
+    },
+  }),
+];

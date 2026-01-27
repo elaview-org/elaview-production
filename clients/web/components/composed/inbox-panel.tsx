@@ -1,7 +1,8 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
-import { ConversationList } from "./conversation-list";
+import { ConversationList } from "@/components/composed/conversation-list";
 import type { Conversation } from "@/types/types";
 
 interface MessagesClientProps {
@@ -10,7 +11,7 @@ interface MessagesClientProps {
   children?: React.ReactNode;
 }
 
-export default function MessagesClient({
+export default function InboxPanel({
   conversations,
   initialSelectedBookingId,
   children,
@@ -23,8 +24,15 @@ export default function MessagesClient({
   const selectedBookingId = currentBookingId || initialSelectedBookingId;
 
   return (
-    <div className="flex h-full flex-col">
+    <div
+      className={cn(
+        "bg-background flex flex-col border-r",
+        "w-full max-w-sm md:max-w-sm"
+      )}
+    >
+      {/** header */}
       {children}
+      {/** body */}
       <ConversationList
         conversations={conversations}
         selectedBookingId={selectedBookingId}

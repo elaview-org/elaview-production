@@ -1,16 +1,20 @@
 import getConversationsQuery from "./messages-queries";
-import MessagesClient from "./messages-client";
 import MessagesHeader from "./messages-header";
+import InboxPanel from "@/components/composed/inbox-panel";
+import { WelcomeChat } from "./welcome-chat";
 
-export default async function MessagesPage() {
+export default async function Page() {
   const { conversations } = await getConversationsQuery();
 
   return (
-    <MessagesClient
-      conversations={conversations}
-      initialSelectedBookingId={undefined}
-    >
-      <MessagesHeader conversationCount={conversations.length} />
-    </MessagesClient>
+    <div className="flex h-full overflow-hidden">
+      <InboxPanel
+        conversations={conversations}
+        initialSelectedBookingId={undefined}
+      >
+        <MessagesHeader conversationCount={conversations.length} />
+      </InboxPanel>
+      <WelcomeChat />
+    </div>
   );
 }

@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { MessageThread } from "./message-thread";
-import { InboxPanel } from "./inbox-panel";
 import { GuideMessage } from "./guide-message";
 import type {
   Conversation,
@@ -13,6 +12,9 @@ import type {
   ThreadContext,
 } from "@/types/types";
 import { mockMessages } from "@/app/(dashboard)/@advertiser/messages/mock-data";
+import ConditionalRender from "@/components/composed/conditionally-render";
+import MessagesHeader from "../messages-header";
+import InboxPanel from "@/components/composed/inbox-panel";
 type ViewState = "list" | "thread";
 
 interface MessagesClientProps {
@@ -22,10 +24,6 @@ interface MessagesClientProps {
   bookingId: string;
 }
 
-/**
- * Client component that handles all interactive logic
- * Receives server-fetched data as props
- */
 export default function MessagesClient({
   conversations,
   initialMessages,
@@ -158,14 +156,17 @@ export default function MessagesClient({
 
   return (
     <div className="flex h-full overflow-hidden">
-      {showList && (
-        <InboxPanel
-          isLoading={isLoading}
-          conversations={conversations}
-          selectedBookingId={selectedBookingId}
-        />
-      )}
-
+      <ConditionalRender
+        condition={showList}
+        show={
+          <InboxPanel
+            conversations={conversations}
+            initialSelectedBookingId={selectedBookingId}
+          >
+            <MessagesHeader conversationCount={conversations.length} />
+          </InboxPanel>
+        }
+      />
       {showThread && threadContext ? (
         <div className="flex flex-1 flex-col">
           <MessageThread

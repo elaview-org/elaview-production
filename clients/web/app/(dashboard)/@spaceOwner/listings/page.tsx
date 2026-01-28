@@ -11,9 +11,8 @@ import ListingsGrid from "./(grid)/listings-grid";
 import ListingsTable from "./(table)/listings-table";
 import ListingsMap from "./(map)/listings-map";
 
-export default async function Page() {
-  const [cookieStore, { data, error }] = await Promise.all([
-    cookies(),
+export default async function Page(props: PageProps<"/listings">) {
+  const [{ data, error }, view] = await Promise.all([
     api.query({
       query: graphql(`
         query SpaceOwnerListings {
@@ -27,15 +26,17 @@ export default async function Page() {
         }
       `),
     }),
+    (await cookies()).get(storageKey.preferences.listings.view)
+      ?.value as ViewOptions,
   ]);
 
-  const viewCookie = cookieStore.get(
-    storageKey.preferences.listings.view
-  )?.value;
-  const view =
-    viewCookie === ViewOptions.Table || viewCookie === ViewOptions.Map
-      ? viewCookie
-      : ViewOptions.Grid;
+  console.log(props);
+
+  // const viewCookie = cookieStore.;
+  // const view =
+  //   viewCookie === ViewOptions.Table || viewCookie === ViewOptions.Map
+  //     ? viewCookie
+  //     : ViewOptions.Grid;
 
   if (error) {
     redirect("/logout");

@@ -11,6 +11,7 @@ import {
 } from "@/components/primitives/card";
 import { Skeleton } from "@/components/primitives/skeleton";
 import { cn } from "@/lib/utils";
+import ErrorState from "@/components/status/error-state";
 
 type Props = {
   title: string;
@@ -77,6 +78,28 @@ export function SectionCardSkeleton({
         <Skeleton className="h-9 w-20" />
       </CardHeader>
       <CardContent className="flex-1">{children}</CardContent>
+    </Card>
+  );
+}
+
+type SectionCardErrorProps = {
+  title?: string;
+  message?: string;
+  reset?: () => void;
+  className?: string;
+};
+
+export function SectionCardError({
+  title = "Failed to load",
+  message,
+  reset,
+  className,
+}: SectionCardErrorProps) {
+  return (
+    <Card className={cn("flex flex-col", className)}>
+      <CardContent className="py-6">
+        <ErrorState title={title} message={message} onAction={reset} />
+      </CardContent>
     </Card>
   );
 }

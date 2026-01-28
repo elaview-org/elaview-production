@@ -152,224 +152,65 @@ The following files now use shared utilities and constants:
 
 ---
 
-## Advertiser Profile GraphQL Query
+## Backend GraphQL Integration
 
 **Date:** 2026-01-27 | **Status:** Blocked (Backend)
 
-The `@advertiser/profile` page currently uses mock data. When backend support is available, implement proper GraphQL fragments.
+Multiple @advertiser pages use mock data. Backend queries/mutations required before frontend implementation.
 
-**Required Schema Changes:**
+### Advertiser Profile
 
-`AdvertiserProfile` needs a `bookings` field (similar to `SpaceOwnerProfile.spaces`) to calculate:
-- Total campaigns count
-- Total spend across all bookings
+`AdvertiserProfile` needs a `bookings` field (similar to `SpaceOwnerProfile.spaces`) to calculate total campaigns and total spend.
 
-**Proposed Query:**
+**Files:**
+- `app/(dashboard)/@advertiser/profile/page.tsx`
+- `app/(dashboard)/@advertiser/profile/profile-card.tsx`
+- `app/(dashboard)/@advertiser/profile/about-section.tsx`
 
-```graphql
-query AdvertiserProfile {
-  me {
-    name
-    avatar
-    advertiserProfile {
-      createdAt
-      companyName
-      industry
-      website
-      onboardingComplete
-      campaigns(first: 100) {
-        nodes {
-          id
-          bookings(first: 100) {
-            nodes {
-              id
-              totalPrice
-            }
-          }
-        }
-      }
-    }
-  }
-}
-```
+### Advertiser Spending
 
-**Files to Update:**
-- `app/(dashboard)/@advertiser/profile/page.tsx` - Add GraphQL query
-- `app/(dashboard)/@advertiser/profile/profile-card.tsx` - Add fragment
-- `app/(dashboard)/@advertiser/profile/about-section.tsx` - Add fragment
+Requires `spendingSummary` query and `myPaymentsAsAdvertiser` paginated query.
 
-**Tasks:**
-- [ ] Confirm schema supports nested campaigns → bookings query
-- [ ] Implement GraphQL fragments matching @spaceOwner pattern
-- [ ] Remove mock.json dependency
+**Files:**
+- `app/(dashboard)/@advertiser/spending/page.tsx`
+- `app/(dashboard)/@advertiser/spending/spending-cards.tsx`
+- `app/(dashboard)/@advertiser/spending/payments-table.tsx`
 
----
+### Discover Favorites
 
-## Advertiser Spending GraphQL Query
+Allow advertisers to favorite spaces. Requires `toggleFavoriteSpace` mutation, `myFavoriteSpaces` query, and `Space.isFavorite` field.
 
-**Date:** 2026-01-27 | **Status:** Blocked (Backend)
+**Files:**
+- `app/(dashboard)/@advertiser/discover/space-card.tsx` - Add heart button
+- New route or section for favorites list
 
-The `@advertiser/spending` page currently uses mock data. Backend queries required.
+### Discover Backend Filtering
 
-**Required Operations:**
+Replace client-side filtering with server-side. Requires `SpaceFilterInput`, `SpaceOrderInput`, and `availableSpaces` query with pagination.
 
-```graphql
-query SpendingSummary {
-  spendingSummary {
-    totalSpent
-    pendingPayments
-    thisMonthSpending
-    lastMonthSpending
-  }
-}
+**Files:**
+- `app/(dashboard)/@advertiser/discover/page.tsx`
+- `app/(dashboard)/@advertiser/discover/filter-sheet.tsx`
 
-query MyPaymentsAsAdvertiser($first: Int, $after: String) {
-  myPaymentsAsAdvertiser(first: $first, after: $after) {
-    nodes {
-      id
-      amount
-      status
-      createdAt
-      booking {
-        id
-        space {
-          title
-          images
-        }
-        campaign {
-          name
-        }
-      }
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-    totalCount
-  }
-}
-```
+### Tasks
 
-**Files to Update:**
-- `app/(dashboard)/@advertiser/spending/page.tsx` - Replace mock data with GraphQL
-- `app/(dashboard)/@advertiser/spending/spending-cards.tsx` - Add fragment
-- `app/(dashboard)/@advertiser/spending/payments-table.tsx` - Add fragment
+**Backend:**
+- [ ] Add `AdvertiserProfile.campaigns.bookings` nested query support
+- [ ] Add `spendingSummary` query
+- [ ] Add `myPaymentsAsAdvertiser` query
+- [ ] Add `Space.isFavorite` field
+- [ ] Add `toggleFavoriteSpace` mutation
+- [ ] Add `myFavoriteSpaces` query
+- [ ] Add `SpaceFilterInput` and `SpaceOrderInput` types
+- [ ] Add `availableSpaces` query with filtering/sorting/pagination
 
-**Tasks:**
-- [ ] Add `spendingSummary` query to backend
-- [ ] Add `myPaymentsAsAdvertiser` query to backend
-- [ ] Implement GraphQL fragments
-- [ ] Remove mock.json dependency
+**Frontend (after backend ready):**
+- [ ] Implement profile GraphQL fragments, remove mock.json
+- [ ] Implement spending GraphQL fragments, remove mock.json
+- [ ] Add favorites UI with optimistic updates
+- [ ] Update discover to use server-side filtering
 
 ---
+## Pre-Launch Reminders
 
-## Discover Favorites Feature
-
-**Date:** 2026-01-27 | **Status:** Blocked (Backend)
-
-Allow advertisers to favorite spaces for later reference.
-
-**Required Operations:**
-
-```graphql
-mutation ToggleFavoriteSpace($spaceId: UUID!) {
-  toggleFavoriteSpace(spaceId: $spaceId) {
-    success
-    isFavorite
-  }
-}
-
-query MyFavoriteSpaces($first: Int) {
-  myFavoriteSpaces(first: $first) {
-    nodes {
-      id
-      ...SpaceCard_SpaceFragment
-    }
-  }
-}
-```
-
-**Schema Changes:**
-- Add `Space.isFavorite: Boolean` field (resolver checks user favorites)
-- Add `toggleFavoriteSpace` mutation
-- Add `myFavoriteSpaces` query
-
-**Frontend Tasks:**
-- [ ] Add heart button to space cards in discover grid
-- [ ] Implement localStorage-based favorites until backend ready
-- [ ] Create favorites section in discover or separate route
-- [ ] Add optimistic UI updates for favorite toggle
-
----
-
-## Discover Backend Filtering
-
-**Date:** 2026-01-27 | **Status:** Blocked (Backend)
-
-The discover route currently filters client-side. Backend support needed for:
-
-**Required Filter Support:**
-
-```graphql
-query DiscoverSpaces(
-  $where: SpaceFilterInput
-  $order: [SpaceOrderInput!]
-  $first: Int
-  $after: String
-) {
-  availableSpaces(where: $where, order: $order, first: $first, after: $after) {
-    nodes {
-      id
-      ...SpaceCard_SpaceFragment
-    }
-    pageInfo {
-      hasNextPage
-      endCursor
-    }
-    totalCount
-  }
-}
-```
-
-**Filter Examples:**
-- Price range: `where: { pricePerDay: { gte: 50, lte: 200 } }`
-- Space type: `where: { type: { in: [STOREFRONT, WINDOW_DISPLAY] } }`
-- Location: `where: { city: { eq: "Austin" } }`
-
-**Sort Examples:**
-- `order: [{ pricePerDay: ASC }]`
-- `order: [{ createdAt: DESC }]`
-
-**Tasks:**
-- [ ] Add `SpaceFilterInput` to schema
-- [ ] Add `SpaceOrderInput` to schema
-- [ ] Implement `availableSpaces` query with pagination
-- [ ] Update discover route to use server-side filtering
-- [ ] Add `totalCount` for pagination UI
-
----
-
-## Discover View Preference Cookie Migration
-
-**Date:** 2026-01-27 | **Status:** Planned
-
-Migrate discover view preference from localStorage to cookie for SSR consistency.
-
-**Current State:**
-- Uses localStorage via `useSyncExternalStore`
-- Key: `storageKey.preferences.discover.view`
-
-**Target State:**
-- Use cookie with server action
-- Read initial value from cookie in server component
-- Pass as prop to client content component
-
-**Files to Update:**
-- `app/(dashboard)/@advertiser/discover/layout.tsx` - Read cookie, pass to Content
-- `app/(dashboard)/@advertiser/discover/content.tsx` - Accept initial view as prop
-
-**Tasks:**
-- [ ] Update layout to read cookie and pass initial view
-- [ ] Update Content component to accept initialView prop
-- [ ] Add server action for view change
-- [ ] Remove localStorage usage
+- [ ] Add footer attribution for third-party assets (see [docs/acknowledgements.md](./acknowledgements.md))

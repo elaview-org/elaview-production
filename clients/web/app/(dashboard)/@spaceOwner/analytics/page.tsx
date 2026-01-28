@@ -13,7 +13,6 @@ export default function Page() {
   return (
     <div className="flex flex-col gap-6">
       <SummaryCards />
-
       <TopPerformers />
 
       <div className="grid grid-cols-1 gap-6 @3xl/main:grid-cols-2">
@@ -32,7 +31,6 @@ export default function Page() {
       </div>
 
       <RevenueChart />
-
       <PerformanceTable />
     </div>
   );

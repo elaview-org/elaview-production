@@ -1,0 +1,80 @@
+[
+  {
+    "id": "mock-camp-1",
+    "name": "Spring Sale Campaign",
+    "description": "Promoting our spring collection across local storefronts",
+    "status": "ACTIVE",
+    "startDate": "2026-02-01T00:00:00Z",
+    "endDate": "2026-03-31T00:00:00Z",
+    "totalBudget": "5000.00",
+    "imageUrl": null,
+    "bookings": {
+      "nodes": [{"id": "b1"}, {"id": "b2"}, {"id": "b3"}, {"id": "b4"}, {"id": "b5"}, {"id": "b6"}, {"id": "b7"}, {"id": "b8"}]
+    }
+  },
+  {
+    "id": "mock-camp-2",
+    "name": "Grand Opening",
+    "description": "Launch campaign for our new downtown location",
+    "status": "SUBMITTED",
+    "startDate": "2026-02-15T00:00:00Z",
+    "endDate": "2026-03-15T00:00:00Z",
+    "totalBudget": "3500.00",
+    "imageUrl": null,
+    "bookings": {
+      "nodes": [{"id": "b1"}, {"id": "b2"}, {"id": "b3"}, {"id": "b4"}, {"id": "b5"}]
+    }
+  },
+  {
+    "id": "mock-camp-3",
+    "name": "Summer Festival",
+    "description": "Visibility campaign for the annual summer festival",
+    "status": "DRAFT",
+    "startDate": "2026-06-01T00:00:00Z",
+    "endDate": "2026-06-30T00:00:00Z",
+    "totalBudget": "2000.00",
+    "imageUrl": null,
+    "bookings": {
+      "nodes": []
+    }
+  },
+  {
+    "id": "mock-camp-4",
+    "name": "Holiday Campaign 2025",
+    "description": "End of year promotional campaign",
+    "status": "COMPLETED",
+    "startDate": "2025-12-01T00:00:00Z",
+    "endDate": "2025-12-31T00:00:00Z",
+    "totalBudget": "4500.00",
+    "imageUrl": null,
+    "bookings": {
+      "nodes": [{"id": "b1"}, {"id": "b2"}, {"id": "b3"}, {"id": "b4"}, {"id": "b5"}, {"id": "b6"}, {"id": "b7"}, {"id": "b8"}, {"id": "b9"}, {"id": "b10"}, {"id": "b11"}, {"id": "b12"}]
+    }
+  },
+  {
+    "id": "mock-camp-5",
+    "name": "Back to School",
+    "description": "Targeting students and parents for school season",
+    "status": "COMPLETED",
+    "startDate": "2025-08-01T00:00:00Z",
+    "endDate": "2025-09-15T00:00:00Z",
+    "totalBudget": "3000.00",
+    "imageUrl": null,
+    "bookings": {
+      "nodes": [{"id": "b1"}, {"id": "b2"}, {"id": "b3"}, {"id": "b4"}, {"id": "b5"}, {"id": "b6"}]
+    }
+  },
+  {
+    "id": "mock-camp-6",
+    "name": "Valentine's Special",
+    "description": "Romance-themed campaign for local businesses",
+    "status": "ACTIVE",
+    "startDate": "2026-01-15T00:00:00Z",
+    "endDate": "2026-02-14T00:00:00Z",
+    "totalBudget": "1800.00",
+    "imageUrl": null,
+    "bookings": {
+      "nodes": [{"id": "b1"}, {"id": "b2"}, {"id": "b3"}, {"id": "b4"}]
+    }
+  }
+]

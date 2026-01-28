@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { Button } from "@/components/primitives/button";
 import {
   Field,
@@ -9,49 +9,46 @@ import {
   FieldLabel,
 } from "@/components/primitives/field";
 import { Input } from "@/components/primitives/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/primitives/select";
 import { updateBusinessInfoAction } from "./settings.actions";
-import type { User } from "@/types/gql";
+import type { AdvertiserSettingsQuery } from "@/types/gql/graphql";
 import { toast } from "sonner";
+import { INDUSTRY_OPTIONS } from "./constants";
 
-interface BusinessSettingsFormProps {
-  user: User;
-}
+type Props = {
+  user: NonNullable<AdvertiserSettingsQuery["me"]>;
+};
 
-const INDUSTRY_OPTIONS = [
-  "Restaurant & Food Service",
-  "Fitness & Gym",
-  "Beauty & Salon",
-  "Real Estate",
-  "Retail",
-  "Healthcare",
-  "Education",
-  "Automotive",
-  "Home Services",
-  "Professional Services",
-  "Other",
-] as const;
-
-export function BusinessSettingsForm({ user }: BusinessSettingsFormProps) {
-  const advertiserProfile = user.advertiserProfile;
+export default function BusinessSettingsForm({ user }: Props) {
+  const profile = user.advertiserProfile;
+  const prevSuccessRef = useRef(false);
 
   const [state, action, pending] = useActionState(updateBusinessInfoAction, {
     success: false,
     message: "",
     data: {
-      companyName: advertiserProfile?.companyName ?? "",
-      industry: advertiserProfile?.industry ?? "",
-      website: advertiserProfile?.website ?? "",
+      companyName: profile?.companyName ?? "",
+      industry: profile?.industry ?? "",
+      website: profile?.website ?? "",
     },
   });
 
-  if (state.success) {
-    toast.success("Business information updated successfully");
-  }
+  useEffect(() => {
+    if (state.success && !prevSuccessRef.current) {
+      toast.success("Business information updated successfully");
+    }
+    prevSuccessRef.current = state.success;
+  }, [state.success]);
 
   return (
     <form action={action} className="space-y-6">
       <FieldGroup>
-        {/* Company Name Field */}
         <Field>
           <FieldLabel htmlFor="companyName">Company Name</FieldLabel>
           <Input
@@ -62,33 +59,29 @@ export function BusinessSettingsForm({ user }: BusinessSettingsFormProps) {
             defaultValue={state.data.companyName}
           />
           <FieldDescription>
-            The name of your business or organization. This helps space owners
-            understand who they&#39;re working with.
+            The name of your business or organization.
           </FieldDescription>
         </Field>
 
-        {/* Industry Field */}
         <Field>
           <FieldLabel htmlFor="industry">Industry</FieldLabel>
-          <select
-            id="industry"
-            name="industry"
-            defaultValue={state.data.industry}
-            className="border-input placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <option value="">Select an industry</option>
-            {INDUSTRY_OPTIONS.map((industry) => (
-              <option key={industry} value={industry}>
-                {industry}
-              </option>
-            ))}
-          </select>
+          <Select name="industry" defaultValue={state.data.industry}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select an industry" />
+            </SelectTrigger>
+            <SelectContent>
+              {INDUSTRY_OPTIONS.map((industry) => (
+                <SelectItem key={industry} value={industry}>
+                  {industry}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <FieldDescription>
-            Select the industry that best describes your business.
+            The industry that best describes your business.
           </FieldDescription>
         </Field>
 
-        {/* Website Field */}
         <Field>
           <FieldLabel htmlFor="website">Website</FieldLabel>
           <Input
@@ -99,26 +92,18 @@ export function BusinessSettingsForm({ user }: BusinessSettingsFormProps) {
             defaultValue={state.data.website ?? ""}
           />
           <FieldDescription>
-            Your business website URL. This helps space owners learn more about
-            your business.
+            Your business website URL.
           </FieldDescription>
         </Field>
 
-        {/* Error/Success Message */}
-        {state.message && (
+        {state.message && !state.success && (
           <Field>
-            <p
-              className={`text-sm ${
-                state.success ? "text-green-600" : "text-destructive"
-              }`}
-              aria-live="polite"
-            >
+            <p className="text-destructive text-sm" aria-live="polite">
               {state.message}
             </p>
           </Field>
         )}
 
-        {/* Submit Button */}
         <Field>
           <Button type="submit" disabled={pending}>
             {pending ? "Saving..." : "Save Changes"}

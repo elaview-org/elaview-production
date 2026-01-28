@@ -37,6 +37,7 @@
     --color-chart-rating: var(--chart-rating);
     --color-chart-reviews: var(--chart-reviews);
     --color-chart-spaces: var(--chart-spaces);
+    --color-chart-spending: var(--chart-spending);
     --color-chart-heatmap-0: var(--chart-heatmap-0);
     --color-chart-heatmap-1: var(--chart-heatmap-1);
     --color-chart-heatmap-2: var(--chart-heatmap-2);
@@ -83,6 +84,7 @@
     --chart-rating: oklch(0.795 0.184 86.047);
     --chart-reviews: oklch(0.702 0.183 293.541);
     --chart-spaces: oklch(0.65 0.12 195);
+    --chart-spending: oklch(0.65 0.20 25);
     --chart-heatmap-0: oklch(0.94 0.03 260);
     --chart-heatmap-1: oklch(0.82 0.08 260);
     --chart-heatmap-2: oklch(0.70 0.12 260);
@@ -128,6 +130,7 @@
     --chart-rating: oklch(0.769 0.188 70.08);
     --chart-reviews: oklch(0.627 0.265 303.9);
     --chart-spaces: oklch(0.68 0.10 195);
+    --chart-spending: oklch(0.70 0.18 25);
     --chart-heatmap-0: oklch(0.30 0.04 260);
     --chart-heatmap-1: oklch(0.40 0.10 260);
     --chart-heatmap-2: oklch(0.52 0.14 260);

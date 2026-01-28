@@ -1,13 +1,48 @@
+import api from "@/api/gql/server";
+import { graphql } from "@/types/gql";
 import { redirect } from "next/navigation";
-import { AdvertiserSettingsContent } from "./advertiser-settings-content";
-import getAdvertiserQuery from "./advertiser-queries";
-import { User } from "@/types/gql";
+import SettingsContent from "./settings-content";
 
-export default async function AdvertiserSettingsPage() {
-  const { status, user } = await getAdvertiserQuery();
-  if (status) {
+export default async function Page() {
+  const { data, error } = await api.query({
+    query: graphql(`
+      query AdvertiserSettings {
+        me {
+          id
+          email
+          name
+          avatar
+          phone
+          createdAt
+          lastLoginAt
+          activeProfileType
+          advertiserProfile {
+            id
+            companyName
+            industry
+            website
+            onboardingComplete
+          }
+        }
+        myNotificationPreferences {
+          id
+          notificationType
+          inAppEnabled
+          emailEnabled
+          pushEnabled
+        }
+      }
+    `),
+  });
+
+  if (error || !data?.me) {
     redirect("/logout");
   }
 
-  return <AdvertiserSettingsContent user={user as User} />;
+  return (
+    <SettingsContent
+      user={data.me}
+      notificationPreferences={data.myNotificationPreferences}
+    />
+  );
 }

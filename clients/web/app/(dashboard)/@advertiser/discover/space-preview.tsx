@@ -8,7 +8,8 @@ import {
 } from "@/components/primitives/dialog";
 import { Button } from "@/components/primitives/button";
 import { Badge } from "@/components/primitives/badge";
-import { SpaceMarker } from "./types";
+import { SPACE_TYPE } from "@/lib/constants";
+import type { MapSpace } from "./(map)/map-container";
 import {
   IconMapPin,
   IconRuler,
@@ -17,20 +18,16 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 
-interface SpacePreviewProps {
-  space: SpaceMarker | null;
+type Props = {
+  space: MapSpace | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
+};
 
-export default function SpacePreview({
-  space,
-  open,
-  onOpenChange,
-}: SpacePreviewProps) {
+export default function SpacePreview({ space, open, onOpenChange }: Props) {
   if (!space) return null;
 
-  const fullAddress = `${space.address}, ${space.city}, ${space.state} ${space.zipCode}`;
+  const fullAddress = `${space.address}, ${space.city}, ${space.state}`;
   const dimensions =
     space.width && space.height ? `${space.width}×${space.height} ft` : null;
 
@@ -52,7 +49,7 @@ export default function SpacePreview({
             </div>
           )}
           <Badge className="absolute top-4 left-4" variant="secondary">
-            {space.type.replace("_", " ")}
+            {SPACE_TYPE.labels[space.type]}
           </Badge>
         </div>
 

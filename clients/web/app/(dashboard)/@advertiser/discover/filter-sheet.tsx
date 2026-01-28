@@ -15,35 +15,20 @@ import { Checkbox } from "@/components/primitives/checkbox";
 import { Label } from "@/components/primitives/label";
 import { IconFilter, IconX } from "@tabler/icons-react";
 import { SpaceType } from "@/types/gql";
-import { FilterState } from "./types";
+import { SPACE_TYPE } from "@/lib/constants";
+import { FilterState, PHASE_1_TYPES } from "./constants";
 
-const SPACE_TYPE_LABELS: Record<SpaceType, string> = {
-  [SpaceType.Billboard]: "Billboard",
-  [SpaceType.DigitalDisplay]: "Digital Display",
-  [SpaceType.Other]: "Other",
-  [SpaceType.Storefront]: "Storefront",
-  [SpaceType.Transit]: "Transit",
-  [SpaceType.VehicleWrap]: "Vehicle Wrap",
-  [SpaceType.WindowDisplay]: "Window Display",
-};
-
-const PHASE_1_TYPES = [
-  SpaceType.Storefront,
-  SpaceType.WindowDisplay,
-  SpaceType.Other,
-];
-
-interface FilterSheetProps {
+type Props = {
   filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
   maxPrice?: number;
-}
+};
 
 export default function FilterSheet({
   filters,
   onFiltersChange,
   maxPrice = 500,
-}: FilterSheetProps) {
+}: Props) {
   const [open, setOpen] = useState(false);
   const [localFilters, setLocalFilters] = useState<FilterState>(filters);
 
@@ -135,7 +120,7 @@ export default function FilterSheet({
                     htmlFor={type}
                     className="cursor-pointer text-sm font-normal"
                   >
-                    {SPACE_TYPE_LABELS[type]}
+                    {SPACE_TYPE.labels[type]}
                   </Label>
                 </div>
               ))}

@@ -1,0 +1,71 @@
+{
+  "user": {
+    "name": "John Smith",
+    "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
+    "advertiserProfile": {
+      "createdAt": "2024-03-15T00:00:00Z",
+      "companyName": "Smith Marketing Co.",
+      "industry": "Retail",
+      "website": "https://smithmarketing.com",
+      "onboardingComplete": true
+    }
+  },
+  "responseRate": 95,
+  "responseTime": "within a few hours",
+  "campaigns": [
+    {
+      "id": "camp-1",
+      "name": "Summer Sale Promotion",
+      "status": "COMPLETED",
+      "spaces": 3,
+      "totalSpend": 2450,
+      "startDate": "2025-06-01T00:00:00Z",
+      "endDate": "2025-06-30T00:00:00Z"
+    },
+    {
+      "id": "camp-2",
+      "name": "Grand Opening Campaign",
+      "status": "ACTIVE",
+      "spaces": 5,
+      "totalSpend": 4200,
+      "startDate": "2025-11-15T00:00:00Z",
+      "endDate": "2025-12-15T00:00:00Z"
+    },
+    {
+      "id": "camp-3",
+      "name": "Holiday Special",
+      "status": "COMPLETED",
+      "spaces": 2,
+      "totalSpend": 1850,
+      "startDate": "2025-12-01T00:00:00Z",
+      "endDate": "2025-12-25T00:00:00Z"
+    },
+    {
+      "id": "camp-4",
+      "name": "New Year Kickoff",
+      "status": "ACTIVE",
+      "spaces": 4,
+      "totalSpend": 3600,
+      "startDate": "2026-01-01T00:00:00Z",
+      "endDate": "2026-01-31T00:00:00Z"
+    },
+    {
+      "id": "camp-5",
+      "name": "Spring Collection Launch",
+      "status": "PENDING",
+      "spaces": 3,
+      "totalSpend": 0,
+      "startDate": "2026-03-01T00:00:00Z",
+      "endDate": "2026-03-31T00:00:00Z"
+    },
+    {
+      "id": "camp-6",
+      "name": "Local Business Awareness",
+      "status": "COMPLETED",
+      "spaces": 6,
+      "totalSpend": 5100,
+      "startDate": "2025-04-15T00:00:00Z",
+      "endDate": "2025-05-15T00:00:00Z"
+    }
+  ]
+}

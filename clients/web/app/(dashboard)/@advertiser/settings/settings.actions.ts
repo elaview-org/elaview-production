@@ -32,7 +32,7 @@ interface UpdateBusinessInfoState {
 async function getCurrentUser() {
   const { data } = await api.query({
     query: graphql(`
-      query GetCurrentUserForSettings {
+      query GetAdvertiserForSettings {
         me {
           id
           avatar
@@ -51,16 +51,16 @@ export async function updateProfileAction(
   _prevState: UpdateProfileState,
   formData: FormData
 ): Promise<UpdateProfileState> {
+  const name = formData.get("name")?.toString() ?? "";
+  const email = formData.get("email")?.toString() ?? "";
+  const phone = formData.get("phone")?.toString() ?? "";
+
   try {
     const user = await getCurrentUser();
 
     if (!user) {
       redirect("/logout");
     }
-
-    const name = formData.get("name")?.toString() ?? "";
-    const email = formData.get("email")?.toString() ?? "";
-    const phone = formData.get("phone")?.toString() ?? "";
 
     if (!name.trim()) {
       return {
@@ -70,17 +70,9 @@ export async function updateProfileAction(
       };
     }
 
-    if (!email.trim() || !email.includes("@")) {
-      return {
-        success: false,
-        message: "Valid email is required",
-        data: { name, email, phone },
-      };
-    }
-
     const { data: mutationData } = await api.mutate({
       mutation: graphql(`
-        mutation UpdateCurrentUserProfile($input: UpdateCurrentUserInput!) {
+        mutation UpdateAdvertiserUserProfile($input: UpdateCurrentUserInput!) {
           updateCurrentUser(input: $input) {
             user {
               id
@@ -118,11 +110,7 @@ export async function updateProfileAction(
     return {
       success: false,
       message: error instanceof Error ? error.message : "An error occurred",
-      data: {
-        name: formData.get("name")?.toString() ?? "",
-        email: formData.get("email")?.toString() ?? "",
-        phone: formData.get("phone")?.toString() ?? "",
-      },
+      data: { name, email, phone },
     };
   }
 }
@@ -131,6 +119,10 @@ export async function updateBusinessInfoAction(
   _prevState: UpdateBusinessInfoState,
   formData: FormData
 ): Promise<UpdateBusinessInfoState> {
+  const companyName = formData.get("companyName")?.toString() ?? "";
+  const industry = formData.get("industry")?.toString() ?? "";
+  const website = formData.get("website")?.toString() ?? "";
+
   try {
     const user = await getCurrentUser();
 
@@ -142,21 +134,15 @@ export async function updateBusinessInfoAction(
       return {
         success: false,
         message: "Advertiser profile not found",
-        data: {
-          companyName: "",
-          industry: "",
-          website: "",
-        },
+        data: { companyName, industry, website },
       };
     }
 
-    const companyName = formData.get("companyName")?.toString() ?? "";
-    const industry = formData.get("industry")?.toString() ?? "";
-    const website = formData.get("website")?.toString() ?? "";
-
     const { data: mutationData } = await api.mutate({
       mutation: graphql(`
-        mutation UpdateAdvertiserProfileInfo($input: UpdateAdvertiserProfileInput!) {
+        mutation UpdateAdvertiserBusinessInfo(
+          $input: UpdateAdvertiserProfileInput!
+        ) {
           updateAdvertiserProfile(input: $input) {
             advertiserProfile {
               id
@@ -192,11 +178,7 @@ export async function updateBusinessInfoAction(
     return {
       success: false,
       message: error instanceof Error ? error.message : "An error occurred",
-      data: {
-        companyName: formData.get("companyName")?.toString() ?? "",
-        industry: formData.get("industry")?.toString() ?? "",
-        website: formData.get("website")?.toString() ?? "",
-      },
+      data: { companyName, industry, website },
     };
   }
 }

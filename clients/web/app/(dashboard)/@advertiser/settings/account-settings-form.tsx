@@ -8,29 +8,28 @@ import {
   FieldLabel,
 } from "@/components/primitives/field";
 import { Input } from "@/components/primitives/input";
-import type { User } from "@/types/gql";
 import { Separator } from "@/components/primitives/separator";
+import type { AdvertiserSettingsQuery } from "@/types/gql/graphql";
 
-interface AccountSettingsFormProps {
-  user: User;
+type Props = {
+  user: NonNullable<AdvertiserSettingsQuery["me"]>;
+};
+
+function formatDate(dateString: string | null | undefined | unknown) {
+  if (!dateString) return "Never";
+  return new Date(dateString as string).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
-export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
-  const formatDate = (dateString: string | null | undefined | unknown) => {
-    if (!dateString) return "Never";
-    return new Date(dateString as string).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
+export default function AccountSettingsForm({ user }: Props) {
   return (
     <div className="space-y-6">
       <FieldGroup>
-        {/* Account Information */}
         <Field>
           <FieldLabel>Account Information</FieldLabel>
           <div className="space-y-3 rounded-md border p-4">
@@ -51,9 +50,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
             </div>
             <Separator />
             <div className="flex justify-between">
-              <span className="text-muted-foreground text-sm">
-                Account Type
-              </span>
+              <span className="text-muted-foreground text-sm">Account Type</span>
               <span className="text-sm font-medium capitalize">
                 {user.activeProfileType?.toLowerCase().replace("_", " ")}
               </span>
@@ -61,23 +58,20 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
           </div>
         </Field>
 
-        {/* Password Change Section */}
         <Field>
           <FieldLabel>Change Password</FieldLabel>
           <FieldDescription>
-            Update your password to keep your account secure. Make sure
-            it&apos;s at least 8 characters long.
+            Update your password to keep your account secure.
           </FieldDescription>
           <div className="mt-4 space-y-4">
             <Field>
-              <FieldLabel htmlFor="currentPassword">
-                Current Password
-              </FieldLabel>
+              <FieldLabel htmlFor="currentPassword">Current Password</FieldLabel>
               <Input
                 id="currentPassword"
                 name="currentPassword"
                 type="password"
                 placeholder="Enter current password"
+                disabled
               />
             </Field>
             <Field>
@@ -87,6 +81,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
                 name="newPassword"
                 type="password"
                 placeholder="Enter new password"
+                disabled
               />
             </Field>
             <Field>
@@ -98,6 +93,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
                 name="confirmPassword"
                 type="password"
                 placeholder="Confirm new password"
+                disabled
               />
             </Field>
             <Button type="button" variant="outline" disabled>
@@ -109,8 +105,8 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
           </div>
         </Field>
 
-        {/* Danger Zone */}
         <Separator className="my-6" />
+
         <Field>
           <FieldLabel className="text-destructive">Danger Zone</FieldLabel>
           <FieldDescription>
@@ -123,7 +119,6 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
                   <h4 className="text-sm font-medium">Delete Account</h4>
                   <p className="text-muted-foreground mt-1 text-sm">
                     Permanently delete your account and all associated data.
-                    This action cannot be undone.
                   </p>
                 </div>
                 <Button type="button" variant="destructive" disabled>
@@ -132,8 +127,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
               </div>
             </div>
             <FieldDescription>
-              Account deletion functionality coming soon. Please contact support
-              if you need to delete your account.
+              Account deletion coming soon. Contact support if needed.
             </FieldDescription>
           </div>
         </Field>

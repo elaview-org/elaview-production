@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { Button } from "@/components/primitives/button";
 import {
   Field,
@@ -15,14 +15,15 @@ import {
   AvatarImage,
 } from "@/components/primitives/avatar";
 import { updateProfileAction } from "./settings.actions";
-import type { User } from "@/types/gql";
+import type { AdvertiserSettingsQuery } from "@/types/gql/graphql";
 import { toast } from "sonner";
 
-interface ProfileSettingsFormProps {
-  user: User;
-}
+type Props = {
+  user: NonNullable<AdvertiserSettingsQuery["me"]>;
+};
 
-export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
+export default function ProfileSettingsForm({ user }: Props) {
+  const prevSuccessRef = useRef(false);
   const [state, action, pending] = useActionState(updateProfileAction, {
     success: false,
     message: "",
@@ -33,6 +34,13 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
     },
   });
 
+  useEffect(() => {
+    if (state.success && !prevSuccessRef.current) {
+      toast.success("Profile updated successfully");
+    }
+    prevSuccessRef.current = state.success;
+  }, [state.success]);
+
   const initials =
     user.name
       ?.split(" ")
@@ -41,14 +49,9 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
       .toUpperCase()
       .slice(0, 2) ?? "U";
 
-  if (state.success) {
-    toast.success("Profile updated successfully");
-  }
-
   return (
     <form action={action} className="space-y-6">
       <FieldGroup>
-        {/* Avatar Section */}
         <Field>
           <FieldLabel>Profile Picture</FieldLabel>
           <div className="flex items-center gap-4">
@@ -60,7 +63,7 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
               <AvatarFallback className="text-lg">{initials}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col gap-2">
-              <Button type="button" variant="outline" size="sm">
+              <Button type="button" variant="outline" size="sm" disabled>
                 Change Photo
               </Button>
               <FieldDescription>
@@ -70,7 +73,6 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
           </div>
         </Field>
 
-        {/* Name Field */}
         <Field>
           <FieldLabel htmlFor="name">Full Name</FieldLabel>
           <Input
@@ -82,11 +84,10 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
             required
           />
           <FieldDescription>
-            This is your display name. It will be visible to space owners.
+            This is your display name visible to space owners.
           </FieldDescription>
         </Field>
 
-        {/* Email Field */}
         <Field>
           <FieldLabel htmlFor="email">Email Address</FieldLabel>
           <Input
@@ -95,15 +96,13 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
             type="email"
             placeholder="you@example.com"
             defaultValue={state.data.email}
-            required
+            disabled
           />
           <FieldDescription>
-            We&#39;ll use this email to send you booking updates and
-            notifications.
+            Your email is used for login and cannot be changed here.
           </FieldDescription>
         </Field>
 
-        {/* Phone Field */}
         <Field>
           <FieldLabel htmlFor="phone">Phone Number</FieldLabel>
           <Input
@@ -114,25 +113,18 @@ export function ProfileSettingsForm({ user }: ProfileSettingsFormProps) {
             defaultValue={state.data.phone ?? ""}
           />
           <FieldDescription>
-            Optional. Used for important account notifications via SMS.
+            Optional. Used for important booking notifications via SMS.
           </FieldDescription>
         </Field>
 
-        {/* Error/Success Message */}
-        {state.message && (
+        {state.message && !state.success && (
           <Field>
-            <p
-              className={`text-sm ${
-                state.success ? "text-green-600" : "text-destructive"
-              }`}
-              aria-live="polite"
-            >
+            <p className="text-destructive text-sm" aria-live="polite">
               {state.message}
             </p>
           </Field>
         )}
 
-        {/* Submit Button */}
         <Field>
           <Button type="submit" disabled={pending}>
             {pending ? "Saving..." : "Save Changes"}

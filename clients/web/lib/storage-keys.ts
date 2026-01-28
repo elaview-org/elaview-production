@@ -12,6 +12,15 @@ const storageKey = {
     bookings: {
       view: createKey("preferences", "bookings", "view"),
     },
+    advertiserBookings: {
+      view: createKey("preferences", "advertiser-bookings", "view"),
+    },
+    campaigns: {
+      view: createKey("preferences", "campaigns", "view"),
+    },
+    discover: {
+      view: createKey("preferences", "discover", "view"),
+    },
     sidebar: {
       open: createKey("preferences", "sidebar", "open"),
     },

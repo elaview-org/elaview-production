@@ -227,9 +227,7 @@ function ScheduleStep() {
           </span>
           <Input placeholder="5000" className="pl-7" type="number" min={100} />
         </div>
-        <p className="text-muted-foreground text-xs">
-          Minimum budget is $100
-        </p>
+        <p className="text-muted-foreground text-xs">Minimum budget is $100</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">

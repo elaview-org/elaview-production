@@ -11,6 +11,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import Image from "next/image";
 import { Button } from "@/components/primitives/button";
 import { Badge } from "@/components/primitives/badge";
 import { IconCurrentLocation } from "@tabler/icons-react";
@@ -165,12 +166,14 @@ export default function DiscoverMapContainer({
           >
             <Popup>
               <div className="w-[280px]">
-                <div className="bg-muted aspect-video w-full">
+                <div className="bg-muted relative aspect-video w-full">
                   {space.images[0] ? (
-                    <img
+                    <Image
                       src={space.images[0]}
                       alt={space.title}
-                      className="h-full w-full object-cover"
+                      fill
+                      className="object-cover"
+                      unoptimized
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center">

@@ -82,7 +82,9 @@ export default function ProfileCard({
           {stats.map((stat) => (
             <div key={stat.label} className="flex flex-col">
               <span className="text-2xl font-bold">{stat.value}</span>
-              <span className="text-muted-foreground text-xs">{stat.label}</span>
+              <span className="text-muted-foreground text-xs">
+                {stat.label}
+              </span>
             </div>
           ))}
         </div>

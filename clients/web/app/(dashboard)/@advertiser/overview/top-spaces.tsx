@@ -1,6 +1,15 @@
-import { IconStar, IconEye, IconTrendingUp, IconCalendar } from "@tabler/icons-react";
-import RankedCard, { RankedCardSkeleton } from "@/components/composed/ranked-card";
-import SectionCard, { SectionCardSkeleton } from "@/components/composed/section-card";
+import {
+  IconStar,
+  IconEye,
+  IconTrendingUp,
+  IconCalendar,
+} from "@tabler/icons-react";
+import RankedCard, {
+  RankedCardSkeleton,
+} from "@/components/composed/ranked-card";
+import SectionCard, {
+  SectionCardSkeleton,
+} from "@/components/composed/section-card";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import mock from "./mock.json";
 

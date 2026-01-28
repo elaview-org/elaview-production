@@ -239,7 +239,11 @@ type ViewGroupProps = {
   onViewChangeAction?: (view: ViewOptions) => void;
 };
 
-function ViewGroup({ views, currentView = ViewOptions.Grid, onViewChangeAction }: ViewGroupProps) {
+function ViewGroup({
+  views,
+  currentView = ViewOptions.Grid,
+  onViewChangeAction,
+}: ViewGroupProps) {
   const [isPending, startTransition] = useTransition();
 
   const visibleViews = viewGroupConfig.filter(

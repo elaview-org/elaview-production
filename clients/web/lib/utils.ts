@@ -53,7 +53,10 @@ export function formatCurrency(
   }).format(amount);
 }
 
-export function formatDateRange(start: string | Date, end: string | Date): string {
+export function formatDateRange(
+  start: string | Date,
+  end: string | Date
+): string {
   const startDate = typeof start === "string" ? new Date(start) : start;
   const endDate = typeof end === "string" ? new Date(end) : end;
   const opts: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };

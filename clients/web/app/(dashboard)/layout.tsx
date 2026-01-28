@@ -24,7 +24,8 @@ import storageKey from "@/lib/storage-keys";
 
 export default async function Layout(props: LayoutProps<"/">) {
   const cookieStore = await cookies();
-  const sidebarOpen = cookieStore.get(storageKey.preferences.sidebar.open)?.value !== "false";
+  const sidebarOpen =
+    cookieStore.get(storageKey.preferences.sidebar.open)?.value !== "false";
 
   const { data, error } = await api.query({
     query: graphql(`

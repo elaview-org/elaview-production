@@ -2,13 +2,13 @@
 
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { Button } from "@/components/primitives/button";
-import ActionCard, { ActionCardSkeleton } from "@/components/composed/action-card";
-import SectionCard, { SectionCardSkeleton } from "@/components/composed/section-card";
-import {
-  formatCurrency,
-  formatDateRange,
-  formatTime,
-} from "@/lib/utils";
+import ActionCard, {
+  ActionCardSkeleton,
+} from "@/components/composed/action-card";
+import SectionCard, {
+  SectionCardSkeleton,
+} from "@/components/composed/section-card";
+import { formatCurrency, formatDateRange, formatTime } from "@/lib/utils";
 import mock from "./mock.json";
 
 type PendingRequest = {

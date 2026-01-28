@@ -33,7 +33,7 @@ export default function ErrorState({
         <h3 className="text-xl font-semibold tracking-tight">
           {ensurePeriod(title)}
         </h3>
-        <p className="text-sm text-foreground/80 text-balance">
+        <p className="text-foreground/80 text-sm text-balance">
           {ensurePeriod(message)}
         </p>
       </div>

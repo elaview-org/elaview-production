@@ -6,7 +6,7 @@ import storageKey from "@/lib/storage-keys";
 import Toolbar from "@/components/composed/toolbar";
 import BookingsGrid from "./(grid)/bookings-grid";
 import BookingsTable from "./(table)/bookings-table";
-import { type FilterTabKey, getStatusFilter, TOOLBAR_PROPS } from "./constants";
+import { type FilterTabKey, TOOLBAR_PROPS } from "./constants";
 import mockData from "./mock.json";
 
 export default async function Page(props: PageProps<"/bookings">) {
@@ -20,7 +20,6 @@ export default async function Page(props: PageProps<"/bookings">) {
     }),
   ]);
   const tabKey = (status as FilterTabKey) ?? "all";
-  const filter = getStatusFilter(tabKey);
 
   const { data, error } = await api.query({
     // query: graphql(`

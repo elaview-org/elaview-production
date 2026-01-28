@@ -26,7 +26,7 @@ function CalendarGridSkeleton() {
           <Skeleton key={i} className="mx-auto h-5 w-8" />
         ))}
       </div>
-      <div className="absolute right-2 top-1">
+      <div className="absolute top-1 right-2">
         <Skeleton className="h-7 w-20" />
       </div>
       <div className="grid grid-cols-7 divide-x">

@@ -12,23 +12,3 @@ export async function redirectIfAuthenticated(url: string) {
 export async function authenticatedRedirect() {
   await redirectIfAuthenticated("/overview");
 }
-
-// todo:
-async function authRedirect({
-  on,
-  authenticated,
-  unauthenticated,
-}: {
-  on: "authenticated" | "unauthenticated";
-  authenticated?: () => Promise<boolean>;
-  unauthenticated?: () => Promise<boolean>;
-}) {
-  if (on === "authenticated") {
-    const check =
-      authenticated ??
-      (async () =>
-        !!(await (await import("next/headers")).cookies()).get(
-          storageKey.authentication.token
-        ));
-  }
-}

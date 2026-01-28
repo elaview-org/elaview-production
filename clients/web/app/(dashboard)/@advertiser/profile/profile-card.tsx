@@ -27,7 +27,10 @@ export default function ProfileCard() {
       stats={[
         { value: totalCampaigns, label: "Campaigns" },
         { value: formatCurrency(totalSpend), label: "Total Spend" },
-        { value: yearsAdvertising, label: yearsAdvertising === 1 ? "Year" : "Years" },
+        {
+          value: yearsAdvertising,
+          label: yearsAdvertising === 1 ? "Year" : "Years",
+        },
       ]}
     />
   );

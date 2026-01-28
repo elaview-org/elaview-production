@@ -17,7 +17,10 @@ import {
   SelectValue,
 } from "@/components/primitives/select";
 import { updateBusinessInfoAction } from "./settings.actions";
-import { PayoutSchedule, type SpaceOwnerSettingsQuery } from "@/types/gql/graphql";
+import {
+  PayoutSchedule,
+  type SpaceOwnerSettingsQuery,
+} from "@/types/gql/graphql";
 import { toast } from "sonner";
 import { BUSINESS_TYPES, PAYOUT_SCHEDULE_LABELS } from "./constants";
 

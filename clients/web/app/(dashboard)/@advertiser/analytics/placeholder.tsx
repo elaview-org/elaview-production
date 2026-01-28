@@ -19,7 +19,8 @@ export default function Placeholder() {
         </EmptyMedia>
         <EmptyTitle>No analytics data yet</EmptyTitle>
         <EmptyDescription>
-          Your analytics will populate once you start running advertising campaigns
+          Your analytics will populate once you start running advertising
+          campaigns
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>

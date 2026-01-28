@@ -34,7 +34,12 @@ function calculateChange(current: number, previous: number): number {
   return ((current - previous) / previous) * 100;
 }
 
-function MetricRowComponent({ label, current, previous, format = "number" }: MetricRow) {
+function MetricRowComponent({
+  label,
+  current,
+  previous,
+  format = "number",
+}: MetricRow) {
   const change = calculateChange(current, previous);
   const isPositive = change > 0;
   const isNeutral = change === 0;
@@ -73,7 +78,9 @@ export default function ComparisonTable({ rows, className }: Props) {
       <div className="mb-2 flex items-center justify-between text-xs font-medium">
         <span>Metric</span>
         <div className="flex items-center gap-4">
-          <span className="text-muted-foreground w-20 text-right">Previous</span>
+          <span className="text-muted-foreground w-20 text-right">
+            Previous
+          </span>
           <span className="w-20 text-right">Current</span>
           <span className="w-16 text-right">Change</span>
         </div>
@@ -87,11 +94,18 @@ export default function ComparisonTable({ rows, className }: Props) {
   );
 }
 
-export function ComparisonTableSkeleton({ rowCount = 4 }: { rowCount?: number }) {
+export function ComparisonTableSkeleton({
+  rowCount = 4,
+}: {
+  rowCount?: number;
+}) {
   return (
     <div className="flex flex-col gap-3">
       {Array.from({ length: rowCount }).map((_, i) => (
-        <div key={i} className="flex items-center justify-between border-b pb-3">
+        <div
+          key={i}
+          className="flex items-center justify-between border-b pb-3"
+        >
           <Skeleton className="h-4 w-24" />
           <div className="flex items-center gap-4">
             <Skeleton className="h-4 w-16" />

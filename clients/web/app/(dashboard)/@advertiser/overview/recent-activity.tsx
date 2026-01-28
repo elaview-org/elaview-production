@@ -58,7 +58,8 @@ const columns = [
   currencyColumn<ActivityData>({
     key: "amount",
     header: "Amount",
-    value: (row) => row.amount ? parseFloat(row.amount.replace(/[$,]/g, "")) : null,
+    value: (row) =>
+      row.amount ? parseFloat(row.amount.replace(/[$,]/g, "")) : null,
   }),
   badgeColumn<ActivityData, ActivityStatus>({
     key: "status",

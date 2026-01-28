@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { Area, CartesianGrid, XAxis, YAxis, Bar, ComposedChart } from "recharts";
+import {
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Bar,
+  ComposedChart,
+} from "recharts";
 import {
   Card,
   CardAction,
@@ -22,7 +29,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/primitives/select";
-import { MONTH_RANGES, RATING_CHART_CONFIG, type MonthRange } from "./constants";
+import {
+  MONTH_RANGES,
+  RATING_CHART_CONFIG,
+  type MonthRange,
+} from "./constants";
 import mock from "./mock.json";
 
 export default function RatingChart() {

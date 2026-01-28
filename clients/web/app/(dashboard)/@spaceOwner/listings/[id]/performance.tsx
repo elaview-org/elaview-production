@@ -24,7 +24,9 @@ export default function Performance({ data }: Props) {
           <p className="text-muted-foreground text-xs">Bookings</p>
         </div>
         <div>
-          <p className="text-2xl font-semibold">${String(space.totalRevenue)}</p>
+          <p className="text-2xl font-semibold">
+            ${String(space.totalRevenue)}
+          </p>
           <p className="text-muted-foreground text-xs">Revenue</p>
         </div>
         <div>

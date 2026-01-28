@@ -47,7 +47,9 @@ export default function ProfileCard({ data }: Props) {
     .filter((r): r is number => r != null);
   const averageRating =
     spaceRatings.length > 0
-      ? (spaceRatings.reduce((a, b) => a + b, 0) / spaceRatings.length).toFixed(1)
+      ? (spaceRatings.reduce((a, b) => a + b, 0) / spaceRatings.length).toFixed(
+          1
+        )
       : null;
 
   return (
@@ -63,7 +65,9 @@ export default function ProfileCard({ data }: Props) {
           value: (
             <>
               {averageRating ?? "—"}
-              {averageRating && <IconStarFilled className="ml-0.5 inline size-4" />}
+              {averageRating && (
+                <IconStarFilled className="ml-0.5 inline size-4" />
+              )}
             </>
           ),
           label: "Rating",

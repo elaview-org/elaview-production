@@ -24,7 +24,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/primitives/select";
-import { MONTHLY_CHART_CONFIG, MONTH_RANGES, type MonthRange } from "./constants";
+import {
+  MONTHLY_CHART_CONFIG,
+  MONTH_RANGES,
+  type MonthRange,
+} from "./constants";
 import mock from "./mock.json";
 
 export default function MonthlyChart() {
@@ -40,9 +44,7 @@ export default function MonthlyChart() {
     <Card className="@container/card">
       <CardHeader>
         <CardTitle>Monthly Performance</CardTitle>
-        <CardDescription>
-          Spending and impressions by month
-        </CardDescription>
+        <CardDescription>Spending and impressions by month</CardDescription>
         <CardAction>
           <Select
             value={monthRange}
@@ -66,7 +68,10 @@ export default function MonthlyChart() {
         </CardAction>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={MONTHLY_CHART_CONFIG} className="h-[300px] w-full">
+        <ChartContainer
+          config={MONTHLY_CHART_CONFIG}
+          className="h-[300px] w-full"
+        >
           <BarChart data={filteredData} accessibilityLayer>
             <CartesianGrid vertical={false} />
             <XAxis

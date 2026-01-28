@@ -7,7 +7,10 @@ import mock from "./mock.json";
 export default function StatsCards() {
   const { stats } = mock;
   const spendTrend = calculateTrend(stats.thisMonthSpend, stats.lastMonthSpend);
-  const campaignTrend = calculateTrend(stats.activeCampaigns, stats.previousActiveCampaigns);
+  const campaignTrend = calculateTrend(
+    stats.activeCampaigns,
+    stats.previousActiveCampaigns
+  );
 
   return (
     <SummaryCardGrid>
@@ -21,14 +24,20 @@ export default function StatsCards() {
       <SummaryCard
         label="This Month"
         value={formatCurrency(stats.thisMonthSpend)}
-        badge={spendTrend !== 0 ? { type: "trend", value: spendTrend } : undefined}
+        badge={
+          spendTrend !== 0 ? { type: "trend", value: spendTrend } : undefined
+        }
         footer={`${formatCurrency(stats.lastMonthSpend)} last month`}
         description="vs previous month"
       />
       <SummaryCard
         label="Active Campaigns"
         value={stats.activeCampaigns.toString()}
-        badge={campaignTrend !== 0 ? { type: "trend", value: campaignTrend } : undefined}
+        badge={
+          campaignTrend !== 0
+            ? { type: "trend", value: campaignTrend }
+            : undefined
+        }
         footer={`${stats.activeBookings} active bookings`}
         description="Currently running"
       />

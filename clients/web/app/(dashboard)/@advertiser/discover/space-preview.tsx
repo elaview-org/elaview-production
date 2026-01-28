@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +18,6 @@ import {
   IconCalendar,
   IconArrowRight,
 } from "@tabler/icons-react";
-import Link from "next/link";
 
 type Props = {
   space: MapSpace | null;
@@ -36,10 +37,12 @@ export default function SpacePreview({ space, open, onOpenChange }: Props) {
       <DialogContent size="lg" className="gap-0 overflow-hidden p-0">
         <div className="bg-muted relative aspect-video w-full">
           {space.images[0] ? (
-            <img
+            <Image
               src={space.images[0]}
               alt={space.title}
-              className="h-full w-full object-cover"
+              fill
+              className="object-cover"
+              unoptimized
             />
           ) : (
             <div className="flex h-full items-center justify-center">

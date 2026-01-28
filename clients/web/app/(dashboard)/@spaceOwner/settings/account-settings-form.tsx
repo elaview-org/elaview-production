@@ -50,7 +50,9 @@ export default function AccountSettingsForm({ user }: Props) {
             </div>
             <Separator />
             <div className="flex justify-between">
-              <span className="text-muted-foreground text-sm">Account Type</span>
+              <span className="text-muted-foreground text-sm">
+                Account Type
+              </span>
               <span className="text-sm font-medium capitalize">
                 {user.activeProfileType?.toLowerCase().replace("_", " ")}
               </span>
@@ -65,7 +67,9 @@ export default function AccountSettingsForm({ user }: Props) {
           </FieldDescription>
           <div className="mt-4 space-y-4">
             <Field>
-              <FieldLabel htmlFor="currentPassword">Current Password</FieldLabel>
+              <FieldLabel htmlFor="currentPassword">
+                Current Password
+              </FieldLabel>
               <Input
                 id="currentPassword"
                 name="currentPassword"

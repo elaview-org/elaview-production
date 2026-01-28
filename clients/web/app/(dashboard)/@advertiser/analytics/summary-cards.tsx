@@ -19,18 +19,12 @@ export default function SummaryCards() {
     summary.totalImpressions,
     summary.previousTotalImpressions
   );
-  const reachChange = calculateTrend(
-    summary.reach,
-    summary.previousReach
-  );
+  const reachChange = calculateTrend(summary.reach, summary.previousReach);
   const cpiChange = calculateTrend(
     summary.avgCostPerImpression,
     summary.previousAvgCostPerImpression
   );
-  const roiChange = calculateTrend(
-    summary.roi,
-    summary.previousRoi
-  );
+  const roiChange = calculateTrend(summary.roi, summary.previousRoi);
 
   return (
     <div className="flex flex-col gap-4">

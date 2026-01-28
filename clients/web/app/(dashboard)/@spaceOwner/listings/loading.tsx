@@ -11,7 +11,9 @@ import { columns } from "./(table)/columns";
 
 export default async function Loading() {
   const cookieStore = await cookies();
-  const viewCookie = cookieStore.get(storageKey.preferences.listings.view)?.value;
+  const viewCookie = cookieStore.get(
+    storageKey.preferences.listings.view
+  )?.value;
   const view =
     viewCookie === ViewOptions.Table || viewCookie === ViewOptions.Map
       ? viewCookie
@@ -32,7 +34,9 @@ export default async function Loading() {
         }}
         action={<CreateSpace />}
       />
-      {view === ViewOptions.Table && <TableViewSkeleton columns={columns} rows={8} />}
+      {view === ViewOptions.Table && (
+        <TableViewSkeleton columns={columns} rows={8} />
+      )}
       {view === ViewOptions.Map && <MapViewSkeleton height={600} />}
       {view === ViewOptions.Grid && <GridViewSkeleton count={8} columns={4} />}
     </div>

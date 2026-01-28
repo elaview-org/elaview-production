@@ -1,4 +1,5 @@
 "use client";
+"use no memo";
 
 import * as React from "react";
 import {
@@ -85,6 +86,7 @@ export default function TableView<TData>({
     pageSize: initialPageSize,
   });
 
+  // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is incompatible with React Compiler; "use no memo" directive applied
   const table = useReactTable({
     data,
     columns,
@@ -138,20 +140,14 @@ export default function TableView<TData>({
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>
-                    {flexRender(
-                      cell.column.columnDef.cell,
-                      cell.getContext()
-                    )}
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
               </TableRow>
             ))
           ) : (
             <TableRow>
-              <TableCell
-                colSpan={columns.length}
-                className="h-24 text-center"
-              >
+              <TableCell colSpan={columns.length} className="h-24 text-center">
                 {emptyMessage}
               </TableCell>
             </TableRow>
@@ -473,7 +469,7 @@ export function dateColumn<TData>({
         DATE_FORMATS[format]
       );
       return (
-        <span className="text-muted-foreground whitespace-nowrap text-sm">
+        <span className="text-muted-foreground text-sm whitespace-nowrap">
           {formatted}
         </span>
       );
@@ -519,7 +515,7 @@ export function dateRangeColumn<TData>({
         formatOptions
       );
       return (
-        <span className="text-muted-foreground whitespace-nowrap text-sm">
+        <span className="text-muted-foreground text-sm whitespace-nowrap">
           {startFormatted} – {endFormatted}
         </span>
       );
@@ -601,7 +597,10 @@ export function numberColumn<TData>({
         <div className={cn("tabular-nums", isRight && "text-right")}>{num}</div>
       );
     },
-    meta: { skeleton: "number", headerAlign: isRight ? "right" : "left" } as ColumnMeta,
+    meta: {
+      skeleton: "number",
+      headerAlign: isRight ? "right" : "left",
+    } as ColumnMeta,
     enableHiding,
   };
 }
@@ -650,16 +649,18 @@ export function badgeColumn<TData, TStatus extends string>({
   };
 }
 
-type ActionItem<TData> = {
-  label: string;
-  href?: (row: TData) => string;
-  onClick?: (row: TData) => void;
-  icon?: React.ReactNode;
-  variant?: "default" | "destructive";
-  separator?: false;
-} | {
-  separator: true;
-};
+type ActionItem<TData> =
+  | {
+      label: string;
+      href?: (row: TData) => string;
+      onClick?: (row: TData) => void;
+      icon?: React.ReactNode;
+      variant?: "default" | "destructive";
+      separator?: false;
+    }
+  | {
+      separator: true;
+    };
 
 type ActionsColumnOptions<TData> = {
   items: (row: TData) => ActionItem<TData>[];
@@ -692,7 +693,10 @@ export function actionsColumn<TData>({
                 return <DropdownMenuSeparator key={index} />;
               }
 
-              const menuItem = item as Exclude<ActionItem<TData>, { separator: true }>;
+              const menuItem = item as Exclude<
+                ActionItem<TData>,
+                { separator: true }
+              >;
 
               if (menuItem.href) {
                 return (

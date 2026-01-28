@@ -5,8 +5,12 @@ import {
   IconCalendar,
   IconAlertTriangle,
 } from "@tabler/icons-react";
-import PerformerCard, { PerformerCardSkeleton } from "@/components/composed/performer-card";
-import SectionCard, { SectionCardSkeleton } from "@/components/composed/section-card";
+import PerformerCard, {
+  PerformerCardSkeleton,
+} from "@/components/composed/performer-card";
+import SectionCard, {
+  SectionCardSkeleton,
+} from "@/components/composed/section-card";
 import { formatNumber } from "@/lib/utils";
 import mock from "./mock.json";
 

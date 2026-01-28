@@ -17,7 +17,10 @@ type Props = {
 function formatDateRange(startDate: string, endDate: string): string {
   const start = new Date(startDate);
   const end = new Date(endDate);
-  const options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+  };
 
   if (start.getMonth() === end.getMonth()) {
     return `${start.toLocaleDateString("en-US", options)} - ${end.getDate()}`;
@@ -46,7 +49,10 @@ export default function UpcomingEvents({
       const endDate = new Date(booking.endDate);
       return endDate >= today;
     })
-    .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime())
+    .sort(
+      (a, b) =>
+        new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+    )
     .slice(0, 5);
 
   const deadlines = mock.bookings
@@ -63,7 +69,7 @@ export default function UpcomingEvents({
     );
 
   return (
-    <div className="flex flex-col gap-4 rounded-xl border bg-card p-4">
+    <div className="bg-card flex flex-col gap-4 rounded-xl border p-4">
       {deadlines.length > 0 && (
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
@@ -74,9 +80,7 @@ export default function UpcomingEvents({
             {deadlines.map((booking) => {
               const space = mock.spaces.find((s) => s.id === booking.spaceId);
               const color =
-                SPACE_COLORS[
-                  (space?.colorIndex ?? 0) % SPACE_COLORS.length
-                ];
+                SPACE_COLORS[(space?.colorIndex ?? 0) % SPACE_COLORS.length];
               const days = daysUntil(booking.installationDeadline!);
 
               return (
@@ -124,15 +128,13 @@ export default function UpcomingEvents({
             {upcomingBookings.map((booking) => {
               const space = mock.spaces.find((s) => s.id === booking.spaceId);
               const color =
-                SPACE_COLORS[
-                  (space?.colorIndex ?? 0) % SPACE_COLORS.length
-                ];
+                SPACE_COLORS[(space?.colorIndex ?? 0) % SPACE_COLORS.length];
 
               return (
                 <button
                   key={booking.id}
                   onClick={() => onBookingClick?.(booking)}
-                  className="flex items-start gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50"
+                  className="hover:bg-muted/50 flex items-start gap-3 rounded-lg border p-3 text-left transition-colors"
                 >
                   <div
                     className={cn(

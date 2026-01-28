@@ -2,13 +2,7 @@
 
 import { ReactNode, useState, useSyncExternalStore } from "react";
 import dynamic from "next/dynamic";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMap,
-} from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { cn } from "@/lib/utils";
@@ -150,7 +144,12 @@ function MapViewBase<TData>({
           display: none;
         }
       `}</style>
-      <MapContainer center={center} zoom={zoom} className="h-full w-full" zoomControl>
+      <MapContainer
+        center={center}
+        zoom={zoom}
+        className="h-full w-full"
+        zoomControl
+      >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -180,10 +179,10 @@ function MapViewBase<TData>({
   );
 }
 
-const MapView = dynamic(
-  () => Promise.resolve(MapViewBase),
-  { ssr: false, loading: () => <MapViewSkeleton /> }
-) as <TData>(props: MapViewProps<TData>) => ReactNode;
+const MapView = dynamic(() => Promise.resolve(MapViewBase), {
+  ssr: false,
+  loading: () => <MapViewSkeleton />,
+}) as <TData>(props: MapViewProps<TData>) => ReactNode;
 
 export default MapView;
 

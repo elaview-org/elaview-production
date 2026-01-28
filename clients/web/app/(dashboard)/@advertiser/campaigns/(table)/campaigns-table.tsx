@@ -106,7 +106,7 @@ const columns = [
   currencyColumn<CampaignData>({
     key: "budget",
     header: "Budget",
-    value: (row) => row.totalBudget as string,
+    value: (row) => row.totalBudget,
   }),
   numberColumn<CampaignData>({
     key: "bookings",

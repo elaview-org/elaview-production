@@ -1,6 +1,10 @@
 import { ReactNode } from "react";
 import { IconClock } from "@tabler/icons-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/primitives/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/primitives/avatar";
 import { Badge } from "@/components/primitives/badge";
 import { Skeleton } from "@/components/primitives/skeleton";
 import { cn, getInitials } from "@/lib/utils";
@@ -67,7 +71,11 @@ export default function ActionCard({
   );
 }
 
-export function ActionCardSkeleton({ showActions = true }: { showActions?: boolean }) {
+export function ActionCardSkeleton({
+  showActions = true,
+}: {
+  showActions?: boolean;
+}) {
   return (
     <div className="flex flex-col gap-3 rounded-lg border p-4">
       <div className="flex items-start justify-between">

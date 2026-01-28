@@ -1,7 +1,7 @@
+import Image from "next/image";
 import { Card, CardDescription, CardTitle } from "@/components/primitives/card";
 
 function SpaceInfo() {
-  // Dummy data for presentation; replace with real props/data as needed
   const billboard = {
     name: "Downtown Billboard",
     location: "123 Main St, Springfield",
@@ -19,11 +19,12 @@ function SpaceInfo() {
   return (
     <Card className="p-5">
       <CardTitle className="mb-2 text-lg">Space Information</CardTitle>
-      <div className="mb-4 flex h-32 w-full items-center justify-center overflow-hidden rounded-lg bg-amber-100">
-        <img
+      <div className="relative mb-4 h-32 w-full overflow-hidden rounded-lg bg-amber-100">
+        <Image
           src={billboard.imageUrl}
           alt={billboard.name}
-          className="h-full w-full object-cover"
+          fill
+          className="object-cover"
         />
       </div>
       <div className="mb-4">

@@ -116,7 +116,7 @@ const columns = [
   currencyColumn<BookingData>({
     key: "payout",
     header: "Payout",
-    value: (row) => row.ownerPayoutAmount as string,
+    value: (row) => row.ownerPayoutAmount,
   }),
   badgeColumn<BookingData, BookingStatus>({
     key: "status",

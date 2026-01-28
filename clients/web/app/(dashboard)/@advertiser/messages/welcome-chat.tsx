@@ -1,11 +1,11 @@
 export function WelcomeChat() {
   return (
-    <div className="hidden sm:flex flex-1 flex-col items-center justify-center bg-muted/30 p-4 sm:p-6 md:p-8">
+    <div className="bg-muted/30 hidden flex-1 flex-col items-center justify-center p-4 sm:flex sm:p-6 md:p-8">
       <div className="flex w-full max-w-md flex-col items-center gap-4 text-center sm:gap-6">
         {/* Icon */}
-        <div className="flex size-16 items-center justify-center rounded-full bg-primary/10 sm:size-20">
+        <div className="bg-primary/10 flex size-16 items-center justify-center rounded-full sm:size-20">
           <svg
-            className="size-8 text-primary sm:size-10"
+            className="text-primary size-8 sm:size-10"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -22,7 +22,7 @@ export function WelcomeChat() {
 
         {/* Content */}
         <div className="space-y-1.5 sm:space-y-2">
-          <h2 className="text-xl font-semibold text-foreground sm:text-2xl">
+          <h2 className="text-foreground text-xl font-semibold sm:text-2xl">
             Welcome to Messages
           </h2>
           <p className="text-muted-foreground text-sm leading-relaxed sm:text-base">
@@ -33,10 +33,10 @@ export function WelcomeChat() {
 
         {/* Features */}
         <div className="mt-3 grid w-full grid-cols-1 gap-3 text-left sm:mt-4 sm:grid-cols-2 sm:gap-4">
-          <div className="flex items-start gap-2.5 rounded-lg border bg-background p-3 sm:gap-3 sm:p-4">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 sm:size-8">
+          <div className="bg-background flex items-start gap-2.5 rounded-lg border p-3 sm:gap-3 sm:p-4">
+            <div className="bg-primary/10 flex size-7 shrink-0 items-center justify-center rounded-md sm:size-8">
               <svg
-                className="size-3.5 text-primary sm:size-4"
+                className="text-primary size-3.5 sm:size-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -50,7 +50,7 @@ export function WelcomeChat() {
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-medium text-foreground sm:text-base">
+              <h3 className="text-foreground text-sm font-medium sm:text-base">
                 Track Bookings
               </h3>
               <p className="text-muted-foreground mt-0.5 text-xs sm:mt-1 sm:text-sm">
@@ -59,10 +59,10 @@ export function WelcomeChat() {
             </div>
           </div>
 
-          <div className="flex items-start gap-2.5 rounded-lg border bg-background p-3 sm:gap-3 sm:p-4">
-            <div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 sm:size-8">
+          <div className="bg-background flex items-start gap-2.5 rounded-lg border p-3 sm:gap-3 sm:p-4">
+            <div className="bg-primary/10 flex size-7 shrink-0 items-center justify-center rounded-md sm:size-8">
               <svg
-                className="size-3.5 text-primary sm:size-4"
+                className="text-primary size-3.5 sm:size-4"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -76,7 +76,7 @@ export function WelcomeChat() {
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-medium text-foreground sm:text-base">
+              <h3 className="text-foreground text-sm font-medium sm:text-base">
                 Share Files
               </h3>
               <p className="text-muted-foreground mt-0.5 text-xs sm:mt-1 sm:text-sm">

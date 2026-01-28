@@ -9,7 +9,16 @@
     "totalBudget": "5000.00",
     "imageUrl": null,
     "bookings": {
-      "nodes": [{"id": "b1"}, {"id": "b2"}, {"id": "b3"}, {"id": "b4"}, {"id": "b5"}, {"id": "b6"}, {"id": "b7"}, {"id": "b8"}]
+      "nodes": [
+        { "id": "b1" },
+        { "id": "b2" },
+        { "id": "b3" },
+        { "id": "b4" },
+        { "id": "b5" },
+        { "id": "b6" },
+        { "id": "b7" },
+        { "id": "b8" }
+      ]
     }
   },
   {
@@ -22,7 +31,13 @@
     "totalBudget": "3500.00",
     "imageUrl": null,
     "bookings": {
-      "nodes": [{"id": "b1"}, {"id": "b2"}, {"id": "b3"}, {"id": "b4"}, {"id": "b5"}]
+      "nodes": [
+        { "id": "b1" },
+        { "id": "b2" },
+        { "id": "b3" },
+        { "id": "b4" },
+        { "id": "b5" }
+      ]
     }
   },
   {
@@ -48,7 +63,20 @@
     "totalBudget": "4500.00",
     "imageUrl": null,
     "bookings": {
-      "nodes": [{"id": "b1"}, {"id": "b2"}, {"id": "b3"}, {"id": "b4"}, {"id": "b5"}, {"id": "b6"}, {"id": "b7"}, {"id": "b8"}, {"id": "b9"}, {"id": "b10"}, {"id": "b11"}, {"id": "b12"}]
+      "nodes": [
+        { "id": "b1" },
+        { "id": "b2" },
+        { "id": "b3" },
+        { "id": "b4" },
+        { "id": "b5" },
+        { "id": "b6" },
+        { "id": "b7" },
+        { "id": "b8" },
+        { "id": "b9" },
+        { "id": "b10" },
+        { "id": "b11" },
+        { "id": "b12" }
+      ]
     }
   },
   {
@@ -61,7 +89,14 @@
     "totalBudget": "3000.00",
     "imageUrl": null,
     "bookings": {
-      "nodes": [{"id": "b1"}, {"id": "b2"}, {"id": "b3"}, {"id": "b4"}, {"id": "b5"}, {"id": "b6"}]
+      "nodes": [
+        { "id": "b1" },
+        { "id": "b2" },
+        { "id": "b3" },
+        { "id": "b4" },
+        { "id": "b5" },
+        { "id": "b6" }
+      ]
     }
   },
   {
@@ -74,7 +109,7 @@
     "totalBudget": "1800.00",
     "imageUrl": null,
     "bookings": {
-      "nodes": [{"id": "b1"}, {"id": "b2"}, {"id": "b3"}, {"id": "b4"}]
+      "nodes": [{ "id": "b1" }, { "id": "b2" }, { "id": "b3" }, { "id": "b4" }]
     }
   }
 ]

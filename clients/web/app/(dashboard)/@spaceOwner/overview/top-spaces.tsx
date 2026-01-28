@@ -1,6 +1,15 @@
-import { IconStar, IconEye, IconCalendar, IconChartBar } from "@tabler/icons-react";
-import RankedCard, { RankedCardSkeleton } from "@/components/composed/ranked-card";
-import SectionCard, { SectionCardSkeleton } from "@/components/composed/section-card";
+import {
+  IconStar,
+  IconEye,
+  IconCalendar,
+  IconChartBar,
+} from "@tabler/icons-react";
+import RankedCard, {
+  RankedCardSkeleton,
+} from "@/components/composed/ranked-card";
+import SectionCard, {
+  SectionCardSkeleton,
+} from "@/components/composed/section-card";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import mock from "./mock.json";
 
@@ -27,7 +36,7 @@ function SpaceCard({ space, rank }: { space: TopSpace; rank: number }) {
       primaryValue={formatCurrency(space.totalRevenue, { compact: true })}
       secondaryValue={
         space.averageRating !== null && (
-          <span className="flex items-center gap-1 text-muted-foreground">
+          <span className="text-muted-foreground flex items-center gap-1">
             <IconStar className="size-3.5 fill-yellow-400 text-yellow-400" />
             {space.averageRating.toFixed(1)}
           </span>

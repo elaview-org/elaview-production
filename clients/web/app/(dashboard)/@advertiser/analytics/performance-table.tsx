@@ -34,10 +34,7 @@ const roiColumn: ColumnDef<SpacePerformance> = {
   header: () => <div className="text-right">ROI</div>,
   cell: ({ row }) => (
     <div className="flex items-center justify-end gap-1">
-      <Badge
-        variant={getRoiVariant(row.original.roi)}
-        className="tabular-nums"
-      >
+      <Badge variant={getRoiVariant(row.original.roi)} className="tabular-nums">
         <IconTrendingUp className="mr-1 size-3" />
         {row.original.roi.toFixed(1)}x
       </Badge>

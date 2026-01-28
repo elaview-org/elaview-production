@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 import { Badge } from "@/components/primitives/badge";
-import ProgressSteps, { ProgressStepsSkeleton } from "@/components/composed/progress-steps";
-import SectionCard, { SectionCardSkeleton } from "@/components/composed/section-card";
+import ProgressSteps, {
+  ProgressStepsSkeleton,
+} from "@/components/composed/progress-steps";
+import SectionCard, {
+  SectionCardSkeleton,
+} from "@/components/composed/section-card";
 import { Skeleton } from "@/components/primitives/skeleton";
 import { cn, formatDateRange } from "@/lib/utils";
 import {
@@ -36,7 +40,7 @@ function BookingCard({ booking }: { booking: ActiveBooking }) {
   return (
     <Link
       href={`/bookings/${booking.id}`}
-      className="flex flex-col gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50"
+      className="hover:bg-muted/50 flex flex-col gap-3 rounded-lg border p-4 transition-colors"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="flex flex-col gap-0.5">
@@ -47,7 +51,9 @@ function BookingCard({ booking }: { booking: ActiveBooking }) {
         </div>
         {booking.daysRemaining <= 2 && (
           <Badge variant="destructive" className="shrink-0">
-            {booking.daysRemaining === 0 ? "Due today" : `${booking.daysRemaining}d left`}
+            {booking.daysRemaining === 0
+              ? "Due today"
+              : `${booking.daysRemaining}d left`}
           </Badge>
         )}
       </div>

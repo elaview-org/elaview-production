@@ -70,7 +70,9 @@ export default function StatusChart() {
                     return (
                       <div className="flex items-center gap-2">
                         <span className="text-muted-foreground">{label}</span>
-                        <span className="font-medium tabular-nums">{value}</span>
+                        <span className="font-medium tabular-nums">
+                          {value}
+                        </span>
                       </div>
                     );
                   }}

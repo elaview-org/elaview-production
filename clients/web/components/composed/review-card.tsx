@@ -48,7 +48,9 @@ export default function ReviewCard({
           </Avatar>
           <div className="flex flex-col">
             <span className="text-sm font-medium">{authorName}</span>
-            <span className="text-muted-foreground text-xs">{formattedDate}</span>
+            <span className="text-muted-foreground text-xs">
+              {formattedDate}
+            </span>
           </div>
         </div>
       </CardContent>

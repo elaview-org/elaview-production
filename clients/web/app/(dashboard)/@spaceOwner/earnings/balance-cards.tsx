@@ -43,7 +43,11 @@ export default function BalanceCards({ data }: Props) {
       <SummaryCard
         label="Pending Payouts"
         value={formatCurrency(pendingPayouts, { decimals: true })}
-        badge={{ type: "text", text: "Processing", className: "text-yellow-600" }}
+        badge={{
+          type: "text",
+          text: "Processing",
+          className: "text-yellow-600",
+        }}
         footer="In escrow awaiting release"
         description="Pending booking verifications"
         showFooterIcon={false}

@@ -36,7 +36,11 @@ export default function SpendingCards({ data }: Props) {
       <SummaryCard
         label="Pending Payments"
         value={formatCurrency(pendingPayments, { decimals: true })}
-        badge={{ type: "text", text: "In Escrow", className: "text-yellow-600" }}
+        badge={{
+          type: "text",
+          text: "In Escrow",
+          className: "text-yellow-600",
+        }}
         footer="Awaiting booking completion"
         description="Will be released upon verification"
         showFooterIcon={false}

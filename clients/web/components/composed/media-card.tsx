@@ -37,7 +37,7 @@ export default function MediaCard({
 
   return (
     <Link href={href} className={cn("group block", className)}>
-      <article className="bg-card text-card-foreground flex h-full flex-col overflow-hidden rounded-sm shadow-sm shadow-border transition-shadow hover:shadow-lg">
+      <article className="bg-card text-card-foreground shadow-border flex h-full flex-col overflow-hidden rounded-sm shadow-sm transition-shadow hover:shadow-lg">
         <div className="p-3 pb-0">
           <div
             className={cn(

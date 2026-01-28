@@ -35,7 +35,11 @@ export const ACTIVE_STATUSES = [
 
 export const SPACE_COLORS = [
   { bg: "bg-blue-500", border: "border-blue-500", text: "text-blue-500" },
-  { bg: "bg-emerald-500", border: "border-emerald-500", text: "text-emerald-500" },
+  {
+    bg: "bg-emerald-500",
+    border: "border-emerald-500",
+    text: "text-emerald-500",
+  },
   { bg: "bg-violet-500", border: "border-violet-500", text: "text-violet-500" },
   { bg: "bg-amber-500", border: "border-amber-500", text: "text-amber-500" },
   { bg: "bg-rose-500", border: "border-rose-500", text: "text-rose-500" },
@@ -44,7 +48,15 @@ export const SPACE_COLORS = [
   { bg: "bg-pink-500", border: "border-pink-500", text: "text-pink-500" },
 ] as const;
 
-export const DAYS_OF_WEEK = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+export const DAYS_OF_WEEK = [
+  "Sun",
+  "Mon",
+  "Tue",
+  "Wed",
+  "Thu",
+  "Fri",
+  "Sat",
+] as const;
 
 export const MONTHS = [
   "January",

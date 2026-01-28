@@ -2,8 +2,12 @@
 
 import { IconCheck, IconX, IconPhoto } from "@tabler/icons-react";
 import { Button } from "@/components/primitives/button";
-import ActionCard, { ActionCardSkeleton } from "@/components/composed/action-card";
-import SectionCard, { SectionCardSkeleton } from "@/components/composed/section-card";
+import ActionCard, {
+  ActionCardSkeleton,
+} from "@/components/composed/action-card";
+import SectionCard, {
+  SectionCardSkeleton,
+} from "@/components/composed/section-card";
 import { formatDate } from "@/lib/utils";
 import mock from "./mock.json";
 

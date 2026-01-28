@@ -18,7 +18,8 @@ import mock from "./mock.json";
 
 export default function RevenueChart() {
   const chartData = mock.spacePerformance.map((space) => ({
-    name: space.title.length > 15 ? space.title.slice(0, 15) + "..." : space.title,
+    name:
+      space.title.length > 15 ? space.title.slice(0, 15) + "..." : space.title,
     fullName: space.title,
     revenue: space.totalRevenue,
   }));
@@ -32,7 +33,10 @@ export default function RevenueChart() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={SPACE_REVENUE_CHART_CONFIG} className="h-[300px] w-full">
+        <ChartContainer
+          config={SPACE_REVENUE_CHART_CONFIG}
+          className="h-[300px] w-full"
+        >
           <BarChart
             data={chartData}
             layout="vertical"
@@ -68,7 +72,9 @@ export default function RevenueChart() {
                   hideLabel
                   formatter={(value, _name, item) => (
                     <div className="flex flex-col gap-0.5">
-                      <span className="font-medium">{item.payload.fullName}</span>
+                      <span className="font-medium">
+                        {item.payload.fullName}
+                      </span>
                       <span className="text-muted-foreground">
                         {new Intl.NumberFormat("en-US", {
                           style: "currency",

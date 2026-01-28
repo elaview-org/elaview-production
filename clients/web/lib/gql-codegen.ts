@@ -33,6 +33,13 @@ const config: CodegenConfig = {
           field: true,
           inputValue: false,
         },
+        scalars: {
+          Decimal: "number",
+          DateTime: "string",
+          Date: "string",
+          UUID: "string",
+          Long: "number",
+        },
         defaultScalarType: "unknown",
         nonOptionalTypename: true,
         skipTypeNameForRoot: true,

@@ -7,7 +7,11 @@ type Props = {
   className?: string;
 };
 
-export default function ProgressSteps({ steps, currentStep, className }: Props) {
+export default function ProgressSteps({
+  steps,
+  currentStep,
+  className,
+}: Props) {
   return (
     <div className={cn("flex items-center gap-1", className)}>
       {steps.map((step, index) => (
@@ -18,7 +22,7 @@ export default function ProgressSteps({ steps, currentStep, className }: Props) 
               index < currentStep
                 ? "bg-primary text-primary-foreground"
                 : index === currentStep
-                  ? "bg-primary/20 text-primary ring-2 ring-primary"
+                  ? "bg-primary/20 text-primary ring-primary ring-2"
                   : "bg-muted text-muted-foreground"
             )}
           >

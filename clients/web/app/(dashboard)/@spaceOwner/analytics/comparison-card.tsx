@@ -5,7 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
-import ComparisonTable, { ComparisonTableSkeleton } from "@/components/composed/comparison-table";
+import ComparisonTable, {
+  ComparisonTableSkeleton,
+} from "@/components/composed/comparison-table";
 import { Skeleton } from "@/components/primitives/skeleton";
 import mock from "./mock.json";
 
@@ -38,10 +40,29 @@ export default function ComparisonCard() {
       <CardContent>
         <ComparisonTable
           rows={[
-            { label: "Bookings", current: current.bookings, previous: previous.bookings },
-            { label: "Revenue", current: current.revenue, previous: previous.revenue, format: "currency" },
-            { label: "Avg. Rating", current: current.avgRating, previous: previous.avgRating, format: "rating" },
-            { label: "Completion Rate", current: current.completionRate, previous: previous.completionRate, format: "percent" },
+            {
+              label: "Bookings",
+              current: current.bookings,
+              previous: previous.bookings,
+            },
+            {
+              label: "Revenue",
+              current: current.revenue,
+              previous: previous.revenue,
+              format: "currency",
+            },
+            {
+              label: "Avg. Rating",
+              current: current.avgRating,
+              previous: previous.avgRating,
+              format: "rating",
+            },
+            {
+              label: "Completion Rate",
+              current: current.completionRate,
+              previous: previous.completionRate,
+              format: "percent",
+            },
           ]}
         />
       </CardContent>

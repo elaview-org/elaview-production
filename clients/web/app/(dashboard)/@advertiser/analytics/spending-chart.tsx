@@ -28,7 +28,11 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/components/primitives/toggle-group";
-import { SPENDING_CHART_CONFIG, TIME_RANGES, type TimeRange } from "./constants";
+import {
+  SPENDING_CHART_CONFIG,
+  TIME_RANGES,
+  type TimeRange,
+} from "./constants";
 import mock from "./mock.json";
 
 type ChartSkeletonProps = {
@@ -68,7 +72,9 @@ export default function SpendingChart() {
     const startDate = new Date(now);
     startDate.setDate(startDate.getDate() - daysToSubtract);
 
-    return mock.spendingTrend.filter((item) => new Date(item.date) >= startDate);
+    return mock.spendingTrend.filter(
+      (item) => new Date(item.date) >= startDate
+    );
   }, [timeRange]);
 
   return (

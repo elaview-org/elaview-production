@@ -1,7 +1,9 @@
 import { FragmentType } from "@/types/gql";
 import { GridView } from "@/components/composed/grid-view";
 import MaybePlaceholder from "@/components/status/maybe-placeholder";
-import BookingCard, { BookingCard_AdvertiserBookingFragment } from "./booking-card";
+import BookingCard, {
+  BookingCard_AdvertiserBookingFragment,
+} from "./booking-card";
 import Placeholder from "./placeholder";
 import { type FilterTabKey } from "../constants";
 

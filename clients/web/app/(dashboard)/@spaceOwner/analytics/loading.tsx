@@ -1,4 +1,7 @@
-import { SummaryCardSkeleton, SummaryCardGrid } from "@/components/composed/summary-card";
+import {
+  SummaryCardSkeleton,
+  SummaryCardGrid,
+} from "@/components/composed/summary-card";
 import { PerformanceTableSkeleton } from "./performance-table";
 import { TopPerformersSkeleton } from "./top-performers";
 import { HeatmapChartSkeleton } from "./heatmap-chart";

@@ -79,7 +79,12 @@ export default function Details({ data }: Props) {
       </Row>
 
       <Row label="State">
-        <Input name="state" defaultValue={space.state} maxLength={2} className="uppercase" />
+        <Input
+          name="state"
+          defaultValue={space.state}
+          maxLength={2}
+          className="uppercase"
+        />
       </Row>
 
       <Row label="ZIP Code">
@@ -96,7 +101,9 @@ export default function Details({ data }: Props) {
 
       <Row label="Daily Rate">
         <div className="relative">
-          <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">$</span>
+          <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
+            $
+          </span>
           <Input
             name="pricePerDay"
             type="number"
@@ -109,11 +116,15 @@ export default function Details({ data }: Props) {
 
       <Row label="Installation Fee">
         <div className="relative">
-          <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">$</span>
+          <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
+            $
+          </span>
           <Input
             name="installationFee"
             type="number"
-            defaultValue={space.installationFee ? String(space.installationFee) : ""}
+            defaultValue={
+              space.installationFee ? String(space.installationFee) : ""
+            }
             className="pl-7"
             placeholder="Optional"
           />
@@ -129,7 +140,12 @@ export default function Details({ data }: Props) {
       </Row>
 
       <Row label="Min Duration (days)">
-        <Input name="minDuration" type="number" defaultValue={space.minDuration} min={1} />
+        <Input
+          name="minDuration"
+          type="number"
+          defaultValue={space.minDuration}
+          min={1}
+        />
       </Row>
 
       <Row label="Max Duration (days)">
@@ -151,7 +167,13 @@ export default function Details({ data }: Props) {
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="grid grid-cols-3 items-start gap-4 border-b p-4 last:border-b-0">
       <label className="text-muted-foreground pt-2 text-sm">{label}</label>

@@ -33,13 +33,14 @@ export default function RankedCard({
   stats,
   className,
 }: Props) {
-  const rankStyle = rank <= 3 ? RANK_STYLES[rank - 1] : "bg-muted text-muted-foreground";
+  const rankStyle =
+    rank <= 3 ? RANK_STYLES[rank - 1] : "bg-muted text-muted-foreground";
 
   return (
     <Link
       href={href}
       className={cn(
-        "group flex flex-col overflow-hidden rounded-lg border transition-colors hover:bg-muted/50",
+        "group hover:bg-muted/50 flex flex-col overflow-hidden rounded-lg border transition-colors",
         className
       )}
     >
@@ -52,7 +53,7 @@ export default function RankedCard({
         />
         <div
           className={cn(
-            "absolute left-2 top-2 flex size-6 items-center justify-center rounded-full text-xs font-bold",
+            "absolute top-2 left-2 flex size-6 items-center justify-center rounded-full text-xs font-bold",
             rankStyle
           )}
         >
@@ -62,11 +63,11 @@ export default function RankedCard({
       <div className="flex flex-1 flex-col gap-2 p-3">
         <span className="line-clamp-1 font-medium">{title}</span>
         <div className="flex items-center justify-between text-sm">
-          <span className="font-semibold text-primary">{primaryValue}</span>
+          <span className="text-primary font-semibold">{primaryValue}</span>
           {secondaryValue}
         </div>
         {stats && (
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
             {stats}
           </div>
         )}

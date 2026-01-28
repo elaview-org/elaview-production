@@ -51,16 +51,18 @@ export default function ReviewsSection({ userName }: Props) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {reviews.slice(startIndex, startIndex + REVIEWS_PER_PAGE).map((review) => (
-          <ReviewCard
-            key={review.id}
-            rating={review.rating}
-            comment={review.comment}
-            authorName={review.reviewer.name}
-            authorAvatar={review.reviewer.avatar}
-            date={review.createdAt}
-          />
-        ))}
+        {reviews
+          .slice(startIndex, startIndex + REVIEWS_PER_PAGE)
+          .map((review) => (
+            <ReviewCard
+              key={review.id}
+              rating={review.rating}
+              comment={review.comment}
+              authorName={review.reviewer.name}
+              authorAvatar={review.reviewer.avatar}
+              date={review.createdAt}
+            />
+          ))}
       </div>
     </div>
   );

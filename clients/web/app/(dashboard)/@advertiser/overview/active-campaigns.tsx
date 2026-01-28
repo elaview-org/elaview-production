@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { Badge } from "@/components/primitives/badge";
 import { Progress } from "@/components/primitives/progress";
-import SectionCard, { SectionCardSkeleton } from "@/components/composed/section-card";
+import SectionCard, {
+  SectionCardSkeleton,
+} from "@/components/composed/section-card";
 import { Skeleton } from "@/components/primitives/skeleton";
 import { formatCurrency, formatDateRange } from "@/lib/utils";
 import { CAMPAIGN_STATUS_CONFIG, type CampaignStatus } from "./constants";

@@ -1,9 +1,5 @@
 function Page() {
-  return (
-    <div>
-      Message
-    </div>
-  )
+  return <div>Message</div>;
 }
 
-export default Page
+export default Page;

@@ -83,8 +83,10 @@ const columns = [
   stackColumn<PayoutData>({
     key: "stage",
     header: "Stage",
-    primary: (row) => PAYOUT_STAGE.labels[row.stage as PayoutStage] ?? row.stage,
-    secondary: (row) => PAYOUT_STAGE.descriptions[row.stage as PayoutStage] ?? "",
+    primary: (row) =>
+      PAYOUT_STAGE.labels[row.stage as PayoutStage] ?? row.stage,
+    secondary: (row) =>
+      PAYOUT_STAGE.descriptions[row.stage as PayoutStage] ?? "",
   }),
   currencyColumn<PayoutData>({
     key: "amount",

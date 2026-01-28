@@ -91,9 +91,7 @@ export default function BusinessSettingsForm({ user }: Props) {
             placeholder="https://www.example.com"
             defaultValue={state.data.website ?? ""}
           />
-          <FieldDescription>
-            Your business website URL.
-          </FieldDescription>
+          <FieldDescription>Your business website URL.</FieldDescription>
         </Field>
 
         {state.message && !state.success && (

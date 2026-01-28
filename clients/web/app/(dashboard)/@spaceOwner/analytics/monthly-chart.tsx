@@ -22,7 +22,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/primitives/select";
-import { MONTH_RANGES, MONTHLY_CHART_CONFIG, type MonthRange } from "./constants";
+import {
+  MONTH_RANGES,
+  MONTHLY_CHART_CONFIG,
+  type MonthRange,
+} from "./constants";
 import mock from "./mock.json";
 
 export default function MonthlyChart() {
@@ -44,9 +48,7 @@ export default function MonthlyChart() {
     <Card className="@container/card">
       <CardHeader>
         <CardTitle>Monthly Revenue & Bookings</CardTitle>
-        <CardDescription>
-          Revenue and booking trends over time
-        </CardDescription>
+        <CardDescription>Revenue and booking trends over time</CardDescription>
         <CardAction>
           <Select
             value={monthRange}

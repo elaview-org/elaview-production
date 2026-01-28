@@ -8,7 +8,9 @@ import { BookingsTableSkeleton } from "./(table)/bookings-table";
 
 export default async function Loading() {
   const cookieStore = await cookies();
-  const viewCookie = cookieStore.get(storageKey.preferences.bookings.view)?.value;
+  const viewCookie = cookieStore.get(
+    storageKey.preferences.bookings.view
+  )?.value;
   const view = viewCookie === ViewOptions.Table ? viewCookie : ViewOptions.Grid;
 
   return (

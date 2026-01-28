@@ -59,31 +59,37 @@ export default function CampaignsSection({ userName }: Props) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {campaigns.slice(startIndex, startIndex + CAMPAIGNS_PER_PAGE).map((campaign) => (
-          <Card key={campaign.id}>
-            <CardContent className="flex flex-col gap-3 pt-5">
-              <div className="flex items-center justify-between">
-                <Badge variant={STATUS_VARIANTS[campaign.status] ?? "outline"}>
-                  {campaign.status}
-                </Badge>
-                <span className="text-muted-foreground text-xs">
-                  {campaign.spaces} {campaign.spaces === 1 ? "space" : "spaces"}
-                </span>
-              </div>
-              <h3 className="font-medium">{campaign.name}</h3>
-              <div className="text-muted-foreground space-y-1 text-sm">
-                <p>
-                  {formatDate(campaign.startDate)} - {formatDate(campaign.endDate)}
-                </p>
-                {campaign.totalSpend > 0 && (
-                  <p className="font-medium text-foreground">
-                    {formatCurrency(campaign.totalSpend)}
+        {campaigns
+          .slice(startIndex, startIndex + CAMPAIGNS_PER_PAGE)
+          .map((campaign) => (
+            <Card key={campaign.id}>
+              <CardContent className="flex flex-col gap-3 pt-5">
+                <div className="flex items-center justify-between">
+                  <Badge
+                    variant={STATUS_VARIANTS[campaign.status] ?? "outline"}
+                  >
+                    {campaign.status}
+                  </Badge>
+                  <span className="text-muted-foreground text-xs">
+                    {campaign.spaces}{" "}
+                    {campaign.spaces === 1 ? "space" : "spaces"}
+                  </span>
+                </div>
+                <h3 className="font-medium">{campaign.name}</h3>
+                <div className="text-muted-foreground space-y-1 text-sm">
+                  <p>
+                    {formatDate(campaign.startDate)} -{" "}
+                    {formatDate(campaign.endDate)}
                   </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                  {campaign.totalSpend > 0 && (
+                    <p className="text-foreground font-medium">
+                      {formatCurrency(campaign.totalSpend)}
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
       </div>
     </div>
   );

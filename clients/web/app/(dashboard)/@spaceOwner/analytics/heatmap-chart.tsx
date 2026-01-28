@@ -105,7 +105,7 @@ export default function HeatmapChart() {
                         <TooltipTrigger asChild>
                           <div
                             className={cn(
-                              "aspect-square rounded-sm transition-colors hover:ring-2 hover:ring-ring",
+                              "hover:ring-ring aspect-square rounded-sm transition-colors hover:ring-2",
                               getIntensityClass(count, maxCount)
                             )}
                           />

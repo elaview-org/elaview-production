@@ -19,7 +19,11 @@ type Props = {
   className?: string;
 };
 
-export default function TimeRangeSelector({ value, onChange, className }: Props) {
+export default function TimeRangeSelector({
+  value,
+  onChange,
+  className,
+}: Props) {
   return (
     <>
       <ToggleGroup
@@ -45,7 +49,11 @@ export default function TimeRangeSelector({ value, onChange, className }: Props)
         </SelectTrigger>
         <SelectContent className="rounded-xl">
           {TIME_RANGES.map((range) => (
-            <SelectItem key={range.value} value={range.value} className="rounded-lg">
+            <SelectItem
+              key={range.value}
+              value={range.value}
+              className="rounded-lg"
+            >
               {range.label}
             </SelectItem>
           ))}

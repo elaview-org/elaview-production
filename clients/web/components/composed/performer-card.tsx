@@ -29,8 +29,9 @@ export default function PerformerCard({
     <Link
       href={href}
       className={cn(
-        "flex items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50",
-        variant === "warning" && "border-yellow-500/50 bg-yellow-50/50 dark:bg-yellow-950/20",
+        "hover:bg-muted/50 flex items-start gap-3 rounded-lg border p-4 transition-colors",
+        variant === "warning" &&
+          "border-yellow-500/50 bg-yellow-50/50 dark:bg-yellow-950/20",
         className
       )}
     >
@@ -38,7 +39,8 @@ export default function PerformerCard({
         className={cn(
           "flex size-10 shrink-0 items-center justify-center rounded-lg",
           variant === "default" && "bg-primary/10 text-primary",
-          variant === "warning" && "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400"
+          variant === "warning" &&
+            "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400"
         )}
       >
         {icon}

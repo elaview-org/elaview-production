@@ -64,7 +64,10 @@ export default function Gallery({ data }: Props) {
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-4 gap-2">
             {images.map((image, index) => (
-              <div key={index} className="group relative aspect-square overflow-hidden rounded-lg">
+              <div
+                key={index}
+                className="group relative aspect-square overflow-hidden rounded-lg"
+              >
                 <Image
                   src={image}
                   alt={`${space.title} - ${index + 1}`}

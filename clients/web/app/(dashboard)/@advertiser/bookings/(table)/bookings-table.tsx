@@ -59,7 +59,10 @@ type Props = {
 };
 
 export default function BookingsTable({ data, tabKey }: Props) {
-  const bookings = getFragmentData(BookingsTable_AdvertiserBookingFragment, data);
+  const bookings = getFragmentData(
+    BookingsTable_AdvertiserBookingFragment,
+    data
+  );
 
   return (
     <MaybePlaceholder data={data} placeholder={<Placeholder tabKey={tabKey} />}>
@@ -134,7 +137,7 @@ const columns = [
   currencyColumn<BookingData>({
     key: "price",
     header: "Amount",
-    value: (row) => row.totalAmount as string,
+    value: (row) => row.totalAmount,
   }),
   badgeColumn<BookingData, BookingStatus>({
     key: "status",

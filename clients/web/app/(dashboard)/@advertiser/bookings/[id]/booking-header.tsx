@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/primitives/button";
 import { Badge } from "@/components/primitives/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@/components/primitives/card";
+import { Card, CardContent, CardHeader } from "@/components/primitives/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,7 +40,9 @@ export function BookingHeader({
     })}`;
   };
 
-  const getStatusVariant = (status: string): "default" | "secondary" | "destructive" | "outline" => {
+  const getStatusVariant = (
+    status: string
+  ): "default" | "secondary" | "destructive" | "outline" => {
     switch (status) {
       case "VERIFIED":
       case "COMPLETED":
@@ -64,8 +62,10 @@ export function BookingHeader({
     <Card>
       <CardHeader className="flex-row items-center justify-between pb-4">
         <div className="space-y-1">
-          <h1 className="text-xl font-semibold">Booking #{bookingId.slice(-8)}</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-xl font-semibold">
+            Booking #{bookingId.slice(-8)}
+          </h1>
+          <p className="text-muted-foreground text-sm">
             {formatDateRange(startDate, endDate)}
           </p>
         </div>

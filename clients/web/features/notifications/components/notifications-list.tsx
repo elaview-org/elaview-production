@@ -26,7 +26,7 @@ function groupNotificationsByDate(notifications: TNotification[]) {
     { label: "Older", notifications: [] },
   ];
 
-  notifications.forEach((notification:TNotification) => {
+  notifications.forEach((notification: TNotification) => {
     const date = new Date(notification.createdAt as string);
 
     if (date >= today) {
@@ -48,7 +48,6 @@ export function NotificationsList({
   onMarkAsRead,
   onDelete,
 }: NotificationsListProps) {
-  
   if (notifications.length === 0) {
     return null;
   }
@@ -60,11 +59,11 @@ export function NotificationsList({
       {grouped.map((group, groupIndex) => (
         <div key={group.label} className="space-y-3">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-muted-foreground">
+            <h3 className="text-muted-foreground text-sm font-semibold">
               {group.label}
             </h3>
             <Separator className="flex-1" />
-            <span className="text-xs text-muted-foreground">
+            <span className="text-muted-foreground text-xs">
               {group.notifications.length}
             </span>
           </div>
@@ -78,9 +77,7 @@ export function NotificationsList({
               />
             ))}
           </div>
-          {groupIndex < grouped.length - 1 && (
-            <Separator className="my-6" />
-          )}
+          {groupIndex < grouped.length - 1 && <Separator className="my-6" />}
         </div>
       ))}
     </div>

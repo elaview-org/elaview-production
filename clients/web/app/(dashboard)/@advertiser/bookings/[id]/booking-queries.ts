@@ -60,7 +60,12 @@ interface BookingData {
 
 interface TimelineEvent {
   id: string;
-  type: "payment" | "verification" | "status_change" | "file_download" | "approval";
+  type:
+    | "payment"
+    | "verification"
+    | "status_change"
+    | "file_download"
+    | "approval";
   title: string;
   description?: string;
   createdAt: string;

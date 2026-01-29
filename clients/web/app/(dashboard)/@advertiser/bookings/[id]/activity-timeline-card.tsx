@@ -1,4 +1,8 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/primitives/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/primitives/avatar";
 import { Badge } from "@/components/primitives/badge";
 import { Separator } from "@/components/primitives/separator";
 import {
@@ -18,7 +22,12 @@ import {
 
 interface TimelineEvent {
   id: string;
-  type: "payment" | "verification" | "status_change" | "file_download" | "approval";
+  type:
+    | "payment"
+    | "verification"
+    | "status_change"
+    | "file_download"
+    | "approval";
   title: string;
   description?: string;
   createdAt: string;
@@ -34,7 +43,9 @@ interface ActivityTimelineCardProps {
   events?: TimelineEvent[];
 }
 
-export function ActivityTimelineCard({ events = [] }: ActivityTimelineCardProps) {
+export function ActivityTimelineCard({
+  events = [],
+}: ActivityTimelineCardProps) {
   const formatDateTime = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleString("en-US", {
@@ -70,7 +81,7 @@ export function ActivityTimelineCard({ events = [] }: ActivityTimelineCardProps)
           <CardTitle className="text-lg">Activity Timeline</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No activity yet</p>
+          <p className="text-muted-foreground text-sm">No activity yet</p>
         </CardContent>
       </Card>
     );
@@ -99,8 +110,8 @@ export function ActivityTimelineCard({ events = [] }: ActivityTimelineCardProps)
                         </AvatarFallback>
                       </Avatar>
                     ) : (
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-                        <Icon className="h-4 w-4 text-muted-foreground" />
+                      <div className="bg-muted flex h-8 w-8 items-center justify-center rounded-full">
+                        <Icon className="text-muted-foreground h-4 w-4" />
                       </div>
                     )}
                   </div>
@@ -115,11 +126,11 @@ export function ActivityTimelineCard({ events = [] }: ActivityTimelineCardProps)
                         </Badge>
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-muted-foreground text-xs">
                       {formatDateTime(event.createdAt)}
                     </p>
                     {event.description && (
-                      <p className="text-sm text-muted-foreground">
+                      <p className="text-muted-foreground text-sm">
                         {event.description}
                       </p>
                     )}

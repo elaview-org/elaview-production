@@ -9,7 +9,7 @@
       "createdAt": "2025-11-15T10:00:00Z",
       "reviewer": {
         "name": "Michael Chen",
-        "avatar": null,
+        "avatar": "https://picsum.photos/seed/michael-chen/100/100",
         "companyName": "Chen's Kitchen"
       }
     },
@@ -20,7 +20,7 @@
       "createdAt": "2025-10-22T14:30:00Z",
       "reviewer": {
         "name": "Jessica Rodriguez",
-        "avatar": null,
+        "avatar": "https://picsum.photos/seed/jessica-rodriguez/100/100",
         "companyName": "FitLife Studios"
       }
     },
@@ -31,7 +31,7 @@
       "createdAt": "2025-09-18T09:15:00Z",
       "reviewer": {
         "name": "David Park",
-        "avatar": null,
+        "avatar": "https://picsum.photos/seed/david-park/100/100",
         "companyName": "Park Dental Care"
       }
     },
@@ -42,7 +42,7 @@
       "createdAt": "2025-08-05T16:45:00Z",
       "reviewer": {
         "name": "Amanda Foster",
-        "avatar": null,
+        "avatar": "https://picsum.photos/seed/amanda-foster/100/100",
         "companyName": "Foster Real Estate"
       }
     },
@@ -53,7 +53,7 @@
       "createdAt": "2025-07-12T11:00:00Z",
       "reviewer": {
         "name": "Robert Kim",
-        "avatar": null,
+        "avatar": "https://picsum.photos/seed/robert-kim/100/100",
         "companyName": "Kim's Auto Repair"
       }
     },
@@ -64,7 +64,7 @@
       "createdAt": "2025-06-28T13:20:00Z",
       "reviewer": {
         "name": "Emily Watson",
-        "avatar": null,
+        "avatar": "https://picsum.photos/seed/emily-watson/100/100",
         "companyName": "Bloom Salon"
       }
     }

@@ -66,7 +66,7 @@ export function ActionsPanelCard({
           <p className="text-sm">
             Status: <Badge variant="outline">{status}</Badge>
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-xs">
             Next: {getNextActionHint(status)}
           </p>
         </div>
@@ -78,7 +78,11 @@ export function ActionsPanelCard({
               <CheckCircle2 className="mr-2 h-4 w-4" />
               Approve Installation
             </Button>
-            <Button variant="outline" onClick={onDisputeClick} className="w-full">
+            <Button
+              variant="outline"
+              onClick={onDisputeClick}
+              className="w-full"
+            >
               <AlertTriangle className="mr-2 h-4 w-4" />
               Open Dispute
             </Button>
@@ -86,8 +90,13 @@ export function ActionsPanelCard({
         )}
 
         {/* Secondary Actions */}
-        <div className="border-t pt-3 space-y-2">
-          <Button variant="ghost" size="sm" className="w-full justify-start" asChild>
+        <div className="space-y-2 border-t pt-3">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full justify-start"
+            asChild
+          >
             <Link href={`/messages/${bookingId}`}>
               <MessageSquare className="mr-2 h-4 w-4" />
               Message Owner
@@ -101,7 +110,7 @@ export function ActionsPanelCard({
             <Button
               variant="ghost"
               size="sm"
-              className="w-full justify-start text-destructive hover:text-destructive"
+              className="text-destructive hover:text-destructive w-full justify-start"
               onClick={onCancelClick}
             >
               <X className="mr-2 h-4 w-4" />

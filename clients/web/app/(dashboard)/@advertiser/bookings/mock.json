@@ -7,7 +7,9 @@
     "totalAmount": "450.00",
     "space": {
       "title": "Downtown Storefront Window",
-      "images": [],
+      "images": [
+        "https://picsum.photos/seed/downtown-storefront-window/400/225"
+      ],
       "city": "Austin",
       "state": "TX",
       "owner": {
@@ -26,7 +28,7 @@
     "totalAmount": "890.00",
     "space": {
       "title": "Main Street Billboard",
-      "images": [],
+      "images": ["https://picsum.photos/seed/main-street-billboard/400/225"],
       "city": "Houston",
       "state": "TX",
       "owner": {
@@ -45,7 +47,7 @@
     "totalAmount": "320.00",
     "space": {
       "title": "Coffee Shop Window",
-      "images": [],
+      "images": ["https://picsum.photos/seed/coffee-shop-window/400/225"],
       "city": "Dallas",
       "state": "TX",
       "owner": {
@@ -64,7 +66,7 @@
     "totalAmount": "275.00",
     "space": {
       "title": "Gallery Wall Space",
-      "images": [],
+      "images": ["https://picsum.photos/seed/gallery-wall-space/400/225"],
       "city": "San Antonio",
       "state": "TX",
       "owner": {
@@ -83,7 +85,7 @@
     "totalAmount": "560.00",
     "space": {
       "title": "Shopping Center Display",
-      "images": [],
+      "images": ["https://picsum.photos/seed/shopping-center-display/400/225"],
       "city": "Austin",
       "state": "TX",
       "owner": {
@@ -102,7 +104,7 @@
     "totalAmount": "750.00",
     "space": {
       "title": "Holiday Market Booth",
-      "images": [],
+      "images": ["https://picsum.photos/seed/holiday-market-booth/400/225"],
       "city": "Houston",
       "state": "TX",
       "owner": {
@@ -121,7 +123,7 @@
     "totalAmount": "420.00",
     "space": {
       "title": "Restaurant Window",
-      "images": [],
+      "images": ["https://picsum.photos/seed/restaurant-window/400/225"],
       "city": "Dallas",
       "state": "TX",
       "owner": {

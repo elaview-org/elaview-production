@@ -20,7 +20,11 @@ interface FAQSectionProps {
   defaultOpen?: boolean;
 }
 
-export function FAQSection({ title, faqs, defaultOpen = false }: FAQSectionProps) {
+export function FAQSection({
+  title,
+  faqs,
+  defaultOpen = false,
+}: FAQSectionProps) {
   const [openItems, setOpenItems] = useState<string[]>(
     defaultOpen ? [faqs[0]?.id] : []
   );
@@ -35,8 +39,12 @@ export function FAQSection({ title, faqs, defaultOpen = false }: FAQSectionProps
         className="space-y-2"
       >
         {faqs.map((faq) => (
-          <AccordionItem key={faq.id} value={faq.id} className="border rounded-lg px-4">
-            <AccordionTrigger className="text-left hover:no-underline py-4">
+          <AccordionItem
+            key={faq.id}
+            value={faq.id}
+            className="rounded-lg border px-4"
+          >
+            <AccordionTrigger className="py-4 text-left hover:no-underline">
               <span className="font-medium">{faq.question}</span>
             </AccordionTrigger>
             <AccordionContent className="text-muted-foreground pb-4">

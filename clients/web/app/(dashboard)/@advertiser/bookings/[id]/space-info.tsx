@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { Button } from "@/components/primitives/button";
 import { Badge } from "@/components/primitives/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/primitives/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/primitives/avatar";
 import {
   Card,
   CardContent,
@@ -45,7 +49,9 @@ export default function SpaceInfo({ space, bookingId }: SpaceInfoProps) {
           <CardTitle className="text-lg">Space Information</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">No space information available</p>
+          <p className="text-muted-foreground text-sm">
+            No space information available
+          </p>
         </CardContent>
       </Card>
     );
@@ -68,7 +74,7 @@ export default function SpaceInfo({ space, bookingId }: SpaceInfoProps) {
       <CardContent className="space-y-4">
         {/* Space Image */}
         {space.photos && space.photos.length > 0 && (
-          <div className="flex h-32 w-full items-center justify-center overflow-hidden rounded-lg bg-muted">
+          <div className="bg-muted flex h-32 w-full items-center justify-center overflow-hidden rounded-lg">
             <Image
               src={space.photos[0]}
               alt={space.title}
@@ -80,7 +86,7 @@ export default function SpaceInfo({ space, bookingId }: SpaceInfoProps) {
         {/* Space Details */}
         <div className="space-y-2">
           <h3 className="font-semibold">{space.title}</h3>
-          <div className="space-y-1 text-sm text-muted-foreground">
+          <div className="text-muted-foreground space-y-1 text-sm">
             <div className="flex items-center gap-2">
               <MapPin className="h-4 w-4" />
               <span>{locationString}</span>
@@ -111,7 +117,7 @@ export default function SpaceInfo({ space, bookingId }: SpaceInfoProps) {
               <p className="text-sm font-medium">
                 {space.owner.firstName} {space.owner.lastName}
               </p>
-              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-1 text-xs">
                 <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                 <span>4.8</span>
               </div>

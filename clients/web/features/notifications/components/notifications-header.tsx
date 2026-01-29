@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "@/components/primitives/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/primitives/card";
+import { Card, CardHeader, CardTitle } from "@/components/primitives/card";
 import { CheckCircle2, Trash2 } from "lucide-react";
 
 interface NotificationsHeaderProps {
@@ -29,7 +24,7 @@ export function NotificationsHeader({
       <CardHeader className="flex-row items-center justify-between pb-4">
         <div>
           <CardTitle className="text-xl">Notifications</CardTitle>
-          <p className="text-sm text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-sm">
             {totalCount} notification{totalCount !== 1 ? "s" : ""}
             {unreadCount > 0 && ` • ${unreadCount} unread`}
           </p>

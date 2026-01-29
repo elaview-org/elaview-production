@@ -42,7 +42,7 @@ export default function InstallationReviews({
           <CardDescription>Owner&apos;s Verification Photos</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-muted-foreground text-sm">
             Verification photos not yet uploaded
           </p>
         </CardContent>
@@ -66,7 +66,7 @@ export default function InstallationReviews({
                 // TODO: Open full-size photo viewer
                 window.open(photo.url, "_blank");
               }}
-              className="group relative aspect-square overflow-hidden rounded-lg bg-muted"
+              className="group bg-muted relative aspect-square overflow-hidden rounded-lg"
             >
               <Image
                 src={photo.url}

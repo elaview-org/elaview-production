@@ -35,7 +35,7 @@ export default function ConfirmModal({
         <DialogDescription>
           Please confirm installation is correct.
         </DialogDescription>
-        <div className="flex w-full justify-between mt-4">
+        <div className="mt-4 flex w-full justify-between">
           <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>

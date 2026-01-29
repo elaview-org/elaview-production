@@ -10,10 +10,7 @@ import {
   SelectValue,
 } from "@/components/primitives/select";
 import { Button } from "@/components/primitives/button";
-import {
-  Dialog,
-  DialogContent,
-} from "@/components/primitives/dialog";
+import { Dialog, DialogContent } from "@/components/primitives/dialog";
 
 interface DisputeModalProps {
   isOpen: boolean;

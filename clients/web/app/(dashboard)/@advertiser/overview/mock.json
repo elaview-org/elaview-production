@@ -75,7 +75,7 @@
     {
       "id": "space-1",
       "title": "Downtown Storefront",
-      "image": "https://via.placeholder.com/400x225/6366f1/ffffff?text=Downtown+Storefront",
+      "image": "https://picsum.photos/seed/downtown-storefront/400/225",
       "totalSpend": 2450.0,
       "impressions": 45200,
       "roi": 3.2,
@@ -85,7 +85,7 @@
     {
       "id": "space-2",
       "title": "Main St Window",
-      "image": "https://via.placeholder.com/400x225/8b5cf6/ffffff?text=Main+St+Window",
+      "image": "https://picsum.photos/seed/main-st-window/400/225",
       "totalSpend": 1850.0,
       "impressions": 32100,
       "roi": 2.8,
@@ -95,7 +95,7 @@
     {
       "id": "space-3",
       "title": "Corner Billboard",
-      "image": "https://via.placeholder.com/400x225/ec4899/ffffff?text=Corner+Billboard",
+      "image": "https://picsum.photos/seed/corner-billboard/400/225",
       "totalSpend": 1200.0,
       "impressions": 28500,
       "roi": 2.5,
@@ -105,7 +105,7 @@
     {
       "id": "space-4",
       "title": "Mall Entrance",
-      "image": "https://via.placeholder.com/400x225/f59e0b/ffffff?text=Mall+Entrance",
+      "image": "https://picsum.photos/seed/mall-entrance/400/225",
       "totalSpend": 980.0,
       "impressions": 18200,
       "roi": 2.1,
@@ -115,7 +115,7 @@
     {
       "id": "space-5",
       "title": "Park View Wall",
-      "image": "https://via.placeholder.com/400x225/10b981/ffffff?text=Park+View+Wall",
+      "image": "https://picsum.photos/seed/park-view-wall/400/225",
       "totalSpend": 650.0,
       "impressions": 12400,
       "roi": 1.9,

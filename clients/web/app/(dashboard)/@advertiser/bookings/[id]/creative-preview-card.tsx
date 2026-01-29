@@ -44,18 +44,21 @@ export function CreativePreviewCard({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* File Preview/Icon */}
-        <div className="flex items-center justify-center h-32 bg-muted rounded-lg">
-          <FileText className="h-12 w-12 text-muted-foreground" />
+        <div className="bg-muted flex h-32 items-center justify-center rounded-lg">
+          <FileText className="text-muted-foreground h-12 w-12" />
         </div>
 
         {/* File Info */}
         {creativeFileName && (
           <div className="space-y-1">
             <p className="font-medium">{creativeFileName}</p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {formatFileSize(creativeFileSize)}
               {width && height && dimensionUnit && (
-                <> • {width}×{height} {dimensionUnit}</>
+                <>
+                  {" "}
+                  • {width}×{height} {dimensionUnit}
+                </>
               )}
             </p>
           </div>

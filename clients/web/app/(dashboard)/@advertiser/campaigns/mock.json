@@ -7,7 +7,7 @@
     "startDate": "2026-02-01T00:00:00Z",
     "endDate": "2026-03-31T00:00:00Z",
     "totalBudget": "5000.00",
-    "imageUrl": null,
+    "imageUrl": "https://picsum.photos/seed/spring-sale-campaign/400/225",
     "bookings": {
       "nodes": [
         { "id": "b1" },
@@ -29,7 +29,7 @@
     "startDate": "2026-02-15T00:00:00Z",
     "endDate": "2026-03-15T00:00:00Z",
     "totalBudget": "3500.00",
-    "imageUrl": null,
+    "imageUrl": "https://picsum.photos/seed/grand-opening/400/225",
     "bookings": {
       "nodes": [
         { "id": "b1" },
@@ -48,7 +48,7 @@
     "startDate": "2026-06-01T00:00:00Z",
     "endDate": "2026-06-30T00:00:00Z",
     "totalBudget": "2000.00",
-    "imageUrl": null,
+    "imageUrl": "https://picsum.photos/seed/summer-festival/400/225",
     "bookings": {
       "nodes": []
     }
@@ -61,7 +61,7 @@
     "startDate": "2025-12-01T00:00:00Z",
     "endDate": "2025-12-31T00:00:00Z",
     "totalBudget": "4500.00",
-    "imageUrl": null,
+    "imageUrl": "https://picsum.photos/seed/holiday-campaign-2025/400/225",
     "bookings": {
       "nodes": [
         { "id": "b1" },
@@ -87,7 +87,7 @@
     "startDate": "2025-08-01T00:00:00Z",
     "endDate": "2025-09-15T00:00:00Z",
     "totalBudget": "3000.00",
-    "imageUrl": null,
+    "imageUrl": "https://picsum.photos/seed/back-to-school/400/225",
     "bookings": {
       "nodes": [
         { "id": "b1" },
@@ -107,7 +107,7 @@
     "startDate": "2026-01-15T00:00:00Z",
     "endDate": "2026-02-14T00:00:00Z",
     "totalBudget": "1800.00",
-    "imageUrl": null,
+    "imageUrl": "https://picsum.photos/seed/valentines-special/400/225",
     "bookings": {
       "nodes": [{ "id": "b1" }, { "id": "b2" }, { "id": "b3" }, { "id": "b4" }]
     }

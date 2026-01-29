@@ -60,6 +60,11 @@ export default function Toolbar(props: Props) {
         <SearchGroup searchTarget={props.searchTarget} />
         <PaginationGroup />
 
+        <ViewGroup
+          views={props.views}
+          currentView={props.currentView}
+          onViewChangeAction={props.onViewChangeAction}
+        />
         <ToggleButton
           open={filtersOpen}
           onClick={() => {
@@ -79,11 +84,6 @@ export default function Toolbar(props: Props) {
           label="Sort"
         />
 
-        <ViewGroup
-          views={props.views}
-          currentView={props.currentView}
-          onViewChangeAction={props.onViewChangeAction}
-        />
         {props.action}
       </div>
 

@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/primitives/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/primitives/card";
 import {
   FileText,
   BookOpen,
@@ -64,11 +70,11 @@ export function QuickLinks() {
           const Icon = link.icon;
           return (
             <Link key={link.title} href={link.href}>
-              <Card className="h-full transition-colors hover:bg-muted/50">
+              <Card className="hover:bg-muted/50 h-full transition-colors">
                 <CardHeader>
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                      <Icon className="h-5 w-5 text-primary" />
+                    <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
+                      <Icon className="text-primary h-5 w-5" />
                     </div>
                     <CardTitle className="text-base">{link.title}</CardTitle>
                   </div>

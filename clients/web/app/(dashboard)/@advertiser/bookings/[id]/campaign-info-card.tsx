@@ -48,27 +48,36 @@ export function CampaignInfoCard({ campaign }: CampaignInfoCardProps) {
       <CardContent className="space-y-3">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="text-muted-foreground h-4 w-4" />
             <p className="font-medium">{campaign.name}</p>
           </div>
-          <div className="ml-6 space-y-1 text-sm text-muted-foreground">
+          <div className="text-muted-foreground ml-6 space-y-1 text-sm">
             <p>Start: {formatDate(campaign.startDate)}</p>
             <p>End: {formatDate(campaign.endDate)}</p>
-            <p>Duration: {calculateWeeks(campaign.startDate, campaign.endDate)} weeks</p>
+            <p>
+              Duration: {calculateWeeks(campaign.startDate, campaign.endDate)}{" "}
+              weeks
+            </p>
           </div>
         </div>
 
         {campaign.budget !== undefined && (
-          <div className="border-t pt-3 space-y-2">
+          <div className="space-y-2 border-t pt-3">
             <div className="flex items-center gap-2 text-sm">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <DollarSign className="text-muted-foreground h-4 w-4" />
               <div className="flex-1">
                 <p>
-                  Budget: <span className="font-medium">${campaign.budget.toLocaleString()}</span>
+                  Budget:{" "}
+                  <span className="font-medium">
+                    ${campaign.budget.toLocaleString()}
+                  </span>
                 </p>
                 {campaign.spent !== undefined && (
                   <p>
-                    Spent: <span className="font-medium">${campaign.spent.toLocaleString()}</span>
+                    Spent:{" "}
+                    <span className="font-medium">
+                      ${campaign.spent.toLocaleString()}
+                    </span>
                   </p>
                 )}
               </div>

@@ -46,7 +46,7 @@
       "totalRevenue": 5400.0,
       "averageRating": 4.8,
       "occupancyRate": 82.3,
-      "image": "https://via.placeholder.com/400x225/6366f1/ffffff?text=Downtown+Storefront"
+      "image": "https://picsum.photos/seed/downtown-storefront/400/225"
     },
     {
       "id": "2",
@@ -55,7 +55,7 @@
       "totalRevenue": 3200.0,
       "averageRating": 4.6,
       "occupancyRate": 71.5,
-      "image": "https://via.placeholder.com/400x225/8b5cf6/ffffff?text=Main+St+Window"
+      "image": "https://picsum.photos/seed/main-st-window/400/225"
     },
     {
       "id": "3",
@@ -64,7 +64,7 @@
       "totalRevenue": 2400.0,
       "averageRating": 4.9,
       "occupancyRate": 68.2,
-      "image": "https://via.placeholder.com/400x225/ec4899/ffffff?text=Corner+Billboard"
+      "image": "https://picsum.photos/seed/corner-billboard/400/225"
     },
     {
       "id": "4",
@@ -73,7 +73,7 @@
       "totalRevenue": 980.0,
       "averageRating": 4.5,
       "occupancyRate": 45.8,
-      "image": "https://via.placeholder.com/400x225/f59e0b/ffffff?text=Mall+Entrance"
+      "image": "https://picsum.photos/seed/mall-entrance/400/225"
     },
     {
       "id": "5",
@@ -82,7 +82,7 @@
       "totalRevenue": 470.0,
       "averageRating": null,
       "occupancyRate": 28.4,
-      "image": "https://via.placeholder.com/400x225/10b981/ffffff?text=Park+View+Wall"
+      "image": "https://picsum.photos/seed/park-view-wall/400/225"
     }
   ],
   "monthlyRevenue": [

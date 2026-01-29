@@ -15,7 +15,9 @@
         "id": "book-1",
         "space": {
           "title": "Downtown Storefront Window",
-          "images": []
+          "images": [
+            "https://picsum.photos/seed/downtown-storefront-window/400/225"
+          ]
         },
         "campaign": {
           "name": "Spring Sale Campaign"
@@ -31,7 +33,7 @@
         "id": "book-2",
         "space": {
           "title": "Main Street Billboard",
-          "images": []
+          "images": ["https://picsum.photos/seed/main-street-billboard/400/225"]
         },
         "campaign": {
           "name": "Grand Opening"
@@ -47,7 +49,7 @@
         "id": "book-3",
         "space": {
           "title": "Coffee Shop Window",
-          "images": []
+          "images": ["https://picsum.photos/seed/coffee-shop-window/400/225"]
         },
         "campaign": {
           "name": "Winter Promo"
@@ -63,7 +65,9 @@
         "id": "book-4",
         "space": {
           "title": "Shopping Center Display",
-          "images": []
+          "images": [
+            "https://picsum.photos/seed/shopping-center-display/400/225"
+          ]
         },
         "campaign": {
           "name": "Valentine's Special"
@@ -79,7 +83,7 @@
         "id": "book-5",
         "space": {
           "title": "Gallery Wall Space",
-          "images": []
+          "images": ["https://picsum.photos/seed/gallery-wall-space/400/225"]
         },
         "campaign": {
           "name": "Art Exhibition"
@@ -95,7 +99,7 @@
         "id": "book-6",
         "space": {
           "title": "Holiday Market Booth",
-          "images": []
+          "images": ["https://picsum.photos/seed/holiday-market-booth/400/225"]
         },
         "campaign": {
           "name": "Holiday Campaign"
@@ -111,7 +115,7 @@
         "id": "book-7",
         "space": {
           "title": "Restaurant Window",
-          "images": []
+          "images": ["https://picsum.photos/seed/restaurant-window/400/225"]
         },
         "campaign": {
           "name": "New Year Promo"
@@ -127,7 +131,7 @@
         "id": "book-8",
         "space": {
           "title": "Fitness Center Wall",
-          "images": []
+          "images": ["https://picsum.photos/seed/fitness-center-wall/400/225"]
         },
         "campaign": {
           "name": "Spring Sale Campaign"

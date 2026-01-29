@@ -1,4 +1,8 @@
-import { NotificationType, type Notification, type User } from "@/types/gql/graphql";
+import {
+  NotificationType,
+  type Notification,
+  type User,
+} from "@/types/gql/graphql";
 
 export type TNotification = Omit<Notification, "user"> & {
   user: Pick<User, "__typename" | "id" | "email" | "name">;

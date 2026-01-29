@@ -7,9 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/primitives/dropdown-menu";
-import {
-  NotificationType,
-} from "@/types/gql/graphql";
+import { NotificationType } from "@/types/gql/graphql";
 import {
   CheckCircle2,
   XCircle,
@@ -24,7 +22,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { type TNotification } from "./mock-notification";
-
 
 interface NotificationItemProps {
   notification: TNotification;
@@ -101,28 +98,26 @@ export function NotificationItem({
   const content = (
     <div
       className={cn(
-        "group flex items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-muted/50",
-        isUnread && "bg-blue-50/50 border-blue-200 dark:bg-blue-950/20 dark:border-blue-900"
+        "group hover:bg-muted/50 flex items-start gap-3 rounded-lg border p-4 transition-colors",
+        isUnread &&
+          "border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20"
       )}
     >
       {/* Icon */}
-      <div className="flex-shrink-0 mt-0.5">
+      <div className="mt-0.5 flex-shrink-0">
         {getNotificationIcon(notification.type)}
       </div>
 
       {/* Content */}
-      <div className="flex-1 min-w-0 space-y-1">
+      <div className="min-w-0 flex-1 space-y-1">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
             <p
-              className={cn(
-                "text-sm font-medium",
-                isUnread && "font-semibold"
-              )}
+              className={cn("text-sm font-medium", isUnread && "font-semibold")}
             >
               {notification.title}
             </p>
-            <p className="text-sm text-muted-foreground line-clamp-2">
+            <p className="text-muted-foreground line-clamp-2 text-sm">
               {notification.body}
             </p>
           </div>
@@ -132,7 +127,7 @@ export function NotificationItem({
             </div>
           )}
         </div>
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <div className="text-muted-foreground flex items-center gap-2 text-xs">
           <span>{formatTime(notification.createdAt as string)}</span>
           {notification.entityType && (
             <>

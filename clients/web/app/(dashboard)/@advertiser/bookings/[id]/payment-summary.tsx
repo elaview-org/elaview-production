@@ -53,7 +53,8 @@ export default function PaymentSummary({
     { label: "Print/Install Fee", value: booking?.printInstallFee || 0 },
   ].filter((item) => item.value > 0);
 
-  const total = booking?.total || breakdown.reduce((acc, item) => acc + item.value, 0);
+  const total =
+    booking?.total || breakdown.reduce((acc, item) => acc + item.value, 0);
 
   return (
     <Card>
@@ -81,14 +82,16 @@ export default function PaymentSummary({
         </div>
 
         {(payment?.cardBrand || payment?.cardLast4 || booking?.paidAt) && (
-          <div className="border-t pt-3 space-y-2 text-sm">
+          <div className="space-y-2 border-t pt-3 text-sm">
             {payment?.cardBrand && payment?.cardLast4 && (
               <p className="text-muted-foreground">
                 Payment Method: {payment.cardBrand} •••• {payment.cardLast4}
               </p>
             )}
             {booking?.paidAt && (
-              <p className="text-muted-foreground">Paid: {formatDate(booking.paidAt)}</p>
+              <p className="text-muted-foreground">
+                Paid: {formatDate(booking.paidAt)}
+              </p>
             )}
           </div>
         )}

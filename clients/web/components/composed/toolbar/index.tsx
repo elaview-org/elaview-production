@@ -19,6 +19,8 @@ type Props = {
   searchTarget: string;
   filters: Parameters<typeof ToolbarFiltersPanel>[0]["filters"];
   sort: Parameters<typeof ToolbarSortPanel>[0]["sort"];
+  pageInfo?: Parameters<typeof ToolbarPagination>[0]["pageInfo"];
+  pageSize?: Parameters<typeof ToolbarPagination>[0]["pageSize"];
   views?: Set<ViewOptions>;
   currentView?: ViewOptions;
   onViewChangeAction?: (view: ViewOptions) => void;
@@ -33,7 +35,10 @@ export default function Toolbar(props: Props) {
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
         <ToolbarSearch searchTarget={props.searchTarget} />
-        <ToolbarPagination />
+        <ToolbarPagination
+          pageInfo={props.pageInfo}
+          pageSize={props.pageSize}
+        />
 
         <ToolbarViewSelect
           views={props.views}

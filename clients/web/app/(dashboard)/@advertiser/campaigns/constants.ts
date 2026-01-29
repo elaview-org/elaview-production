@@ -49,6 +49,7 @@ export const TOOLBAR_PROPS = {
   searchTarget: "campaigns",
   filters: [
     {
+      key: "status",
       placeholder: "Status",
       fields: [
         { value: "draft", label: "Draft" },

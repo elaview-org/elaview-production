@@ -50,6 +50,7 @@ export const TOOLBAR_PROPS = {
   searchTarget: "bookings",
   filters: [
     {
+      key: "status",
       placeholder: "Status",
       fields: [
         { value: "pending", label: "Pending Approval" },

@@ -65,6 +65,7 @@ export const TOOLBAR_PROPS = {
   searchTarget: "payouts",
   filters: [
     {
+      key: "status",
       placeholder: "Status",
       fields: [
         { value: "pending", label: "Pending" },
@@ -74,6 +75,7 @@ export const TOOLBAR_PROPS = {
       ],
     },
     {
+      key: "stage",
       placeholder: "Stage",
       fields: [
         { value: "stage1", label: "Stage 1 (Print & Install)" },

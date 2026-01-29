@@ -64,7 +64,7 @@ export default async function Page(props: PageProps<"/listings">) {
     };
   });
 
-  const spaces = await api
+  const { spaces, pageInfo } = await api
     .query({
       query: graphql(`
         query SpaceOwnerListings(
@@ -101,7 +101,10 @@ export default async function Page(props: PageProps<"/listings">) {
       `),
       variables: variables,
     })
-    .then((res) => res.data?.mySpaces?.nodes ?? [])
+    .then((res) => ({
+      spaces: res.data?.mySpaces?.nodes ?? [],
+      pageInfo: res.data?.mySpaces?.pageInfo,
+    }))
     .catch((err) => {
       throw err;
     });
@@ -110,6 +113,7 @@ export default async function Page(props: PageProps<"/listings">) {
     <div className="flex flex-col gap-6">
       <Toolbar
         {...TOOLBAR_PROPS}
+        pageInfo={pageInfo}
         currentView={view}
         onViewChangeAction={async (view: ViewOptions) => {
           "use server";

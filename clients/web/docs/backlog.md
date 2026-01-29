@@ -211,6 +211,40 @@ Replace client-side filtering with server-side. Requires `SpaceFilterInput`, `Sp
 - [ ] Update discover to use server-side filtering
 
 ---
+
+## Infinite Scroll Pagination
+
+**Date:** 2026-01-29 | **Status:** Planned
+
+Replace `ToolbarPagination` (cursor-based prev/next) with an infinite scroll component. Drop-in replacement at the toolbar level — swap `<ToolbarPagination>` usage in `toolbar/index.tsx`.
+
+**Approach:**
+- Use `IntersectionObserver` with a sentinel element to trigger `fetchMore` with `after` cursor
+- Keep cursor-based GraphQL pagination (auto-advance instead of manual clicks)
+- Remove `before`/`last` search params (no backward navigation needed)
+
+**Considerations:**
+- Loading indicator at bottom of list
+- Scroll-to-top button
+- Empty state and end-of-list state
+- Grid and table views: place sentinel after the last item
+- Map view: may keep manual pagination or load all results
+
+**Affected files:**
+- `components/composed/toolbar/index.tsx` — replace `<ToolbarPagination>` with infinite scroll
+- `components/composed/toolbar/pagination.tsx` — replace or remove
+
+**Tasks:**
+
+- [ ] Create infinite scroll component with `IntersectionObserver` sentinel
+- [ ] Integrate with existing `fetchMore` / cursor-based pagination
+- [ ] Remove `before`/`last` search params from toolbar
+- [ ] Add loading indicator, scroll-to-top button, end-of-list state
+- [ ] Update grid and table views to place sentinel correctly
+- [ ] Decide map view strategy (keep pagination vs load all)
+- [ ] Remove or repurpose `pagination.tsx`
+
+---
 ## Pre-Launch Reminders
 
 - [ ] Add footer attribution for third-party assets (see [docs/acknowledgements.md](./acknowledgements.md))

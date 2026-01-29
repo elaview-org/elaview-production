@@ -83,6 +83,7 @@ export const TOOLBAR_PROPS = {
   searchTarget: "spaces",
   filters: [
     {
+      key: "status",
       placeholder: "Status",
       fields: [
         { value: "active", label: "Active" },

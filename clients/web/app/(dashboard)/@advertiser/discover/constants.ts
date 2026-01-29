@@ -22,6 +22,7 @@ export const TOOLBAR_PROPS = {
   searchTarget: "spaces",
   filters: [
     {
+      key: "type",
       placeholder: "Type",
       fields: [
         { value: "storefront", label: "Storefront" },
@@ -30,6 +31,7 @@ export const TOOLBAR_PROPS = {
       ],
     },
     {
+      key: "price",
       placeholder: "Price",
       fields: [
         { value: "0-50", label: "$0 - $50/day" },

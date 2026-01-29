@@ -94,7 +94,7 @@
     {
       "id": "space-1",
       "title": "Downtown Storefront",
-      "image": "https://picsum.photos/seed/space1/400/225",
+      "image": "https://via.placeholder.com/400x225/6366f1/ffffff?text=Downtown+Storefront",
       "totalBookings": 18,
       "totalRevenue": 5400.0,
       "averageRating": 4.8,
@@ -105,7 +105,7 @@
     {
       "id": "space-2",
       "title": "Main St Window",
-      "image": "https://picsum.photos/seed/space2/400/225",
+      "image": "https://via.placeholder.com/400x225/8b5cf6/ffffff?text=Main+St+Window",
       "totalBookings": 12,
       "totalRevenue": 3200.0,
       "averageRating": 4.6,
@@ -116,7 +116,7 @@
     {
       "id": "space-3",
       "title": "Corner Billboard",
-      "image": "https://picsum.photos/seed/space3/400/225",
+      "image": "https://via.placeholder.com/400x225/ec4899/ffffff?text=Corner+Billboard",
       "totalBookings": 9,
       "totalRevenue": 2400.0,
       "averageRating": 4.9,
@@ -127,7 +127,7 @@
     {
       "id": "space-4",
       "title": "Mall Entrance",
-      "image": "https://picsum.photos/seed/space4/400/225",
+      "image": "https://via.placeholder.com/400x225/f59e0b/ffffff?text=Mall+Entrance",
       "totalBookings": 5,
       "totalRevenue": 980.0,
       "averageRating": 4.5,
@@ -138,7 +138,7 @@
     {
       "id": "space-5",
       "title": "Park View Wall",
-      "image": "https://picsum.photos/seed/space5/400/225",
+      "image": "https://via.placeholder.com/400x225/10b981/ffffff?text=Park+View+Wall",
       "totalBookings": 3,
       "totalRevenue": 470.0,
       "averageRating": null,

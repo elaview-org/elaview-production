@@ -51,5 +51,6 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 types/gql
+lib/schema.graphql
 
 *.md

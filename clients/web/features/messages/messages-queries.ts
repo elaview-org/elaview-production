@@ -9,7 +9,7 @@ export async function getConversationsQuery(): Promise<{
   try {
     // TODO: Replace with actual GraphQL query when backend is ready
     const { mockConversations } =
-      await import("@/app/(dashboard)/@advertiser/messages/mock-data");
+      await import("@/features/conversations/mock-data");
     return { conversations: mockConversations };
   } catch (error) {
     console.error("Failed to fetch conversations:", error);
@@ -56,7 +56,7 @@ export async function getMessagesQuery(bookingId: string): Promise<{
 
     // For now, return mock data
     const { mockMessages, mockConversations } =
-      await import("@/app/(dashboard)/@advertiser/messages/mock-data");
+      await import("@/features/conversations/mock-data");
 
     const bookingMessages = mockMessages.filter(
       (msg) => msg.bookingId === bookingId

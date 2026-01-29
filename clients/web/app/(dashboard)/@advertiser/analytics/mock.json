@@ -45,7 +45,7 @@
       "totalSpend": 4200.0,
       "impressions": 68500,
       "roi": 3.2,
-      "image": "https://picsum.photos/seed/ad-perf1/400/225"
+      "image": "https://via.placeholder.com/400x225/6366f1/ffffff?text=Downtown+Storefront"
     },
     {
       "id": "2",
@@ -54,7 +54,7 @@
       "totalSpend": 3100.0,
       "impressions": 52300,
       "roi": 2.9,
-      "image": "https://picsum.photos/seed/ad-perf2/400/225"
+      "image": "https://via.placeholder.com/400x225/8b5cf6/ffffff?text=Main+St+Window"
     },
     {
       "id": "3",
@@ -63,7 +63,7 @@
       "totalSpend": 2800.0,
       "impressions": 48200,
       "roi": 3.1,
-      "image": "https://picsum.photos/seed/ad-perf3/400/225"
+      "image": "https://via.placeholder.com/400x225/ec4899/ffffff?text=Corner+Billboard"
     },
     {
       "id": "4",
@@ -72,7 +72,7 @@
       "totalSpend": 2150.0,
       "impressions": 38400,
       "roi": 2.6,
-      "image": "https://picsum.photos/seed/ad-perf4/400/225"
+      "image": "https://via.placeholder.com/400x225/f59e0b/ffffff?text=Mall+Entrance"
     },
     {
       "id": "5",
@@ -81,7 +81,7 @@
       "totalSpend": 1450.0,
       "impressions": 22100,
       "roi": 2.2,
-      "image": "https://picsum.photos/seed/ad-perf5/400/225"
+      "image": "https://via.placeholder.com/400x225/10b981/ffffff?text=Park+View+Wall"
     }
   ],
   "monthlyData": [

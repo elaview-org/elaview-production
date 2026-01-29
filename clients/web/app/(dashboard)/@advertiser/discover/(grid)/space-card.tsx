@@ -39,7 +39,7 @@ export default function SpaceCard({ data }: Props) {
         },
       ]}
       metaLeft={`${space.city}, ${space.state}`}
-      metaRight={`${formatCurrency(space.pricePerDay)}/day`}
+      metaRight={`${formatCurrency(space.pricePerDay as number)}/day`}
     />
   );
 }

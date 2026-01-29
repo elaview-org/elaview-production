@@ -27,7 +27,7 @@ export default function InboxPanel({
     <div
       className={cn(
         "bg-background flex flex-col border-r",
-        "w-full max-w-sm md:max-w-sm"
+        "w-full md:w-full md:max-w-sm"
       )}
     >
       {/** header */}

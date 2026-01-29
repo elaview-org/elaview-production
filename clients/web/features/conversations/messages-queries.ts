@@ -30,7 +30,7 @@ export default async function getConversationsQuery(): Promise<{
     // For now, return mock data
     // In production, this would be: return { conversations: data?.myConversations || [] };
     const { mockConversations } =
-      await import("@/app/(dashboard)/@advertiser/messages/mock-data");
+      await import("@/features/conversations/mock-data");
     return { conversations: mockConversations };
   } catch (error) {
     console.error("Failed to fetch conversations:", error);

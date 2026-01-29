@@ -10,10 +10,10 @@ import type {
   MessageAttachment,
   ThreadContext,
 } from "@/types/messages";
-import { mockMessages } from "@/app/(dashboard)/@advertiser/messages/mock-data";
+import { mockMessages } from "@/features/conversations/mock-data";
 import ConditionalRender from "@/components/composed/conditionally-render";
-import MessagesHeader from "../messages-header";
-import InboxPanel from "@/app/(dashboard)/@advertiser/messages/inbox-panel";
+import MessagesHeader from "../../conversations/components/messages-header";
+import InboxPanel from "@/features/conversations/components/inbox-panel";
 
 type ViewState = "list" | "thread";
 

@@ -1,10 +1,9 @@
 "use client";
 
-import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/primitives/avatar";
 import { Button } from "@/components/primitives/button";
-import type { Message, MessageAttachment } from "../../../../../types/messages";
+import type { Message, MessageAttachment } from "../../../types/messages";
 import { DownloadIcon, FileIcon } from "lucide-react";
 import Image from "next/image";
 // ============================================
@@ -152,7 +151,7 @@ export function MessageBubble({
               : "bg-muted text-foreground"
           )}
         >
-          <p className="text-sm break-words whitespace-pre-wrap">
+          <p className="text-sm wrap-break-word whitespace-pre-wrap">
             {message.content}
           </p>
 

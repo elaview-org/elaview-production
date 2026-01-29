@@ -107,6 +107,20 @@ public static class Services {
 
         builder
             .AddGraphQL()
+            .ModifyCostOptions(options => {
+                options.MaxFieldCost = 20_000;
+                options.MaxTypeCost = 20_000;
+                options.EnforceCostLimits = true;
+                options.ApplyCostDefaults = true;
+                options.DefaultResolverCost = 10.0;
+                options.Filtering.DefaultFilterArgumentCost = 10.0;
+                options.Filtering.DefaultFilterOperationCost = 10.0;
+                options.Filtering.DefaultExpensiveFilterOperationCost = 20.0;
+                options.Filtering.VariableMultiplier = 5;
+                options.Sorting.DefaultSortArgumentCost = 10.0;
+                options.Sorting.DefaultSortOperationCost = 10.0;
+                options.Sorting.VariableMultiplier = 5;
+            })
             .AddAuthorization()
             .AddTypes()
             .AddQueryContext()

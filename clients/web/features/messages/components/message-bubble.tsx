@@ -4,7 +4,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback } from "@/components/primitives/avatar";
 import { Button } from "@/components/primitives/button";
-import type { Message, MessageAttachment } from "../../../../../types/messages";
+import type { Message, MessageAttachment } from "../../../types/messages";
 import type { LucideProps } from "lucide-react";
 import { DownloadIcon, FileIcon, ImageIcon } from "lucide-react";
 import Image from "next/image";

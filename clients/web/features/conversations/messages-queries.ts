@@ -1,6 +1,7 @@
 // import api from "@/api/gql/server";
 // import { graphql } from "@/types/gql";
-import type { Conversation } from "@/types/types";
+
+import type { Conversation } from "@/types/messages";
 
 export default async function getConversationsQuery(): Promise<{
   conversations: Conversation[];
@@ -30,7 +31,7 @@ export default async function getConversationsQuery(): Promise<{
     // For now, return mock data
     // In production, this would be: return { conversations: data?.myConversations || [] };
     const { mockConversations } =
-      await import("@/app/(dashboard)/@advertiser/messages/mock-data");
+      await import("@/features/conversations/mock-data");
     return { conversations: mockConversations };
   } catch (error) {
     console.error("Failed to fetch conversations:", error);

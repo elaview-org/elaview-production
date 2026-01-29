@@ -1,64 +1,136 @@
-import { Card, CardDescription, CardTitle } from "@/components/primitives/card";
+import Link from "next/link";
+import { Button } from "@/components/primitives/button";
+import { Badge } from "@/components/primitives/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/primitives/avatar";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/primitives/card";
+import { MapPin, Ruler, Star } from "lucide-react";
 
-function SpaceInfo() {
-  // Dummy data for presentation; replace with real props/data as needed
-  const billboard = {
-    name: "Downtown Billboard",
-    location: "123 Main St, Springfield",
-    imageUrl:
-      "/components/assets/images/still-b742de551ffe7ebf2eda37f96ab92d00.webp",
-    size: "14 ft x 48 ft",
+interface SpaceInfoProps {
+  space?: {
+    id: string;
+    title: string;
+    photos?: string[];
+    location?: {
+      address: string;
+      city: string;
+      state: string;
+    };
+    width?: number;
+    height?: number;
+    dimensionUnit?: string;
+    spaceType?: {
+      name: string;
+    };
+    owner?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+      avatarUrl?: string | null;
+    };
   };
+  bookingId?: string;
+}
 
-  const campaign = {
-    name: "Summer Sales Explosion",
-    startDate: "2024-07-01",
-    endDate: "2024-08-31",
-  };
+export default function SpaceInfo({ space, bookingId }: SpaceInfoProps) {
+  if (!space) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Space Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-muted-foreground">No space information available</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const locationString = space.location
+    ? `${space.location.address}, ${space.location.city}, ${space.location.state}`
+    : "Location not available";
+
+  const dimensionsString =
+    space.width && space.height && space.dimensionUnit
+      ? `${space.width}×${space.height} ${space.dimensionUnit}`
+      : "Dimensions not available";
 
   return (
-    <Card className="p-5">
-      <CardTitle className="mb-2 text-lg">Space Information</CardTitle>
-      <div className="mb-4 flex h-32 w-full items-center justify-center overflow-hidden rounded-lg bg-amber-100">
-        <img
-          src={billboard.imageUrl}
-          alt={billboard.name}
-          className="h-full w-full object-cover"
-        />
-      </div>
-      <div className="mb-4">
-        <CardTitle className="text-base">Billboard</CardTitle>
-        <CardDescription>
-          <span className="block font-medium">{billboard.name}</span>
-          <span className="text-muted-foreground block text-sm">
-            {billboard.location}
-          </span>
-          <span className="text-muted-foreground block text-sm">
-            Size: {billboard.size}
-          </span>
-        </CardDescription>
-      </div>
-      <div className="mb-2">
-        <CardTitle className="text-base">Campaign Information</CardTitle>
-        <CardDescription>
-          <div className="flex flex-col gap-1">
-            <span>
-              <span className="font-medium">Campaign Name:</span>{" "}
-              {campaign.name}
-            </span>
-            <span>
-              <span className="font-medium">Start Date:</span>{" "}
-              {new Date(campaign.startDate).toLocaleDateString()}
-            </span>
-            <span>
-              <span className="font-medium">End Date:</span>{" "}
-              {new Date(campaign.endDate).toLocaleDateString()}
-            </span>
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Space Information</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Space Image */}
+        {space.photos && space.photos.length > 0 && (
+          <div className="flex h-32 w-full items-center justify-center overflow-hidden rounded-lg bg-muted">
+            <img
+              src={space.photos[0]}
+              alt={space.title}
+              className="h-full w-full object-cover"
+            />
           </div>
-        </CardDescription>
-      </div>
+        )}
+
+        {/* Space Details */}
+        <div className="space-y-2">
+          <h3 className="font-semibold">{space.title}</h3>
+          <div className="space-y-1 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4" />
+              <span>{locationString}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Ruler className="h-4 w-4" />
+              <span>{dimensionsString}</span>
+            </div>
+            {space.spaceType && (
+              <div>
+                <Badge variant="outline">{space.spaceType.name}</Badge>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Owner Info */}
+        {space.owner && (
+          <div className="flex items-center gap-2 border-t pt-4">
+            <Avatar className="h-8 w-8">
+              <AvatarImage src={space.owner.avatarUrl || undefined} />
+              <AvatarFallback>
+                {space.owner.firstName[0]}
+                {space.owner.lastName[0]}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1">
+              <p className="text-sm font-medium">
+                {space.owner.firstName} {space.owner.lastName}
+              </p>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                <span>4.8</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex gap-2 border-t pt-4">
+          <Button variant="outline" size="sm" asChild>
+            <Link href={`/spaces/${space.id}`}>View Space</Link>
+          </Button>
+          {bookingId && (
+            <Button variant="outline" size="sm" asChild>
+              <Link href={`/messages/${bookingId}`}>Contact Owner</Link>
+            </Button>
+          )}
+        </div>
+      </CardContent>
     </Card>
   );
 }
-
-export default SpaceInfo;

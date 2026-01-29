@@ -1,0 +1,41 @@
+name: Validate Web
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+
+env:
+  ELAVIEW_ENVIRONMENT: ${{ inputs.environment }}
+  DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+jobs:
+  validate:
+    name: _
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: devbox run -- bash -e {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Devbox
+        uses: jetify-com/devbox-install-action@v0.11.0
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: ev web:install
+
+      - name: Lint
+        run: ev web:lint
+
+      - name: Typecheck
+        run: ev web:typecheck
+
+      - name: Test
+        run: ev web:test
+
+      - name: Build
+        run: ev web:build

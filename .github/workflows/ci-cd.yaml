@@ -25,11 +25,14 @@ jobs:
     with:
       environment: development
 
-#  validate-web:
-#    name: Validate Web
-#    uses: ./.github/workflows/jobs/validate-web.yaml
-#    secrets: inherit
-#
+  validate-web:
+    name: Validate Web
+    uses: ./.github/workflows/validate-web.yaml
+    secrets: inherit
+    with:
+      environment: development
+
+
 #  validate-mobile:
 #    name: Validate Mobile
 #    uses: ./.github/workflows/jobs/validate-mobile.yaml

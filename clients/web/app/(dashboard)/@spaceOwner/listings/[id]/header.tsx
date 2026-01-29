@@ -5,7 +5,7 @@ import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import { IconChevronLeft } from "@tabler/icons-react";
 import Link from "next/link";
 
-export const Header_SpaceFragment = graphql(`
+const Header_SpaceFragment = graphql(`
   fragment Header_SpaceFragment on Space {
     title
     status

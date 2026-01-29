@@ -24,7 +24,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/primitives/tooltip";
-import storageKey from "@/lib/storage-keys";
+import storage from "@/lib/storage";
 
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 const SIDEBAR_WIDTH = "16rem";
@@ -82,7 +82,7 @@ function SidebarProvider({
         _setOpen(openState);
       }
 
-      document.cookie = `${storageKey.preferences.sidebar.open}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+      document.cookie = `${storage.preferences.sidebar.open}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
     },
     [setOpenProp, open]
   );

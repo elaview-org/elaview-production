@@ -4,7 +4,7 @@ function createKey(...segments: string[]): string {
   return [PREFIX, ...segments].join(".");
 }
 
-const storageKey = {
+const storage = {
   preferences: {
     listings: {
       view: createKey("preferences", "listings", "view"),
@@ -31,4 +31,4 @@ const storageKey = {
   },
 } as const;
 
-export default storageKey;
+export default storage;

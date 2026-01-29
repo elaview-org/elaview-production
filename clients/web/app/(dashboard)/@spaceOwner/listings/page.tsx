@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import api from "@/api/gql/server";
 import { graphql } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
-import storageKey from "@/lib/storage-keys";
+import storage from "@/lib/storage";
 import Toolbar from "@/components/composed/toolbar";
 import CreateSpace from "./create-space";
 import { TOOLBAR_PROPS } from "./constants";
@@ -26,7 +26,7 @@ export default async function Page(props: PageProps<"/listings">) {
         }
       `),
     }),
-    (await cookies()).get(storageKey.preferences.listings.view)
+    (await cookies()).get(storage.preferences.listings.view)
       ?.value as ViewOptions,
   ]);
 
@@ -51,7 +51,7 @@ export default async function Page(props: PageProps<"/listings">) {
         currentView={view}
         onViewChangeAction={async (view: ViewOptions) => {
           "use server";
-          (await cookies()).set(storageKey.preferences.listings.view, view, {
+          (await cookies()).set(storage.preferences.listings.view, view, {
             path: "/",
             maxAge: 60 * 60 * 24 * 365,
             sameSite: "lax",

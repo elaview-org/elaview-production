@@ -2,7 +2,7 @@
 
 import { ActionState } from "@/types/actions";
 import env from "@/lib/env";
-import storageKey from "@/lib/storage-keys";
+import storage from "@/lib/storage";
 
 import assert from "node:assert";
 import { redirect } from "next/navigation";
@@ -56,7 +56,7 @@ export default async function signup(
 
     const authCookie: Cookie = setCookieParser
       .parse(res.headers.getSetCookie())
-      .find((cookie) => cookie.name === storageKey.authentication.token)!;
+      .find((cookie) => cookie.name === storage.authentication.token)!;
     (await cookies()).set({
       name: authCookie.name,
       value: authCookie.value,

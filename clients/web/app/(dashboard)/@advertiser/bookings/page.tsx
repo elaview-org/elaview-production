@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import api from "@/api/gql/server";
 import { graphql } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
-import storageKey from "@/lib/storage-keys";
+import storage from "@/lib/storage";
 import Toolbar from "@/components/composed/toolbar";
 import BookingsGrid from "./(grid)/bookings-grid";
 import BookingsTable from "./(table)/bookings-table";
@@ -14,7 +14,7 @@ export default async function Page(props: PageProps<"/bookings">) {
     props.searchParams,
     cookies().then((cookieStore) => {
       const viewCookie = cookieStore.get(
-        storageKey.preferences.advertiserBookings.view
+        storage.preferences.advertiserBookings.view
       )?.value;
       return viewCookie === ViewOptions.Table ? viewCookie : ViewOptions.Grid;
     }),
@@ -50,7 +50,7 @@ export default async function Page(props: PageProps<"/bookings">) {
         onViewChangeAction={async (view: ViewOptions) => {
           "use server";
           (await cookies()).set(
-            storageKey.preferences.advertiserBookings.view,
+            storage.preferences.advertiserBookings.view,
             view,
             {
               path: "/",

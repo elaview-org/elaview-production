@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import api from "@/api/gql/server";
 import { graphql } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
-import storageKey from "@/lib/storage-keys";
+import storage from "@/lib/storage";
 import Toolbar from "@/components/composed/toolbar";
 import CreateCampaign from "./create-campaign";
 import CampaignsGrid from "./(grid)/campaigns-grid";
@@ -15,7 +15,7 @@ export default async function Page(props: PageProps<"/campaigns">) {
     props.searchParams,
     cookies().then((cookieStore) => {
       const viewCookie = cookieStore.get(
-        storageKey.preferences.campaigns.view
+        storage.preferences.campaigns.view
       )?.value;
       return viewCookie === ViewOptions.Table ? viewCookie : ViewOptions.Grid;
     }),
@@ -50,7 +50,7 @@ export default async function Page(props: PageProps<"/campaigns">) {
         currentView={view}
         onViewChangeAction={async (view: ViewOptions) => {
           "use server";
-          (await cookies()).set(storageKey.preferences.campaigns.view, view, {
+          (await cookies()).set(storage.preferences.campaigns.view, view, {
             path: "/",
             maxAge: 60 * 60 * 24 * 365,
             sameSite: "lax",

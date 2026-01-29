@@ -1,7 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { redirect } from "next/navigation";
-import storageKey from "@/lib/storage-keys";
+import storage from "@/lib/storage";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export async function redirectIfAuthenticated(url: string) {
   const { cookies } = await import("next/headers");
-  if ((await cookies()).get(storageKey.authentication.token)) {
+  if ((await cookies()).get(storage.authentication.token)) {
     // delegate cookie-verification responsibility to {url}
     redirect(url);
   }

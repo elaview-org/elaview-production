@@ -3,7 +3,7 @@ import { ApolloWrapper } from "@/api/gql/client";
 
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
-import storageKey from "@/lib/storage-keys";
+import storage from "@/lib/storage";
 
 export const metadata: Metadata = {
   title: "Elaview",
@@ -22,7 +22,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
           attribute="data-theme"
           defaultTheme="system"
           enableSystem
-          storageKey={storageKey.preferences.theme}
+          storageKey={storage.preferences.theme}
         >
           <ApolloWrapper>{props.children}</ApolloWrapper>
         </ThemeProvider>

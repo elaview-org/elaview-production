@@ -20,12 +20,12 @@ import RoleBasedView from "@/app/(dashboard)/role-based-view";
 import assert from "node:assert";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import storageKey from "@/lib/storage-keys";
+import storage from "@/lib/storage";
 
 export default async function Layout(props: LayoutProps<"/">) {
   const cookieStore = await cookies();
   const sidebarOpen =
-    cookieStore.get(storageKey.preferences.sidebar.open)?.value !== "false";
+    cookieStore.get(storage.preferences.sidebar.open)?.value !== "false";
 
   const { data, error } = await api.query({
     query: graphql(`

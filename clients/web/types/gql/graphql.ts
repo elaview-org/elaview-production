@@ -15,10 +15,10 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   /** The `DateTime` scalar represents an ISO-8601 compliant date time type. */
-  DateTime: { input: string; output: string; }
+  DateTime: { input: unknown; output: unknown; }
   /** The `Decimal` scalar type represents a decimal floating-point number. */
-  Decimal: { input: number; output: number; }
-  UUID: { input: string; output: string; }
+  Decimal: { input: unknown; output: unknown; }
+  UUID: { input: unknown; output: unknown; }
 };
 
 export type AdvertiserProfile = {
@@ -2926,81 +2926,81 @@ export type ValidationError = Error & {
   message: Scalars['String']['output'];
 };
 
-export type BookingCard_AdvertiserBookingFragmentFragment = { __typename: 'Booking', id: string, status: BookingStatus, startDate: string, endDate: string, totalAmount: number, space: { __typename: 'Space', title: string, images: Array<string>, city: string, state: string, owner: { __typename: 'SpaceOwnerProfile', businessName: string | null } | null } | null, campaign: { __typename: 'Campaign', name: string } | null } & { ' $fragmentName'?: 'BookingCard_AdvertiserBookingFragmentFragment' };
+export type BookingCard_AdvertiserBookingFragmentFragment = { __typename: 'Booking', id: unknown, status: BookingStatus, startDate: unknown, endDate: unknown, totalAmount: unknown, space: { __typename: 'Space', title: string, images: Array<string>, city: string, state: string, owner: { __typename: 'SpaceOwnerProfile', businessName: string | null } | null } | null, campaign: { __typename: 'Campaign', name: string } | null } & { ' $fragmentName'?: 'BookingCard_AdvertiserBookingFragmentFragment' };
 
-export type BookingsTable_AdvertiserBookingFragmentFragment = { __typename: 'Booking', id: string, status: BookingStatus, startDate: string, endDate: string, totalAmount: number, space: { __typename: 'Space', title: string, images: Array<string>, city: string, state: string, owner: { __typename: 'SpaceOwnerProfile', businessName: string | null } | null } | null, campaign: { __typename: 'Campaign', name: string } | null } & { ' $fragmentName'?: 'BookingsTable_AdvertiserBookingFragmentFragment' };
+export type BookingsTable_AdvertiserBookingFragmentFragment = { __typename: 'Booking', id: unknown, status: BookingStatus, startDate: unknown, endDate: unknown, totalAmount: unknown, space: { __typename: 'Space', title: string, images: Array<string>, city: string, state: string, owner: { __typename: 'SpaceOwnerProfile', businessName: string | null } | null } | null, campaign: { __typename: 'Campaign', name: string } | null } & { ' $fragmentName'?: 'BookingsTable_AdvertiserBookingFragmentFragment' };
 
 export type AdvertiserBookingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type AdvertiserBookingsQuery = { myBookingsAsAdvertiser: { __typename: 'MyBookingsAsAdvertiserConnection', nodes: Array<(
-      { __typename: 'Booking', id: string }
+      { __typename: 'Booking', id: unknown }
       & { ' $fragmentRefs'?: { 'BookingCard_AdvertiserBookingFragmentFragment': BookingCard_AdvertiserBookingFragmentFragment;'BookingsTable_AdvertiserBookingFragmentFragment': BookingsTable_AdvertiserBookingFragmentFragment } }
     )> | null } | null };
 
-export type CampaignCard_CampaignFragmentFragment = { __typename: 'Campaign', id: string, name: string, description: string | null, status: CampaignStatus, startDate: string | null, endDate: string | null, totalBudget: number | null, imageUrl: string, bookings: { __typename: 'BookingsConnection', nodes: Array<{ __typename: 'Booking', id: string }> | null } | null } & { ' $fragmentName'?: 'CampaignCard_CampaignFragmentFragment' };
+export type CampaignCard_CampaignFragmentFragment = { __typename: 'Campaign', id: unknown, name: string, description: string | null, status: CampaignStatus, startDate: unknown | null, endDate: unknown | null, totalBudget: unknown | null, imageUrl: string, bookings: { __typename: 'BookingsConnection', nodes: Array<{ __typename: 'Booking', id: unknown }> | null } | null } & { ' $fragmentName'?: 'CampaignCard_CampaignFragmentFragment' };
 
-export type CampaignsTable_CampaignFragmentFragment = { __typename: 'Campaign', id: string, name: string, description: string | null, status: CampaignStatus, startDate: string | null, endDate: string | null, totalBudget: number | null, imageUrl: string, bookings: { __typename: 'BookingsConnection', nodes: Array<{ __typename: 'Booking', id: string }> | null } | null } & { ' $fragmentName'?: 'CampaignsTable_CampaignFragmentFragment' };
+export type CampaignsTable_CampaignFragmentFragment = { __typename: 'Campaign', id: unknown, name: string, description: string | null, status: CampaignStatus, startDate: unknown | null, endDate: unknown | null, totalBudget: unknown | null, imageUrl: string, bookings: { __typename: 'BookingsConnection', nodes: Array<{ __typename: 'Booking', id: unknown }> | null } | null } & { ' $fragmentName'?: 'CampaignsTable_CampaignFragmentFragment' };
 
 export type AdvertiserCampaignsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type AdvertiserCampaignsQuery = { myCampaigns: { __typename: 'MyCampaignsConnection', nodes: Array<(
-      { __typename: 'Campaign', id: string }
+      { __typename: 'Campaign', id: unknown }
       & { ' $fragmentRefs'?: { 'CampaignCard_CampaignFragmentFragment': CampaignCard_CampaignFragmentFragment;'CampaignsTable_CampaignFragmentFragment': CampaignsTable_CampaignFragmentFragment } }
     )> | null } | null };
 
-export type DiscoverSpaceCard_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, description: string | null, city: string, state: string, images: Array<string>, type: SpaceType, pricePerDay: number } & { ' $fragmentName'?: 'DiscoverSpaceCard_SpaceFragmentFragment' };
+export type DiscoverSpaceCard_SpaceFragmentFragment = { __typename: 'Space', id: unknown, title: string, description: string | null, city: string, state: string, images: Array<string>, type: SpaceType, pricePerDay: unknown } & { ' $fragmentName'?: 'DiscoverSpaceCard_SpaceFragmentFragment' };
 
-export type DiscoverMap_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, address: string, city: string, state: string, zipCode: string | null, latitude: number, longitude: number, pricePerDay: number, type: SpaceType, images: Array<string>, width: number | null, height: number | null } & { ' $fragmentName'?: 'DiscoverMap_SpaceFragmentFragment' };
+export type DiscoverMap_SpaceFragmentFragment = { __typename: 'Space', id: unknown, title: string, address: string, city: string, state: string, zipCode: string | null, latitude: number, longitude: number, pricePerDay: unknown, type: SpaceType, images: Array<string>, width: number | null, height: number | null } & { ' $fragmentName'?: 'DiscoverMap_SpaceFragmentFragment' };
 
-export type DiscoverTable_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, city: string, state: string, images: Array<string>, type: SpaceType, pricePerDay: number } & { ' $fragmentName'?: 'DiscoverTable_SpaceFragmentFragment' };
+export type DiscoverTable_SpaceFragmentFragment = { __typename: 'Space', id: unknown, title: string, city: string, state: string, images: Array<string>, type: SpaceType, pricePerDay: unknown } & { ' $fragmentName'?: 'DiscoverTable_SpaceFragmentFragment' };
 
 export type DiscoverSpacesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type DiscoverSpacesQuery = { spaces: { __typename: 'SpacesConnection', nodes: Array<(
-      { __typename: 'Space', id: string }
+      { __typename: 'Space', id: unknown }
       & { ' $fragmentRefs'?: { 'DiscoverSpaceCard_SpaceFragmentFragment': DiscoverSpaceCard_SpaceFragmentFragment;'DiscoverTable_SpaceFragmentFragment': DiscoverTable_SpaceFragmentFragment;'DiscoverMap_SpaceFragmentFragment': DiscoverMap_SpaceFragmentFragment } }
     )> | null } | null };
 
 export type AdvertiserSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AdvertiserSettingsQuery = { me: { __typename: 'User', id: string, email: string, name: string, avatar: string | null, phone: string | null, createdAt: string, lastLoginAt: string | null, activeProfileType: ProfileType, advertiserProfile: { __typename: 'AdvertiserProfile', id: string, companyName: string | null, industry: string | null, website: string | null, onboardingComplete: boolean } | null } | null, myNotificationPreferences: Array<{ __typename: 'NotificationPreference', id: string, notificationType: NotificationType, inAppEnabled: boolean, emailEnabled: boolean, pushEnabled: boolean }> };
+export type AdvertiserSettingsQuery = { me: { __typename: 'User', id: unknown, email: string, name: string, avatar: string | null, phone: string | null, createdAt: unknown, lastLoginAt: unknown | null, activeProfileType: ProfileType, advertiserProfile: { __typename: 'AdvertiserProfile', id: unknown, companyName: string | null, industry: string | null, website: string | null, onboardingComplete: boolean } | null } | null, myNotificationPreferences: Array<{ __typename: 'NotificationPreference', id: unknown, notificationType: NotificationType, inAppEnabled: boolean, emailEnabled: boolean, pushEnabled: boolean }> };
 
 export type GetAdvertiserForSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAdvertiserForSettingsQuery = { me: { __typename: 'User', id: string, avatar: string | null, advertiserProfile: { __typename: 'AdvertiserProfile', id: string } | null } | null };
+export type GetAdvertiserForSettingsQuery = { me: { __typename: 'User', id: unknown, avatar: string | null, advertiserProfile: { __typename: 'AdvertiserProfile', id: unknown } | null } | null };
 
 export type UpdateAdvertiserUserProfileMutationVariables = Exact<{
   input: UpdateCurrentUserInput;
 }>;
 
 
-export type UpdateAdvertiserUserProfileMutation = { updateCurrentUser: { __typename: 'UpdateCurrentUserPayload', user: { __typename: 'User', id: string } | null } };
+export type UpdateAdvertiserUserProfileMutation = { updateCurrentUser: { __typename: 'UpdateCurrentUserPayload', user: { __typename: 'User', id: unknown } | null } };
 
 export type UpdateAdvertiserBusinessInfoMutationVariables = Exact<{
   input: UpdateAdvertiserProfileInput;
 }>;
 
 
-export type UpdateAdvertiserBusinessInfoMutation = { updateAdvertiserProfile: { __typename: 'UpdateAdvertiserProfilePayload', advertiserProfile: { __typename: 'AdvertiserProfile', id: string } | null } };
+export type UpdateAdvertiserBusinessInfoMutation = { updateAdvertiserProfile: { __typename: 'UpdateAdvertiserProfilePayload', advertiserProfile: { __typename: 'AdvertiserProfile', id: unknown } | null } };
 
-export type BookingCard_BookingFragmentFragment = { __typename: 'Booking', id: string, status: BookingStatus, startDate: string, endDate: string, ownerPayoutAmount: number, space: { __typename: 'Space', title: string, images: Array<string> } | null, campaign: { __typename: 'Campaign', name: string, advertiserProfile: { __typename: 'AdvertiserProfile', companyName: string | null } } | null } & { ' $fragmentName'?: 'BookingCard_BookingFragmentFragment' };
+export type BookingCard_BookingFragmentFragment = { __typename: 'Booking', id: unknown, status: BookingStatus, startDate: unknown, endDate: unknown, ownerPayoutAmount: unknown, space: { __typename: 'Space', title: string, images: Array<string> } | null, campaign: { __typename: 'Campaign', name: string, advertiserProfile: { __typename: 'AdvertiserProfile', companyName: string | null } } | null } & { ' $fragmentName'?: 'BookingCard_BookingFragmentFragment' };
 
-export type BookingsTable_BookingFragmentFragment = { __typename: 'Booking', id: string, status: BookingStatus, startDate: string, endDate: string, ownerPayoutAmount: number, space: { __typename: 'Space', title: string, images: Array<string> } | null, campaign: { __typename: 'Campaign', name: string, advertiserProfile: { __typename: 'AdvertiserProfile', companyName: string | null } } | null } & { ' $fragmentName'?: 'BookingsTable_BookingFragmentFragment' };
+export type BookingsTable_BookingFragmentFragment = { __typename: 'Booking', id: unknown, status: BookingStatus, startDate: unknown, endDate: unknown, ownerPayoutAmount: unknown, space: { __typename: 'Space', title: string, images: Array<string> } | null, campaign: { __typename: 'Campaign', name: string, advertiserProfile: { __typename: 'AdvertiserProfile', companyName: string | null } } | null } & { ' $fragmentName'?: 'BookingsTable_BookingFragmentFragment' };
 
 export type SpaceOwnerBookingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SpaceOwnerBookingsQuery = { myBookingsAsOwner: { __typename: 'MyBookingsAsOwnerConnection', nodes: Array<(
-      { __typename: 'Booking', id: string }
+      { __typename: 'Booking', id: unknown }
       & { ' $fragmentRefs'?: { 'BookingCard_BookingFragmentFragment': BookingCard_BookingFragmentFragment;'BookingsTable_BookingFragmentFragment': BookingsTable_BookingFragmentFragment } }
     )> | null } | null };
 
-export type BalanceCards_EarningsSummaryFragmentFragment = { __typename: 'EarningsSummary', availableBalance: number | null, pendingPayouts: number | null, thisMonthEarnings: number | null, lastMonthEarnings: number | null, totalEarnings: number | null } & { ' $fragmentName'?: 'BalanceCards_EarningsSummaryFragmentFragment' };
+export type BalanceCards_EarningsSummaryFragmentFragment = { __typename: 'EarningsSummary', availableBalance: unknown | null, pendingPayouts: unknown | null, thisMonthEarnings: unknown | null, lastMonthEarnings: unknown | null, totalEarnings: unknown | null } & { ' $fragmentName'?: 'BalanceCards_EarningsSummaryFragmentFragment' };
 
 export type SpaceOwnerEarningsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3009,19 +3009,19 @@ export type SpaceOwnerEarningsQuery = { earningsSummary: (
     { __typename: 'EarningsSummary' }
     & { ' $fragmentRefs'?: { 'BalanceCards_EarningsSummaryFragmentFragment': BalanceCards_EarningsSummaryFragmentFragment } }
   ), myPayouts: { __typename: 'MyPayoutsConnection', nodes: Array<(
-      { __typename: 'Payout', id: string, amount: number, processedAt: string | null }
+      { __typename: 'Payout', id: unknown, amount: unknown, processedAt: unknown | null }
       & { ' $fragmentRefs'?: { 'PayoutsTable_PayoutFragmentFragment': PayoutsTable_PayoutFragmentFragment } }
     )> | null } | null };
 
-export type PayoutsTable_PayoutFragmentFragment = { __typename: 'Payout', id: string, amount: number, stage: PayoutStage, status: PayoutStatus, processedAt: string | null, booking: { __typename: 'Booking', id: string, space: { __typename: 'Space', title: string } | null } } & { ' $fragmentName'?: 'PayoutsTable_PayoutFragmentFragment' };
+export type PayoutsTable_PayoutFragmentFragment = { __typename: 'Payout', id: unknown, amount: unknown, stage: PayoutStage, status: PayoutStatus, processedAt: unknown | null, booking: { __typename: 'Booking', id: unknown, space: { __typename: 'Space', title: string } | null } } & { ' $fragmentName'?: 'PayoutsTable_PayoutFragmentFragment' };
 
-export type SpaceCard_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, description: string | null, city: string, state: string, images: Array<string>, type: SpaceType, status: SpaceStatus, createdAt: string } & { ' $fragmentName'?: 'SpaceCard_SpaceFragmentFragment' };
+export type SpaceCard_SpaceFragmentFragment = { __typename: 'Space', id: unknown, title: string, description: string | null, city: string, state: string, images: Array<string>, type: SpaceType, status: SpaceStatus, createdAt: unknown } & { ' $fragmentName'?: 'SpaceCard_SpaceFragmentFragment' };
 
-export type ListingsTable_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, city: string, state: string, images: Array<string>, type: SpaceType, status: SpaceStatus, createdAt: string } & { ' $fragmentName'?: 'ListingsTable_SpaceFragmentFragment' };
+export type ListingsTable_SpaceFragmentFragment = { __typename: 'Space', id: unknown, title: string, city: string, state: string, images: Array<string>, type: SpaceType, status: SpaceStatus, createdAt: unknown } & { ' $fragmentName'?: 'ListingsTable_SpaceFragmentFragment' };
 
-export type Details_SpaceFragmentFragment = { __typename: 'Space', id: string, description: string | null, type: SpaceType, address: string, city: string, state: string, zipCode: string | null, traffic: string | null, pricePerDay: number, installationFee: number | null, minDuration: number, maxDuration: number | null, width: number | null, height: number | null, dimensionsText: string | null, availableFrom: string | null, availableTo: string | null } & { ' $fragmentName'?: 'Details_SpaceFragmentFragment' };
+export type Details_SpaceFragmentFragment = { __typename: 'Space', id: unknown, description: string | null, type: SpaceType, address: string, city: string, state: string, zipCode: string | null, traffic: string | null, pricePerDay: unknown, installationFee: unknown | null, minDuration: number, maxDuration: number | null, width: number | null, height: number | null, dimensionsText: string | null, availableFrom: unknown | null, availableTo: unknown | null } & { ' $fragmentName'?: 'Details_SpaceFragmentFragment' };
 
-export type Gallery_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, images: Array<string> } & { ' $fragmentName'?: 'Gallery_SpaceFragmentFragment' };
+export type Gallery_SpaceFragmentFragment = { __typename: 'Space', id: unknown, title: string, images: Array<string> } & { ' $fragmentName'?: 'Gallery_SpaceFragmentFragment' };
 
 export type Header_SpaceFragmentFragment = { __typename: 'Space', title: string, status: SpaceStatus } & { ' $fragmentName'?: 'Header_SpaceFragmentFragment' };
 
@@ -3031,21 +3031,21 @@ export type SpaceDetailQueryVariables = Exact<{
 
 
 export type SpaceDetailQuery = { spaceById: (
-    { __typename: 'Space', id: string }
+    { __typename: 'Space', id: unknown }
     & { ' $fragmentRefs'?: { 'Header_SpaceFragmentFragment': Header_SpaceFragmentFragment;'Gallery_SpaceFragmentFragment': Gallery_SpaceFragmentFragment;'Details_SpaceFragmentFragment': Details_SpaceFragmentFragment;'Performance_SpaceFragmentFragment': Performance_SpaceFragmentFragment } }
   ) | null };
 
-export type Performance_SpaceFragmentFragment = { __typename: 'Space', totalBookings: number, totalRevenue: number, averageRating: number | null } & { ' $fragmentName'?: 'Performance_SpaceFragmentFragment' };
+export type Performance_SpaceFragmentFragment = { __typename: 'Space', totalBookings: number, totalRevenue: unknown, averageRating: number | null } & { ' $fragmentName'?: 'Performance_SpaceFragmentFragment' };
 
 export type SpaceOwnerListingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type SpaceOwnerListingsQuery = { mySpaces: { __typename: 'MySpacesConnection', nodes: Array<(
-      { __typename: 'Space', id: string }
+      { __typename: 'Space', id: unknown }
       & { ' $fragmentRefs'?: { 'SpaceCard_SpaceFragmentFragment': SpaceCard_SpaceFragmentFragment;'ListingsTable_SpaceFragmentFragment': ListingsTable_SpaceFragmentFragment } }
     )> | null } | null };
 
-export type AboutSection_UserFragmentFragment = { __typename: 'User', name: string, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', businessName: string | null, businessType: string | null, onboardingComplete: boolean, spaces: { __typename: 'SpacesConnection', nodes: Array<{ __typename: 'Space', id: string }> | null } | null } | null } & { ' $fragmentName'?: 'AboutSection_UserFragmentFragment' };
+export type AboutSection_UserFragmentFragment = { __typename: 'User', name: string, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', businessName: string | null, businessType: string | null, onboardingComplete: boolean, spaces: { __typename: 'SpacesConnection', nodes: Array<{ __typename: 'Space', id: unknown }> | null } | null } | null } & { ' $fragmentName'?: 'AboutSection_UserFragmentFragment' };
 
 export type SpaceOwnerProfileQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3055,31 +3055,31 @@ export type SpaceOwnerProfileQuery = { me: (
     & { ' $fragmentRefs'?: { 'ProfileCard_UserFragmentFragment': ProfileCard_UserFragmentFragment;'AboutSection_UserFragmentFragment': AboutSection_UserFragmentFragment } }
   ) | null };
 
-export type ProfileCard_UserFragmentFragment = { __typename: 'User', name: string, avatar: string | null, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', createdAt: string, spaces: { __typename: 'SpacesConnection', nodes: Array<{ __typename: 'Space', averageRating: number | null, reviews: { __typename: 'ReviewsConnection', nodes: Array<{ __typename: 'Review', id: string }> | null } | null }> | null } | null } | null } & { ' $fragmentName'?: 'ProfileCard_UserFragmentFragment' };
+export type ProfileCard_UserFragmentFragment = { __typename: 'User', name: string, avatar: string | null, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', createdAt: unknown, spaces: { __typename: 'SpacesConnection', nodes: Array<{ __typename: 'Space', averageRating: number | null, reviews: { __typename: 'ReviewsConnection', nodes: Array<{ __typename: 'Review', id: unknown }> | null } | null }> | null } | null } | null } & { ' $fragmentName'?: 'ProfileCard_UserFragmentFragment' };
 
 export type SpaceOwnerSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type SpaceOwnerSettingsQuery = { me: { __typename: 'User', id: string, email: string, name: string, avatar: string | null, phone: string | null, createdAt: string, lastLoginAt: string | null, activeProfileType: ProfileType, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', id: string, businessName: string | null, businessType: string | null, payoutSchedule: PayoutSchedule, onboardingComplete: boolean, stripeAccountId: string | null, stripeAccountStatus: string | null } | null } | null, myNotificationPreferences: Array<{ __typename: 'NotificationPreference', id: string, notificationType: NotificationType, inAppEnabled: boolean, emailEnabled: boolean, pushEnabled: boolean }> };
+export type SpaceOwnerSettingsQuery = { me: { __typename: 'User', id: unknown, email: string, name: string, avatar: string | null, phone: string | null, createdAt: unknown, lastLoginAt: unknown | null, activeProfileType: ProfileType, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', id: unknown, businessName: string | null, businessType: string | null, payoutSchedule: PayoutSchedule, onboardingComplete: boolean, stripeAccountId: string | null, stripeAccountStatus: string | null } | null } | null, myNotificationPreferences: Array<{ __typename: 'NotificationPreference', id: unknown, notificationType: NotificationType, inAppEnabled: boolean, emailEnabled: boolean, pushEnabled: boolean }> };
 
 export type GetSpaceOwnerForSettingsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetSpaceOwnerForSettingsQuery = { me: { __typename: 'User', id: string, avatar: string | null, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', id: string } | null } | null };
+export type GetSpaceOwnerForSettingsQuery = { me: { __typename: 'User', id: unknown, avatar: string | null, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', id: unknown } | null } | null };
 
 export type UpdateSpaceOwnerProfileMutationVariables = Exact<{
   input: UpdateCurrentUserInput;
 }>;
 
 
-export type UpdateSpaceOwnerProfileMutation = { updateCurrentUser: { __typename: 'UpdateCurrentUserPayload', user: { __typename: 'User', id: string } | null } };
+export type UpdateSpaceOwnerProfileMutation = { updateCurrentUser: { __typename: 'UpdateCurrentUserPayload', user: { __typename: 'User', id: unknown } | null } };
 
 export type UpdateSpaceOwnerBusinessInfoMutationVariables = Exact<{
   input: UpdateSpaceOwnerProfileInput;
 }>;
 
 
-export type UpdateSpaceOwnerBusinessInfoMutation = { updateSpaceOwnerProfile: { __typename: 'UpdateSpaceOwnerProfilePayload', spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', id: string } | null } };
+export type UpdateSpaceOwnerBusinessInfoMutation = { updateSpaceOwnerProfile: { __typename: 'UpdateSpaceOwnerProfilePayload', spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', id: unknown } | null } };
 
 export type DashboardUserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -3098,7 +3098,7 @@ export type SwitchProfileMutationVariables = Exact<{
 }>;
 
 
-export type SwitchProfileMutation = { updateCurrentUser: { __typename: 'UpdateCurrentUserPayload', user: { __typename: 'User', id: string, activeProfileType: ProfileType } | null, errors: Array<{ __typename: 'NotFoundError', message: string }> | null } };
+export type SwitchProfileMutation = { updateCurrentUser: { __typename: 'UpdateCurrentUserPayload', user: { __typename: 'User', id: unknown, activeProfileType: ProfileType } | null, errors: Array<{ __typename: 'NotFoundError', message: string }> | null } };
 
 export type UserSection_UserFragmentFragment = { __typename: 'User', email: string, name: string, avatar: string | null, activeProfileType: ProfileType } & { ' $fragmentName'?: 'UserSection_UserFragmentFragment' };
 

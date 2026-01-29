@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   poweredByHeader: false,
+  experimental: {
+    globalNotFound: true,
+  },
   images: {
     remotePatterns: [
       {

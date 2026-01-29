@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { ViewOptions } from "@/types/constants";
-import storageKey from "@/lib/storage-keys";
+import storage from "@/lib/storage";
 import Toolbar from "@/components/composed/toolbar";
 import { GridViewSkeleton } from "@/components/composed/grid-view";
 import { TOOLBAR_PROPS } from "./constants";
@@ -9,7 +9,7 @@ import { BookingsTableSkeleton } from "./(table)/bookings-table";
 export default async function Loading() {
   const cookieStore = await cookies();
   const viewCookie = cookieStore.get(
-    storageKey.preferences.advertiserBookings.view
+    storage.preferences.advertiserBookings.view
   )?.value;
   const view = viewCookie === ViewOptions.Table ? viewCookie : ViewOptions.Grid;
 
@@ -21,7 +21,7 @@ export default async function Loading() {
         onViewChangeAction={async (view: ViewOptions) => {
           "use server";
           (await cookies()).set(
-            storageKey.preferences.advertiserBookings.view,
+            storage.preferences.advertiserBookings.view,
             view,
             {
               path: "/",

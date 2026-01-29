@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import api from "@/api/gql/server";
-import { graphql } from "@/types/gql";
+import { Booking, graphql } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
-import storageKey from "@/lib/storage-keys";
+import storage from "@/lib/storage";
 import Toolbar from "@/components/composed/toolbar";
 import BookingsGrid from "./(grid)/bookings-grid";
 import BookingsTable from "./(table)/bookings-table";
@@ -10,48 +10,35 @@ import { type FilterTabKey, TOOLBAR_PROPS } from "./constants";
 import mockData from "./mock.json";
 
 export default async function Page(props: PageProps<"/bookings">) {
-  const [{ status }, view] = await Promise.all([
-    props.searchParams,
+  const [tabKey, view, bookings] = await Promise.all([
+    props.searchParams.then(
+      (searchParams) => (searchParams.status as FilterTabKey) ?? "all"
+    ),
     cookies().then((cookieStore) => {
       const viewCookie = cookieStore.get(
-        storageKey.preferences.bookings.view
+        storage.preferences.bookings.view
       )?.value;
       return viewCookie === ViewOptions.Table ? viewCookie : ViewOptions.Grid;
     }),
-  ]);
-  const tabKey = (status as FilterTabKey) ?? "all";
-
-  const { data, error } = await api.query({
-    // query: graphql(`
-    //   query SpaceOwnerBookings($where: BookingFilterInput) {
-    //     myBookingsAsOwner(where: $where) {
-    //       nodes {
-    //         id
-    //         ...BookingsTable_BookingFragment
-    //       }
-    //     }
-    //   }
-    // `),
-    // variables: { where: filter },
-    query: graphql(`
-      query SpaceOwnerBookings {
-        myBookingsAsOwner {
-          nodes {
-            id
-            ...BookingCard_BookingFragment
-            ...BookingsTable_BookingFragment
+    api
+      .query({
+        query: graphql(`
+          query SpaceOwnerBookings {
+            myBookingsAsOwner {
+              nodes {
+                id
+                ...BookingCard_BookingFragment
+                ...BookingsTable_BookingFragment
+              }
+            }
           }
-        }
-      }
-    `),
-  });
-
-  if (error) {
-    console.error("Bookings query error:", error);
-  }
-
-  const queryBookings = data?.myBookingsAsOwner?.nodes ?? [];
-  const bookings = queryBookings.length > 0 ? queryBookings : mockData;
+        `),
+      })
+      .then(() => mockData as unknown as Booking[])
+      .catch((error) => {
+        throw error;
+      }),
+  ]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -60,7 +47,7 @@ export default async function Page(props: PageProps<"/bookings">) {
         currentView={view}
         onViewChangeAction={async (view: ViewOptions) => {
           "use server";
-          (await cookies()).set(storageKey.preferences.bookings.view, view, {
+          (await cookies()).set(storage.preferences.bookings.view, view, {
             path: "/",
             maxAge: 60 * 60 * 24 * 365,
             sameSite: "lax",

@@ -104,10 +104,7 @@ export default async function Page(props: PageProps<"/listings">) {
     .then((res) => ({
       spaces: res.data?.mySpaces?.nodes ?? [],
       pageInfo: res.data?.mySpaces?.pageInfo,
-    }))
-    .catch((err) => {
-      throw err;
-    });
+    }));
 
   return (
     <div className="flex flex-col gap-6">

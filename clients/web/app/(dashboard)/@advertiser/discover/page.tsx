@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import api from "@/api/gql/server";
 import { graphql } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
@@ -11,22 +10,24 @@ import DiscoverTable from "./(table)/discover-table";
 import DiscoverMap from "./(map)/discover-map";
 
 export default async function Page() {
-  const [cookieStore, { data, error }] = await Promise.all([
+  const [cookieStore, spaces] = await Promise.all([
     cookies(),
-    api.query({
-      query: graphql(`
-        query DiscoverSpaces {
-          spaces(first: 32, where: { status: { eq: ACTIVE } }) {
-            nodes {
-              id
-              ...DiscoverSpaceCard_SpaceFragment
-              ...DiscoverTable_SpaceFragment
-              ...DiscoverMap_SpaceFragment
+    api
+      .query({
+        query: graphql(`
+          query DiscoverSpaces {
+            spaces(first: 32, where: { status: { eq: ACTIVE } }) {
+              nodes {
+                id
+                ...DiscoverSpaceCard_SpaceFragment
+                ...DiscoverTable_SpaceFragment
+                ...DiscoverMap_SpaceFragment
+              }
             }
           }
-        }
-      `),
-    }),
+        `),
+      })
+      .then((res) => res.data?.spaces?.nodes ?? []),
   ]);
 
   const viewCookie = cookieStore.get(storage.preferences.discover.view)?.value;
@@ -34,12 +35,6 @@ export default async function Page() {
     viewCookie === ViewOptions.Table || viewCookie === ViewOptions.Map
       ? viewCookie
       : ViewOptions.Grid;
-
-  if (error) {
-    redirect("/logout");
-  }
-
-  const spaces = data?.spaces?.nodes ?? [];
 
   return (
     <div className="flex flex-col gap-6">

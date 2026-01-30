@@ -17,33 +17,30 @@ import { UserSection } from "./user-section";
 import { CSSProperties } from "react";
 import ContentHeader from "@/app/(dashboard)/content-header";
 import RoleBasedView from "@/app/(dashboard)/role-based-view";
-import assert from "node:assert";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import storage from "@/lib/storage";
+import assert from "node:assert";
 
 export default async function Layout(props: LayoutProps<"/">) {
-  const cookieStore = await cookies();
   const sidebarOpen =
-    cookieStore.get(storage.preferences.sidebar.open)?.value !== "false";
+    (await cookies()).get(storage.preferences.sidebar.open)?.value !== "false";
 
-  const { data, error } = await api.query({
-    query: graphql(`
-      query DashboardUser {
-        me {
-          ...NavigationSection_UserFragment
-          ...UserSection_UserFragment
-          ...RoleBasedView_UserFragment
+  const me = await api
+    .query({
+      query: graphql(`
+        query DashboardUser {
+          me {
+            ...NavigationSection_UserFragment
+            ...UserSection_UserFragment
+            ...RoleBasedView_UserFragment
+          }
         }
-      }
-    `),
-  });
-
-  if (error || !data?.me) {
-    redirect("/logout");
-  }
-
-  assert(data?.me, "data?.me");
+      `),
+    })
+    .then((res) => {
+      assert(!!res.data?.me);
+      return res.data?.me;
+    });
 
   return (
     <SidebarProvider
@@ -67,15 +64,15 @@ export default async function Layout(props: LayoutProps<"/">) {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent>
-          <NavigationSection data={data.me} />
+          <NavigationSection data={me} />
         </SidebarContent>
         <SidebarFooter>
-          <UserSection data={data.me} />
+          <UserSection data={me} />
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <ContentHeader />
-        <RoleBasedView data={data.me} {...props} />
+        <RoleBasedView data={me} {...props} />
       </SidebarInset>
     </SidebarProvider>
   );

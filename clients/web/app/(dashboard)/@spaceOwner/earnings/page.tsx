@@ -1,6 +1,5 @@
 import api from "@/api/gql/server";
 import { graphql } from "@/types/gql";
-import { redirect } from "next/navigation";
 import BalanceCards from "./balance-cards";
 import EarningsChart from "./earnings-chart";
 import PayoutsTable from "./payouts-table";
@@ -8,30 +7,28 @@ import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import Placeholder from "./placeholder";
 
 export default async function Page() {
-  const { data, error } = await api.query({
-    query: graphql(`
-      query SpaceOwnerEarnings {
-        earningsSummary {
-          ...BalanceCards_EarningsSummaryFragment
-        }
-        myPayouts {
-          nodes {
-            id
-            amount
-            processedAt
-            ...PayoutsTable_PayoutFragment
+  const { summary, payouts } = await api
+    .query({
+      query: graphql(`
+        query SpaceOwnerEarnings {
+          earningsSummary {
+            ...BalanceCards_EarningsSummaryFragment
+          }
+          myPayouts {
+            nodes {
+              id
+              amount
+              processedAt
+              ...PayoutsTable_PayoutFragment
+            }
           }
         }
-      }
-    `),
-  });
-
-  if (error) {
-    redirect("/logout");
-  }
-
-  const summary = data?.earningsSummary;
-  const payouts = data?.myPayouts?.nodes ?? [];
+      `),
+    })
+    .then((res) => ({
+      summary: res.data?.earningsSummary,
+      payouts: res.data?.myPayouts?.nodes ?? [],
+    }));
 
   const chartData = generateChartData(payouts);
 

@@ -1,8 +1,9 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import logger from "@/lib/logger";
+import storage from "@/lib/storage";
 
-const AUTH_COOKIE = "elaview.authentication.token";
+const AUTH_COOKIE = storage.authentication.token;
 
 const log = logger.child({ module: "proxy" });
 

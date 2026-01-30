@@ -1,22 +1,8 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { redirect } from "next/navigation";
-import storage from "@/lib/storage";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
-}
-
-export async function redirectIfAuthenticated(url: string) {
-  const { cookies } = await import("next/headers");
-  if ((await cookies()).get(storage.authentication.token)) {
-    // delegate cookie-verification responsibility to {url}
-    redirect(url);
-  }
-}
-
-export async function authenticatedRedirect() {
-  await redirectIfAuthenticated("/overview");
 }
 
 export function truncateText(text: string, maxLength: number): string {

@@ -28,7 +28,7 @@ import {
   graphql,
   ProfileType,
 } from "@/types/gql";
-import { switchProfile } from "./switch-profile.action";
+import { logout, switchProfile } from "@/lib/auth.actions";
 import { BadgeCheck, Bell, LogOut, Settings } from "lucide-react";
 
 export const UserSection_UserFragment = graphql(`
@@ -67,6 +67,12 @@ export function UserSection({ data }: Props) {
     });
   }
 
+  function handleLogout() {
+    startTransition(async () => {
+      await logout();
+    });
+  }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -98,54 +104,46 @@ export function UserSection({ data }: Props) {
             sideOffset={4}
           >
             <DropdownMenuGroup>
-              <Link href="/profile">
-                <DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/profile">
                   <BadgeCheck />
                   Profile
-                </DropdownMenuItem>
-              </Link>
-              <Link href="/notifications">
-                <DropdownMenuItem>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/notifications">
                   <Bell />
                   Notifications
-                </DropdownMenuItem>
-              </Link>
-              <Link href="/messages">
-                <DropdownMenuItem>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/messages">
                   <IconMessage />
                   Messages
-                </DropdownMenuItem>
-              </Link>
-              <Link href="/settings">
-                <DropdownMenuItem>
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href="/settings">
                   <Settings />
                   Settings
-                </DropdownMenuItem>
-              </Link>
+                </Link>
+              </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleSwitchProfile();
-                }}
+              <DropdownMenuItem
+                onSelect={handleSwitchProfile}
                 disabled={isPending}
-                className={"w-full"}
               >
-                <DropdownMenuItem>
-                  <IconSwitchHorizontal
-                    className={isPending ? "animate-pulse" : ""}
-                  />
-                  Switch to {targetLabel}
-                </DropdownMenuItem>
-              </button>
-              <Link href="/logout">
-                <DropdownMenuItem>
-                  <LogOut />
-                  Logout
-                </DropdownMenuItem>
-              </Link>
+                <IconSwitchHorizontal
+                  className={isPending ? "animate-pulse" : ""}
+                />
+                Switch to {targetLabel}
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={handleLogout} disabled={isPending}>
+                <LogOut />
+                Logout
+              </DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>

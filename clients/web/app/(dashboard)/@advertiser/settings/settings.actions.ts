@@ -1,8 +1,8 @@
 "use server";
 
 import api from "@/lib/gql/server";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { logout } from "@/lib/auth.actions";
 import {
   graphql,
   type UpdateAdvertiserProfileInput,
@@ -59,7 +59,7 @@ export async function updateProfileAction(
     const user = await getCurrentUser();
 
     if (!user) {
-      redirect("/logout");
+      return logout();
     }
 
     if (!name.trim()) {
@@ -127,7 +127,7 @@ export async function updateBusinessInfoAction(
     const user = await getCurrentUser();
 
     if (!user) {
-      redirect("/logout");
+      return logout();
     }
 
     if (!user.advertiserProfile) {

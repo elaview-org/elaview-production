@@ -1,10 +1,10 @@
-import storage from "@/lib/storage";
+import "server-only";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import storage from "@/lib/storage";
 
 export async function redirectIfAuthenticated(url: string) {
-  const { cookies } = await import("next/headers");
   if ((await cookies()).get(storage.authentication.token)) {
-    // delegate cookie-verification responsibility to {url}
     redirect(url);
   }
 }

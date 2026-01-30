@@ -1,11 +1,30 @@
 "use server";
 
-import api from "@/lib/gql/server";
-import { graphql, type ProfileType } from "@/types/gql";
 import { revalidatePath } from "next/cache";
+import api from "@/lib/gql/server";
+import env from "@/lib/env";
+import storage from "@/lib/storage";
+import { graphql, type ProfileType } from "@/types/gql";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
+export async function logout(): Promise<never> {
+  "use server";
+
+  try {
+    await fetch(`${env.client.apiUrl}/auth/logout`, {
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    });
+  } catch {}
+
+  (await cookies()).delete(storage.authentication.token);
+  redirect("/login");
+}
+
 export async function switchProfile(targetProfileType: ProfileType) {
+  "use server";
+
   const result = await api.mutate({
     mutation: graphql(`
       mutation SwitchProfile($input: UpdateCurrentUserInput!) {

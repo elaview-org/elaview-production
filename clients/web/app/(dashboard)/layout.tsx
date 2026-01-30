@@ -38,7 +38,6 @@ export default async function Layout(props: LayoutProps<"/">) {
           }
         }
       `),
-      tags: ["dashboard-user"],
     })
     .then((res) => {
       assert(!!res.data?.me);

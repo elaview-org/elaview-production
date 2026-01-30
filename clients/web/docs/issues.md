@@ -195,39 +195,40 @@ Known upstream issue: [recharts#6716](https://github.com/recharts/recharts/issue
 
 ---
 
-## `/profile` Returns 404 and Deletes Auth Cookie in Production
+## Logout `<Link>` in Sidebar Dropdown Caused Multiple Failures
 
 **Date:** 2026-01-30
-**Status:** Open
+**Status:** Fixed
 
-Hard navigation to `/profile` in production returned 404 and deleted the auth cookie, forcing re-login. Two compounding
-issues caused the failure:
+`user-section.tsx` rendered logout as `<Link href="/logout">` inside a Radix `DropdownMenu`. This single mistake
+caused four cascading failures:
 
-1. **`default.ts` called `notFound()` in all parallel slots.** During hard navigation in production, Next.js cannot
-   determine the active state of unmatched slots and falls back to `default.ts`. Even though all slots have
-   `/profile/page.tsx`, production route resolution triggers `default.ts` for non-active slots before `RoleBasedView`
-   selects the correct one. Calling `notFound()` there caused a 404 response.
+1. **Auth cookie deleted on dropdown open** — Next.js prefetched `/logout` when the dropdown opened, silently executing
+   the GET route handler (`app/(auth)/logout/route.ts`) which called the backend, deleted the auth cookie, and
+   redirected to `/login`.
+2. **Dashboard routes 404 on hard navigation** — With the cookie already gone from prefetch, hard navigation (refresh,
+   direct URL) to `/profile`, `/settings`, `/messages`, `/notifications` hit `proxy.ts` which rewrites cookieless
+   requests to `/not-found`. Client-side navigation appeared to work because the proxy only runs on full page loads.
+3. **Dropdown items not responding to clicks** — `<Link>` and `<button>` elements wrapped `<DropdownMenuItem>` from the
+   outside (wrong Radix pattern). Radix's dismiss layer intercepted pointer events on the outer element, preventing
+   clicks from reaching the inner elements.
+4. **OOM after clicking Switch Profile** — With the cookie already deleted by the `/logout` prefetch, the
+   `switchProfile` server action's `revalidatePath("/", "layout")` and `redirect("/overview")` cascaded into repeated
+   auth failures, eventually exhausting the Node.js heap.
 
-2. **No `app/not-found.tsx` existed with `globalNotFound: true`.** `next.config.ts` sets
-   `experimental: { globalNotFound: true }`, which routes all `notFound()` calls to a single root-level `not-found.tsx`.
-   That file didn't exist, so Next.js returned a bare 404.
+**Fixes applied:**
 
-The 404 response caused the dashboard layout's `me` query to fail, `throwIfAuthError` detected
-`AUTH_NOT_AUTHENTICATED`, and redirected to `/logout` — deleting the cookie.
-
-Fixed by changing all `default.ts` files to return `null` (per Next.js docs recommendation) and adding a global
-`app/not-found.tsx` as a safety net.
-
-**References:**
-
-- [#60989](https://github.com/vercel/next.js/issues/60989) — Parallel route not rendering when built
-- [#48090](https://github.com/vercel/next.js/issues/48090) — Parallel routes must provide default.js
-- [#48509](https://github.com/vercel/next.js/issues/48509) — 404 on parallel route with default.tsx defined
+- Replaced `<Link href="/logout">` with `onSelect` handler calling a server action
+- Inverted Radix nesting for remaining links: `<DropdownMenuItem asChild><Link>` instead of the reverse
+- Replaced outer `<button>` for switch profile with `onSelect` handler on `<DropdownMenuItem>`
+- Server action calls backend (best-effort), always deletes cookie, redirects to `/login`
+- Consolidated auth actions into `lib/auth.actions.ts` (`logout`, `switchProfile`)
+- Converted `app/(auth)/logout/route.ts` (GET handler) to `page.tsx` (client component calling `logout()` on mount) — eliminates CSRF/prefetch vulnerability
+- Settings actions call `logout()` directly instead of `redirect("/logout")`
 
 **Affected files:**
 
-- `app/(dashboard)/@admin/default.ts`
-- `app/(dashboard)/@advertiser/default.ts`
-- `app/(dashboard)/@marketing/default.ts`
-- `app/(dashboard)/@spaceOwner/default.ts`
-- `app/not-found.tsx` (new)
+- `lib/auth.actions.ts`
+- `lib/auth.ts`
+- `app/(auth)/logout/page.tsx`
+- `app/(dashboard)/user-section.tsx`

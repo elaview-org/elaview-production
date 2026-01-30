@@ -1,5 +1,6 @@
 "use client";
 
+import { useBreadcrumbLabel } from "@/components/composed/breadcrumb-nav";
 import { useState } from "react";
 import StatusTimeline from "./status-timeline";
 import SpaceInfo from "./space-info";
@@ -23,6 +24,7 @@ export default function BookingDetailsWrapper({
   bookingId,
   initialData,
 }: BookingDetailsWrapperProps) {
+  useBreadcrumbLabel(bookingId, initialData.booking.space.title);
   const [openConfirmModal, setOpenConfirmModal] = useState(false);
   const [openDisputeModal, setOpenDisputeModal] = useState(false);
 

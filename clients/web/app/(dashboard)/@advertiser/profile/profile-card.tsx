@@ -1,3 +1,5 @@
+"use client";
+
 import { IconAd } from "@tabler/icons-react";
 import ProfileCardBase from "@/components/composed/profile-card";
 import { formatCurrency } from "@/lib/utils";

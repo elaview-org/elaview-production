@@ -15,6 +15,7 @@ import { IconInnerShadowTop } from "@tabler/icons-react";
 import { NavigationSection } from "./navigation-section";
 import { UserSection } from "./user-section";
 import { CSSProperties } from "react";
+import { BreadcrumbProvider } from "@/components/composed/breadcrumb-nav";
 import ContentHeader from "@/app/(dashboard)/content-header";
 import RoleBasedView from "@/app/(dashboard)/role-based-view";
 import { cookies } from "next/headers";
@@ -37,6 +38,7 @@ export default async function Layout(props: LayoutProps<"/">) {
           }
         }
       `),
+      tags: ["dashboard-user"],
     })
     .then((res) => {
       assert(!!res.data?.me);
@@ -72,8 +74,10 @@ export default async function Layout(props: LayoutProps<"/">) {
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
-        <ContentHeader />
-        <RoleBasedView data={me} {...props} />
+        <BreadcrumbProvider>
+          <ContentHeader />
+          <RoleBasedView data={me} {...props} />
+        </BreadcrumbProvider>
       </SidebarInset>
     </SidebarProvider>
   );

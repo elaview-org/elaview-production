@@ -329,48 +329,6 @@ function PricingStep() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div>
-        <h2 className="text-lg font-semibold">Set your pricing</h2>
-        <p className="text-muted-foreground text-sm">
-          Set competitive rates to attract more advertisers.
-        </p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-3">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">
-            Daily Rate
-            <span className="text-destructive">*</span>
-          </label>
-          <div className="relative">
-            <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
-              $
-            </span>
-            <Input placeholder="25" className="pl-7" type="number" min={5} />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Weekly Rate</label>
-          <div className="relative">
-            <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
-              $
-            </span>
-            <Input placeholder="Auto" className="pl-7" type="number" />
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Monthly Rate</label>
-          <div className="relative">
-            <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
-              $
-            </span>
-            <Input placeholder="Auto" className="pl-7" type="number" />
-          </div>
-        </div>
-      </div>
-
       <div className="border-t pt-6">
         <h2 className="text-lg font-semibold">Space Dimensions</h2>
         <p className="text-muted-foreground text-sm">
@@ -417,6 +375,48 @@ function PricingStep() {
           <div className="relative">
             <IconRuler className="text-muted-foreground absolute top-1/2 left-3 size-4 -translate-y-1/2 rotate-90" />
             <Input placeholder="36" className="pl-9" type="number" />
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-lg font-semibold">Set your pricing</h2>
+        <p className="text-muted-foreground text-sm">
+          Set competitive rates to attract more advertisers.
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">
+            Daily Rate
+            <span className="text-destructive">*</span>
+          </label>
+          <div className="relative">
+            <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
+              $
+            </span>
+            <Input placeholder="25" className="pl-7" type="number" min={5} />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">Weekly Rate</label>
+          <div className="relative">
+            <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
+              $
+            </span>
+            <Input placeholder="Auto" className="pl-7" type="number" />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label className="text-sm font-medium">Monthly Rate</label>
+          <div className="relative">
+            <span className="text-muted-foreground absolute top-1/2 left-3 -translate-y-1/2">
+              $
+            </span>
+            <Input placeholder="Auto" className="pl-7" type="number" />
           </div>
         </div>
       </div>

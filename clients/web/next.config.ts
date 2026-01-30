@@ -1,8 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
+  cacheComponents: true,
+  serverExternalPackages: ["pino", "pino-pretty"],
+  logging: false,
   env: {
     API_URL: process.env.ELAVIEW_WEB_API_URL,
   },

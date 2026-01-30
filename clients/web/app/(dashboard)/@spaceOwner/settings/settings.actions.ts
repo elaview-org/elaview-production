@@ -2,7 +2,7 @@
 
 import api from "@/lib/gql/server";
 import { redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import {
   graphql,
   PayoutSchedule,
@@ -100,6 +100,7 @@ export async function updateProfileAction(
       };
     }
 
+    revalidateTag("dashboard-user", { expire: 0 });
     revalidatePath("/settings");
     return {
       success: true,
@@ -170,6 +171,7 @@ export async function updateBusinessInfoAction(
       };
     }
 
+    revalidateTag("dashboard-user", { expire: 0 });
     revalidatePath("/settings");
     return {
       success: true,

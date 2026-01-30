@@ -1,5 +1,6 @@
 import {
   ApolloClient,
+  ApolloLink,
   HttpLink,
   InMemoryCache,
   type OperationVariables,
@@ -10,23 +11,26 @@ import { registerApolloClient } from "@apollo/client-integration-nextjs";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import env from "@/lib/env";
+import { loggingLink } from "@/lib/logger";
 
 const {
   getClient,
   query: _query,
   PreloadQuery,
 } = registerApolloClient(async () => {
+  const httpLink = new HttpLink({
+    uri: `${env.client.apiUrl}/graphql`,
+    headers: {
+      cookie: (await cookies()).toString(),
+    },
+    fetchOptions: {},
+  });
+
   return new ApolloClient({
     cache: new InMemoryCache({
       resultCaching: true,
     }),
-    link: new HttpLink({
-      uri: `${env.client.apiUrl}/graphql`,
-      headers: {
-        cookie: (await cookies()).toString(),
-      },
-      fetchOptions: {},
-    }),
+    link: ApolloLink.from([loggingLink, httpLink]),
   });
 });
 
@@ -39,12 +43,33 @@ function throwIfAuthError(error: unknown) {
   }
 }
 
+type CacheOptions = {
+  revalidate?: number | false;
+  tags?: string[];
+};
+
 async function query<
   TData = unknown,
   TVariables extends OperationVariables = OperationVariables,
->(options: ApolloClient.QueryOptions<TData, TVariables>) {
+>(options: ApolloClient.QueryOptions<TData, TVariables> & CacheOptions) {
+  const { revalidate, tags, ...rest } = options;
+  const queryOptions = rest as ApolloClient.QueryOptions<TData, TVariables>;
+
+  queryOptions.context = {
+    ...queryOptions.context,
+    fetchPolicy: queryOptions.fetchPolicy ?? "cache-first",
+    ...((revalidate !== undefined || tags) && {
+      fetchOptions: {
+        next: {
+          ...(revalidate !== undefined && { revalidate }),
+          ...(tags && { tags }),
+        },
+      },
+    }),
+  } as typeof queryOptions.context;
+
   try {
-    const result = await _query(options);
+    const result = await _query(queryOptions);
     throwIfAuthError(result.error);
     return result;
   } catch (error) {

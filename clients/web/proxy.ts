@@ -1,13 +1,28 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import logger from "@/lib/logger";
 
 const AUTH_COOKIE = "elaview.authentication.token";
 
+const log = logger.child({ module: "proxy" });
+
 export function proxy(request: NextRequest) {
+  const start = performance.now();
+  const { method } = request;
+  const path = request.nextUrl.pathname;
+
   if (!request.cookies.has(AUTH_COOKIE)) {
+    log.debug(
+      { method, path, duration: `${Math.round(performance.now() - start)}ms` },
+      "redirected (no auth)"
+    );
     return NextResponse.rewrite(new URL("/not-found", request.url));
   }
 
+  log.debug(
+    { method, path, duration: `${Math.round(performance.now() - start)}ms` },
+    "passed"
+  );
   return NextResponse.next();
 }
 

@@ -1,3 +1,5 @@
+"use client";
+
 import { IconStar, IconStarFilled } from "@tabler/icons-react";
 import ProfileCardBase from "@/components/composed/profile-card";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";

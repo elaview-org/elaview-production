@@ -15,11 +15,11 @@
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "gql:codegen": "graphql-codegen --config lib/gql-codegen.ts",
+    "gql:codegen": "graphql-codegen --config lib/gql/codegen.ts",
     "test": "bun test",
     "test:watch": "bun test --watch",
     "test:coverage": "bun test --coverage",
-    "gql:codegen:watch": "graphql-codegen --config lib/gql-codegen.ts --watch"
+    "gql:codegen:watch": "graphql-codegen --config lib/gql/codegen.ts --watch"
   },
   "dependencies": {
     "@apollo/client": "^4.1.3",

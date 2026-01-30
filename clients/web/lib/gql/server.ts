@@ -17,7 +17,9 @@ const {
   PreloadQuery,
 } = registerApolloClient(async () => {
   return new ApolloClient({
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      resultCaching: true,
+    }),
     link: new HttpLink({
       uri: `${env.client.apiUrl}/graphql`,
       headers: {

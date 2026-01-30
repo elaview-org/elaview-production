@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import api from "@/api/gql/server";
+import api from "@/lib/gql/server";
 import { Booking, graphql } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
 import storage from "@/lib/storage";

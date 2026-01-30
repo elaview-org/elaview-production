@@ -1,6 +1,6 @@
 "use server";
 
-import api from "@/api/gql/server";
+import api from "@/lib/gql/server";
 import { graphql, type ProfileType } from "@/types/gql";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";

@@ -1,4 +1,4 @@
-import api from "@/api/gql/server";
+import api from "@/lib/gql/server";
 import { graphql } from "@/types/gql";
 
 export default async function getSpaceOwnerSettingsQuery() {

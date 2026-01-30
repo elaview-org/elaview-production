@@ -50,7 +50,7 @@ type Documents = {
     "\n      query GetSpaceOwnerForSettings {\n        me {\n          id\n          avatar\n          spaceOwnerProfile {\n            id\n          }\n        }\n      }\n    ": typeof types.GetSpaceOwnerForSettingsDocument,
     "\n        mutation UpdateSpaceOwnerProfile($input: UpdateCurrentUserInput!) {\n          updateCurrentUser(input: $input) {\n            user {\n              id\n            }\n          }\n        }\n      ": typeof types.UpdateSpaceOwnerProfileDocument,
     "\n        mutation UpdateSpaceOwnerBusinessInfo(\n          $input: UpdateSpaceOwnerProfileInput!\n        ) {\n          updateSpaceOwnerProfile(input: $input) {\n            spaceOwnerProfile {\n              id\n            }\n          }\n        }\n      ": typeof types.UpdateSpaceOwnerBusinessInfoDocument,
-    "\n        query DashboardUser {\n          me {\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      ": typeof types.DashboardUserDocument,
+    "\n        query DashboardUser {\n          me {\n            id\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      ": typeof types.DashboardUserDocument,
     "\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n": typeof types.NavigationSection_UserFragmentFragmentDoc,
     "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n": typeof types.RoleBasedView_UserFragmentFragmentDoc,
     "\n      mutation SwitchProfile($input: UpdateCurrentUserInput!) {\n        updateCurrentUser(input: $input) {\n          user {\n            id\n            activeProfileType\n          }\n          errors {\n            ... on Error {\n              message\n            }\n          }\n        }\n      }\n    ": typeof types.SwitchProfileDocument,
@@ -93,7 +93,7 @@ const documents: Documents = {
     "\n      query GetSpaceOwnerForSettings {\n        me {\n          id\n          avatar\n          spaceOwnerProfile {\n            id\n          }\n        }\n      }\n    ": types.GetSpaceOwnerForSettingsDocument,
     "\n        mutation UpdateSpaceOwnerProfile($input: UpdateCurrentUserInput!) {\n          updateCurrentUser(input: $input) {\n            user {\n              id\n            }\n          }\n        }\n      ": types.UpdateSpaceOwnerProfileDocument,
     "\n        mutation UpdateSpaceOwnerBusinessInfo(\n          $input: UpdateSpaceOwnerProfileInput!\n        ) {\n          updateSpaceOwnerProfile(input: $input) {\n            spaceOwnerProfile {\n              id\n            }\n          }\n        }\n      ": types.UpdateSpaceOwnerBusinessInfoDocument,
-    "\n        query DashboardUser {\n          me {\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      ": types.DashboardUserDocument,
+    "\n        query DashboardUser {\n          me {\n            id\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      ": types.DashboardUserDocument,
     "\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n": types.NavigationSection_UserFragmentFragmentDoc,
     "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n": types.RoleBasedView_UserFragmentFragmentDoc,
     "\n      mutation SwitchProfile($input: UpdateCurrentUserInput!) {\n        updateCurrentUser(input: $input) {\n          user {\n            id\n            activeProfileType\n          }\n          errors {\n            ... on Error {\n              message\n            }\n          }\n        }\n      }\n    ": types.SwitchProfileDocument,
@@ -261,7 +261,7 @@ export function graphql(source: "\n        mutation UpdateSpaceOwnerBusinessInfo
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n        query DashboardUser {\n          me {\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      "): (typeof documents)["\n        query DashboardUser {\n          me {\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      "];
+export function graphql(source: "\n        query DashboardUser {\n          me {\n            id\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      "): (typeof documents)["\n        query DashboardUser {\n          me {\n            id\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

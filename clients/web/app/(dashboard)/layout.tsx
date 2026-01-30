@@ -1,4 +1,4 @@
-import api from "@/api/gql/server";
+import api from "@/lib/gql/server";
 import { graphql } from "@/types/gql";
 import {
   Sidebar,
@@ -30,6 +30,7 @@ export default async function Layout(props: LayoutProps<"/">) {
       query: graphql(`
         query DashboardUser {
           me {
+            id
             ...NavigationSection_UserFragment
             ...UserSection_UserFragment
             ...RoleBasedView_UserFragment

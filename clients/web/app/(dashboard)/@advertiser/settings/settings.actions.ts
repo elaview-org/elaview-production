@@ -1,6 +1,6 @@
 "use server";
 
-import api from "@/api/gql/server";
+import api from "@/lib/gql/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import {

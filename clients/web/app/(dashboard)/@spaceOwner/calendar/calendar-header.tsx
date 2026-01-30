@@ -14,6 +14,11 @@ import {
 } from "@/components/primitives/toggle-group";
 import { cn } from "@/lib/utils";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/primitives/tooltip";
+import {
   IconChevronLeft,
   IconChevronRight,
   IconPalette,
@@ -136,12 +141,22 @@ export default function CalendarHeader({
     <div className="bg-card flex flex-col gap-4 rounded-xl border p-4 @lg/main:flex-row @lg/main:items-center @lg/main:justify-between">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon" onClick={navigatePrevious}>
-            <IconChevronLeft className="size-4" />
-          </Button>
-          <Button variant="outline" size="icon" onClick={navigateNext}>
-            <IconChevronRight className="size-4" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="icon" onClick={navigatePrevious}>
+                <IconChevronLeft className="size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Previous</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button variant="outline" size="icon" onClick={navigateNext}>
+                <IconChevronRight className="size-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Next</TooltipContent>
+          </Tooltip>
         </div>
         <h2 className="text-lg font-semibold">{formatTitle()}</h2>
       </div>

@@ -4,6 +4,11 @@ import { useState } from "react";
 import { Button } from "@/components/primitives/button";
 import { Card, CardContent } from "@/components/primitives/card";
 import { Badge } from "@/components/primitives/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/primitives/tooltip";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import mockData from "./mock.json";
@@ -38,22 +43,32 @@ export default function CampaignsSection({ userName }: Props) {
         </h2>
         {totalPages > 1 && (
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={page === 0}
-              onClick={() => setPage((p) => p - 1)}
-            >
-              <IconChevronLeft className="size-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={page >= totalPages - 1}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              <IconChevronRight className="size-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={page === 0}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  <IconChevronLeft className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Previous</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={page >= totalPages - 1}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  <IconChevronRight className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Next</TooltipContent>
+            </Tooltip>
           </div>
         )}
       </div>

@@ -2,6 +2,11 @@
 
 import { useTransition } from "react";
 import { Button } from "@/components/primitives/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/primitives/tooltip";
 import { IconLayoutGrid, IconMap, IconTable } from "@tabler/icons-react";
 import { ViewOptions, ViewSet } from "@/types/constants";
 
@@ -45,17 +50,20 @@ export default function ToolbarViewSelect({
   return (
     <div className="flex rounded-md border">
       {visibleViews.map(({ key, icon: Icon, title }, index) => (
-        <Button
-          key={key}
-          className={`${getRadius(index)} border-0`}
-          variant={currentView === key ? "default" : "ghost"}
-          size="icon"
-          onClick={() => handleViewChange(key)}
-          disabled={isPending}
-          title={title}
-        >
-          <Icon className="h-4 w-4" />
-        </Button>
+        <Tooltip key={key}>
+          <TooltipTrigger asChild>
+            <Button
+              className={`${getRadius(index)} border-0`}
+              variant={currentView === key ? "default" : "ghost"}
+              size="icon"
+              onClick={() => handleViewChange(key)}
+              disabled={isPending}
+            >
+              <Icon className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{title}</TooltipContent>
+        </Tooltip>
       ))}
     </div>
   );

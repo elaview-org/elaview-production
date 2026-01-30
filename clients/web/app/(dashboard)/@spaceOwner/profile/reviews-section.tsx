@@ -2,6 +2,11 @@
 
 import { useState } from "react";
 import { Button } from "@/components/primitives/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/primitives/tooltip";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import ReviewCard from "@/components/composed/review-card";
 import mockData from "./mock.json";
@@ -30,22 +35,32 @@ export default function ReviewsSection({ userName }: Props) {
         </h2>
         {totalPages > 1 && (
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={page === 0}
-              onClick={() => setPage((p) => p - 1)}
-            >
-              <IconChevronLeft className="size-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              disabled={page >= totalPages - 1}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              <IconChevronRight className="size-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={page === 0}
+                  onClick={() => setPage((p) => p - 1)}
+                >
+                  <IconChevronLeft className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Previous</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  disabled={page >= totalPages - 1}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  <IconChevronRight className="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Next</TooltipContent>
+            </Tooltip>
           </div>
         )}
       </div>

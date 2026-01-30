@@ -1,13 +1,13 @@
 # Testing
 
-Vitest + Testing Library + jsdom.
+Bun test + Testing Library + happy-dom.
 
 ## Quick Start
 
 ```bash
 bun test              # Run all tests
-bun test:watch        # Watch mode
-bun test:coverage     # Coverage report → /coverage
+bun test --watch      # Watch mode
+bun test --coverage   # Coverage report
 ```
 
 Or via the `ev` CLI:
@@ -45,29 +45,75 @@ bun test lib/utils.test.ts
 
 ## Architecture
 
-| Layer | Tool | Purpose |
-|-------|------|---------|
-| Runner | Vitest | Test execution, mocking, assertions |
-| DOM | jsdom | Browser-like environment |
-| Rendering | @testing-library/react | Component render + queries |
-| Matchers | @testing-library/jest-dom | DOM assertions (`toBeInTheDocument`) |
-| Interaction | @testing-library/user-event | Realistic user events |
+| Layer       | Tool                        | Purpose                              |
+|-------------|-----------------------------|--------------------------------------|
+| Runner      | bun test                    | Test execution, mocking, assertions  |
+| DOM         | happy-dom                   | Browser-like environment             |
+| Rendering   | @testing-library/react      | Component render + queries           |
+| Matchers    | @testing-library/jest-dom   | DOM assertions (`toBeInTheDocument`) |
+| Interaction | @testing-library/user-event | Realistic user events                |
 
 ### Directory structure
 
 ```
+# Co-located unit tests (next to source)
+lib/utils.test.ts
+hooks/use-mobile.test.ts
+components/composed/toolbar/sort-panel.test.tsx
+
+# Centralized test infrastructure + non-unit tests
 test/
-├── setup.ts                    # Global setup (matchers, mocks)
-├── utils.tsx                   # Custom render, re-exports
-├── mocks/
-│   └── next-navigation.ts      # next/navigation mock
-└── issues/                     # Issue-driven regression tests
-    ├── parallel-routes.test.tsx
-    ├── sort-filter-reset.test.tsx
-    └── sort-duplicate-field.test.tsx
+├── utils/
+│   ├── index.tsx              # Custom render, re-exports (screen, userEvent, asMock)
+│   ├── setup.ts               # Preload: jest-dom matchers, happy-dom, browser mocks
+│   ├── jest-dom.d.ts          # Type augmentation for jest-dom matchers in bun:test
+│   └── mocks/
+│       └── next-navigation.ts # next/navigation mock
+├── issues/                    # Issue-driven regression tests
+│   ├── parallel-routes.test.tsx
+│   ├── sort-filter-reset.test.tsx
+│   └── sort-duplicate-field.test.tsx
+├── integration/               # Integration tests (multi-component flows)
+└── snapshots/                 # Snapshot tests for composed components
 ```
 
-Tests can also be co-located with their source files as `*.test.ts(x)`.
+**Where each test type lives:**
+- **Unit tests**: co-located with source (`*.test.ts` next to `*.ts`)
+- **Issue regression tests**: `test/issues/` — one file per bug/issue
+- **Integration tests**: `test/integration/` — multi-component or cross-module
+- **Snapshot tests**: `test/snapshots/` — UI snapshot comparisons
+
+### Configuration
+
+`bunfig.toml` configures the test runner:
+
+```toml
+[test]
+preload = ["./test/utils/setup.ts"]
+
+[test.coverage]
+skipTestFiles = true
+```
+
+Bun test auto-discovers `*.test.{ts,tsx}` files. No include/exclude config needed — `node_modules` is excluded by default.
+
+---
+
+## Development Methodology
+
+### Test-Driven Development (TDD) for New Features
+
+1. Write failing tests that describe expected behavior
+2. Implement the feature to make tests pass
+3. Refactor while keeping tests green
+
+### Issue-Driven Development for Bugs
+
+1. Reproduce the bug with a failing test in `test/issues/`
+2. Fix the code to make the test pass
+3. Test stays as a permanent regression guard
+
+Both approaches are mandatory. No new feature or bug fix lands without tests first.
 
 ---
 
@@ -75,7 +121,7 @@ Tests can also be co-located with their source files as `*.test.ts(x)`.
 
 ### Unit tests
 
-Pure functions, no DOM needed.
+Pure functions, no DOM needed. Co-locate with source.
 
 ```ts
 import { formatCurrency } from "@/lib/utils";
@@ -116,20 +162,75 @@ it("handles click", async () => {
 
 ## Mocking
 
-### next/navigation
+### Module mocking
 
-Auto-mocked globally via `test/setup.ts`. Override per-test:
+Use `mock.module()` (bun:test global) to mock entire modules:
 
 ```tsx
+mock.module("@/hooks/use-search-params-updater", () => ({
+  useSearchParamsUpdater: () => ({
+    get: mock(),
+    update: mock(),
+  }),
+}));
+```
+
+`mock.module()` is NOT hoisted like vitest's `vi.mock()`. However, at the top level of a test file, bun processes it before resolving static imports.
+
+### Function mocking
+
+```tsx
+const mockFn = mock();
+const typedMock = mock((_key: string): string | null => null);
+
+mockFn.mockClear();
+mockFn.mockReturnValue("value");
+mockFn.mockImplementation(() => "custom");
+```
+
+### Asserting mock calls
+
+```tsx
+expect(mockFn).toHaveBeenCalled();
+expect(mockFn).toHaveBeenCalledTimes(1);
+expect(mockFn).toHaveBeenCalledWith("arg");
+```
+
+### Spy on methods
+
+```tsx
+import { spyOn } from "bun:test";
+
+const spy = spyOn(object, "method");
+spy.mockReturnValue("mocked");
+```
+
+### asMock helper
+
+For functions mocked via `mock.module()` in setup (e.g., `next/navigation`), use `asMock` to access mock methods:
+
+```tsx
+import { asMock } from "@/test/utils";
 import { useRouter } from "next/navigation";
 
 it("navigates on submit", async () => {
-  const push = vi.fn();
-  vi.mocked(useRouter).mockReturnValue({ ...useRouter(), push });
+  const push = mock();
+  asMock(useRouter).mockReturnValue({ ...useRouter(), push });
 
   // ... trigger navigation ...
   expect(push).toHaveBeenCalledWith("/dashboard");
 });
+```
+
+### next/navigation
+
+Auto-mocked globally via `test/utils/setup.ts`. Override per-test with `asMock`:
+
+```tsx
+import { asMock } from "@/test/utils";
+import { useSearchParams } from "next/navigation";
+
+asMock(useSearchParams).mockReturnValue(new URLSearchParams({ page: "2" }));
 ```
 
 Or use the custom render's `navigation` option:
@@ -147,39 +248,15 @@ render(<MyComponent />, {
 
 ### window.matchMedia
 
-Auto-mocked globally. Returns `matches: false` by default. Override for responsive tests:
-
-```tsx
-Object.defineProperty(window, "matchMedia", {
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: query === "(max-width: 768px)",
-    // ...
-  })),
-});
-```
+Auto-mocked globally. Returns `matches: false` by default.
 
 ### localStorage
 
-jsdom provides a working `localStorage`. For isolation, clear in `beforeEach`:
+happy-dom provides a working `localStorage`. For isolation, clear in `beforeEach`:
 
 ```tsx
 beforeEach(() => localStorage.clear());
 ```
-
-### Apollo Client / GraphQL
-
-Mock at the hook/module level rather than setting up a full Apollo provider:
-
-```tsx
-vi.mock("@/hooks/use-search-params-updater", () => ({
-  useSearchParamsUpdater: () => ({
-    get: vi.fn(),
-    update: vi.fn(),
-  }),
-}));
-```
-
-For server component data, mock the query results directly.
 
 ### What NOT to mock
 
@@ -195,13 +272,8 @@ For server component data, mock the query results directly.
 
 ```tsx
 it("disables submit when empty", async () => {
-  // Arrange
   render(<Form />);
-
-  // Act
   const button = screen.getByRole("button", { name: /submit/i });
-
-  // Assert
   expect(button).toBeDisabled();
 });
 ```
@@ -215,9 +287,10 @@ The `render` from `@/test/utils` wraps Testing Library's render with navigation 
 Toolbar components (`sort-panel`, `filters-panel`) depend on `useSearchParamsUpdater`. Mock it and assert against `update`:
 
 ```tsx
-const mockUpdate = vi.fn();
-vi.mock("@/hooks/use-search-params-updater", () => ({
-  useSearchParamsUpdater: () => ({ get: vi.fn(), update: mockUpdate }),
+const mockUpdate = mock();
+
+mock.module("@/hooks/use-search-params-updater", () => ({
+  useSearchParamsUpdater: () => ({ get: mock(), update: mockUpdate }),
 }));
 
 it("applies sort", async () => {
@@ -254,15 +327,16 @@ it("applies sort", async () => {
 
 ## Coverage
 
-Run locally:
-
 ```bash
-bun test:coverage
+bun test --coverage
 ```
 
-Reports output to `/coverage` (gitignored). Open `coverage/index.html` for the HTML report.
+Coverage configuration is in `bunfig.toml`:
 
-Coverage excludes primitives, generated types, loading/placeholder skeletons, and static constants (configured in `vitest.config.ts`).
+```toml
+[test.coverage]
+skipTestFiles = true
+```
 
 ---
 
@@ -273,26 +347,10 @@ The `validate-web` workflow (`.github/workflows/validate-web.yaml`) runs on ever
 1. `ev web:install` - Install dependencies
 2. `ev web:lint` - ESLint
 3. `ev web:typecheck` - TypeScript
-4. `ev web:test` - Vitest
+4. `ev web:test` - bun test
 5. `ev web:build` - Next.js build
 
 All steps must pass for the PR to merge.
-
----
-
-## TDD Workflow
-
-Issue-driven tests in `test/issues/` follow TDD:
-
-1. **Write a failing test** that documents the expected behavior
-2. **Fix the code** to make the test pass
-3. **Verify** the test passes and no regressions are introduced
-
-Current issue tests:
-
-- `parallel-routes.test.tsx` - Verifies `RoleBasedView` slot selection (passes)
-- `sort-filter-reset.test.tsx` - Reset/Clear should not commit to URL (fails until fixed)
-- `sort-duplicate-field.test.tsx` - Secondary sort should exclude primary field (fails until fixed)
 
 ---
 
@@ -300,15 +358,15 @@ Current issue tests:
 
 ### `ReferenceError: ResizeObserver is not defined`
 
-Already handled in `test/setup.ts`. If a new Radix component triggers this, verify the stub is loaded.
+Handled in `test/utils/setup.ts`. If a new Radix component triggers this, verify the stub is loaded.
 
 ### `window.matchMedia is not a function`
 
-Already handled in `test/setup.ts`. Ensure tests import from `@/test/utils` which loads the setup.
+Handled in `test/utils/setup.ts`. Ensure tests import from `@/test/utils` which loads the setup.
 
-### Radix Select not opening in jsdom
+### Radix Select not opening in happy-dom
 
-jsdom doesn't fully implement pointer events. Radix Select may not open via `userEvent.click()`. Workarounds:
+happy-dom doesn't fully implement pointer events. Radix Select may not open via `userEvent.click()`. Workarounds:
 
 - Use `fireEvent.pointerDown` on the trigger
 - Mock the Select component for unit tests
@@ -316,8 +374,12 @@ jsdom doesn't fully implement pointer events. Radix Select may not open via `use
 
 ### `Cannot find module 'next/navigation'`
 
-Ensure `test/setup.ts` includes the `vi.mock("next/navigation", ...)` call. This is handled globally.
+Ensure `test/utils/setup.ts` includes the `mock.module("next/navigation", ...)` call. This is handled globally via preload.
 
 ### Tests hang or timeout
 
 Check for unresolved promises or missing mock implementations. Radix portals can cause issues if `ResizeObserver` or `scrollIntoView` aren't mocked.
+
+### TypeScript doesn't recognize jest-dom matchers
+
+Ensure `test/utils/jest-dom.d.ts` exists and is included in `tsconfig.json`. This file augments `bun:test`'s `Matchers` interface with jest-dom matchers.

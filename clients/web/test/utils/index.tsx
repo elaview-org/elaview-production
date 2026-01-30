@@ -2,11 +2,16 @@ import { render, type RenderOptions } from "@testing-library/react";
 import { useSearchParams, usePathname } from "next/navigation";
 import type { ReadonlyURLSearchParams } from "next/navigation";
 import type { ReactElement } from "react";
+import type { Mock } from "bun:test";
 
 type NavigationOptions = {
   searchParams?: URLSearchParams | Record<string, string>;
   pathname?: string;
 };
+
+export function asMock<T extends (...args: never[]) => unknown>(fn: T) {
+  return fn as unknown as Mock<(...args: never[]) => unknown>;
+}
 
 function customRender(
   ui: ReactElement,
@@ -19,12 +24,12 @@ function customRender(
         searchParams instanceof URLSearchParams
           ? searchParams
           : new URLSearchParams(searchParams);
-      vi.mocked(useSearchParams).mockReturnValue(
+      asMock(useSearchParams).mockReturnValue(
         params as unknown as ReadonlyURLSearchParams
       );
     }
     if (pathname) {
-      vi.mocked(usePathname).mockReturnValue(pathname);
+      asMock(usePathname).mockReturnValue(pathname);
     }
   }
 

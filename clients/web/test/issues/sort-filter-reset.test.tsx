@@ -1,11 +1,12 @@
 import { render, screen, userEvent } from "@/test/utils";
 import ToolbarSortPanel from "@/components/composed/toolbar/sort-panel";
 import ToolbarFiltersPanel from "@/components/composed/toolbar/filters-panel";
+import { describe, it, expect, beforeEach, mock } from "bun:test";
 
-const mockUpdate = vi.fn();
-const mockGet = vi.fn<(key: string) => string | null>();
+const mockUpdate = mock();
+const mockGet = mock();
 
-vi.mock("@/hooks/use-search-params-updater", () => ({
+mock.module("@/hooks/use-search-params-updater", () => ({
   useSearchParamsUpdater: () => ({
     get: mockGet,
     update: mockUpdate,

@@ -1,7 +1,8 @@
 import { render, screen } from "@/test/utils";
 import RoleBasedView from "@/app/(dashboard)/role-based-view";
+import { describe, it, expect, mock } from "bun:test";
 
-vi.mock("@/types/gql", () => ({
+mock.module("@/types/gql", () => ({
   UserRole: { Admin: "ADMIN", Marketing: "MARKETING", User: "USER" },
   ProfileType: { Advertiser: "ADVERTISER", SpaceOwner: "SPACE_OWNER" },
   getFragmentData: (_doc: unknown, data: unknown) => data,

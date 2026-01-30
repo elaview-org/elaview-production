@@ -14,6 +14,11 @@ import "leaflet/dist/leaflet.css";
 import Image from "next/image";
 import { Button } from "@/components/primitives/button";
 import { Badge } from "@/components/primitives/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/primitives/tooltip";
 import { IconCurrentLocation } from "@tabler/icons-react";
 import { SPACE_TYPE } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
@@ -77,15 +82,20 @@ function GeolocationButton() {
       className="leaflet-top leaflet-right"
       style={{ marginTop: 10, marginRight: 10 }}
     >
-      <Button
-        size="icon"
-        variant="secondary"
-        className="z-[1000] shadow-md"
-        onClick={handleGeolocation}
-        disabled={loading}
-      >
-        <IconCurrentLocation className={loading ? "animate-pulse" : ""} />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            size="icon"
+            variant="secondary"
+            className="z-[1000] shadow-md"
+            onClick={handleGeolocation}
+            disabled={loading}
+          >
+            <IconCurrentLocation className={loading ? "animate-pulse" : ""} />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent side="left">My location</TooltipContent>
+      </Tooltip>
     </div>
   );
 }

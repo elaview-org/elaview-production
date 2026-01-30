@@ -41,7 +41,7 @@ async function mutate<
 const api = {
   query,
   mutate,
-  // getClient,
+  getClient,
 };
 
 export default api;

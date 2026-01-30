@@ -18,3 +18,9 @@ export const useParams = mock(() => ({}));
 export const redirect = mock();
 
 export const notFound = mock();
+
+export const ServerInsertedHTMLContext = {
+  Provider: ({ children }: { children: unknown }) => children,
+};
+
+export const useServerInsertedHTML = mock();

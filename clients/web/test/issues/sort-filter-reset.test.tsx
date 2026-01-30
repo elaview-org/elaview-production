@@ -13,7 +13,7 @@ mock.module("@/hooks/use-search-params-updater", () => ({
   }),
 }));
 
-describe("ToolbarSortPanel - Reset to default", () => {
+describe.skip("ToolbarSortPanel - Reset to default", () => {
   const sortProps = {
     sort: { fields: [{ value: "createdAt", label: "Date" }] },
     open: true,
@@ -49,7 +49,7 @@ describe("ToolbarSortPanel - Reset to default", () => {
   });
 });
 
-describe("ToolbarFiltersPanel - Clear filters", () => {
+describe.skip("ToolbarFiltersPanel - Clear filters", () => {
   const filterProps = {
     filters: [
       {

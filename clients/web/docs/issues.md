@@ -5,7 +5,9 @@
 **Date:** 2026-01-27
 **Status:** Open (Next.js limitation)
 
-All parallel route slots execute server-side code regardless of which one is displayed. With role-based parallel routes (`@admin`, `@advertiser`, etc.), every slot renders on each request—causing unnecessary data fetching and degraded performance.
+All parallel route slots execute server-side code regardless of which one is displayed. With role-based parallel
+routes (`@admin`, `@advertiser`, etc.), every slot renders on each request—causing unnecessary data fetching and
+degraded performance.
 
 **Workaround:** Each page must check user role early and `return null` if not applicable.
 
@@ -19,6 +21,7 @@ export default async function Page() {
 ```
 
 **References:**
+
 - [GitHub #53292](https://github.com/vercel/next.js/issues/53292) - Confirmed by Vercel team, still open
 - [Medium: Parallel Routes Tricky Parts](https://medium.com/@sibteali786/parallel-routes-in-nextjs-and-tricky-parts-61ee39c9a312)
 - [Next.js Parallel Routes Docs](https://nextjs.org/docs/app/api-reference/file-conventions/parallel-routes)
@@ -30,9 +33,11 @@ export default async function Page() {
 **Date:** 2026-01-29
 **Status:** Open
 
-"Reset to default" (sort) and "Clear filters" (filter) currently clear local state AND commit to the URL in a single click. They should only reset the local pending state — the user must click "Apply" to confirm.
+"Reset to default" (sort) and "Clear filters" (filter) currently clear local state AND commit to the URL in a single
+click. They should only reset the local pending state — the user must click "Apply" to confirm.
 
 **Affected files:**
+
 - `components/composed/toolbar/filters-panel.tsx`
 - `components/composed/toolbar/sort-panel.tsx`
 
@@ -43,7 +48,32 @@ export default async function Page() {
 **Date:** 2026-01-29
 **Status:** Open
 
-The secondary sort selector shows all fields including the one already selected as primary. Selecting the same field for both primary and secondary is nonsensical. The secondary selector should exclude the currently selected primary field.
+The secondary sort selector shows all fields including the one already selected as primary. Selecting the same field for
+both primary and secondary is nonsensical. The secondary selector should exclude the currently selected primary field.
 
 **Affected file:**
+
 - `components/composed/toolbar/sort-panel.tsx`
+
+---
+
+## Expired Token and Manual Navigations to Unauthorized Routes Shows Generic Error Instead of Redirecting
+
+**Date:** 2026-01-29
+**Status:** Open
+
+When a user's auth token expires mid-session, server component GraphQL queries fail and bubble up to slot `error.tsx`
+boundaries, which showed a generic "Try again" error state. The dashboard layout only validates auth on initial load —
+layouts persist across client-side navigations, so the `me` query never re-runs.
+
+Fixed with two-layer error handling: slot error boundaries call `checkAuth()` server action to determine if the error is
+auth-related. If not authenticated, the error propagates to the dashboard-level boundary which redirects to `/logout`.
+
+**Affected files:**
+
+- `lib/check-auth.ts`
+- `app/(dashboard)/error.tsx`
+- `app/(dashboard)/@admin/error.tsx`
+- `app/(dashboard)/@advertiser/error.tsx`
+- `app/(dashboard)/@marketing/error.tsx`
+- `app/(dashboard)/@spaceOwner/error.tsx`

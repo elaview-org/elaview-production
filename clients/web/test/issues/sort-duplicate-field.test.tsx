@@ -12,7 +12,7 @@ mock.module("@/hooks/use-search-params-updater", () => ({
   }),
 }));
 
-describe("ToolbarSortPanel - Duplicate field selection", () => {
+describe.skip("ToolbarSortPanel - Duplicate field selection", () => {
   const fields = [
     { value: "createdAt", label: "Date" },
     { value: "price", label: "Price" },

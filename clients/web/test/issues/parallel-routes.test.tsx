@@ -14,6 +14,7 @@ const slots = {
   marketing: <div data-testid="marketing-slot">Marketing</div>,
   spaceOwner: <div data-testid="space-owner-slot">Space Owner</div>,
   advertiser: <div data-testid="advertiser-slot">Advertiser</div>,
+  children: <div data-testid="children-slot">Children</div>,
 };
 
 describe.skip("RoleBasedView (parallel routes mitigation)", () => {

@@ -114,6 +114,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   overview: "Overview",
   bookings: "Bookings",
   listings: "Listings",
+  spaces: "Spaces",
   messages: "Messages",
   analytics: "Analytics",
   earnings: "Earnings",

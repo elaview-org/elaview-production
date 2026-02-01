@@ -245,6 +245,29 @@ Replace `ToolbarPagination` (cursor-based prev/next) with an infinite scroll com
 - [ ] Remove or repurpose `pagination.tsx`
 
 ---
+
+## Shared Dashboard Routes
+
+**Date:** 2026-01-31 | **Status:** In Progress
+
+**Docs:** [shared-routes.md](./shared-routes.md)
+
+Shared routes (spaces, messages, notifications, settings) render as direct `children` of `(dashboard)/` instead of being duplicated across parallel slots. `RoleBasedView` detects shared routes via `useIsSharedRoute` and renders `children` instead of the role slot.
+
+**Infrastructure (Phase 0):**
+
+- [x] Create `hooks/use-is-shared-route.ts` hook
+- [x] Convert `role-based-view.tsx` to client component with `children` prop and `useIsSharedRoute`
+- [x] Create `@{admin,advertiser,marketing,spaceOwner}/default.tsx` — return `null` for shared routes, `notFound()` otherwise
+
+**Shared Routes:**
+
+- [x] `spaces/[id]` — space detail page (stub)
+- [ ] `messages` — extract from `@advertiser/messages` and `@spaceOwner/messages` (Phase 1)
+- [ ] `notifications` — extract from `@advertiser/notifications` and `@spaceOwner/notifications` (Phase 2)
+- [ ] `settings` — extract with role-aware branching (Phase 3)
+
+---
 ## Pre-Launch Reminders
 
 - [ ] Add footer attribution for third-party assets (see [docs/acknowledgements.md](./acknowledgements.md))

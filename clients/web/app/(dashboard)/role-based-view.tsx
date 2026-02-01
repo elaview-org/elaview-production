@@ -1,3 +1,5 @@
+"use client";
+
 import {
   type FragmentType,
   getFragmentData,
@@ -6,6 +8,7 @@ import {
   UserRole,
 } from "@/types/gql";
 import type { ReactNode } from "react";
+import useIsSharedRoute from "@/hooks/use-is-shared-route";
 
 const RoleBasedView_UserFragment = graphql(`
   fragment RoleBasedView_UserFragment on User {
@@ -20,6 +23,7 @@ type Props = {
   marketing: ReactNode;
   spaceOwner: ReactNode;
   advertiser: ReactNode;
+  children: ReactNode;
 };
 
 export default function RoleBasedView(props: Props) {
@@ -27,7 +31,9 @@ export default function RoleBasedView(props: Props) {
     RoleBasedView_UserFragment,
     props.data
   );
-
+  if (useIsSharedRoute()) {
+    return props.children;
+  }
   return (
     <div className="@container/main flex flex-1 flex-col gap-4 px-4 py-4 md:gap-6 md:py-6 lg:px-6">
       {(() => {

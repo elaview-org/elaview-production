@@ -3,7 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactCompiler: true,
   cacheComponents: true,
-  // serverExternalPackages: ["pino", "pino-pretty"],
+  output: "standalone",
+  serverExternalPackages: ["pino", "pino-pretty"],
   // logging: false,
   env: {
     API_URL: process.env.ELAVIEW_WEB_API_URL,

@@ -5,12 +5,19 @@ import { IconStar } from "@tabler/icons-react";
 import { Skeleton } from "@/components/primitives/skeleton";
 import { Badge } from "@/components/primitives/badge";
 import TableView, {
-  TableViewSkeleton,
   createSelectColumn,
   currencyColumn,
   imageTextColumn,
   numberColumn,
+  TableViewSkeleton,
 } from "@/components/composed/table-view";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/primitives/card";
 import mock from "./mock.json";
 
 type SpacePerformance = {
@@ -90,20 +97,22 @@ const columns = [
 
 export default function PerformanceTable() {
   return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h3 className="text-lg font-semibold">Space Performance</h3>
-        <p className="text-muted-foreground text-sm">
+    <Card>
+      <CardHeader>
+        <CardTitle>Space Performance</CardTitle>
+        <CardDescription>
           Performance metrics for each of your spaces
-        </p>
-      </div>
-      <TableView
-        data={mock.spacePerformance as SpacePerformance[]}
-        columns={columns}
-        getRowId={(row) => row.id}
-        emptyMessage="No spaces found."
-      />
-    </div>
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <TableView
+          data={mock.spacePerformance as SpacePerformance[]}
+          columns={columns}
+          getRowId={(row) => row.id}
+          emptyMessage="No spaces found."
+        />
+      </CardContent>
+    </Card>
   );
 }
 

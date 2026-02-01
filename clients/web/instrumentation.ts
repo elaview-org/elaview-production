@@ -15,45 +15,6 @@ export async function register() {
       log.error(args.map(String).join(" "));
     globalThis.console.debug = (...args: unknown[]) =>
       log.debug(args.map(String).join(" "));
-
-    const nextLog = logger.child({ module: "nextjs" });
-    let stdoutBuffer: string[] = [];
-    let stdoutTimer: ReturnType<typeof setTimeout> | null = null;
-
-    function flushStdoutBuffer() {
-      stdoutTimer = null;
-      if (stdoutBuffer.length > 0) {
-        const [first, ...rest] = stdoutBuffer;
-        const message = rest.length
-          ? first + "\n" + rest.map((l) => "    " + l).join("\n")
-          : first;
-        nextLog.debug(message);
-        stdoutBuffer = [];
-      }
-    }
-
-    process.stdout.write = (
-      chunk: Uint8Array | string,
-      encodingOrCallback?: BufferEncoding | ((err?: Error) => void),
-      callback?: (err?: Error) => void
-    ): boolean => {
-      const text = typeof chunk === "string" ? chunk : chunk.toString();
-      const clean = text.replace(/\x1B\[[0-9;]*[A-Za-z]/g, "").trim();
-
-      if (clean) {
-        stdoutBuffer.push(clean);
-        if (stdoutTimer) clearTimeout(stdoutTimer);
-        stdoutTimer = setTimeout(flushStdoutBuffer, 0);
-      }
-
-      const cb =
-        typeof encodingOrCallback === "function"
-          ? encodingOrCallback
-          : callback;
-      if (cb) cb();
-
-      return true;
-    };
   }
 }
 

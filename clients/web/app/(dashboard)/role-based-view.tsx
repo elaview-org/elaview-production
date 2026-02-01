@@ -22,16 +22,10 @@ type Props = {
   advertiser: ReactNode;
 };
 
-export default function RoleBasedView({
-  data,
-  admin,
-  marketing,
-  spaceOwner,
-  advertiser,
-}: Props) {
+export default function RoleBasedView(props: Props) {
   const { role, activeProfileType } = getFragmentData(
     RoleBasedView_UserFragment,
-    data
+    props.data
   );
 
   return (
@@ -39,13 +33,13 @@ export default function RoleBasedView({
       {(() => {
         switch (role) {
           case UserRole.Admin:
-            return admin;
+            return props.admin;
           case UserRole.Marketing:
-            return marketing;
+            return props.marketing;
           case UserRole.User:
             return activeProfileType === ProfileType.SpaceOwner
-              ? spaceOwner
-              : advertiser;
+              ? props.spaceOwner
+              : props.advertiser;
         }
       })()}
     </div>

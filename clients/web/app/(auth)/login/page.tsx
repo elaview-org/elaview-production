@@ -25,11 +25,10 @@ export default async function Page() {
       </div>
       <div className="bg-muted relative hidden lg:block">
         <Image
-          width={0}
-          height={0}
-          src="/placeholder.svg"
-          alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          fill
+          src="https://picsum.photos/seed/login/1920/1080"
+          alt="Login background"
+          className="object-cover dark:brightness-[0.2] dark:grayscale"
         />
       </div>
     </div>

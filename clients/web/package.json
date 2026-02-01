@@ -9,8 +9,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "build": "next build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public",
+    "start": "bun .next/standalone/server.js ",
     "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",

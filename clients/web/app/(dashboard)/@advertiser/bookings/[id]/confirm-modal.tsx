@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "@/components/primitives/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-} from "@/components/primitives/dialog";
+import Modal from "@/components/composed/modal";
 
 interface ConfirmModalProps {
   isOpen: boolean;
@@ -29,19 +24,18 @@ export default function ConfirmModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader>Approve Installation?</DialogHeader>
-        <DialogDescription>
-          Please confirm installation is correct.
-        </DialogDescription>
-        <div className="mt-4 flex w-full justify-between">
-          <Button variant="outline" onClick={handleCancel}>
-            Cancel
-          </Button>
-          <Button onClick={handleConfirm}>Confirm Approval</Button>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <Modal
+      open={isOpen}
+      onOpenChange={handleOpenChange}
+      title="Approve Installation?"
+      description="Please confirm installation is correct."
+    >
+      <div className="mt-4 flex w-full justify-between">
+        <Button variant="outline" onClick={handleCancel}>
+          Cancel
+        </Button>
+        <Button onClick={handleConfirm}>Confirm Approval</Button>
+      </div>
+    </Modal>
   );
 }

@@ -2,12 +2,7 @@
 
 import { ReactNode, useState } from "react";
 import { Button } from "@/components/primitives/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/primitives/dialog";
+import Modal from "@/components/composed/modal";
 import { Input } from "@/components/primitives/input";
 import { cn } from "@/lib/utils";
 import {
@@ -32,21 +27,21 @@ export default function CreateCampaign() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <>
       <Button onClick={() => setOpen(true)}>
         <IconPlus />
         New Campaign
       </Button>
 
-      <DialogContent
+      <Modal
+        open={open}
+        onOpenChange={setOpen}
+        title="Create New Campaign"
+        srOnly
         size="xl"
         showCloseButton={false}
         className="h-[85vh] overflow-hidden p-0"
       >
-        <DialogHeader className="sr-only">
-          <DialogTitle>Create New Campaign</DialogTitle>
-        </DialogHeader>
-
         <div className="flex h-full min-h-0 flex-col">
           <StepIndicator currentStep={currentStep} />
 
@@ -89,8 +84,8 @@ export default function CreateCampaign() {
             )}
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </Modal>
+    </>
   );
 }
 

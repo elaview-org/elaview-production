@@ -25,7 +25,7 @@ export default function SpaceCard({ data }: Props) {
 
   return (
     <MediaCard
-      href={`/space/${space.id}`}
+      href={`/spaces/${space.id}`}
       image={space.images[0]}
       alt={space.title}
       title={space.title}

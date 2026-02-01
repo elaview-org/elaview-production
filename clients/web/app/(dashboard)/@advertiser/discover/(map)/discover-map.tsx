@@ -11,7 +11,7 @@ import type { MapSpace } from "./map-container";
 const MapContainer = dynamic(() => import("./map-container"), {
   ssr: false,
   loading: () => (
-    <div className="bg-muted flex h-[600px] w-full items-center justify-center rounded-lg">
+    <div className="bg-muted flex h-150 w-full items-center justify-center rounded-lg">
       <div className="text-muted-foreground">Loading map...</div>
     </div>
   ),

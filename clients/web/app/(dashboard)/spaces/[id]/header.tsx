@@ -7,11 +7,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/primitives/tooltip";
-import { useBreadcrumbLabel } from "@/components/composed/breadcrumb-nav";
 import { SPACE_STATUS, SPACE_TYPE } from "@/lib/constants";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import { IconChevronLeft } from "@tabler/icons-react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export const Header_SharedSpaceFragment = graphql(`
   fragment Header_SharedSpaceFragment on Space {
@@ -27,9 +26,7 @@ type Props = {
 
 export default function Header({ data }: Props) {
   const router = useRouter();
-  const { id } = useParams<{ id: string }>();
   const space = getFragmentData(Header_SharedSpaceFragment, data);
-  useBreadcrumbLabel(id, space.title);
 
   return (
     <div className="flex items-center gap-4">

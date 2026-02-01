@@ -1,6 +1,5 @@
 "use client";
 
-import BreadcrumbNav from "@/components/composed/breadcrumb-nav";
 import { Separator } from "@/components/primitives/separator";
 import { SidebarTrigger } from "@/components/primitives/sidebar";
 import { ThemeToggle } from "@/components/composed/theme-toggle";
@@ -14,7 +13,6 @@ export default function ContentHeader() {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <BreadcrumbNav />
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />
         </div>

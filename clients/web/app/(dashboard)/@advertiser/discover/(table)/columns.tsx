@@ -1,10 +1,10 @@
 "use client";
 
 import {
+  actionsColumn,
+  currencyColumn,
   imageTextColumn,
   textColumn,
-  currencyColumn,
-  actionsColumn,
 } from "@/components/composed/table-view";
 import { SPACE_TYPE } from "@/lib/constants";
 import { SpaceType } from "@/types/gql/graphql";
@@ -26,7 +26,7 @@ export const columns = [
     header: "Space",
     image: (row) => row.images[0],
     text: "title",
-    href: (row) => `/space/${row.id}`,
+    href: (row) => `/spaces/${row.id}`,
   }),
   textColumn<SpaceRow>({
     key: "location",
@@ -47,12 +47,12 @@ export const columns = [
     items: (row) => [
       {
         label: "View Details",
-        href: () => `/space/${row.id}`,
+        href: () => `/spaces/${row.id}`,
         icon: <IconEye className="size-4" />,
       },
       {
         label: "Book Now",
-        href: () => `/space/${row.id}#book`,
+        href: () => `/spaces/${row.id}#book`,
         icon: <IconCalendar className="size-4" />,
       },
     ],

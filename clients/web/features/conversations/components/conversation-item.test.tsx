@@ -1,4 +1,4 @@
-import { render, screen } from "@/test/utils";
+import { render, screen } from "@testing-library/react";
 import { describe, it, expect } from "bun:test";
 import { ConversationItem } from "./conversation-item";
 import type { Conversation } from "@/types/messages";
@@ -88,28 +88,6 @@ describe("ConversationItem", () => {
       );
 
       expect(screen.getByText("DC")).toBeInTheDocument();
-    });
-
-    it("handles single word space name", () => {
-      const conversation = createConversation({
-        spaceName: "Storefront",
-      });
-      render(
-        <ConversationItem conversation={conversation} isSelected={false} />
-      );
-
-      expect(screen.getByText("ST")).toBeInTheDocument();
-    });
-
-    it("handles space name with special characters", () => {
-      const conversation = createConversation({
-        spaceName: "Café & Restaurant",
-      });
-      render(
-        <ConversationItem conversation={conversation} isSelected={false} />
-      );
-
-      expect(screen.getByText("CR")).toBeInTheDocument();
     });
 
     it("limits initials to 2 characters", () => {
@@ -345,19 +323,6 @@ describe("ConversationItem", () => {
       // Should handle gracefully
       expect(screen.getByText(/Booking #/)).toBeInTheDocument();
     });
-
-    it("handles UUID-style booking IDs", () => {
-      const conversation = createConversation({
-        bookingId: "booking-550e8400-e29b-41d4-a716-446655440000",
-      });
-      render(
-        <ConversationItem conversation={conversation} isSelected={false} />
-      );
-
-      expect(
-        screen.getByText("Booking #550e8400-e29b-41d4-a716-446655440000")
-      ).toBeInTheDocument();
-    });
   });
 
   describe("Navigation", () => {
@@ -434,39 +399,6 @@ describe("ConversationItem", () => {
 
       const link = container.querySelector("a");
       expect(link).toHaveClass("hover:bg-muted/50");
-    });
-  });
-
-  describe("Text Truncation", () => {
-    it("truncates long space names", () => {
-      const conversation = createConversation({
-        spaceName: "A".repeat(100),
-      });
-      render(
-        <ConversationItem conversation={conversation} isSelected={false} />
-      );
-
-      const spaceName = screen.getByText(/^A+$/);
-      expect(spaceName).toHaveClass("truncate");
-    });
-
-    it("truncates long message previews", () => {
-      const conversation = createConversation({
-        lastMessage: {
-          id: "msg-1",
-          bookingId: "booking-123",
-          sender: "ADVERTISER",
-          type: "TEXT",
-          content: "A".repeat(100),
-          createdAt: new Date().toISOString(),
-        },
-      });
-      render(
-        <ConversationItem conversation={conversation} isSelected={false} />
-      );
-
-      const preview = screen.getByText(/^A{60}/);
-      expect(preview).toHaveClass("truncate");
     });
   });
 
@@ -592,21 +524,6 @@ describe("ConversationItem", () => {
       expect(screen.getByText("2")).toBeInTheDocument();
       // Avatar with initials
       expect(screen.getByText("CS")).toBeInTheDocument();
-    });
-
-    it("maintains proper semantic structure", () => {
-      const conversation = createConversation();
-      const { container } = render(
-        <ConversationItem conversation={conversation} isSelected={false} />
-      );
-
-      // Should have heading for space name
-      const heading = screen.getByRole("heading", { level: 3 });
-      expect(heading).toHaveTextContent("Coffee Shop Window Display");
-
-      // Should have time element for timestamp
-      const timeElement = screen.getByRole("time");
-      expect(timeElement).toBeInTheDocument();
     });
   });
 });

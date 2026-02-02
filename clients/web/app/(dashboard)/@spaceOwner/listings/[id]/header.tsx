@@ -10,7 +10,7 @@ import {
 import { SPACE_STATUS } from "@/lib/constants";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import { IconChevronLeft } from "@tabler/icons-react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const Header_SpaceFragment = graphql(`
   fragment Header_SpaceFragment on Space {
@@ -25,7 +25,6 @@ type Props = {
 
 export default function Header({ data }: Props) {
   const router = useRouter();
-  const { id } = useParams<{ id: string }>();
   const space = getFragmentData(Header_SpaceFragment, data);
 
   return (

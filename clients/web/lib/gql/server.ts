@@ -8,9 +8,11 @@ import {
   type OperationVariables,
   type TypedDocumentNode,
 } from "@apollo/client";
+import type { DocumentTypeDecoration } from "@graphql-typed-document-node/core";
 import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { registerApolloClient } from "@apollo/client-integration-nextjs";
 import { cookies } from "next/headers";
+import { type FragmentType, getFragmentData } from "@/types/gql";
 import { redirect } from "next/navigation";
 import env from "@/lib/env";
 import { loggingLink } from "@/lib/logger";
@@ -19,22 +21,25 @@ const {
   getClient,
   query: _query,
   PreloadQuery,
-} = registerApolloClient(async () => {
-  const httpLink = new HttpLink({
-    uri: `${env.client.apiUrl}/graphql`,
-    headers: {
-      cookie: (await cookies()).toString(),
-    },
-    fetchOptions: {},
-  });
-
-  return new ApolloClient({
-    cache: new InMemoryCache({
-      resultCaching: true,
-    }),
-    link: ApolloLink.from([loggingLink, httpLink]),
-  });
-});
+} = registerApolloClient(
+  async () =>
+    new ApolloClient({
+      cache: new InMemoryCache({
+        resultCaching: true,
+      }),
+      queryDeduplication: true,
+      link: ApolloLink.from([
+        loggingLink,
+        new HttpLink({
+          uri: `${env.client.apiUrl}/graphql`,
+          headers: {
+            cookie: (await cookies()).toString(),
+          },
+          fetchOptions: {},
+        }),
+      ]),
+    })
+);
 
 function throwIfAuthError(error: unknown) {
   if (
@@ -103,10 +108,20 @@ async function mutate<
   }
 }
 
+function createFragmentReader<TQuery>(queryFn: () => Promise<TQuery>) {
+  return async <TType>(
+    fragment: DocumentTypeDecoration<TType, any>
+  ): Promise<TType> => {
+    const data = await queryFn();
+    return getFragmentData(fragment, data as FragmentType<typeof fragment>);
+  };
+}
+
 const api = {
   query,
   mutate,
   getClient,
+  createFragmentReader,
 };
 
 export default api;

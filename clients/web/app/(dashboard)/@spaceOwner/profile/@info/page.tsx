@@ -1,11 +1,10 @@
-"use client";
-
 import { IconStar, IconStarFilled } from "@tabler/icons-react";
 import ProfileCardBase from "@/components/composed/profile-card";
-import { FragmentType, getFragmentData, graphql } from "@/types/gql";
+import { graphql } from "@/types/gql";
+import api from "../api";
 
-export const ProfileCard_UserFragment = graphql(`
-  fragment ProfileCard_UserFragment on User {
+const Info_UserFragment = graphql(`
+  fragment Info_UserFragment on User {
     name
     avatar
     spaceOwnerProfile {
@@ -24,12 +23,8 @@ export const ProfileCard_UserFragment = graphql(`
   }
 `);
 
-type Props = {
-  data: FragmentType<typeof ProfileCard_UserFragment>;
-};
-
-export default function ProfileCard({ data }: Props) {
-  const user = getFragmentData(ProfileCard_UserFragment, data);
+export default async function ProfileCard() {
+  const user = await api.getSpaceOwnerProfile(Info_UserFragment);
   const profile = user.spaceOwnerProfile!;
   const spaces = profile.spaces?.nodes ?? [];
 

@@ -1,4 +1,4 @@
-import { FragmentType, getFragmentData, graphql } from "@/types/gql";
+import { graphql } from "@/types/gql";
 import {
   IconBriefcase,
   IconClock,
@@ -7,9 +7,10 @@ import {
   IconShieldCheck,
 } from "@tabler/icons-react";
 import mockData from "./mock.json";
+import api from "../api";
 
-export const AboutSection_UserFragment = graphql(`
-  fragment AboutSection_UserFragment on User {
+const About_UserFragment = graphql(`
+  fragment About_UserFragment on User {
     name
     spaceOwnerProfile {
       businessName
@@ -24,12 +25,8 @@ export const AboutSection_UserFragment = graphql(`
   }
 `);
 
-type Props = {
-  data: FragmentType<typeof AboutSection_UserFragment>;
-};
-
-export default function AboutSection({ data }: Props) {
-  const user = getFragmentData(AboutSection_UserFragment, data);
+export default async function Page() {
+  const user = await api.getSpaceOwnerProfile(About_UserFragment);
   const profile = user.spaceOwnerProfile!;
   const spaces = profile.spaces?.nodes ?? [];
 

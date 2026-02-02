@@ -13,9 +13,9 @@ import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { registerApolloClient } from "@apollo/client-integration-nextjs";
 import { cookies } from "next/headers";
 import { type FragmentType, getFragmentData } from "@/types/gql";
-import { redirect } from "next/navigation";
 import env from "@/lib/env";
 import { loggingLink } from "@/lib/logger";
+import { redirect } from "next/navigation";
 
 const {
   getClient,
@@ -110,7 +110,7 @@ async function mutate<
 
 function createFragmentReader<TQuery>(queryFn: () => Promise<TQuery>) {
   return async <TType>(
-    fragment: DocumentTypeDecoration<TType, any>
+    fragment: DocumentTypeDecoration<TType, unknown>
   ): Promise<TType> => {
     const data = await queryFn();
     return getFragmentData(fragment, data as FragmentType<typeof fragment>);

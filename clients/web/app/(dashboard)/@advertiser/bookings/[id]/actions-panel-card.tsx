@@ -8,10 +8,10 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import {
-  CheckCircle2,
   AlertTriangle,
-  MessageSquare,
+  CheckCircle2,
   FileText,
+  MessageSquare,
   X,
 } from "lucide-react";
 
@@ -97,7 +97,7 @@ export function ActionsPanelCard({
             className="w-full justify-start"
             asChild
           >
-            <Link href={`/messages/${bookingId}`}>
+            <Link href={`/app/(dashboard)/messages/${bookingId}`}>
               <MessageSquare className="mr-2 h-4 w-4" />
               Message Owner
             </Link>

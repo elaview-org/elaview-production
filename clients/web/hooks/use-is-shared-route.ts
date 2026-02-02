@@ -5,4 +5,4 @@ export default function useIsSharedRoute() {
   return !!sharedRoutes.find((route) => pathname.startsWith(route));
 }
 
-const sharedRoutes = ["/spaces"];
+const sharedRoutes = ["/spaces", "/messages", "/notifications"];

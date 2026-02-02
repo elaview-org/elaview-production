@@ -132,7 +132,9 @@ export default function SpaceInfo({ space, bookingId }: SpaceInfoProps) {
           </Button>
           {bookingId && (
             <Button variant="outline" size="sm" asChild>
-              <Link href={`/messages/${bookingId}`}>Contact Owner</Link>
+              <Link href={`/app/(dashboard)/messages/${bookingId}`}>
+                Contact Owner
+              </Link>
             </Button>
           )}
         </div>

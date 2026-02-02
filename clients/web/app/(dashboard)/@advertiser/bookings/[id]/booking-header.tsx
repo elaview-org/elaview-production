@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/primitives/dropdown-menu";
-import { MessageSquare, X, MoreVertical } from "lucide-react";
+import { MessageSquare, MoreVertical, X } from "lucide-react";
 
 interface BookingHeaderProps {
   bookingId: string;
@@ -74,7 +74,7 @@ export function BookingHeader({
       <CardContent>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={onMessageClick} asChild>
-            <Link href={`/messages/${bookingId}`}>
+            <Link href={`/app/(dashboard)/messages/${bookingId}`}>
               <MessageSquare className="mr-2 h-4 w-4" />
               Message Owner
             </Link>

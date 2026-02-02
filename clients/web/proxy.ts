@@ -42,5 +42,6 @@ export const config = {
     "/listings/:path*",
     "/earnings",
     "/calendar",
+    "/spaces/:path*",
   ],
 };

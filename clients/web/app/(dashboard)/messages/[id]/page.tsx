@@ -1,8 +1,8 @@
 import {
   getConversationsQuery,
   getMessagesQuery,
-} from "../../../../../features/messages/messages-queries";
-import DisplayMessages from "../../../../../features/messages/components/display-messages";
+} from "@/features/messages/messages-queries";
+import DisplayMessages from "@/features/messages/components/display-messages";
 
 interface PageProps {
   params: {

@@ -12,8 +12,8 @@ import {
 import { NotificationType } from "@/types/gql/graphql";
 import {
   ADVERTISER_NOTIFICATIONS,
-  NOTIFICATION_LABELS,
-} from "../../../app/(dashboard)/@advertiser/settings/constants";
+  ADVERTISER_NOTIFICATION_LABELS,
+} from "@/app/(dashboard)/settings/constants";
 
 interface NotificationsFiltersProps {
   filter: "all" | "unread" | NotificationType;
@@ -69,7 +69,7 @@ export function NotificationsFilters({
             <SelectItem value="all">All Types</SelectItem>
             {ADVERTISER_NOTIFICATIONS.map((type) => (
               <SelectItem key={type} value={type}>
-                {NOTIFICATION_LABELS[type] || type}
+                {ADVERTISER_NOTIFICATION_LABELS[type] || type}
               </SelectItem>
             ))}
           </SelectContent>

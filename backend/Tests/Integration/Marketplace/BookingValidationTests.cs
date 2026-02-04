@@ -22,6 +22,7 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
             mutation($campaignId: ID!, $input: CreateBookingInput!) {
                 createBooking(campaignId: $campaignId, input: $input) {
                     booking { id }
+                    errors { __typename }
                 }
             }
             """,
@@ -34,7 +35,8 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
                 }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors!.First().TypeName.Should().Be("ValidationError");
     }
 
     [Fact]
@@ -50,6 +52,7 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
             mutation($campaignId: ID!, $input: CreateBookingInput!) {
                 createBooking(campaignId: $campaignId, input: $input) {
                     booking { id }
+                    errors { __typename }
                 }
             }
             """,
@@ -62,7 +65,8 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
                 }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors!.First().TypeName.Should().Be("ValidationError");
     }
 
     [Fact]
@@ -79,6 +83,7 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
             mutation($campaignId: ID!, $input: CreateBookingInput!) {
                 createBooking(campaignId: $campaignId, input: $input) {
                     booking { id }
+                    errors { __typename }
                 }
             }
             """,
@@ -91,7 +96,8 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
                 }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors!.First().TypeName.Should().Be("ValidationError");
     }
 
     [Fact]
@@ -107,6 +113,7 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
             mutation($campaignId: ID!, $input: CreateBookingInput!) {
                 createBooking(campaignId: $campaignId, input: $input) {
                     booking { id }
+                    errors { __typename }
                 }
             }
             """,
@@ -119,7 +126,8 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
                 }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors!.First().TypeName.Should().Be("ValidationError");
     }
 
     [Fact]
@@ -134,6 +142,7 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
             mutation($campaignId: ID!, $input: CreateBookingInput!) {
                 createBooking(campaignId: $campaignId, input: $input) {
                     booking { id }
+                    errors { __typename }
                 }
             }
             """,
@@ -146,9 +155,8 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
                 }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("NOT_FOUND");
+        response.Data!.CreateBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors!.First().TypeName.Should().Be("NotFoundError");
     }
 
     [Fact]
@@ -162,6 +170,7 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
             mutation($campaignId: ID!, $input: CreateBookingInput!) {
                 createBooking(campaignId: $campaignId, input: $input) {
                     booking { id }
+                    errors { __typename }
                 }
             }
             """,
@@ -174,8 +183,7 @@ public sealed class BookingValidationTests(IntegrationTestFixture fixture)
                 }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("NOT_FOUND");
+        response.Data!.CreateBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors!.First().TypeName.Should().Be("NotFoundError");
     }
 }

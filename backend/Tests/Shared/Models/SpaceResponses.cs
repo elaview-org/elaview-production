@@ -27,20 +27,20 @@ public record MySpacesResponse(SpacesConnection MySpaces);
 
 public record CreateSpaceResponse(CreateSpacePayload CreateSpace);
 
-public record CreateSpacePayload(SpaceNode Space);
+public record CreateSpacePayload(SpaceNode Space, List<MutationError>? Errors);
 
 public record UpdateSpaceResponse(UpdateSpacePayload UpdateSpace);
 
-public record UpdateSpacePayload(SpaceNode Space);
+public record UpdateSpacePayload(SpaceNode Space, List<MutationError>? Errors);
 
 public record DeleteSpaceResponse(DeleteSpacePayload DeleteSpace);
 
-public record DeleteSpacePayload(bool Success);
+public record DeleteSpacePayload(bool? Success, List<MutationError>? Errors);
 
 public record DeactivateSpaceResponse(DeactivateSpacePayload DeactivateSpace);
 
-public record DeactivateSpacePayload(SpaceNode Space);
+public record DeactivateSpacePayload(SpaceNode Space, List<MutationError>? Errors);
 
 public record ReactivateSpaceResponse(ReactivateSpacePayload ReactivateSpace);
 
-public record ReactivateSpacePayload(SpaceNode Space);
+public record ReactivateSpacePayload(SpaceNode Space, List<MutationError>? Errors);

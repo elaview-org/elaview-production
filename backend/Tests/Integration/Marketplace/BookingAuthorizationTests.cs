@@ -24,13 +24,13 @@ public sealed class BookingAuthorizationTests(IntegrationTestFixture fixture)
             mutation($input: ApproveBookingInput!) {
                 approveBooking(input: $input) {
                     booking { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = booking.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("FORBIDDEN");
+        response.Data!.ApproveBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.ApproveBooking.Errors!.First().TypeName.Should().Be("ForbiddenError");
     }
 
     [Fact]
@@ -47,13 +47,13 @@ public sealed class BookingAuthorizationTests(IntegrationTestFixture fixture)
             mutation($input: RejectBookingInput!) {
                 rejectBooking(input: $input) {
                     booking { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = booking.Id, reason = "Test rejection" } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("FORBIDDEN");
+        response.Data!.RejectBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.RejectBooking.Errors!.First().TypeName.Should().Be("ForbiddenError");
     }
 
     [Fact]
@@ -71,13 +71,13 @@ public sealed class BookingAuthorizationTests(IntegrationTestFixture fixture)
             mutation($input: MarkFileDownloadedInput!) {
                 markFileDownloaded(input: $input) {
                     booking { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = booking.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("FORBIDDEN");
+        response.Data!.MarkFileDownloaded.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.MarkFileDownloaded.Errors!.First().TypeName.Should().Be("ForbiddenError");
     }
 
     [Fact]
@@ -95,13 +95,13 @@ public sealed class BookingAuthorizationTests(IntegrationTestFixture fixture)
             mutation($input: MarkInstalledInput!) {
                 markInstalled(input: $input) {
                     booking { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = booking.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("FORBIDDEN");
+        response.Data!.MarkInstalled.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.MarkInstalled.Errors!.First().TypeName.Should().Be("ForbiddenError");
     }
 
     [Fact]
@@ -119,12 +119,12 @@ public sealed class BookingAuthorizationTests(IntegrationTestFixture fixture)
             mutation($input: CancelBookingInput!) {
                 cancelBooking(input: $input) {
                     booking { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = booking.Id, reason = "Test" } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("FORBIDDEN");
+        response.Data!.CancelBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CancelBooking.Errors!.First().TypeName.Should().Be("ForbiddenError");
     }
 }

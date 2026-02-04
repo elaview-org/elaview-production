@@ -15,7 +15,7 @@ public static partial class BookingQueries {
     ) => bookingService.GetById(id);
 
     [Authorize]
-    [UsePaging]
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
@@ -25,7 +25,7 @@ public static partial class BookingQueries {
     ) => bookingService.GetByAdvertiserUserId(userService.GetPrincipalId());
 
     [Authorize]
-    [UsePaging]
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]

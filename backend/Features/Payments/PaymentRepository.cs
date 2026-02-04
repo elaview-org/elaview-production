@@ -11,6 +11,7 @@ public interface IPaymentRepository {
     Task<Payment?> GetByStripePaymentIntentIdAsync(string paymentIntentId, CancellationToken ct);
     Task<Payment?> GetPendingByBookingIdAsync(Guid bookingId, CancellationToken ct);
     Task<BookingPaymentInfo?> GetBookingInfoForPaymentAsync(Guid bookingId, Guid userId, CancellationToken ct);
+    Task<BookingPaymentInfo?> GetBookingInfoByIdAsync(Guid bookingId, CancellationToken ct);
     Task<Payment> AddAsync(Payment payment, CancellationToken ct);
     Task<Payment> UpdateStatusAsync(Payment payment, PaymentStatus status, string? chargeId, CancellationToken ct);
     Task<Payment> UpdateRefundStatusAsync(Payment payment, PaymentStatus status, CancellationToken ct);
@@ -21,7 +22,8 @@ public interface IPaymentRepository {
 public record BookingPaymentInfo(
     Guid Id,
     BookingStatus Status,
-    decimal TotalAmount
+    decimal TotalAmount,
+    Guid AdvertiserUserId
 );
 
 public sealed class PaymentRepository(
@@ -46,7 +48,13 @@ public sealed class PaymentRepository(
     public async Task<BookingPaymentInfo?> GetBookingInfoForPaymentAsync(Guid bookingId, Guid userId, CancellationToken ct)
         => await context.Bookings
             .Where(b => b.Id == bookingId && b.Campaign.AdvertiserProfile.UserId == userId)
-            .Select(b => new BookingPaymentInfo(b.Id, b.Status, b.TotalAmount))
+            .Select(b => new BookingPaymentInfo(b.Id, b.Status, b.TotalAmount, b.Campaign.AdvertiserProfile.UserId))
+            .FirstOrDefaultAsync(ct);
+
+    public async Task<BookingPaymentInfo?> GetBookingInfoByIdAsync(Guid bookingId, CancellationToken ct)
+        => await context.Bookings
+            .Where(b => b.Id == bookingId)
+            .Select(b => new BookingPaymentInfo(b.Id, b.Status, b.TotalAmount, b.Campaign.AdvertiserProfile.UserId))
             .FirstOrDefaultAsync(ct);
 
     public async Task<Payment> AddAsync(Payment payment, CancellationToken ct) {

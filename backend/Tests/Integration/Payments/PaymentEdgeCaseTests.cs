@@ -21,23 +21,23 @@ public sealed class PaymentEdgeCaseTests(IntegrationTestFixture fixture)
         var booking = await SeedBookingAsync(campaign.Id, space.Id);
 
         var response = await Client.MutateAsync<CreatePaymentIntentResponse>("""
-            mutation($bookingId: ID!) {
-                createPaymentIntent(bookingId: $bookingId) {
+            mutation($input: CreatePaymentIntentInput!) {
+                createPaymentIntent(input: $input) {
                     clientSecret
                     paymentIntentId
                     amount
+                    errors { __typename }
                 }
             }
-            """, new { bookingId = booking.Id });
+            """, new { input = new { bookingId = booking.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should()
-            .Be("INVALID_STATUS_TRANSITION");
+        response.Data!.CreatePaymentIntent.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreatePaymentIntent.Errors!.First().TypeName.Should()
+            .Be("InvalidStatusTransitionError");
     }
 
     [Fact]
-    public async Task CreatePaymentIntent_AlreadyPaid_ReturnsConflict() {
+    public async Task CreatePaymentIntent_AlreadyPaid_ReturnsInvalidStatusTransition() {
         var (advertiser, advertiserProfile) = await SeedAdvertiserAsync();
         var (_, ownerProfile) = await SeedSpaceOwnerAsync();
         await LoginAsync(advertiser.Email, "Test123!");
@@ -48,18 +48,19 @@ public sealed class PaymentEdgeCaseTests(IntegrationTestFixture fixture)
             BookingStatus.Paid);
 
         var response = await Client.MutateAsync<CreatePaymentIntentResponse>("""
-            mutation($bookingId: ID!) {
-                createPaymentIntent(bookingId: $bookingId) {
+            mutation($input: CreatePaymentIntentInput!) {
+                createPaymentIntent(input: $input) {
                     clientSecret
                     paymentIntentId
                     amount
+                    errors { __typename }
                 }
             }
-            """, new { bookingId = booking.Id });
+            """, new { input = new { bookingId = booking.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("CONFLICT");
+        response.Data!.CreatePaymentIntent.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreatePaymentIntent.Errors!.First().TypeName.Should()
+            .Be("InvalidStatusTransitionError");
     }
 
     [Fact]
@@ -75,18 +76,19 @@ public sealed class PaymentEdgeCaseTests(IntegrationTestFixture fixture)
         var unrelatedUser = await CreateAndLoginUserAsync();
 
         var response = await Client.MutateAsync<CreatePaymentIntentResponse>("""
-            mutation($bookingId: ID!) {
-                createPaymentIntent(bookingId: $bookingId) {
+            mutation($input: CreatePaymentIntentInput!) {
+                createPaymentIntent(input: $input) {
                     clientSecret
                     paymentIntentId
                     amount
+                    errors { __typename }
                 }
             }
-            """, new { bookingId = booking.Id });
+            """, new { input = new { bookingId = booking.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("FORBIDDEN");
+        response.Data!.CreatePaymentIntent.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreatePaymentIntent.Errors!.First().TypeName.Should()
+            .Be("ForbiddenError");
     }
 
     [Fact]
@@ -95,18 +97,19 @@ public sealed class PaymentEdgeCaseTests(IntegrationTestFixture fixture)
         await LoginAsync(advertiser.Email, "Test123!");
 
         var response = await Client.MutateAsync<CreatePaymentIntentResponse>("""
-            mutation($bookingId: ID!) {
-                createPaymentIntent(bookingId: $bookingId) {
+            mutation($input: CreatePaymentIntentInput!) {
+                createPaymentIntent(input: $input) {
                     clientSecret
                     paymentIntentId
                     amount
+                    errors { __typename }
                 }
             }
-            """, new { bookingId = Guid.NewGuid() });
+            """, new { input = new { bookingId = Guid.NewGuid() } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("NOT_FOUND");
+        response.Data!.CreatePaymentIntent.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreatePaymentIntent.Errors!.First().TypeName.Should()
+            .Be("NotFoundError");
     }
 
     [Fact]
@@ -117,6 +120,7 @@ public sealed class PaymentEdgeCaseTests(IntegrationTestFixture fixture)
             mutation($input: RequestRefundInput!) {
                 requestRefund(input: $input) {
                     refund { id status amount }
+                    errors { __typename }
                 }
             }
             """,
@@ -128,8 +132,7 @@ public sealed class PaymentEdgeCaseTests(IntegrationTestFixture fixture)
                 }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("NOT_FOUND");
+        response.Data!.RequestRefund.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.RequestRefund.Errors!.First().TypeName.Should().Be("NotFoundError");
     }
 }

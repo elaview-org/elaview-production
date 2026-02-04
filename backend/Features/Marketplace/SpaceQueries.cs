@@ -14,7 +14,7 @@ public static partial class SpaceQueries {
         ISpaceService spaceService
     ) => spaceService.GetById(id);
 
-    [UsePaging]
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]
@@ -24,7 +24,7 @@ public static partial class SpaceQueries {
     ) => spaceService.GetAllExcludingUser(userService.GetPrincipalIdOrNull());
 
     [Authorize]
-    [UsePaging]
+    [UsePaging(IncludeTotalCount = true)]
     [UseProjection]
     [UseFiltering]
     [UseSorting]

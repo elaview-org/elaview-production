@@ -45,15 +45,16 @@ public record EarningsSummaryNode(
 public record GetEarningsSummaryResponse(EarningsSummaryNode EarningsSummary);
 
 public record CreatePaymentIntentPayloadResponse(
-    string ClientSecret,
-    string PaymentIntentId,
-    decimal Amount
+    string? ClientSecret,
+    string? PaymentIntentId,
+    decimal? Amount,
+    List<MutationError>? Errors
 );
 
 public record CreatePaymentIntentResponse(
     CreatePaymentIntentPayloadResponse CreatePaymentIntent);
 
-public record ConfirmPaymentPayloadResponse(PaymentNode Payment);
+public record ConfirmPaymentPayloadResponse(PaymentNode Payment, List<MutationError>? Errors);
 
 public record ConfirmPaymentResponse(
     ConfirmPaymentPayloadResponse ConfirmPayment);
@@ -65,7 +66,7 @@ public record RefundNode(
     string Reason
 );
 
-public record RequestRefundPayloadResponse(RefundNode Refund);
+public record RequestRefundPayloadResponse(RefundNode Refund, List<MutationError>? Errors);
 
 public record RequestRefundResponse(RequestRefundPayloadResponse RequestRefund);
 

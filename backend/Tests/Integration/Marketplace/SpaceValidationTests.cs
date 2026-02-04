@@ -25,13 +25,13 @@ public sealed class SpaceValidationTests(IntegrationTestFixture fixture)
             mutation($input: DeactivateSpaceInput!) {
                 deactivateSpace(input: $input) {
                     space { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = space.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("CONFLICT");
+        response.Data!.DeactivateSpace.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.DeactivateSpace.Errors!.First().TypeName.Should().Be("ConflictError");
     }
 
     [Fact]
@@ -49,13 +49,13 @@ public sealed class SpaceValidationTests(IntegrationTestFixture fixture)
             mutation($input: DeleteSpaceInput!) {
                 deleteSpace(input: $input) {
                     success
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = space.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("CONFLICT");
+        response.Data!.DeleteSpace.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.DeleteSpace.Errors!.First().TypeName.Should().Be("ConflictError");
     }
 
     [Fact]
@@ -72,6 +72,7 @@ public sealed class SpaceValidationTests(IntegrationTestFixture fixture)
             mutation($campaignId: ID!, $input: CreateBookingInput!) {
                 createBooking(campaignId: $campaignId, input: $input) {
                     booking { id }
+                    errors { __typename }
                 }
             }
             """,
@@ -84,7 +85,7 @@ public sealed class SpaceValidationTests(IntegrationTestFixture fixture)
                 }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors.Should().NotBeNullOrEmpty();
     }
 
     [Fact]
@@ -106,6 +107,7 @@ public sealed class SpaceValidationTests(IntegrationTestFixture fixture)
             mutation($campaignId: ID!, $input: CreateBookingInput!) {
                 createBooking(campaignId: $campaignId, input: $input) {
                     booking { id }
+                    errors { __typename }
                 }
             }
             """,
@@ -118,9 +120,8 @@ public sealed class SpaceValidationTests(IntegrationTestFixture fixture)
                 }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("CONFLICT");
+        response.Data!.CreateBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateBooking.Errors!.First().TypeName.Should().Be("ConflictError");
     }
 
     [Fact]
@@ -132,6 +133,7 @@ public sealed class SpaceValidationTests(IntegrationTestFixture fixture)
             mutation($input: CreateSpaceInput!) {
                 createSpace(input: $input) {
                     space { id }
+                    errors { __typename }
                 }
             }
             """,
@@ -149,7 +151,8 @@ public sealed class SpaceValidationTests(IntegrationTestFixture fixture)
                 }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateSpace.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CreateSpace.Errors!.First().TypeName.Should().Be("ValidationError");
     }
 
     [Fact]
@@ -162,6 +165,7 @@ public sealed class SpaceValidationTests(IntegrationTestFixture fixture)
             mutation($id: ID!, $input: UpdateSpaceInput!) {
                 updateSpace(id: $id, input: $input) {
                     space { id pricePerDay }
+                    errors { __typename }
                 }
             }
             """,
@@ -170,6 +174,7 @@ public sealed class SpaceValidationTests(IntegrationTestFixture fixture)
                 input = new { pricePerDay = -100.00m }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.UpdateSpace.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.UpdateSpace.Errors!.First().TypeName.Should().Be("ValidationError");
     }
 }

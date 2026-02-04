@@ -8,6 +8,7 @@ namespace ElaviewBackend.Features.Marketplace;
 public static partial class SpaceMutations {
     [Authorize]
     [Error<NotFoundException>]
+    [Error<ValidationException>]
     public static async Task<CreateSpacePayload> CreateSpace(
         CreateSpaceInput input,
         IUserService userService,
@@ -21,6 +22,7 @@ public static partial class SpaceMutations {
     [Authorize]
     [Error<NotFoundException>]
     [Error<ForbiddenException>]
+    [Error<ValidationException>]
     public static async Task<UpdateSpacePayload> UpdateSpace(
         [ID] Guid id,
         UpdateSpaceInput input,
@@ -49,6 +51,7 @@ public static partial class SpaceMutations {
     [Authorize]
     [Error<NotFoundException>]
     [Error<ForbiddenException>]
+    [Error<ConflictException>]
     public static async Task<DeactivateSpacePayload> DeactivateSpace(
         [ID] Guid id,
         IUserService userService,

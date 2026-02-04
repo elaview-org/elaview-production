@@ -26,8 +26,11 @@ public sealed class PaymentService(
         => await repository.GetByIdAsync(id, ct);
 
     public async Task<PaymentIntentResult> CreatePaymentIntentAsync(Guid userId, Guid bookingId, CancellationToken ct) {
-        var booking = await repository.GetBookingInfoForPaymentAsync(bookingId, userId, ct)
+        var booking = await repository.GetBookingInfoByIdAsync(bookingId, ct)
             ?? throw new NotFoundException("Booking", bookingId);
+
+        if (booking.AdvertiserUserId != userId)
+            throw new ForbiddenException("create payment for this booking");
 
         if (booking.Status != BookingStatus.Approved)
             throw new InvalidStatusTransitionException(booking.Status.ToString(), "Payment");

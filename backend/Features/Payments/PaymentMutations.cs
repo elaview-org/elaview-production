@@ -8,7 +8,9 @@ namespace ElaviewBackend.Features.Payments;
 public static partial class PaymentMutations {
     [Authorize]
     [Error<NotFoundException>]
+    [Error<ForbiddenException>]
     [Error<InvalidStatusTransitionException>]
+    [Error<ConflictException>]
     public static async Task<CreatePaymentIntentPayload> CreatePaymentIntent(
         [ID] Guid bookingId,
         IUserService userService,

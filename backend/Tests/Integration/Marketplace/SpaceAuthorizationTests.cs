@@ -20,6 +20,7 @@ public sealed class SpaceAuthorizationTests(IntegrationTestFixture fixture)
             mutation($id: ID!, $input: UpdateSpaceInput!) {
                 updateSpace(id: $id, input: $input) {
                     space { id title }
+                    errors { __typename }
                 }
             }
             """,
@@ -28,9 +29,8 @@ public sealed class SpaceAuthorizationTests(IntegrationTestFixture fixture)
                 input = new { title = "Hijacked Title" }
             });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("FORBIDDEN");
+        response.Data!.UpdateSpace.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.UpdateSpace.Errors!.First().TypeName.Should().Be("ForbiddenError");
     }
 
     [Fact]
@@ -44,13 +44,13 @@ public sealed class SpaceAuthorizationTests(IntegrationTestFixture fixture)
             mutation($input: DeleteSpaceInput!) {
                 deleteSpace(input: $input) {
                     success
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = space.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("FORBIDDEN");
+        response.Data!.DeleteSpace.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.DeleteSpace.Errors!.First().TypeName.Should().Be("ForbiddenError");
     }
 
     [Fact]
@@ -64,12 +64,12 @@ public sealed class SpaceAuthorizationTests(IntegrationTestFixture fixture)
             mutation($input: DeactivateSpaceInput!) {
                 deactivateSpace(input: $input) {
                     space { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = space.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should().Be("FORBIDDEN");
+        response.Data!.DeactivateSpace.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.DeactivateSpace.Errors!.First().TypeName.Should().Be("ForbiddenError");
     }
 }

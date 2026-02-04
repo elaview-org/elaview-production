@@ -21,12 +21,13 @@ public interface IBookingRepository {
     IQueryable<Payout> GetPayoutsByBookingId(Guid bookingId);
     Task<Guid?> GetCampaignIdIfOwnedByUserAsync(Guid campaignId, Guid userId, CancellationToken ct);
     Task<SpaceInfo?> GetActiveSpaceInfoAsync(Guid spaceId, CancellationToken ct);
+    Task<bool> HasOverlappingBookingsAsync(Guid spaceId, DateTime startDate, DateTime endDate, CancellationToken ct);
     Task<Booking> AddAsync(Booking booking, CancellationToken ct);
     Task<Booking> UpdateStatusAsync(Booking booking, BookingStatus status, CancellationToken ct);
     Task SaveChangesAsync(CancellationToken ct);
 }
 
-public record SpaceInfo(Guid Id, decimal PricePerDay, decimal? InstallationFee);
+public record SpaceInfo(Guid Id, decimal PricePerDay, decimal? InstallationFee, int MinDuration);
 
 public sealed class BookingRepository(
     AppDbContext context,
@@ -97,8 +98,17 @@ public sealed class BookingRepository(
     public async Task<SpaceInfo?> GetActiveSpaceInfoAsync(Guid spaceId, CancellationToken ct)
         => await context.Spaces
             .Where(s => s.Id == spaceId && s.Status == SpaceStatus.Active)
-            .Select(s => new SpaceInfo(s.Id, s.PricePerDay, s.InstallationFee))
+            .Select(s => new SpaceInfo(s.Id, s.PricePerDay, s.InstallationFee, s.MinDuration))
             .FirstOrDefaultAsync(ct);
+
+    public async Task<bool> HasOverlappingBookingsAsync(
+        Guid spaceId, DateTime startDate, DateTime endDate, CancellationToken ct)
+        => await context.Bookings.AnyAsync(b =>
+            b.SpaceId == spaceId &&
+            b.Status != BookingStatus.Cancelled &&
+            b.Status != BookingStatus.Rejected &&
+            b.StartDate < endDate &&
+            b.EndDate > startDate, ct);
 
     public async Task<Booking> AddAsync(Booking booking, CancellationToken ct) {
         context.Bookings.Add(booking);

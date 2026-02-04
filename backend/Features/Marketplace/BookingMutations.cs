@@ -9,6 +9,7 @@ public static partial class BookingMutations {
     [Authorize]
     [Error<NotFoundException>]
     [Error<ValidationException>]
+    [Error<ConflictException>]
     public static async Task<CreateBookingPayload> CreateBooking(
         [ID] Guid campaignId,
         CreateBookingInput input,

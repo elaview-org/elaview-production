@@ -62,9 +62,18 @@ public sealed class BookingService(IBookingRepository repository) : IBookingServ
         var space = await repository.GetActiveSpaceInfoAsync(input.SpaceId, ct)
             ?? throw new NotFoundException("Space", input.SpaceId);
 
+        if (input.StartDate.Date < DateTime.UtcNow.Date)
+            throw new ValidationException("StartDate", "Start date cannot be in the past");
+
         var totalDays = (input.EndDate - input.StartDate).Days;
         if (totalDays <= 0)
             throw new ValidationException("EndDate", "End date must be after start date");
+
+        if (totalDays < space.MinDuration)
+            throw new ValidationException("Duration", $"Minimum duration is {space.MinDuration} days");
+
+        if (await repository.HasOverlappingBookingsAsync(input.SpaceId, input.StartDate, input.EndDate, ct))
+            throw new ConflictException("Booking", "Space already has bookings for the requested dates");
 
         var subtotal = space.PricePerDay * totalDays;
         var installationFee = space.InstallationFee ?? 0;

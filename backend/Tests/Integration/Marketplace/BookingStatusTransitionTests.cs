@@ -33,14 +33,14 @@ public sealed class BookingStatusTransitionTests(IntegrationTestFixture fixture)
             mutation($input: ApproveBookingInput!) {
                 approveBooking(input: $input) {
                     booking { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = booking.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should()
-            .Be("INVALID_STATUS_TRANSITION");
+        response.Data!.ApproveBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.ApproveBooking.Errors!.First().TypeName.Should()
+            .Be("InvalidStatusTransitionError");
     }
 
     [Theory]
@@ -66,14 +66,14 @@ public sealed class BookingStatusTransitionTests(IntegrationTestFixture fixture)
             mutation($input: RejectBookingInput!) {
                 rejectBooking(input: $input) {
                     booking { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = booking.Id, reason = "Not suitable" } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should()
-            .Be("INVALID_STATUS_TRANSITION");
+        response.Data!.RejectBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.RejectBooking.Errors!.First().TypeName.Should()
+            .Be("InvalidStatusTransitionError");
     }
 
     [Theory]
@@ -98,14 +98,14 @@ public sealed class BookingStatusTransitionTests(IntegrationTestFixture fixture)
             mutation($input: MarkFileDownloadedInput!) {
                 markFileDownloaded(input: $input) {
                     booking { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = booking.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should()
-            .Be("INVALID_STATUS_TRANSITION");
+        response.Data!.MarkFileDownloaded.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.MarkFileDownloaded.Errors!.First().TypeName.Should()
+            .Be("InvalidStatusTransitionError");
     }
 
     [Theory]
@@ -130,14 +130,14 @@ public sealed class BookingStatusTransitionTests(IntegrationTestFixture fixture)
             mutation($input: MarkInstalledInput!) {
                 markInstalled(input: $input) {
                     booking { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = booking.Id } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should()
-            .Be("INVALID_STATUS_TRANSITION");
+        response.Data!.MarkInstalled.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.MarkInstalled.Errors!.First().TypeName.Should()
+            .Be("InvalidStatusTransitionError");
     }
 
     [Theory]
@@ -161,13 +161,13 @@ public sealed class BookingStatusTransitionTests(IntegrationTestFixture fixture)
             mutation($input: CancelBookingInput!) {
                 cancelBooking(input: $input) {
                     booking { id status }
+                    errors { __typename }
                 }
             }
             """, new { input = new { id = booking.Id, reason = "Changed plans" } });
 
-        response.Errors.Should().NotBeNullOrEmpty();
-        response.Errors!.First().Extensions.Should().ContainKey("code");
-        response.Errors!.First().Extensions!["code"].Should()
-            .Be("INVALID_STATUS_TRANSITION");
+        response.Data!.CancelBooking.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.CancelBooking.Errors!.First().TypeName.Should()
+            .Be("InvalidStatusTransitionError");
     }
 }

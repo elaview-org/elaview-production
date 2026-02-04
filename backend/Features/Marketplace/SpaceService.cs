@@ -45,6 +45,9 @@ public sealed class SpaceService(ISpaceRepository repository) : ISpaceService {
         => await repository.GetSpaceOwnerBySpaceIdAsync(spaceId, ct);
 
     public async Task<Space> CreateAsync(Guid userId, CreateSpaceInput input, CancellationToken ct) {
+        if (input.PricePerDay < 0)
+            throw new ValidationException("PricePerDay", "Price cannot be negative");
+
         var profile = await repository.GetSpaceOwnerProfileByUserIdAsync(userId, ct)
             ?? throw new NotFoundException("SpaceOwnerProfile", userId);
 
@@ -79,6 +82,9 @@ public sealed class SpaceService(ISpaceRepository repository) : ISpaceService {
     }
 
     public async Task<Space> UpdateAsync(Guid userId, Guid id, UpdateSpaceInput input, CancellationToken ct) {
+        if (input.PricePerDay is < 0)
+            throw new ValidationException("PricePerDay", "Price cannot be negative");
+
         var space = await repository.GetByIdWithOwnerAsync(id, ct)
             ?? throw new NotFoundException("Space", id);
 
@@ -107,6 +113,9 @@ public sealed class SpaceService(ISpaceRepository repository) : ISpaceService {
 
         if (space.SpaceOwnerProfile.UserId != userId)
             throw new ForbiddenException("deactivate this space");
+
+        if (await repository.HasActiveBookingsAsync(id, ct))
+            throw new ConflictException("Space", "Cannot deactivate space with active bookings");
 
         return await repository.UpdateStatusAsync(space, SpaceStatus.Inactive, ct);
     }

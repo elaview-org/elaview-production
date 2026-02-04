@@ -27,25 +27,25 @@ public record MyBookingsAsOwnerResponse(BookingsConnection MyBookingsAsOwner);
 
 public record CreateBookingResponse(CreateBookingPayload CreateBooking);
 
-public record CreateBookingPayload(BookingNode Booking);
+public record CreateBookingPayload(BookingNode Booking, List<MutationError>? Errors);
 
 public record ApproveBookingResponse(ApproveBookingPayload ApproveBooking);
 
-public record ApproveBookingPayload(BookingNode Booking);
+public record ApproveBookingPayload(BookingNode Booking, List<MutationError>? Errors);
 
 public record CancelBookingResponse(CancelBookingPayload CancelBooking);
 
-public record CancelBookingPayload(BookingNode Booking);
+public record CancelBookingPayload(BookingNode Booking, List<MutationError>? Errors);
 
 public record RejectBookingResponse(RejectBookingPayload RejectBooking);
 
-public record RejectBookingPayload(BookingNode Booking);
+public record RejectBookingPayload(BookingNode Booking, List<MutationError>? Errors);
 
 public record MarkFileDownloadedResponse(
     MarkFileDownloadedPayload MarkFileDownloaded);
 
-public record MarkFileDownloadedPayload(BookingNode Booking);
+public record MarkFileDownloadedPayload(BookingNode Booking, List<MutationError>? Errors);
 
 public record MarkInstalledResponse(MarkInstalledPayload MarkInstalled);
 
-public record MarkInstalledPayload(BookingNode Booking);
+public record MarkInstalledPayload(BookingNode Booking, List<MutationError>? Errors);

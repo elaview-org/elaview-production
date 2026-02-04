@@ -2,7 +2,7 @@ import SummaryCard, {
   SummaryCardGrid,
 } from "@/components/composed/summary-card";
 import { calculateTrend, formatCurrency } from "@/lib/utils";
-import mock from "./mock.json";
+import mock from "../mock.json";
 
 export default function StatsCards() {
   const { stats } = mock;

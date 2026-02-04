@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/primitives/skeleton";
-import { PendingRequestsSkeleton } from "./pending-requests";
-import { ActiveBookingsSkeleton } from "./active-bookings";
-import { TopSpacesSkeleton } from "./top-spaces";
+import { PendingRequestsSkeleton } from "./@pending-requests/pending-requests";
+import { ActiveBookingsSkeleton } from "./@active-bookings/page";
+import { TopSpacesSkeleton } from "./@top-spaces/top-spaces";
 
 function StatsCardsSkeleton() {
   return (
@@ -13,21 +13,6 @@ function StatsCardsSkeleton() {
           <Skeleton className="h-4 w-40" />
         </div>
       ))}
-    </div>
-  );
-}
-
-function ActivityChartSkeleton() {
-  return (
-    <div className="flex flex-col gap-4 rounded-xl border p-6">
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-4 w-48" />
-        </div>
-        <Skeleton className="h-9 w-40" />
-      </div>
-      <Skeleton className="h-[250px] w-full" />
     </div>
   );
 }

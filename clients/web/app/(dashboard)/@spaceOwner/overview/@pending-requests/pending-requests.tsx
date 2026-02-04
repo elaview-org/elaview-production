@@ -9,7 +9,7 @@ import SectionCard, {
   SectionCardSkeleton,
 } from "@/components/composed/section-card";
 import { formatCurrency, formatDateRange, formatTime } from "@/lib/utils";
-import mock from "./mock.json";
+import mock from "../mock.json";
 
 type PendingRequest = {
   id: string;

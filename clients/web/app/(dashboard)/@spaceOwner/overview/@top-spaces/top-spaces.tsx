@@ -1,8 +1,8 @@
 import {
-  IconStar,
-  IconEye,
   IconCalendar,
   IconChartBar,
+  IconEye,
+  IconStar,
 } from "@tabler/icons-react";
 import RankedCard, {
   RankedCardSkeleton,
@@ -11,7 +11,7 @@ import SectionCard, {
   SectionCardSkeleton,
 } from "@/components/composed/section-card";
 import { formatCurrency, formatNumber } from "@/lib/utils";
-import mock from "./mock.json";
+import mock from "../mock.json";
 
 type TopSpace = {
   id: string;

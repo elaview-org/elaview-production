@@ -18,8 +18,8 @@ import {
 } from "@/components/primitives/chart";
 import TimeRangeSelector from "@/components/composed/time-range-selector";
 import { TIME_RANGES, type TimeRange } from "@/lib/constants";
-import { CHART_CONFIG } from "./constants";
-import mock from "./mock.json";
+import { CHART_CONFIG } from "../constants";
+import mock from "../mock.json";
 
 export default function ActivityChart() {
   const isMobile = useIsMobile();
@@ -59,7 +59,7 @@ export default function ActivityChart() {
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={CHART_CONFIG}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-62.5 w-full"
         >
           <AreaChart data={filteredData}>
             <defs>

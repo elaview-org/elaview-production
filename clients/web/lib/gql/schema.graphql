@@ -619,7 +619,7 @@ type CreateBookingConversationPayload {
   errors: [CreateBookingConversationError!]
 }
 
-union CreateBookingError = NotFoundError | ValidationError
+union CreateBookingError = ConflictError | NotFoundError | ValidationError
 
 input CreateBookingInput {
   advertiserNotes: String
@@ -651,7 +651,7 @@ type CreateCampaignPayload {
   errors: [CreateCampaignError!]
 }
 
-union CreatePaymentIntentError = InvalidStatusTransitionError | NotFoundError
+union CreatePaymentIntentError = ConflictError | ForbiddenError | InvalidStatusTransitionError | NotFoundError
 
 input CreatePaymentIntentInput {
   bookingId: ID!
@@ -676,7 +676,7 @@ type CreateReviewPayload {
   review: Review
 }
 
-union CreateSpaceError = NotFoundError
+union CreateSpaceError = NotFoundError | ValidationError
 
 input CreateSpaceInput {
   address: String!
@@ -725,7 +725,7 @@ input DateTimeOperationFilterInput {
   nlte: DateTime
 }
 
-union DeactivateSpaceError = ForbiddenError | NotFoundError
+union DeactivateSpaceError = ConflictError | ForbiddenError | NotFoundError
 
 input DeactivateSpaceInput {
   id: ID!
@@ -1154,6 +1154,8 @@ type MyBookingsAsAdvertiserConnection {
   nodes: [Booking!]
   """Information to aid in pagination."""
   pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
 }
 
 """An edge in a connection."""
@@ -1172,6 +1174,8 @@ type MyBookingsAsOwnerConnection {
   nodes: [Booking!]
   """Information to aid in pagination."""
   pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
 }
 
 """An edge in a connection."""
@@ -1280,6 +1284,8 @@ type MySpacesConnection {
   nodes: [Space!]
   """Information to aid in pagination."""
   pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
 }
 
 """An edge in a connection."""
@@ -2346,6 +2352,8 @@ type SpacesConnection {
   nodes: [Space!]
   """Information to aid in pagination."""
   pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
 }
 
 """An edge in a connection."""
@@ -2535,7 +2543,7 @@ type UpdateReviewPayload {
   review: Review
 }
 
-union UpdateSpaceError = ForbiddenError | NotFoundError
+union UpdateSpaceError = ForbiddenError | NotFoundError | ValidationError
 
 input UpdateSpaceInput {
   availableFrom: DateTime

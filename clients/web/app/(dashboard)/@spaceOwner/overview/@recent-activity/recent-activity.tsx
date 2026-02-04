@@ -14,12 +14,12 @@ import TableView, {
   textColumn,
 } from "@/components/composed/table-view";
 import {
-  ACTIVITY_TYPES,
   ACTIVITY_STATUS,
-  type ActivityType,
+  ACTIVITY_TYPES,
   type ActivityStatus,
-} from "./constants";
-import mock from "./mock.json";
+  type ActivityType,
+} from "../constants";
+import mock from "../mock.json";
 
 type ActivityData = {
   id: string;

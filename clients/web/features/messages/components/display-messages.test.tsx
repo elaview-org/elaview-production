@@ -12,7 +12,15 @@ import { asMock } from "@/test/utils";
 
 // Mock Next.js Image component
 mock.module("next/image", () => ({
-  default: ({ src, alt, ...props }: { src: string; alt: string; [key: string]: unknown }) => (
+  default: ({
+    src,
+    alt,
+    ...props
+  }: {
+    src: string;
+    alt: string;
+    [key: string]: unknown;
+  }) => (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt={alt} {...props} />
   ),
@@ -47,7 +55,9 @@ describe("DisplayMessages", () => {
 
   const defaultProps = {
     conversations: mockConversations,
-    initialMessages: mockMessages.filter((msg) => msg.bookingId === "booking-123"),
+    initialMessages: mockMessages.filter(
+      (msg) => msg.bookingId === "booking-123"
+    ),
     initialThreadContext: mockThreadContext,
     bookingId: "booking-123",
   };
@@ -60,14 +70,20 @@ describe("DisplayMessages", () => {
     // Reset useIsMobile mock to desktop
     asMock(useIsMobile).mockReturnValue(false);
     // Clear any timers
-    if (typeof globalThis !== "undefined" && typeof globalThis.clearTimeout === "function") {
-        globalThis.clearTimeout();
-      }
+    if (
+      typeof globalThis !== "undefined" &&
+      typeof globalThis.clearTimeout === "function"
+    ) {
+      globalThis.clearTimeout();
+    }
   });
 
   afterEach(() => {
     // Clear any pending timers
-    if (typeof global !== "undefined" && typeof global.clearTimeout === "function") {
+    if (
+      typeof global !== "undefined" &&
+      typeof global.clearTimeout === "function"
+    ) {
       global.clearTimeout();
     }
   });
@@ -78,7 +94,9 @@ describe("DisplayMessages", () => {
       render(<DisplayMessages {...defaultProps} />);
 
       // InboxPanel should be visible on desktop - check for conversation item
-      const conversationItems = screen.getAllByText("Coffee Shop Window Display");
+      const conversationItems = screen.getAllByText(
+        "Coffee Shop Window Display"
+      );
       expect(conversationItems.length).toBeGreaterThan(0);
     });
 
@@ -88,7 +106,9 @@ describe("DisplayMessages", () => {
       // Wait for messages to load (setTimeout in useEffect)
       await waitFor(
         () => {
-          expect(screen.getByText(/Hi! I'm interested in booking/)).toBeInTheDocument();
+          expect(
+            screen.getByText(/Hi! I'm interested in booking/)
+          ).toBeInTheDocument();
         },
         { timeout: 1000 }
       );
@@ -113,9 +133,13 @@ describe("DisplayMessages", () => {
 
       // Both should be visible - check for inbox panel and thread
       await waitFor(() => {
-        const conversationItems = screen.getAllByText("Coffee Shop Window Display");
+        const conversationItems = screen.getAllByText(
+          "Coffee Shop Window Display"
+        );
         expect(conversationItems.length).toBeGreaterThanOrEqual(1);
-        expect(screen.getByText(/Hi! I'm interested in booking/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Hi! I'm interested in booking/)
+        ).toBeInTheDocument();
       });
     });
 
@@ -139,7 +163,9 @@ describe("DisplayMessages", () => {
       render(<DisplayMessages {...defaultProps} />);
 
       await waitFor(() => {
-        expect(screen.getByText(/Hi! I'm interested in booking/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Hi! I'm interested in booking/)
+        ).toBeInTheDocument();
       });
     });
 
@@ -235,7 +261,9 @@ describe("DisplayMessages", () => {
       render(<DisplayMessages {...defaultProps} />);
 
       await waitFor(() => {
-        expect(screen.getByPlaceholderText("Type a message...")).toBeInTheDocument();
+        expect(
+          screen.getByPlaceholderText("Type a message...")
+        ).toBeInTheDocument();
       });
 
       const input = screen.getByPlaceholderText("Type a message...");
@@ -254,7 +282,9 @@ describe("DisplayMessages", () => {
       render(<DisplayMessages {...defaultProps} />);
 
       await waitFor(() => {
-        expect(screen.getByPlaceholderText("Type a message...")).toBeInTheDocument();
+        expect(
+          screen.getByPlaceholderText("Type a message...")
+        ).toBeInTheDocument();
       });
 
       const input = screen.getByPlaceholderText("Type a message...");
@@ -309,10 +339,7 @@ describe("DisplayMessages", () => {
         (msg) => msg.bookingId === "booking-123"
       );
       render(
-        <DisplayMessages
-          {...defaultProps}
-          initialMessages={initialMessages}
-        />
+        <DisplayMessages {...defaultProps} initialMessages={initialMessages} />
       );
 
       // Should show initial messages immediately
@@ -423,7 +450,9 @@ describe("DisplayMessages", () => {
       render(<DisplayMessages {...defaultProps} />);
 
       // Both should be visible on desktop - check for inbox panel
-      const conversationItems = screen.getAllByText("Coffee Shop Window Display");
+      const conversationItems = screen.getAllByText(
+        "Coffee Shop Window Display"
+      );
       expect(conversationItems.length).toBeGreaterThan(0);
     });
   });
@@ -434,14 +463,18 @@ describe("DisplayMessages", () => {
 
       await waitFor(() => {
         // Should have inbox panel - check for conversation items
-        const conversationItems = screen.getAllByText("Coffee Shop Window Display");
+        const conversationItems = screen.getAllByText(
+          "Coffee Shop Window Display"
+        );
         expect(conversationItems.length).toBeGreaterThan(0);
         // Should have message thread
         expect(
           screen.getByText(/Hi! I'm interested in booking/)
         ).toBeInTheDocument();
         // Should have message composer
-        expect(screen.getByPlaceholderText("Type a message...")).toBeInTheDocument();
+        expect(
+          screen.getByPlaceholderText("Type a message...")
+        ).toBeInTheDocument();
       });
     });
 
@@ -451,7 +484,9 @@ describe("DisplayMessages", () => {
       // Should render inbox with all conversations - use getAllByText since there are multiple
       const coffeeShopItems = screen.getAllByText("Coffee Shop Window Display");
       expect(coffeeShopItems.length).toBeGreaterThan(0);
-      expect(screen.getByText("Dry Cleaner Bulletin Board")).toBeInTheDocument();
+      expect(
+        screen.getByText("Dry Cleaner Bulletin Board")
+      ).toBeInTheDocument();
       expect(screen.getByText("Barbershop Wall Mount")).toBeInTheDocument();
     });
   });

@@ -41,7 +41,9 @@ describe("NotificationsContent", () => {
       render(<NotificationsContent {...defaultProps} />);
 
       expect(screen.getByText("Booking Approved")).toBeInTheDocument();
-      expect(screen.getByText("Verification Photos Uploaded")).toBeInTheDocument();
+      expect(
+        screen.getByText("Verification Photos Uploaded")
+      ).toBeInTheDocument();
       expect(screen.getByText("Payment Received")).toBeInTheDocument();
     });
 
@@ -63,20 +65,23 @@ describe("NotificationsContent", () => {
     });
 
     it("shows zero unread when all notifications are read", () => {
-      const allReadNotifications: TNotification[] = mockNotifications.map((n) => ({
-        ...n,
-        isRead: true,
-        readAt: new Date().toISOString(),
-      }));
+      const allReadNotifications: TNotification[] = mockNotifications.map(
+        (n) => ({
+          ...n,
+          isRead: true,
+          readAt: new Date().toISOString(),
+        })
+      );
 
-      render(<NotificationsContent initialNotifications={allReadNotifications} />);
+      render(
+        <NotificationsContent initialNotifications={allReadNotifications} />
+      );
 
       // Should not show unread count
       expect(screen.queryByText(/unread/)).not.toBeInTheDocument();
     });
 
     it("updates unread count when notification is marked as read", async () => {
-      const user = userEvent.setup();
       render(<NotificationsContent {...defaultProps} />);
 
       // Initial unread count should be 3
@@ -94,7 +99,9 @@ describe("NotificationsContent", () => {
 
       // All 5 notifications should be visible
       expect(screen.getByText("Booking Approved")).toBeInTheDocument();
-      expect(screen.getByText("Verification Photos Uploaded")).toBeInTheDocument();
+      expect(
+        screen.getByText("Verification Photos Uploaded")
+      ).toBeInTheDocument();
       expect(screen.getByText("Payment Received")).toBeInTheDocument();
       expect(screen.getByText("New Message")).toBeInTheDocument();
       expect(screen.getByText("Dispute Resolved")).toBeInTheDocument();
@@ -111,7 +118,9 @@ describe("NotificationsContent", () => {
       await waitFor(() => {
         // Should show only unread notifications (3 of them)
         expect(screen.getByText("Booking Approved")).toBeInTheDocument();
-        expect(screen.getByText("Verification Photos Uploaded")).toBeInTheDocument();
+        expect(
+          screen.getByText("Verification Photos Uploaded")
+        ).toBeInTheDocument();
         expect(screen.getByText("New Message")).toBeInTheDocument();
         // Should not show read notifications
         expect(screen.queryByText("Payment Received")).not.toBeInTheDocument();
@@ -143,7 +152,9 @@ describe("NotificationsContent", () => {
         },
       ];
 
-      render(<NotificationsContent initialNotifications={filteredNotifications} />);
+      render(
+        <NotificationsContent initialNotifications={filteredNotifications} />
+      );
 
       // Filter to unread (should show empty since all are read)
       const unreadTab = screen.getByRole("tab", { name: /unread/i });
@@ -158,7 +169,6 @@ describe("NotificationsContent", () => {
 
   describe("Mark as Read", () => {
     it("marks single notification as read", async () => {
-      const user = userEvent.setup();
       render(<NotificationsContent {...defaultProps} />);
 
       // Initial unread count should be 3
@@ -178,7 +188,9 @@ describe("NotificationsContent", () => {
       expect(screen.getByText(/3 unread/)).toBeInTheDocument();
 
       // Click "Mark all read" button
-      const markAllReadButton = screen.getByRole("button", { name: /mark all read/i });
+      const markAllReadButton = screen.getByRole("button", {
+        name: /mark all read/i,
+      });
       await user.click(markAllReadButton);
 
       await waitFor(() => {
@@ -191,7 +203,9 @@ describe("NotificationsContent", () => {
       const user = userEvent.setup();
       render(<NotificationsContent {...defaultProps} />);
 
-      const markAllReadButton = screen.getByRole("button", { name: /mark all read/i });
+      const markAllReadButton = screen.getByRole("button", {
+        name: /mark all read/i,
+      });
       await user.click(markAllReadButton);
 
       // After marking all as read, unread count should be 0
@@ -203,7 +217,6 @@ describe("NotificationsContent", () => {
 
   describe("Delete", () => {
     it("deletes single notification", async () => {
-      const user = userEvent.setup();
       render(<NotificationsContent {...defaultProps} />);
 
       // Initial count should be 5
@@ -231,7 +244,9 @@ describe("NotificationsContent", () => {
       await waitFor(() => {
         // All notifications should be deleted
         expect(screen.queryByText("Booking Approved")).not.toBeInTheDocument();
-        expect(screen.queryByText("Verification Photos Uploaded")).not.toBeInTheDocument();
+        expect(
+          screen.queryByText("Verification Photos Uploaded")
+        ).not.toBeInTheDocument();
       });
     });
 
@@ -249,7 +264,9 @@ describe("NotificationsContent", () => {
 
       // Notifications should still be present
       expect(screen.getByText("Booking Approved")).toBeInTheDocument();
-      expect(screen.getByText("Verification Photos Uploaded")).toBeInTheDocument();
+      expect(
+        screen.getByText("Verification Photos Uploaded")
+      ).toBeInTheDocument();
     });
   });
 
@@ -264,13 +281,17 @@ describe("NotificationsContent", () => {
     it("shows empty state when filter results in no notifications", async () => {
       const user = userEvent.setup();
       // All notifications are read
-      const allReadNotifications: TNotification[] = mockNotifications.map((n) => ({
-        ...n,
-        isRead: true,
-        readAt: new Date().toISOString(),
-      }));
+      const allReadNotifications: TNotification[] = mockNotifications.map(
+        (n) => ({
+          ...n,
+          isRead: true,
+          readAt: new Date().toISOString(),
+        })
+      );
 
-      render(<NotificationsContent initialNotifications={allReadNotifications} />);
+      render(
+        <NotificationsContent initialNotifications={allReadNotifications} />
+      );
 
       // Filter to unread
       const unreadTab = screen.getByRole("tab", { name: /unread/i });
@@ -301,26 +322,36 @@ describe("NotificationsContent", () => {
     it("shows mark all read button when hasUnread is true", () => {
       render(<NotificationsContent {...defaultProps} />);
 
-      expect(screen.getByRole("button", { name: /mark all read/i })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: /mark all read/i })
+      ).toBeInTheDocument();
     });
 
     it("hides mark all read button when hasUnread is false", () => {
-      const allReadNotifications: TNotification[] = mockNotifications.map((n) => ({
-        ...n,
-        isRead: true,
-        readAt: new Date().toISOString(),
-      }));
+      const allReadNotifications: TNotification[] = mockNotifications.map(
+        (n) => ({
+          ...n,
+          isRead: true,
+          readAt: new Date().toISOString(),
+        })
+      );
 
-      render(<NotificationsContent initialNotifications={allReadNotifications} />);
+      render(
+        <NotificationsContent initialNotifications={allReadNotifications} />
+      );
 
-      expect(screen.queryByRole("button", { name: /mark all read/i })).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: /mark all read/i })
+      ).not.toBeInTheDocument();
     });
 
     it("passes onMarkAllRead handler to NotificationsHeader", async () => {
       const user = userEvent.setup();
       render(<NotificationsContent {...defaultProps} />);
 
-      const markAllReadButton = screen.getByRole("button", { name: /mark all read/i });
+      const markAllReadButton = screen.getByRole("button", {
+        name: /mark all read/i,
+      });
       await user.click(markAllReadButton);
 
       // Should mark all as read
@@ -409,14 +440,18 @@ describe("NotificationsContent", () => {
       render(<NotificationsContent {...defaultProps} />);
 
       expect(screen.getByText("Booking Approved")).toBeInTheDocument();
-      expect(screen.getByText("Verification Photos Uploaded")).toBeInTheDocument();
+      expect(
+        screen.getByText("Verification Photos Uploaded")
+      ).toBeInTheDocument();
     });
 
     it("updates notifications state when marking as read", async () => {
       const user = userEvent.setup();
       render(<NotificationsContent {...defaultProps} />);
 
-      const markAllReadButton = screen.getByRole("button", { name: /mark all read/i });
+      const markAllReadButton = screen.getByRole("button", {
+        name: /mark all read/i,
+      });
       await user.click(markAllReadButton);
 
       await waitFor(() => {
@@ -451,19 +486,25 @@ describe("NotificationsContent", () => {
     it("handles single notification", () => {
       const singleNotification: TNotification[] = [mockNotifications[0]];
 
-      render(<NotificationsContent initialNotifications={singleNotification} />);
+      render(
+        <NotificationsContent initialNotifications={singleNotification} />
+      );
 
       expect(screen.getByText("Booking Approved")).toBeInTheDocument();
       expect(screen.getByText(/1 notification/)).toBeInTheDocument();
     });
 
     it("handles all notifications with same type", () => {
-      const sameTypeNotifications: TNotification[] = mockNotifications.map((n) => ({
-        ...n,
-        type: NotificationType.BookingApproved,
-      }));
+      const sameTypeNotifications: TNotification[] = mockNotifications.map(
+        (n) => ({
+          ...n,
+          type: NotificationType.BookingApproved,
+        })
+      );
 
-      render(<NotificationsContent initialNotifications={sameTypeNotifications} />);
+      render(
+        <NotificationsContent initialNotifications={sameTypeNotifications} />
+      );
 
       // All should be visible
       expect(screen.getByText("Booking Approved")).toBeInTheDocument();

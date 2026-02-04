@@ -42,7 +42,9 @@ describe("NotificationItem", () => {
       });
       render(<NotificationItem notification={notification} />);
 
-      expect(screen.getByText("Your booking has been approved")).toBeInTheDocument();
+      expect(
+        screen.getByText("Your booking has been approved")
+      ).toBeInTheDocument();
     });
 
     it("renders entity type badge", () => {
@@ -57,7 +59,9 @@ describe("NotificationItem", () => {
       render(<NotificationItem notification={notification} />);
 
       // Should show relative time
-      expect(screen.getByText(/Just now|m ago|h ago|d ago/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Just now|m ago|h ago|d ago/)
+      ).toBeInTheDocument();
     });
   });
 
@@ -66,7 +70,9 @@ describe("NotificationItem", () => {
       const notification = createNotification({
         type: NotificationType.BookingApproved,
       });
-      const { container } = render(<NotificationItem notification={notification} />);
+      const { container } = render(
+        <NotificationItem notification={notification} />
+      );
 
       // CheckCircle2 icon should be present
       const svg = container.querySelector("svg");
@@ -220,7 +226,7 @@ describe("NotificationItem", () => {
 
     it("does not render link for unknown entity type", () => {
       const notification = createNotification({
-        entityType: "Unknown" as string|undefined,
+        entityType: "Unknown" as string | undefined,
         entityId: "unknown-123",
       });
       render(<NotificationItem notification={notification} />);
@@ -268,12 +274,16 @@ describe("NotificationItem", () => {
 
     it("formats time as date for older notifications", () => {
       const notification = createNotification({
-        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(), // 10 days ago
+        createdAt: new Date(
+          Date.now() - 10 * 24 * 60 * 60 * 1000
+        ).toISOString(), // 10 days ago
       });
       render(<NotificationItem notification={notification} />);
 
       // Should show formatted date like "Jan 15"
-      const timeElement = screen.getByText(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/);
+      const timeElement = screen.getByText(
+        /Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/
+      );
       expect(timeElement).toBeInTheDocument();
     });
   });
@@ -281,7 +291,9 @@ describe("NotificationItem", () => {
   describe("Read/Unread States", () => {
     it("applies unread styling when notification is unread", () => {
       const notification = createNotification({ isRead: false });
-      const { container } = render(<NotificationItem notification={notification} />);
+      const { container } = render(
+        <NotificationItem notification={notification} />
+      );
 
       const item = container.querySelector('[class*="border-blue-200"]');
       expect(item).toBeInTheDocument();
@@ -289,7 +301,9 @@ describe("NotificationItem", () => {
 
     it("shows unread indicator dot when notification is unread", () => {
       const notification = createNotification({ isRead: false });
-      const { container } = render(<NotificationItem notification={notification} />);
+      const { container } = render(
+        <NotificationItem notification={notification} />
+      );
 
       const dot = container.querySelector('[class*="bg-blue-600"]');
       expect(dot).toBeInTheDocument();
@@ -297,7 +311,7 @@ describe("NotificationItem", () => {
 
     it("applies bold font to title when notification is unread", () => {
       const notification = createNotification({ isRead: false });
-      const { container } = render(<NotificationItem notification={notification} />);
+      render(<NotificationItem notification={notification} />);
 
       const title = screen.getByText("Test Notification");
       expect(title).toHaveClass("font-semibold");
@@ -305,7 +319,9 @@ describe("NotificationItem", () => {
 
     it("does not apply unread styling when notification is read", () => {
       const notification = createNotification({ isRead: true });
-      const { container } = render(<NotificationItem notification={notification} />);
+      const { container } = render(
+        <NotificationItem notification={notification} />
+      );
 
       const item = container.querySelector('[class*="border-blue-200"]');
       expect(item).not.toBeInTheDocument();
@@ -313,7 +329,9 @@ describe("NotificationItem", () => {
 
     it("does not show unread indicator dot when notification is read", () => {
       const notification = createNotification({ isRead: true });
-      const { container } = render(<NotificationItem notification={notification} />);
+      const { container } = render(
+        <NotificationItem notification={notification} />
+      );
 
       const dot = container.querySelector('[class*="bg-blue-600"]');
       expect(dot).not.toBeInTheDocument();
@@ -331,7 +349,9 @@ describe("NotificationItem", () => {
   describe("Dropdown Menu", () => {
     it("renders dropdown menu trigger button", () => {
       const notification = createNotification();
-      const { container } = render(<NotificationItem notification={notification} />);
+      const { container } = render(
+        <NotificationItem notification={notification} />
+      );
 
       // Dropdown trigger button exists (even if hidden)
       const button = container.querySelector("button");
@@ -343,14 +363,18 @@ describe("NotificationItem", () => {
       const onMarkAsRead = mock();
       const notification = createNotification({ isRead: false });
       const { container } = render(
-        <NotificationItem notification={notification} onMarkAsRead={onMarkAsRead} />
+        <NotificationItem
+          notification={notification}
+          onMarkAsRead={onMarkAsRead}
+        />
       );
 
       // Find the dropdown trigger button (it's hidden but exists)
-      const dropdownButton = container.querySelector("button[aria-haspopup]") || 
-                             Array.from(container.querySelectorAll("button")).find(btn => 
-                               btn.querySelector("svg")
-                             );
+      const dropdownButton =
+        container.querySelector("button[aria-haspopup]") ||
+        Array.from(container.querySelectorAll("button")).find((btn) =>
+          btn.querySelector("svg")
+        );
 
       if (dropdownButton) {
         // Force visibility for testing
@@ -367,13 +391,16 @@ describe("NotificationItem", () => {
     it("does not show mark as read option for read notifications", async () => {
       const user = userEvent.setup();
       const notification = createNotification({ isRead: true });
-      const { container } = render(<NotificationItem notification={notification} />);
+      const { container } = render(
+        <NotificationItem notification={notification} />
+      );
 
       // Try to open dropdown
-      const dropdownButton = container.querySelector("button[aria-haspopup]") || 
-                             Array.from(container.querySelectorAll("button")).find(btn => 
-                               btn.querySelector("svg")
-                             );
+      const dropdownButton =
+        container.querySelector("button[aria-haspopup]") ||
+        Array.from(container.querySelectorAll("button")).find((btn) =>
+          btn.querySelector("svg")
+        );
 
       if (dropdownButton) {
         (dropdownButton as HTMLElement).style.opacity = "1";
@@ -395,10 +422,11 @@ describe("NotificationItem", () => {
       );
 
       // Open dropdown
-      const dropdownButton = container.querySelector("button[aria-haspopup]") || 
-                             Array.from(container.querySelectorAll("button")).find(btn => 
-                               btn.querySelector("svg")
-                             );
+      const dropdownButton =
+        container.querySelector("button[aria-haspopup]") ||
+        Array.from(container.querySelectorAll("button")).find((btn) =>
+          btn.querySelector("svg")
+        );
 
       if (dropdownButton) {
         (dropdownButton as HTMLElement).style.opacity = "1";
@@ -414,13 +442,16 @@ describe("NotificationItem", () => {
     it("does not show delete option when onDelete handler is not provided", async () => {
       const user = userEvent.setup();
       const notification = createNotification();
-      const { container } = render(<NotificationItem notification={notification} />);
+      const { container } = render(
+        <NotificationItem notification={notification} />
+      );
 
       // Try to open dropdown
-      const dropdownButton = container.querySelector("button[aria-haspopup]") || 
-                             Array.from(container.querySelectorAll("button")).find(btn => 
-                               btn.querySelector("svg")
-                             );
+      const dropdownButton =
+        container.querySelector("button[aria-haspopup]") ||
+        Array.from(container.querySelectorAll("button")).find((btn) =>
+          btn.querySelector("svg")
+        );
 
       if (dropdownButton) {
         (dropdownButton as HTMLElement).style.opacity = "1";
@@ -447,10 +478,11 @@ describe("NotificationItem", () => {
       );
 
       // Open dropdown
-      const dropdownButton = container.querySelector("button[aria-haspopup]") || 
-                             Array.from(container.querySelectorAll("button")).find(btn => 
-                               btn.querySelector("svg")
-                             );
+      const dropdownButton =
+        container.querySelector("button[aria-haspopup]") ||
+        Array.from(container.querySelectorAll("button")).find((btn) =>
+          btn.querySelector("svg")
+        );
 
       if (dropdownButton) {
         (dropdownButton as HTMLElement).style.opacity = "1";
@@ -486,10 +518,11 @@ describe("NotificationItem", () => {
       );
 
       // Open dropdown
-      const dropdownButton = container.querySelector("button[aria-haspopup]") || 
-                             Array.from(container.querySelectorAll("button")).find(btn => 
-                               btn.querySelector("svg")
-                             );
+      const dropdownButton =
+        container.querySelector("button[aria-haspopup]") ||
+        Array.from(container.querySelectorAll("button")).find((btn) =>
+          btn.querySelector("svg")
+        );
 
       if (dropdownButton) {
         (dropdownButton as HTMLElement).style.opacity = "1";
@@ -571,7 +604,9 @@ describe("NotificationItem", () => {
 
       // Title should be in a paragraph element
       expect(screen.getByText("Test Notification")).toBeInTheDocument();
-      expect(screen.getByText("This is a test notification body")).toBeInTheDocument();
+      expect(
+        screen.getByText("This is a test notification body")
+      ).toBeInTheDocument();
     });
   });
 
@@ -597,7 +632,9 @@ describe("NotificationItem", () => {
       render(<NotificationItem notification={notification} />);
 
       // Should show formatted date
-      expect(screen.getByText(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/)
+      ).toBeInTheDocument();
     });
 
     it("handles notification with future date", () => {

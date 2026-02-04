@@ -24,7 +24,7 @@ export default async function Page() {
   return (
     <SettingsSection
       value="notifications"
-      icon={IconBell}
+      icon={<IconBell className="text-muted-foreground size-5" />}
       title="Notification Preferences"
       description="Email, push, and in-app notifications"
     >

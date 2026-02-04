@@ -57,8 +57,8 @@ The sidebar navigation is defined in `navigation-bar.data.ts`:
 | Spendings | ❌ Not Started | —              | Route not implemented                      |
 | Analytics | ❌ Not Started | —              | Route not implemented                      |
 | Messages  | ⚠️ Partial    | GraphQL        | Basic conversation list, needs detail view |
-| Profile   | ❌ Not Started | —              | Under construction placeholder             |
-| Settings  | ⚠️ Partial    | GraphQL        | Basic structure, needs mutations           |
+| Profile   | ✅ Functional  | GraphQL        | Real campaign data, mock removed           |
+| Settings  | ✅ Functional  | GraphQL        | Notifications, delete enabled              |
 
 ---
 
@@ -464,25 +464,37 @@ mutation SendMessage($input: SendMessageInput!) {
 
 **Core Components:**
 
-- [ ] Profile card (avatar, name, company)
-- [ ] About section (company info)
-- [ ] Real GraphQL query (`me`)
-- [ ] Loading skeleton
+- [x] Profile card (avatar, name, company)
+- [x] About section (company info)
+- [x] Real GraphQL query (`me`) with fragment reader pattern
+- [x] Loading skeleton
 
 **Profile Card:**
 
-- [ ] Avatar with fallback
-- [ ] Name display
-- [ ] Company name
-- [ ] Industry
-- [ ] Member since
+- [x] Avatar with fallback
+- [x] Name display
+- [x] Total campaigns count
+- [x] Total spend
+- [x] Years advertising
 
 **About Section:**
 
-- [ ] Company name
-- [ ] Industry
-- [ ] Website link
-- [ ] Campaign count
+- [x] Company name
+- [x] Industry
+- [x] Website link
+- [x] Verification status
+- [x] Completed campaigns count
+
+**Campaigns Section:**
+
+- [x] Recent campaigns with pagination (3 per page)
+- [x] Status badges with campaign details
+- [x] Real campaign data from API
+
+**Additional Features:**
+
+- [ ] Response rate metric (blocked: needs `responseRate` field on `AdvertiserProfile`)
+- [ ] Response time metric (blocked: needs `averageResponseTime` field on `AdvertiserProfile`)
 
 ---
 
@@ -497,9 +509,9 @@ mutation SendMessage($input: SendMessageInput!) {
 - [x] Name field
 - [x] Email field (read-only)
 - [x] Phone field
-- [ ] Avatar upload
-- [ ] Save changes button
-- [ ] `updateCurrentUser` mutation
+- [x] Avatar upload (Cloudinary signed upload)
+- [x] Save changes button
+- [x] `updateCurrentUser` mutation
 
 **Company Tab:**
 
@@ -518,10 +530,18 @@ mutation SendMessage($input: SendMessageInput!) {
 
 **Notifications Tab:**
 
-- [ ] Notification type toggles
-- [ ] In-app, Email, Push columns
-- [ ] Save preferences
-- [ ] `updateNotificationPreference` mutation
+- [x] Notification type toggles
+- [x] In-app, Email, Push columns
+- [x] Individual toggle saves via `updateNotificationPreference` mutation
+- [x] Optimistic UI updates with `useOptimistic`
+
+**Account Tab:**
+
+- [x] Account info display (created date, last login, profile type)
+- [x] Delete account with confirmation dialog (password-verified deletion via `deleteMyAccount`)
+- [x] `deleteMyAccount` mutation
+- [x] Change password
+- [x] Avatar upload
 
 **Notification Types for Advertisers:**
 
@@ -559,7 +579,7 @@ mutation SendMessage($input: SendMessageInput!) {
 | `unreadConversationsCount`   | Int                              | Unread message count                | ❌           |
 | `myNotifications`            | MyNotificationsConnection        | User notifications                  | ❌           |
 | `unreadNotificationsCount`   | Int                              | Unread notification count           | ❌           |
-| `myNotificationPreferences`  | [NotificationPreference]         | Notification settings               | ❌           |
+| `myNotificationPreferences`  | [NotificationPreference]         | Notification settings               | ✅           |
 | `paymentsByBooking(id)`      | PaymentsByBookingConnection      | Payments for a booking              | ❌           |
 | `transactionsByBooking(id)`  | TransactionsByBookingConnection  | Financial transactions              | ❌           |
 
@@ -577,12 +597,12 @@ mutation SendMessage($input: SendMessageInput!) {
 | `createPaymentIntent`          | Start payment                  | ❌           |
 | `confirmPayment`               | Complete payment               | ❌           |
 | `requestRefund`                | Request refund                 | ❌           |
-| `updateAdvertiserProfile`      | Update company info            | ❌           |
-| `updateCurrentUser`            | Update profile info            | ❌           |
+| `updateAdvertiserProfile`      | Update company info            | ✅           |
+| `updateCurrentUser`            | Update profile info            | ✅           |
 | `sendMessage`                  | Send message                   | ❌           |
 | `markConversationRead`         | Mark thread as read            | ❌           |
 | `createBookingConversation`    | Start conversation for booking | ❌           |
-| `updateNotificationPreference` | Toggle notification            | ❌           |
+| `updateNotificationPreference` | Toggle notification            | ✅           |
 | `markNotificationRead`         | Mark notification as read      | ❌           |
 | `markAllNotificationsRead`     | Mark all as read               | ❌           |
 | `deleteNotification`           | Delete a notification          | ❌           |

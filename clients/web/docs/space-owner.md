@@ -55,8 +55,8 @@ The sidebar navigation is defined in `navigation-bar.data.ts`:
 | Analytics | ⚠️ Partial    | Mock JSON      | Needs GraphQL implementation             |
 | Calendar  | ⚠️ Partial    | Mock JSON      | Month/week/day views, needs GraphQL      |
 | Messages  | ❌ Not Started | —              | Minimal stub component                   |
-| Profile   | ✅ Functional  | GraphQL        | Fully integrated                         |
-| Settings  | ✅ Functional  | GraphQL        | Profile, business, notifications tabs    |
+| Profile   | ✅ Functional  | GraphQL        | Real reviews from API, mock removed      |
+| Settings  | ✅ Functional  | GraphQL        | Notifications, Stripe, delete enabled    |
 
 ---
 
@@ -322,8 +322,8 @@ query OverviewData {
 
 | Mutation                     | Status | Purpose                 |
 |------------------------------|--------|-------------------------|
-| `connectStripeAccount`       | ❌      | Start Stripe onboarding |
-| `refreshStripeAccountStatus` | ❌      | Update account health   |
+| `connectStripeAccount`       | ✅      | Start Stripe onboarding |
+| `refreshStripeAccountStatus` | ✅      | Update account health   |
 | `retryPayout`                | ❌      | Retry failed payout     |
 
 ---
@@ -572,13 +572,14 @@ subscription OnMessage($conversationId: ID!) {
 - [x] Paginated reviews (3 per page)
 - [x] Review cards with rating, comment, date
 - [x] Navigation arrows
+- [x] Real reviews from API (via `spaceOwnerProfile.reviews`)
 
 **Additional Features:**
 
 - [ ] Edit profile link to settings
 - [ ] Share profile button
-- [ ] Response rate metric
-- [ ] Response time metric
+- [ ] Response rate metric (blocked: needs `responseRate` field on `SpaceOwnerProfile`)
+- [ ] Response time metric (blocked: needs `averageResponseTime` field on `SpaceOwnerProfile`)
 - [ ] Featured spaces showcase
 - [ ] Advertiser testimonials
 
@@ -596,9 +597,9 @@ subscription OnMessage($conversationId: ID!) {
 - [x] Email field (read-only)
 - [x] Phone field
 - [x] Avatar display
-- [ ] Avatar upload
-- [ ] Save changes button
-- [ ] `updateCurrentUser` mutation
+- [x] Avatar upload (Cloudinary signed upload)
+- [x] Save changes button
+- [x] `updateCurrentUser` mutation
 
 **Business Tab:**
 
@@ -611,19 +612,21 @@ subscription OnMessage($conversationId: ID!) {
 **Payout Tab:**
 
 - [x] Stripe Connect status display
-- [ ] Bank account info (masked)
-- [ ] Connect/Reconnect Stripe button
-- [ ] Disconnect Stripe button
-- [ ] View Stripe Dashboard link
-- [ ] `connectStripeAccount` mutation
-- [ ] `refreshStripeAccountStatus` mutation
+- [x] Bank account info (masked)
+- [x] Connect Stripe button → redirects to Stripe onboarding
+- [x] View Stripe Dashboard link
+- [x] Refresh Status button
+- [x] `connectStripeAccount` mutation
+- [x] `refreshStripeAccountStatus` mutation
+- [ ] Disconnect Stripe button (managed via Stripe dashboard)
+- [ ] Update Bank Account button (managed via Stripe dashboard)
 
 **Notifications Tab:**
 
 - [x] Notification type toggles
 - [x] In-app, Email, Push columns
-- [ ] Save preferences
-- [ ] `updateNotificationPreference` mutation
+- [x] Individual toggle saves via `updateNotificationPreference` mutation
+- [x] Optimistic UI updates with `useOptimistic`
 
 **Notification Types for Space Owners:**
 
@@ -645,9 +648,16 @@ subscription OnMessage($conversationId: ID!) {
 | SPACE_REJECTED    | Space listing rejected       |
 | SPACE_SUSPENDED   | Space listing suspended      |
 
+**Account Tab:**
+
+- [x] Account info display (created date, last login, profile type)
+- [x] Delete account with confirmation dialog (password-verified deletion via `deleteMyAccount`)
+- [x] `deleteMyAccount` mutation
+- [x] Change password
+- [x] Avatar upload
+
 **Additional Features:**
 
-- [ ] Account deletion with confirmation
 - [ ] Data export (GDPR compliance)
 - [ ] Two-factor authentication
 - [ ] Login history
@@ -676,7 +686,7 @@ subscription OnMessage($conversationId: ID!) {
 | `unreadConversationsCount`   | Int                               | Unread message count                | ❌           |
 | `myNotifications`            | MyNotificationsConnection         | User notifications                  | ❌           |
 | `unreadNotificationsCount`   | Int                               | Unread notification count           | ❌           |
-| `myNotificationPreferences`  | [NotificationPreference]          | Notification settings               | ❌           |
+| `myNotificationPreferences`  | [NotificationPreference]          | Notification settings               | ✅           |
 | `reviewsBySpace(spaceId)`    | ReviewsBySpaceConnection          | Reviews for a space                 | ✅           |
 | `transactionsByBooking(id)`  | TransactionsByBookingConnection   | Financial transactions              | ❌           |
 
@@ -694,15 +704,15 @@ subscription OnMessage($conversationId: ID!) {
 | `cancelBooking`                | Cancel booking                 | ❌           |
 | `markFileDownloaded`           | Record creative download       | ❌           |
 | `markInstalled`                | Mark installation complete     | ❌           |
-| `updateSpaceOwnerProfile`      | Update business info           | ❌           |
-| `updateCurrentUser`            | Update profile info            | ❌           |
-| `connectStripeAccount`         | Start Stripe onboarding        | ❌           |
-| `refreshStripeAccountStatus`   | Update Stripe status           | ❌           |
+| `updateSpaceOwnerProfile`      | Update business info           | ✅           |
+| `updateCurrentUser`            | Update profile info            | ✅           |
+| `connectStripeAccount`         | Start Stripe onboarding        | ✅           |
+| `refreshStripeAccountStatus`   | Update Stripe status           | ✅           |
 | `retryPayout`                  | Retry failed payout            | ❌           |
 | `sendMessage`                  | Send message                   | ❌           |
 | `markConversationRead`         | Mark thread as read            | ❌           |
 | `createBookingConversation`    | Start conversation for booking | ❌           |
-| `updateNotificationPreference` | Toggle notification            | ❌           |
+| `updateNotificationPreference` | Toggle notification            | ✅           |
 | `markNotificationRead`         | Mark notification as read      | ❌           |
 | `markAllNotificationsRead`     | Mark all as read               | ❌           |
 | `deleteNotification`           | Delete a notification          | ❌           |

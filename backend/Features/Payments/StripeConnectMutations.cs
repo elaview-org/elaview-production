@@ -27,4 +27,14 @@ public static partial class StripeConnectMutations {
         IStripeConnectService stripeConnectService,
         CancellationToken ct
     ) => new(await stripeConnectService.RefreshAccountStatusAsync(userService.GetPrincipalId(), ct));
+
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ValidationException>]
+    [Error<PaymentException>]
+    public static async Task<DisconnectStripeAccountPayload> DisconnectStripeAccount(
+        IUserService userService,
+        IStripeConnectService stripeConnectService,
+        CancellationToken ct
+    ) => new(await stripeConnectService.DisconnectAccountAsync(userService.GetPrincipalId(), ct));
 }

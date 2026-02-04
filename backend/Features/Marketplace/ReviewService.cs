@@ -5,6 +5,7 @@ namespace ElaviewBackend.Features.Marketplace;
 
 public interface IReviewService {
     IQueryable<Review> GetBySpaceId(Guid spaceId);
+    IQueryable<Review> GetByOwnerProfileId(Guid ownerProfileId);
     IQueryable<Review> GetByBookingIdAndType(Guid bookingId, ReviewerType reviewerType);
     IQueryable<Review> GetByUserId(Guid userId);
     Task<Review?> GetByIdAsync(Guid id, CancellationToken ct);
@@ -18,6 +19,9 @@ public interface IReviewService {
 public sealed class ReviewService(IReviewRepository repository) : IReviewService {
     public IQueryable<Review> GetBySpaceId(Guid spaceId)
         => repository.GetBySpaceId(spaceId);
+
+    public IQueryable<Review> GetByOwnerProfileId(Guid ownerProfileId)
+        => repository.GetByOwnerProfileId(ownerProfileId);
 
     public IQueryable<Review> GetByBookingIdAndType(Guid bookingId, ReviewerType reviewerType)
         => repository.GetByBookingIdAndType(bookingId, reviewerType);

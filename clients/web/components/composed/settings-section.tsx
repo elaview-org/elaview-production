@@ -9,7 +9,7 @@ import {
 
 type Props = {
   value: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ReactNode;
   title: string;
   description: string;
   children: ReactNode;
@@ -17,7 +17,7 @@ type Props = {
 
 export default function SettingsSection({
   value,
-  icon: Icon,
+  icon,
   title,
   description,
   children,
@@ -26,7 +26,7 @@ export default function SettingsSection({
     <AccordionItem value={value} className="rounded-lg border px-6">
       <AccordionTrigger className="text-base">
         <div className="flex items-center gap-3">
-          <Icon className="text-muted-foreground size-5" />
+          {icon}
           <div className="flex flex-col items-start gap-0.5">
             <span>{title}</span>
             <span className="text-muted-foreground text-sm font-normal">

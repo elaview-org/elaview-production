@@ -599,6 +599,12 @@ Features referenced in frontend specs that have no backend implementation:
 | Campaign performance metrics | Views, reach, completion rate                  |
 | Export functionality          | CSV/PDF export for bookings and spending       |
 
+### Available Infrastructure
+
+| Feature | Endpoint | Description |
+|---------|----------|-------------|
+| Cloudinary signed upload | `POST /api/storage/upload-signature` | Generate upload signatures for campaign images and avatars. Use folder `"campaigns"` for campaign creatives, `"avatars"` for user avatars. See `Features/Storage/StorageController.cs`. |
+
 ---
 
 **Last Updated**: 2026-02-03

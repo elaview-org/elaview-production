@@ -3,6 +3,7 @@ import { ApolloWrapper } from "@/lib/gql/client";
 
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/primitives/sonner";
 import storage from "@/lib/storage";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function RootLayout(props: LayoutProps<"/">) {
           storageKey={storage.preferences.theme}
         >
           <ApolloWrapper>{props.children}</ApolloWrapper>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

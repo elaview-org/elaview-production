@@ -3,7 +3,6 @@ import ProfileCardBase from "@/components/composed/profile-card";
 import { formatCurrency } from "@/lib/utils";
 import { graphql, ProfileType } from "@/types/gql";
 import api from "../api";
-import mockData from "../@activity/mock.json";
 
 const Info_UserFragment = graphql(`
   fragment Info_UserFragment on User {
@@ -15,16 +14,22 @@ const Info_UserFragment = graphql(`
       spaces(first: 10) {
         nodes {
           averageRating
-          reviews(first: 10) {
-            nodes {
-              id
-            }
-          }
+        }
+      }
+      reviews(first: 10, order: [{ createdAt: DESC }]) {
+        nodes {
+          id
         }
       }
     }
     advertiserProfile {
       createdAt
+      totalSpend
+      campaigns(first: 10, order: [{ createdAt: DESC }]) {
+        nodes {
+          id
+        }
+      }
     }
   }
 `);
@@ -43,10 +48,7 @@ export default async function Page() {
           (365.25 * 24 * 60 * 60 * 1000)
       )
     );
-    const totalReviews = spaces.reduce(
-      (sum, s) => sum + (s?.reviews?.nodes?.length ?? 0),
-      0
-    );
+    const totalReviews = profile.reviews?.nodes?.length ?? 0;
     const spaceRatings = spaces
       .map((s) => s?.averageRating)
       .filter((r): r is number => r != null);
@@ -94,9 +96,8 @@ export default async function Page() {
         (365.25 * 24 * 60 * 60 * 1000)
     )
   );
-  const campaigns = mockData.campaigns;
-  const totalCampaigns = campaigns.length;
-  const totalSpend = campaigns.reduce((sum, c) => sum + c.totalSpend, 0);
+  const totalCampaigns = profile.campaigns?.nodes?.length ?? 0;
+  const totalSpend = Number(profile.totalSpend ?? 0);
 
   return (
     <ProfileCardBase

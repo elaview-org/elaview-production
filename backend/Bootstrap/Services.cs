@@ -1,3 +1,4 @@
+using CloudinaryDotNet;
 using ElaviewBackend.Data;
 using ElaviewBackend.Data.Seeding;
 using ElaviewBackend.Data.Seeding.Seeders;
@@ -63,6 +64,16 @@ public static class Services {
             .AddScoped<ISeeder, AdminSeeder>()
             .AddScoped<ISeeder, LegacyDevAccountsSeeder>()
             .AddScoped<ISeeder, DevelopmentDataSeeder>()
+            .AddSingleton(sp => {
+                var settings = sp
+                    .GetRequiredService<IOptions<GlobalSettings>>()
+                    .Value.Cloudinary;
+                var account = new Account(
+                    settings.CloudName,
+                    settings.ApiKey,
+                    settings.ApiSecret);
+                return new Cloudinary(account);
+            })
             .AddControllers();
 
         var envVars = Environment.GetEnvironmentVariables();

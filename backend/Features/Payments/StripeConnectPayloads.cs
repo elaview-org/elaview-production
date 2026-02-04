@@ -8,3 +8,5 @@ public record ConnectStripeAccountPayload(
 );
 
 public record RefreshStripeAccountStatusPayload(SpaceOwnerProfile Profile);
+
+public record DisconnectStripeAccountPayload(SpaceOwnerProfile Profile);

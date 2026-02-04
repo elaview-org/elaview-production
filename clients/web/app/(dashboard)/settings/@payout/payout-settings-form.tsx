@@ -1,5 +1,6 @@
 "use client";
 
+import { useTransition } from "react";
 import { Button } from "@/components/primitives/button";
 import {
   Field,
@@ -14,7 +15,14 @@ import {
   IconCheck,
   IconExternalLink,
   IconAlertCircle,
+  IconRefresh,
 } from "@tabler/icons-react";
+import { toast } from "sonner";
+import {
+  connectStripeAction,
+  disconnectStripeAction,
+  refreshStripeStatusAction,
+} from "../settings.actions";
 
 type Props = {
   stripeAccountId?: string | null;
@@ -25,7 +33,51 @@ export default function PayoutSettingsForm({
   stripeAccountId,
   stripeAccountStatus,
 }: Props) {
+  const [connectPending, startConnectTransition] = useTransition();
+  const [refreshPending, startRefreshTransition] = useTransition();
+  const [disconnectPending, startDisconnectTransition] = useTransition();
   const isConnected = !!stripeAccountId;
+
+  function handleConnect() {
+    startConnectTransition(async () => {
+      try {
+        const result = await connectStripeAction();
+        if (result.error) {
+          toast.error(result.error);
+          return;
+        }
+        if (result.onboardingUrl) {
+          window.location.href = result.onboardingUrl;
+          return;
+        }
+        toast.error("Failed to connect Stripe account");
+      } catch {
+        toast.error("Failed to connect Stripe account. Please try again.");
+      }
+    });
+  }
+
+  function handleDisconnect() {
+    startDisconnectTransition(async () => {
+      const result = await disconnectStripeAction();
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Stripe account disconnected");
+    });
+  }
+
+  function handleRefreshStatus() {
+    startRefreshTransition(async () => {
+      const result = await refreshStripeStatusAction();
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      toast.success("Stripe account status refreshed");
+    });
+  }
 
   const getStatusBadge = () => {
     if (!isConnected) {
@@ -80,13 +132,18 @@ export default function PayoutSettingsForm({
 
         {!isConnected && (
           <Field>
-            <Button type="button" className="gap-2" disabled>
+            <Button
+              type="button"
+              className="gap-2"
+              onClick={handleConnect}
+              disabled={connectPending}
+            >
               <IconBrandStripe className="size-4" />
-              Connect Stripe Account
+              {connectPending ? "Connecting..." : "Connect Stripe Account"}
             </Button>
             <FieldDescription>
-              Stripe Connect integration coming soon. You&apos;ll be able to
-              receive payouts directly to your bank account.
+              You&apos;ll be redirected to Stripe to complete onboarding and
+              start receiving payouts.
             </FieldDescription>
           </Field>
         )}
@@ -130,20 +187,41 @@ export default function PayoutSettingsForm({
                   type="button"
                   variant="outline"
                   className="gap-2"
-                  disabled
+                  asChild
                 >
-                  <IconExternalLink className="size-4" />
-                  View Stripe Dashboard
+                  <a
+                    href="https://dashboard.stripe.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <IconExternalLink className="size-4" />
+                    View Stripe Dashboard
+                  </a>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="gap-2"
+                  onClick={handleRefreshStatus}
+                  disabled={refreshPending}
+                >
+                  <IconRefresh className="size-4" />
+                  {refreshPending ? "Refreshing..." : "Refresh Status"}
                 </Button>
                 <Button type="button" variant="outline" disabled>
                   Update Bank Account
                 </Button>
-                <Button type="button" variant="ghost" disabled>
-                  Disconnect
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={handleDisconnect}
+                  disabled={disconnectPending}
+                >
+                  {disconnectPending ? "Disconnecting..." : "Disconnect"}
                 </Button>
               </div>
               <FieldDescription>
-                Stripe dashboard and account management coming soon.
+                Bank account updates are managed through the Stripe dashboard.
               </FieldDescription>
             </Field>
           </>

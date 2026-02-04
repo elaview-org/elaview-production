@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { Button } from "@/components/primitives/button";
 import {
   Field,
@@ -9,16 +10,27 @@ import {
 } from "@/components/primitives/field";
 import { Input } from "@/components/primitives/input";
 import { Separator } from "@/components/primitives/separator";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/primitives/dialog";
+import { toast } from "sonner";
+import { deleteAccountAction, changePasswordAction } from "../settings.actions";
 
 type Props = {
-  createdAt?: unknown;
-  lastLoginAt?: unknown;
+  createdAt?: string;
+  lastLoginAt?: string | null;
   activeProfileType?: string | null;
 };
 
-function formatDate(dateString: unknown) {
+function formatAccountDate(dateString: string | null | undefined) {
   if (!dateString) return "Never";
-  return new Date(dateString as string).toLocaleDateString("en-US", {
+  return new Date(dateString).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -32,6 +44,50 @@ export default function AccountSettingsForm({
   lastLoginAt,
   activeProfileType,
 }: Props) {
+  const [deletePassword, setDeletePassword] = useState("");
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [deletePending, startDeleteTransition] = useTransition();
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordPending, startPasswordTransition] = useTransition();
+
+  function handleDelete() {
+    startDeleteTransition(async () => {
+      const result = await deleteAccountAction(deletePassword);
+      if (result.error) {
+        toast.error(result.error);
+        setDialogOpen(false);
+        setDeletePassword("");
+      }
+    });
+  }
+
+  function handleChangePassword() {
+    if (newPassword !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast.error("Password must be at least 8 characters");
+      return;
+    }
+
+    startPasswordTransition(async () => {
+      const result = await changePasswordAction(currentPassword, newPassword);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Password changed successfully");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
+    });
+  }
+
   return (
     <div className="space-y-6">
       <FieldGroup>
@@ -43,14 +99,14 @@ export default function AccountSettingsForm({
                 Account Created
               </span>
               <span className="text-sm font-medium">
-                {formatDate(createdAt)}
+                {formatAccountDate(createdAt)}
               </span>
             </div>
             <Separator />
             <div className="flex justify-between">
               <span className="text-muted-foreground text-sm">Last Login</span>
               <span className="text-sm font-medium">
-                {formatDate(lastLoginAt)}
+                {formatAccountDate(lastLoginAt)}
               </span>
             </div>
             <Separator />
@@ -80,7 +136,9 @@ export default function AccountSettingsForm({
                 name="currentPassword"
                 type="password"
                 placeholder="Enter current password"
-                disabled
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                disabled={passwordPending}
               />
             </Field>
             <Field>
@@ -90,7 +148,9 @@ export default function AccountSettingsForm({
                 name="newPassword"
                 type="password"
                 placeholder="Enter new password"
-                disabled
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                disabled={passwordPending}
               />
             </Field>
             <Field>
@@ -102,15 +162,24 @@ export default function AccountSettingsForm({
                 name="confirmPassword"
                 type="password"
                 placeholder="Confirm new password"
-                disabled
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={passwordPending}
               />
             </Field>
-            <Button type="button" variant="outline" disabled>
-              Change Password
+            <Button
+              type="button"
+              variant="outline"
+              disabled={
+                passwordPending ||
+                !currentPassword ||
+                !newPassword ||
+                !confirmPassword
+              }
+              onClick={handleChangePassword}
+            >
+              {passwordPending ? "Changing..." : "Change Password"}
             </Button>
-            <FieldDescription>
-              Password change functionality coming soon.
-            </FieldDescription>
           </div>
         </Field>
 
@@ -130,14 +199,51 @@ export default function AccountSettingsForm({
                     Permanently delete your account and all associated data.
                   </p>
                 </div>
-                <Button type="button" variant="destructive" disabled>
-                  Delete Account
-                </Button>
+                <Dialog
+                  open={dialogOpen}
+                  onOpenChange={(open) => {
+                    setDialogOpen(open);
+                    if (!open) setDeletePassword("");
+                  }}
+                >
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="destructive">
+                      Delete Account
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent size="sm">
+                    <DialogHeader>
+                      <DialogTitle>Delete Account</DialogTitle>
+                      <DialogDescription>
+                        This action is permanent and cannot be undone. Enter
+                        your password to verify your identity.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-2">
+                      <p className="text-sm">Enter your password to confirm:</p>
+                      <Input
+                        type="password"
+                        value={deletePassword}
+                        onChange={(e) => setDeletePassword(e.target.value)}
+                        placeholder="Password"
+                        autoComplete="off"
+                      />
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        variant="destructive"
+                        disabled={!deletePassword || deletePending}
+                        onClick={handleDelete}
+                      >
+                        {deletePending
+                          ? "Deleting..."
+                          : "Permanently Delete Account"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
-            <FieldDescription>
-              Account deletion coming soon. Contact support if needed.
-            </FieldDescription>
           </div>
         </Field>
       </FieldGroup>

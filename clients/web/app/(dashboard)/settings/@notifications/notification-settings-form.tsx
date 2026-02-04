@@ -1,13 +1,11 @@
 "use client";
 
+import { useOptimistic, useTransition } from "react";
 import { Checkbox } from "@/components/primitives/checkbox";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-} from "@/components/primitives/field";
-import { Button } from "@/components/primitives/button";
+import { FieldGroup } from "@/components/primitives/field";
 import { NotificationType } from "@/types/gql/graphql";
+import { updateNotificationPreferenceAction } from "../settings.actions";
+import { cn } from "@/lib/utils";
 
 type NotificationPreference = {
   id: string;
@@ -16,6 +14,8 @@ type NotificationPreference = {
   emailEnabled: boolean;
   pushEnabled: boolean;
 };
+
+type Channel = "inAppEnabled" | "emailEnabled" | "pushEnabled";
 
 type Props = {
   preferences: readonly NotificationPreference[];
@@ -28,8 +28,26 @@ export default function NotificationSettingsForm({
   notificationTypes,
   notificationLabels,
 }: Props) {
+  const [pending, startTransition] = useTransition();
+  const [optimisticPrefs, updateOptimisticPrefs] = useOptimistic(preferences);
+
   const getPreference = (type: NotificationType) =>
-    preferences.find((p) => p.notificationType === type);
+    optimisticPrefs.find((p) => p.notificationType === type);
+
+  function handleToggle(
+    type: NotificationType,
+    channel: Channel,
+    enabled: boolean
+  ) {
+    startTransition(async () => {
+      updateOptimisticPrefs((prev) =>
+        prev.map((p) =>
+          p.notificationType === type ? { ...p, [channel]: enabled } : p
+        )
+      );
+      await updateNotificationPreferenceAction(type, channel, enabled);
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -58,24 +76,36 @@ export default function NotificationSettingsForm({
                 const label = notificationLabels[type] ?? type;
 
                 return (
-                  <tr key={type} className="border-b last:border-0">
+                  <tr
+                    key={type}
+                    className={cn(
+                      "border-b last:border-0",
+                      pending && "opacity-60"
+                    )}
+                  >
                     <td className="py-3 text-sm">{label}</td>
                     <td className="py-3 text-center">
                       <Checkbox
-                        defaultChecked={pref?.inAppEnabled ?? true}
-                        disabled
+                        checked={pref?.inAppEnabled ?? true}
+                        onCheckedChange={(checked) =>
+                          handleToggle(type, "inAppEnabled", !!checked)
+                        }
                       />
                     </td>
                     <td className="py-3 text-center">
                       <Checkbox
-                        defaultChecked={pref?.emailEnabled ?? true}
-                        disabled
+                        checked={pref?.emailEnabled ?? true}
+                        onCheckedChange={(checked) =>
+                          handleToggle(type, "emailEnabled", !!checked)
+                        }
                       />
                     </td>
                     <td className="py-3 text-center">
                       <Checkbox
-                        defaultChecked={pref?.pushEnabled ?? false}
-                        disabled
+                        checked={pref?.pushEnabled ?? false}
+                        onCheckedChange={(checked) =>
+                          handleToggle(type, "pushEnabled", !!checked)
+                        }
                       />
                     </td>
                   </tr>
@@ -84,15 +114,6 @@ export default function NotificationSettingsForm({
             </tbody>
           </table>
         </div>
-
-        <Field>
-          <Button type="button" disabled>
-            Save Preferences
-          </Button>
-          <FieldDescription>
-            Notification preferences management coming soon.
-          </FieldDescription>
-        </Field>
       </FieldGroup>
     </div>
   );

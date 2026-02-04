@@ -6,6 +6,7 @@ import { logout } from "@/lib/auth.actions";
 import {
   graphql,
   PayoutSchedule,
+  type NotificationType,
   type UpdateCurrentUserInput,
   type UpdateSpaceOwnerProfileInput,
   type UpdateAdvertiserProfileInput,
@@ -264,6 +265,301 @@ export async function updateAdvertiserBusinessAction(
       success: false,
       message: error instanceof Error ? error.message : "An error occurred",
       data: { companyName, industry, website },
+    };
+  }
+}
+
+export async function updateNotificationPreferenceAction(
+  notificationType: NotificationType,
+  channel: "inAppEnabled" | "emailEnabled" | "pushEnabled",
+  enabled: boolean
+): Promise<{ success: boolean; message: string }> {
+  try {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation UpdateNotificationPreference(
+          $input: UpdateNotificationPreferenceInput!
+        ) {
+          updateNotificationPreference(input: $input) {
+            preference {
+              id
+              notificationType
+              inAppEnabled
+              emailEnabled
+              pushEnabled
+            }
+          }
+        }
+      `),
+      variables: {
+        input: {
+          notificationType,
+          [channel]: enabled,
+        },
+      },
+    });
+
+    if (!mutationData?.updateNotificationPreference?.preference) {
+      return { success: false, message: "Failed to update preference" };
+    }
+
+    revalidatePath("/settings");
+    return { success: true, message: "Preference updated" };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}
+
+export async function connectStripeAction(): Promise<{
+  onboardingUrl: string | null;
+  error: string | null;
+}> {
+  try {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation ConnectStripeAccount {
+          connectStripeAccount {
+            accountId
+            onboardingUrl
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+    });
+
+    const result = mutationData?.connectStripeAccount;
+
+    if (result?.errors?.length) {
+      return { onboardingUrl: null, error: result.errors[0].message };
+    }
+
+    if (!result?.onboardingUrl) {
+      return { onboardingUrl: null, error: "No onboarding URL returned" };
+    }
+
+    return { onboardingUrl: result.onboardingUrl, error: null };
+  } catch (error) {
+    return {
+      onboardingUrl: null,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}
+
+export async function disconnectStripeAction(): Promise<{
+  success: boolean;
+  error: string | null;
+}> {
+  try {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation DisconnectStripeAccount {
+          disconnectStripeAccount {
+            profile {
+              id
+              stripeAccountId
+              stripeAccountStatus
+            }
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+    });
+
+    const result = mutationData?.disconnectStripeAccount;
+
+    if (result?.errors?.length) {
+      return { success: false, error: result.errors[0].message };
+    }
+
+    revalidateTag("dashboard-user", { expire: 0 });
+    revalidatePath("/settings");
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}
+
+export async function refreshStripeStatusAction(): Promise<{
+  success: boolean;
+  error: string | null;
+}> {
+  try {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation RefreshStripeAccountStatus {
+          refreshStripeAccountStatus {
+            profile {
+              id
+              stripeAccountStatus
+            }
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+    });
+
+    const result = mutationData?.refreshStripeAccountStatus;
+
+    if (result?.errors?.length) {
+      return { success: false, error: result.errors[0].message };
+    }
+
+    revalidateTag("dashboard-user", { expire: 0 });
+    revalidatePath("/settings");
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}
+
+export async function deleteAccountAction(password: string): Promise<{
+  success: boolean;
+  error: string | null;
+}> {
+  try {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation DeleteMyAccount($input: DeleteMyAccountInput!) {
+          deleteMyAccount(input: $input) {
+            success
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+      variables: {
+        input: { password },
+      },
+    });
+
+    const result = mutationData?.deleteMyAccount;
+
+    if (result?.errors?.length) {
+      return { success: false, error: result.errors[0].message };
+    }
+
+    if (!result?.success) {
+      return { success: false, error: "Failed to delete account" };
+    }
+
+    return logout();
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}
+
+export async function updateAvatarAction(
+  avatarUrl: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return logout();
+    }
+
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation UpdateUserAvatar($input: UpdateCurrentUserInput!) {
+          updateCurrentUser(input: $input) {
+            user {
+              id
+              avatar
+            }
+          }
+        }
+      `),
+      variables: {
+        input: {
+          input: {
+            avatar: avatarUrl,
+          },
+        } satisfies UpdateCurrentUserInput,
+      },
+    });
+
+    if (!mutationData?.updateCurrentUser?.user) {
+      return { success: false, error: "Failed to update avatar" };
+    }
+
+    revalidateTag("dashboard-user", { expire: 0 });
+    revalidatePath("/settings");
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}
+
+export async function changePasswordAction(
+  currentPassword: string,
+  newPassword: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation ChangePassword($input: ChangePasswordInput!) {
+          changePassword(input: $input) {
+            success
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+      variables: {
+        input: { currentPassword, newPassword },
+      },
+    });
+
+    const result = mutationData?.changePassword;
+
+    if (result?.errors?.length) {
+      return { success: false, error: result.errors[0].message };
+    }
+
+    if (!result?.success) {
+      return { success: false, error: "Failed to change password" };
+    }
+
+    revalidatePath("/settings");
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An error occurred",
     };
   }
 }

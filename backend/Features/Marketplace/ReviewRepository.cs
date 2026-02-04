@@ -11,6 +11,7 @@ public interface IReviewRepository {
     Task<Booking?> GetBookingByReviewIdAsync(Guid reviewId, CancellationToken ct);
     Task<Space?> GetSpaceByReviewIdAsync(Guid reviewId, CancellationToken ct);
     IQueryable<Review> GetBySpaceId(Guid spaceId);
+    IQueryable<Review> GetByOwnerProfileId(Guid ownerProfileId);
     IQueryable<Review> GetByBookingIdAndType(Guid bookingId, ReviewerType reviewerType);
     IQueryable<Review> GetByUserId(Guid userId);
     Task<CompletedBookingInfo?> GetCompletedBookingInfoAsync(Guid bookingId, CancellationToken ct);
@@ -20,6 +21,8 @@ public interface IReviewRepository {
     Task<bool> DeleteAsync(Review review, CancellationToken ct);
     Task UpdateSpaceAverageRatingAsync(Guid spaceId, CancellationToken ct);
 }
+
+public record ReviewerInfo(string Name, string? Avatar, string? CompanyName);
 
 public record CompletedBookingInfo(
     Guid Id,
@@ -56,6 +59,9 @@ public sealed class ReviewRepository(
 
     public IQueryable<Review> GetBySpaceId(Guid spaceId)
         => context.Reviews.Where(r => r.SpaceId == spaceId);
+
+    public IQueryable<Review> GetByOwnerProfileId(Guid ownerProfileId)
+        => context.Reviews.Where(r => r.Space.SpaceOwnerProfileId == ownerProfileId);
 
     public IQueryable<Review> GetByBookingIdAndType(Guid bookingId, ReviewerType reviewerType)
         => context.Reviews.Where(r => r.BookingId == bookingId && r.ReviewerType == reviewerType);
@@ -149,5 +155,35 @@ internal static class ReviewDataLoaders {
             .Where(r => reviewIds.Contains(r.Id))
             .Include(r => r.Space)
             .ToDictionaryAsync(r => r.Id, r => r.Space, ct);
+    }
+
+    [DataLoader]
+    public static async Task<IReadOnlyDictionary<Guid, ReviewerInfo>>
+        GetAdvertiserReviewerInfoByProfileId(
+            IReadOnlyList<Guid> profileIds, AppDbContext context,
+            CancellationToken ct
+        ) {
+        return await context.AdvertiserProfiles
+            .Where(p => profileIds.Contains(p.Id))
+            .Include(p => p.User)
+            .ToDictionaryAsync(
+                p => p.Id,
+                p => new ReviewerInfo(p.User.Name, p.User.Avatar, p.CompanyName),
+                ct);
+    }
+
+    [DataLoader]
+    public static async Task<IReadOnlyDictionary<Guid, ReviewerInfo>>
+        GetSpaceOwnerReviewerInfoByProfileId(
+            IReadOnlyList<Guid> profileIds, AppDbContext context,
+            CancellationToken ct
+        ) {
+        return await context.SpaceOwnerProfiles
+            .Where(p => profileIds.Contains(p.Id))
+            .Include(p => p.User)
+            .ToDictionaryAsync(
+                p => p.Id,
+                p => new ReviewerInfo(p.User.Name, p.User.Avatar, p.BusinessName),
+                ct);
     }
 }

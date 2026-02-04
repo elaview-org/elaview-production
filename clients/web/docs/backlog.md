@@ -205,7 +205,10 @@ Replace client-side filtering with server-side. Requires `SpaceFilterInput`, `Sp
 - [ ] Add `availableSpaces` query with filtering/sorting/pagination
 
 **Frontend (after backend ready):**
-- [ ] Implement profile GraphQL fragments, remove mock.json
+- [x] Implement profile GraphQL fragments, remove mock.json (campaigns, reviews, about)
+- [x] Enable notification preferences (individual toggle saves)
+- [x] Enable Stripe Connect flow (connect, refresh status, dashboard link)
+- [x] Enable delete account with confirmation dialog
 - [ ] Implement spending GraphQL fragments, remove mock.json
 - [ ] Add favorites UI with optimistic updates
 - [ ] Update discover to use server-side filtering

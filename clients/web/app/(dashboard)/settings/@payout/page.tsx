@@ -24,7 +24,7 @@ export default async function Page() {
   return (
     <SettingsSection
       value="payout"
-      icon={IconCreditCard}
+      icon={<IconCreditCard className="text-muted-foreground size-5" />}
       title="Payout Settings"
       description="Stripe Connect and bank account"
     >

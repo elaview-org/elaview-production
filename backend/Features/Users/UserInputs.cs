@@ -20,3 +20,7 @@ public record UpdateSpaceOwnerProfileInput(
     string? BusinessType,
     PayoutSchedule? PayoutSchedule
 );
+
+public record ChangePasswordInput(string CurrentPassword, string NewPassword);
+
+public record DeleteMyAccountInput(string Password);

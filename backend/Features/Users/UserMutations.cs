@@ -1,6 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using ElaviewBackend.Features.Auth;
 using ElaviewBackend.Features.Shared.Errors;
 using HotChocolate.Authorization;
+using ValidationException = ElaviewBackend.Features.Shared.Errors.ValidationException;
 
 namespace ElaviewBackend.Features.Users;
 
@@ -43,4 +45,34 @@ public static partial class UserMutations {
         IUserService userService,
         CancellationToken ct
     ) => new(await userService.DeleteAsync(id, ct));
+
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ValidationException>]
+    public static async Task<ChangePasswordPayload> ChangePassword(
+        ChangePasswordInput input,
+        IUserService userService,
+        AuthService authService,
+        CancellationToken ct
+    ) {
+        await authService.ChangePasswordAsync(
+            userService.GetPrincipalId(), input.CurrentPassword,
+            input.NewPassword, ct);
+        return new(true);
+    }
+
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ValidationException>]
+    public static async Task<DeleteMyAccountPayload> DeleteMyAccount(
+        DeleteMyAccountInput input,
+        IUserService userService,
+        AuthService authService,
+        CancellationToken ct
+    ) {
+        var userId = userService.GetPrincipalId();
+        await authService.VerifyPasswordAsync(userId, input.Password, ct);
+        await userService.DeleteAsync(userId, ct);
+        return new(true);
+    }
 }

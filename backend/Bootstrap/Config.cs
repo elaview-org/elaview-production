@@ -9,6 +9,12 @@ public static class Config {
     public static void Configure(this WebApplicationBuilder builder) {
         DotEnv.Load();
         var envVars = Environment.GetEnvironmentVariables();
+
+        var stripeSecretKey =
+            envVars["ELAVIEW_BACKEND_STRIPE_SECRET_KEY"]?.ToString();
+        if (!string.IsNullOrEmpty(stripeSecretKey))
+            Stripe.StripeConfiguration.ApiKey = stripeSecretKey;
+
         var configData = new Dictionary<string, string?> {
             ["Database:Host"] =
                 envVars["ELAVIEW_BACKEND_DATABASE_HOST"]?.ToString(),
@@ -17,7 +23,13 @@ public static class Config {
             ["Database:User"] =
                 envVars["ELAVIEW_BACKEND_DATABASE_USER"]?.ToString(),
             ["Database:Password"] = envVars["ELAVIEW_BACKEND_DATABASE_PASSWORD"]
-                ?.ToString()
+                ?.ToString(),
+            ["Cloudinary:CloudName"] =
+                envVars["ELAVIEW_BACKEND_CLOUDINARY_CLOUD_NAME"]?.ToString(),
+            ["Cloudinary:ApiKey"] =
+                envVars["ELAVIEW_BACKEND_CLOUDINARY_API_KEY"]?.ToString(),
+            ["Cloudinary:ApiSecret"] =
+                envVars["ELAVIEW_BACKEND_CLOUDINARY_API_SECRET"]?.ToString()
         };
 
         builder.Configuration.AddInMemoryCollection(configData);

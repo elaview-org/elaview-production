@@ -924,7 +924,7 @@ query {
 ### Phase 4: Infrastructure
 
 - [ ] Availability calendar blocking (block/unblock date ranges per space)
-- [ ] Image upload to Cloudflare R2 (currently `Images` is `List<string>` URLs)
+- [x] Cloudinary signed upload endpoint (`POST /api/storage/upload-signature`) — replaces Cloudflare R2 plan. `Images` fields store Cloudinary `secure_url` values.
 - [ ] Admin space approval workflow (PendingApproval -> Active/Rejected)
 - [ ] Withdrawal request system (owner-initiated payouts vs admin-triggered)
 - [ ] Tax document generation support

@@ -134,4 +134,49 @@ internal static class CampaignDataLoaders {
             .Where(b => campaignIds.Contains(b.CampaignId))
             .ToListAsync(ct)).ToLookup(b => b.CampaignId);
     }
+
+    [DataLoader]
+    public static async Task<IReadOnlyDictionary<Guid, decimal>>
+        GetTotalSpendByCampaignId(
+            IReadOnlyList<Guid> campaignIds, AppDbContext context,
+            CancellationToken ct
+        ) {
+        return await context.Payments
+            .Where(p => campaignIds.Contains(p.Booking.CampaignId) &&
+                        p.Status == PaymentStatus.Succeeded)
+            .GroupBy(p => p.Booking.CampaignId)
+            .Select(g => new { CampaignId = g.Key, Total = g.Sum(p => p.Amount) })
+            .ToDictionaryAsync(g => g.CampaignId, g => g.Total, ct);
+    }
+
+    [DataLoader]
+    public static async Task<IReadOnlyDictionary<Guid, int>>
+        GetSpacesCountByCampaignId(
+            IReadOnlyList<Guid> campaignIds, AppDbContext context,
+            CancellationToken ct
+        ) {
+        return await context.Bookings
+            .Where(b => campaignIds.Contains(b.CampaignId))
+            .GroupBy(b => b.CampaignId)
+            .Select(g => new {
+                CampaignId = g.Key,
+                Count = g.Select(b => b.SpaceId).Distinct().Count()
+            })
+            .ToDictionaryAsync(g => g.CampaignId, g => g.Count, ct);
+    }
+
+    [DataLoader]
+    public static async Task<IReadOnlyDictionary<Guid, decimal>>
+        GetTotalSpendByAdvertiserId(
+            IReadOnlyList<Guid> advertiserIds, AppDbContext context,
+            CancellationToken ct
+        ) {
+        return await context.Payments
+            .Where(p =>
+                advertiserIds.Contains(p.Booking.Campaign.AdvertiserProfileId) &&
+                p.Status == PaymentStatus.Succeeded)
+            .GroupBy(p => p.Booking.Campaign.AdvertiserProfileId)
+            .Select(g => new { AdvertiserId = g.Key, Total = g.Sum(p => p.Amount) })
+            .ToDictionaryAsync(g => g.AdvertiserId, g => g.Total, ct);
+    }
 }

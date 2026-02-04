@@ -30,7 +30,7 @@ export default async function Page() {
     return (
       <SettingsSection
         value="business"
-        icon={IconBuilding}
+        icon={<IconBuilding className="text-muted-foreground size-5" />}
         title="Business Information"
         description="Your business details and payout schedule"
       >
@@ -48,7 +48,7 @@ export default async function Page() {
   return (
     <SettingsSection
       value="business"
-      icon={IconBuilding}
+      icon={<IconBuilding className="text-muted-foreground size-5" />}
       title="Business Information"
       description="Your company details and industry"
     >

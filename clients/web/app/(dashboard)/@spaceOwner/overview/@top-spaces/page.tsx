@@ -7,9 +7,13 @@ import api from "../api";
 
 const OverviewTopSpaces_QueryFragment = graphql(`
   fragment OverviewTopSpaces_QueryFragment on Query {
-    mySpaces(first: 5, order: { totalRevenue: DESC }) {
-      nodes {
-        ...OverviewTopSpacesSpaceCard_SpaceFragment
+    me {
+      spaceOwnerProfile {
+        spaces(first: 5, order: { totalRevenue: DESC }) {
+          nodes {
+            ...OverviewTopSpacesSpaceCard_SpaceFragment
+          }
+        }
       }
     }
   }
@@ -18,7 +22,7 @@ const OverviewTopSpaces_QueryFragment = graphql(`
 export default async function Page() {
   const spaces = await api
     .getMyOverview(OverviewTopSpaces_QueryFragment)
-    .then((res) => res.mySpaces?.nodes ?? []);
+    .then((res) => res.me?.spaceOwnerProfile?.spaces?.nodes ?? []);
 
   return (
     <SectionCard

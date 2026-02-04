@@ -24,7 +24,7 @@ export default async function Page() {
   return (
     <SettingsSection
       value="profile"
-      icon={IconUser}
+      icon={<IconUser className="text-muted-foreground size-5" />}
       title="Profile Information"
       description={description}
     >

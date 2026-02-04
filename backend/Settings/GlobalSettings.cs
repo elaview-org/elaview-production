@@ -2,6 +2,8 @@ namespace ElaviewBackend.Settings;
 
 public class GlobalSettings {
     public DatabaseSettings Database { get; set; } = new();
+
+    public CloudinarySettings Cloudinary { get; set; } = new();
 }
 
 public class DatabaseSettings {
@@ -17,4 +19,12 @@ public class DatabaseSettings {
         return
             $"Host={Host};Port={Port};Database={User};Username={User};Password={Password};Include Error Detail=true";
     }
+}
+
+public class CloudinarySettings {
+    public string CloudName { get; set; } = "";
+
+    public string ApiKey { get; set; } = "";
+
+    public string ApiSecret { get; set; } = "";
 }

@@ -18,7 +18,7 @@ export default async function Page() {
   return (
     <SettingsSection
       value="account"
-      icon={IconSettings}
+      icon={<IconSettings className="text-muted-foreground size-5" />}
       title="Account Settings"
       description="Security, password, and account management"
     >

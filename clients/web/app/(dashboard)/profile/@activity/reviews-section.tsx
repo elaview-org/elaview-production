@@ -4,23 +4,38 @@ import {
   TooltipTrigger,
 } from "@/components/primitives/tooltip";
 import { Button } from "@/components/primitives/button";
-import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/primitives/empty";
+import {
+  IconChevronLeft,
+  IconChevronRight,
+  IconMessage,
+} from "@tabler/icons-react";
 import ReviewCard from "@/components/composed/review-card";
-import mockData from "./mock.json";
+
+type Review = {
+  id: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  authorName: string;
+  authorAvatar: string | null;
+};
 
 type Props = {
   userName: string;
+  reviews: Review[];
 };
 
 const REVIEWS_PER_PAGE = 3;
 
-export default function ReviewsSection({ userName }: Props) {
-  const reviews = mockData.reviews;
+export default function ReviewsSection({ userName, reviews }: Props) {
   const totalPages = Math.ceil(reviews.length / REVIEWS_PER_PAGE);
-
-  if (reviews.length === 0) {
-    return null;
-  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -50,18 +65,33 @@ export default function ReviewsSection({ userName }: Props) {
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {reviews.slice(0, REVIEWS_PER_PAGE).map((review) => (
-          <ReviewCard
-            key={review.id}
-            rating={review.rating}
-            comment={review.comment}
-            authorName={review.reviewer.name}
-            authorAvatar={review.reviewer.avatar}
-            date={review.createdAt}
-          />
-        ))}
-      </div>
+      {reviews.length === 0 ? (
+        <Empty className="py-16">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <IconMessage />
+            </EmptyMedia>
+            <EmptyTitle>No reviews yet</EmptyTitle>
+            <EmptyDescription>
+              Reviews from advertisers will appear here once bookings are
+              completed
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {reviews.slice(0, REVIEWS_PER_PAGE).map((review) => (
+            <ReviewCard
+              key={review.id}
+              rating={review.rating}
+              comment={review.comment}
+              authorName={review.authorName}
+              authorAvatar={review.authorAvatar}
+              date={review.createdAt}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

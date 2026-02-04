@@ -7,6 +7,7 @@ namespace ElaviewBackend.Features.Payments;
 public interface IStripeConnectService {
     Task<StripeConnectResult> CreateConnectAccountAsync(Guid userId, CancellationToken ct);
     Task<SpaceOwnerProfile> RefreshAccountStatusAsync(Guid userId, CancellationToken ct);
+    Task<SpaceOwnerProfile> DisconnectAccountAsync(Guid userId, CancellationToken ct);
 }
 
 public sealed class StripeConnectService(IStripeConnectRepository repository) : IStripeConnectService {
@@ -92,13 +93,35 @@ public sealed class StripeConnectService(IStripeConnectRepository repository) : 
         return await repository.UpdateStripeAccountStatusAsync(profile, status, ct);
     }
 
+    public async Task<SpaceOwnerProfile> DisconnectAccountAsync(Guid userId, CancellationToken ct) {
+        var profile = await repository.GetSpaceOwnerProfileByUserIdAsync(userId, ct)
+            ?? throw new NotFoundException("SpaceOwnerProfile", userId);
+
+        if (string.IsNullOrEmpty(profile.StripeAccountId))
+            throw new ValidationException("StripeAccountId", "No Stripe account connected");
+
+        AccountService accountService = new();
+        try {
+            await accountService.DeleteAsync(profile.StripeAccountId, cancellationToken: ct);
+        }
+        catch (StripeException ex) when (
+            ex.HttpStatusCode is System.Net.HttpStatusCode.NotFound
+                or System.Net.HttpStatusCode.Forbidden) {
+        }
+        catch (StripeException ex) {
+            throw new PaymentException("account disconnect", ex.Message);
+        }
+
+        return await repository.DisconnectStripeAccountAsync(profile, ct);
+    }
+
     private static string GetStripeRefreshUrl()
-        => Environment.GetEnvironmentVariable("ELAVIEW_STRIPE_CONNECT_REFRESH_URL")
-           ?? "http://localhost:3000/settings/payments/refresh";
+        => Environment.GetEnvironmentVariable(
+            "ELAVIEW_BACKEND_STRIPE_CONNECT_REFRESH_URL")!;
 
     private static string GetStripeReturnUrl()
-        => Environment.GetEnvironmentVariable("ELAVIEW_STRIPE_CONNECT_RETURN_URL")
-           ?? "http://localhost:3000/settings/payments/complete";
+        => Environment.GetEnvironmentVariable(
+            "ELAVIEW_BACKEND_STRIPE_CONNECT_RETURN_URL")!;
 }
 
 public record StripeConnectResult(string AccountId, string OnboardingUrl);

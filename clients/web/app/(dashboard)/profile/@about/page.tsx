@@ -1,15 +1,11 @@
-import { graphql, ProfileType } from "@/types/gql";
+import { graphql, ProfileType, CampaignStatus } from "@/types/gql";
 import {
   IconBriefcase,
   IconBuilding,
-  IconClock,
   IconMapPin,
-  IconMessageCircle,
   IconShieldCheck,
   IconWorld,
 } from "@tabler/icons-react";
-import mockData from "./mock.json";
-import campaignMock from "../@activity/mock.json";
 import api from "../api";
 
 const About_UserFragment = graphql(`
@@ -31,6 +27,11 @@ const About_UserFragment = graphql(`
       industry
       website
       onboardingComplete
+      campaigns(first: 10, order: [{ createdAt: DESC }]) {
+        nodes {
+          status
+        }
+      }
     }
   }
 `);
@@ -69,16 +70,6 @@ export default async function Page() {
                 : "Identity not verified"}
             </span>
           </div>
-
-          <div className="flex items-center gap-3">
-            <IconMessageCircle className="text-muted-foreground size-5" />
-            <span>Response rate: {mockData.responseRate}%</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <IconClock className="text-muted-foreground size-5" />
-            <span>Responds {mockData.responseTime}</span>
-          </div>
         </div>
 
         {spaces.length > 0 && (
@@ -92,8 +83,8 @@ export default async function Page() {
   }
 
   const profile = user.advertiserProfile!;
-  const completedCampaigns = campaignMock.campaigns.filter(
-    (c) => c.status === "COMPLETED"
+  const completedCampaigns = (profile.campaigns?.nodes ?? []).filter(
+    (c) => c?.status === CampaignStatus.Completed
   );
 
   return (
@@ -136,16 +127,6 @@ export default async function Page() {
               ? "Identity verified"
               : "Identity not verified"}
           </span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <IconMessageCircle className="text-muted-foreground size-5" />
-          <span>Response rate: {mockData.responseRate}%</span>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <IconClock className="text-muted-foreground size-5" />
-          <span>Responds {mockData.responseTime}</span>
         </div>
       </div>
 

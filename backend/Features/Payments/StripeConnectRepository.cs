@@ -8,6 +8,7 @@ public interface IStripeConnectRepository {
     Task<SpaceOwnerProfile?> GetSpaceOwnerProfileByUserIdAsync(Guid userId, CancellationToken ct);
     Task<SpaceOwnerProfile> UpdateStripeAccountIdAsync(SpaceOwnerProfile profile, string accountId, CancellationToken ct);
     Task<SpaceOwnerProfile> UpdateStripeAccountStatusAsync(SpaceOwnerProfile profile, string status, CancellationToken ct);
+    Task<SpaceOwnerProfile> DisconnectStripeAccountAsync(SpaceOwnerProfile profile, CancellationToken ct);
 }
 
 public sealed class StripeConnectRepository(AppDbContext context) : IStripeConnectRepository {
@@ -29,6 +30,17 @@ public sealed class StripeConnectRepository(AppDbContext context) : IStripeConne
         var entry = context.Entry(profile);
         entry.Property(p => p.StripeAccountStatus).CurrentValue = status;
         entry.Property(p => p.StripeLastAccountHealthCheck).CurrentValue = DateTime.UtcNow;
+        await context.SaveChangesAsync(ct);
+        return profile;
+    }
+
+    public async Task<SpaceOwnerProfile> DisconnectStripeAccountAsync(
+        SpaceOwnerProfile profile, CancellationToken ct
+    ) {
+        var entry = context.Entry(profile);
+        entry.Property(p => p.StripeAccountId).CurrentValue = null;
+        entry.Property(p => p.StripeAccountStatus).CurrentValue = null;
+        entry.Property(p => p.StripeAccountDisconnectedAt).CurrentValue = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
         return profile;
     }

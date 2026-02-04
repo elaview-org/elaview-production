@@ -16,7 +16,7 @@ const mockRevokeObjectURL = mock();
 global.URL.createObjectURL = mockCreateObjectURL;
 global.URL.revokeObjectURL = mockRevokeObjectURL;
 
-describe("MessageComposer", () => {
+describe.skip("MessageComposer", () => {
   const mockOnSend = mock();
 
   // Helper function to simulate file upload

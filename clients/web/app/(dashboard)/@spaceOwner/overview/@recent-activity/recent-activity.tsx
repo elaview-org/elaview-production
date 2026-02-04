@@ -19,9 +19,8 @@ import {
   type ActivityStatus,
   type ActivityType,
 } from "../constants";
-import mock from "../mock.json";
 
-type ActivityData = {
+export type ActivityData = {
   id: string;
   type: ActivityType;
   description: string;
@@ -29,6 +28,10 @@ type ActivityData = {
   status: ActivityStatus;
   date: string;
   amount?: string;
+};
+
+type Props = {
+  data: ActivityData[];
 };
 
 const columns = [
@@ -76,7 +79,7 @@ const columns = [
   }),
 ];
 
-export default function RecentActivity() {
+export default function RecentActivity({ data }: Props) {
   return (
     <Card>
       <CardHeader>
@@ -85,7 +88,7 @@ export default function RecentActivity() {
       </CardHeader>
       <CardContent>
         <TableView
-          data={mock.activity as ActivityData[]}
+          data={data}
           columns={columns}
           getRowId={(row) => row.id}
           emptyMessage="No recent activity."

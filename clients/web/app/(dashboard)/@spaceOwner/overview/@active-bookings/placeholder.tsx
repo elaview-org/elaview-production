@@ -7,25 +7,25 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/primitives/empty";
-import { IconChartBar } from "@tabler/icons-react";
+import { IconCalendarEvent } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function Placeholder() {
   return (
-    <Empty className="border py-16">
+    <Empty className="py-16">
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <IconChartBar />
+          <IconCalendarEvent />
         </EmptyMedia>
-        <EmptyTitle>No activity yet</EmptyTitle>
+        <EmptyTitle>No active bookings</EmptyTitle>
         <EmptyDescription>
-          Your dashboard will populate once you have active listings and
-          bookings
+          Bookings in progress will appear here once advertisers book your
+          spaces
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
-        <Button asChild>
-          <Link href="/listings">Create Your First Listing</Link>
+        <Button variant="outline" asChild>
+          <Link href="/bookings?tab=active">View Bookings</Link>
         </Button>
       </EmptyContent>
     </Empty>

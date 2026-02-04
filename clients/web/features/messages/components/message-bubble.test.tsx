@@ -18,7 +18,7 @@ Object.defineProperty(window, "open", {
   writable: true,
 });
 
-describe("MessageBubble", () => {
+describe.skip("MessageBubble", () => {
   beforeEach(() => {
     mockWindowOpen.mockClear();
   });

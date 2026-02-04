@@ -19,8 +19,7 @@ const NotificationSettings_UserFragment = graphql(`
 export default async function Page() {
   const user = await api.getSettingsUser(NotificationSettings_UserFragment);
   const preferences = await api.getNotificationPreferences();
-  const isSpaceOwner =
-    user.activeProfileType === ProfileType.SpaceOwner;
+  const isSpaceOwner = user.activeProfileType === ProfileType.SpaceOwner;
 
   return (
     <SettingsSection

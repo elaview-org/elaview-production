@@ -90,8 +90,7 @@ export default async function Page() {
   const yearsAdvertising = Math.max(
     1,
     Math.floor(
-      (new Date().getTime() -
-        new Date(profile.createdAt as string).getTime()) /
+      (new Date().getTime() - new Date(profile.createdAt as string).getTime()) /
         (365.25 * 24 * 60 * 60 * 1000)
     )
   );

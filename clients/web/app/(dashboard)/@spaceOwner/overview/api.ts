@@ -5,12 +5,7 @@ const getMyOverview = api.createFragmentReader(() =>
   api.query({
     query: graphql(`
       query OverviewData {
-        earningsSummary {
-          availableBalance
-          pendingPayouts
-          thisMonthEarnings
-          lastMonthEarnings
-        }
+        ...OverviewStatCards_QueryFragment
         ...OverviewPendingRequests_QueryFragment
         ...OverviewActiveBookings_QueryFragment
         ...OverviewTopSpaces_QueryFragment

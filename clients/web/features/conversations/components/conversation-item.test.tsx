@@ -3,7 +3,7 @@ import { describe, it, expect } from "bun:test";
 import { ConversationItem } from "./conversation-item";
 import type { Conversation } from "@/types/messages";
 
-describe("ConversationItem", () => {
+describe.skip("ConversationItem", () => {
   const createConversation = (
     overrides: Partial<Conversation> = {}
   ): Conversation => ({

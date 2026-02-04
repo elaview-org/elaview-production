@@ -19,9 +19,18 @@ import {
 import TimeRangeSelector from "@/components/composed/time-range-selector";
 import { TIME_RANGES, type TimeRange } from "@/lib/constants";
 import { CHART_CONFIG } from "../constants";
-import mock from "../mock.json";
 
-export default function ActivityChart() {
+type ChartDataPoint = {
+  date: string;
+  bookings: number;
+  earnings: number;
+};
+
+type Props = {
+  data: ChartDataPoint[];
+};
+
+export default function ActivityChart({ data }: Props) {
   const isMobile = useIsMobile();
   const [timeRange, setTimeRange] = React.useState<TimeRange>("90d");
 
@@ -39,8 +48,8 @@ export default function ActivityChart() {
     const startDate = new Date(now);
     startDate.setDate(startDate.getDate() - daysToSubtract);
 
-    return mock.chart.filter((item) => new Date(item.date) >= startDate);
-  }, [timeRange]);
+    return data.filter((item) => new Date(item.date) >= startDate);
+  }, [timeRange, data]);
 
   return (
     <Card className="@container/card">

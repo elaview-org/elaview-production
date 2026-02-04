@@ -1,0 +1,7 @@
+{
+  "space-1": { "views": 1240, "occupancyRate": 78 },
+  "space-2": { "views": 890, "occupancyRate": 65 },
+  "space-3": { "views": 720, "occupancyRate": 52 },
+  "space-4": { "views": 450, "occupancyRate": 38 },
+  "space-5": { "views": 280, "occupancyRate": 22 }
+}

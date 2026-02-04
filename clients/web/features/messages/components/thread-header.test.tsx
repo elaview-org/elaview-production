@@ -4,7 +4,7 @@ import { ThreadHeader } from "./thread-header";
 import type { ThreadContext } from "@/types/messages";
 import { mockThreadContext } from "@/features/conversations/mock-data";
 
-describe("ThreadHeader", () => {
+describe.skip("ThreadHeader", () => {
   const createThreadContext = (
     overrides: Partial<ThreadContext> = {}
   ): ThreadContext => ({

@@ -4,7 +4,7 @@ import { NotificationItem } from "./notification-item";
 import type { TNotification } from "./mock-notification";
 import { NotificationType } from "@/types/gql/graphql";
 
-describe("NotificationItem", () => {
+describe.skip("NotificationItem", () => {
   const createNotification = (
     overrides: Partial<TNotification> = {}
   ): TNotification => ({

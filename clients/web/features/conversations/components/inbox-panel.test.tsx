@@ -32,8 +32,12 @@ describe("InboxPanel", () => {
       render(<InboxPanel {...defaultProps} />);
 
       // ConversationList should render conversation items
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
-      expect(screen.getByText("Dry Cleaner Bulletin Board")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Dry Cleaner Bulletin Board")
+      ).toBeInTheDocument();
       expect(screen.getByText("Barbershop Wall Mount")).toBeInTheDocument();
     });
 
@@ -55,18 +59,24 @@ describe("InboxPanel", () => {
       render(<InboxPanel {...defaultProps} />);
 
       // The conversation with booking-123 should be selected
-      const conversationItems = screen.getAllByText("Coffee Shop Window Display");
+      const conversationItems = screen.getAllByText(
+        "Coffee Shop Window Display"
+      );
       expect(conversationItems.length).toBeGreaterThan(0);
     });
 
     it("extracts bookingId from pathname with UUID-style bookingId", () => {
       const uuidBookingId = "550e8400-e29b-41d4-a716-446655440000";
-      asMock(usePathname).mockReturnValue(`/bookings/${uuidBookingId}/messages`);
+      asMock(usePathname).mockReturnValue(
+        `/bookings/${uuidBookingId}/messages`
+      );
 
       render(<InboxPanel {...defaultProps} />);
 
       // Component should render without errors
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
 
     it("handles pathname without booking pattern", () => {
@@ -75,7 +85,9 @@ describe("InboxPanel", () => {
       render(<InboxPanel {...defaultProps} />);
 
       // Should render normally without selected booking
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
 
     it("handles pathname with different pattern", () => {
@@ -84,7 +96,9 @@ describe("InboxPanel", () => {
       render(<InboxPanel {...defaultProps} />);
 
       // Should not extract bookingId from this pattern
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
 
     it("handles null pathname", () => {
@@ -93,7 +107,9 @@ describe("InboxPanel", () => {
       render(<InboxPanel {...defaultProps} />);
 
       // Should render without errors
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
 
     it("handles undefined pathname", () => {
@@ -102,7 +118,9 @@ describe("InboxPanel", () => {
       render(<InboxPanel {...defaultProps} />);
 
       // Should render without errors
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
   });
 
@@ -110,28 +128,40 @@ describe("InboxPanel", () => {
     it("uses pathname bookingId when available", () => {
       asMock(usePathname).mockReturnValue("/bookings/booking-123/messages");
 
-      render(<InboxPanel {...defaultProps} initialSelectedBookingId="booking-999" />);
+      render(
+        <InboxPanel {...defaultProps} initialSelectedBookingId="booking-999" />
+      );
 
       // Should use booking-123 from pathname, not booking-999
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
 
     it("falls back to initialSelectedBookingId when pathname doesn't match", () => {
       asMock(usePathname).mockReturnValue("/messages");
 
-      render(<InboxPanel {...defaultProps} initialSelectedBookingId="booking-123" />);
+      render(
+        <InboxPanel {...defaultProps} initialSelectedBookingId="booking-123" />
+      );
 
       // Should use initialSelectedBookingId
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
 
     it("uses initialSelectedBookingId when pathname is null", () => {
       asMock(usePathname).mockReturnValue(null as unknown as string);
 
-      render(<InboxPanel {...defaultProps} initialSelectedBookingId="booking-124" />);
+      render(
+        <InboxPanel {...defaultProps} initialSelectedBookingId="booking-124" />
+      );
 
       // Should use initialSelectedBookingId
-      expect(screen.getByText("Dry Cleaner Bulletin Board")).toBeInTheDocument();
+      expect(
+        screen.getByText("Dry Cleaner Bulletin Board")
+      ).toBeInTheDocument();
     });
 
     it("handles no selected bookingId", () => {
@@ -140,8 +170,12 @@ describe("InboxPanel", () => {
       render(<InboxPanel {...defaultProps} />);
 
       // Should render all conversations without selection
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
-      expect(screen.getByText("Dry Cleaner Bulletin Board")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Dry Cleaner Bulletin Board")
+      ).toBeInTheDocument();
       expect(screen.getByText("Barbershop Wall Mount")).toBeInTheDocument();
     });
   });
@@ -151,8 +185,12 @@ describe("InboxPanel", () => {
       render(<InboxPanel {...defaultProps} />);
 
       // All conversations should be rendered
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
-      expect(screen.getByText("Dry Cleaner Bulletin Board")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Dry Cleaner Bulletin Board")
+      ).toBeInTheDocument();
       expect(screen.getByText("Barbershop Wall Mount")).toBeInTheDocument();
     });
 
@@ -163,14 +201,18 @@ describe("InboxPanel", () => {
 
       // ConversationList should receive booking-123 as selectedBookingId
       // This is tested indirectly by checking that ConversationItem receives isSelected
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
 
     it("passes isLoading=false to ConversationList", () => {
       render(<InboxPanel {...defaultProps} />);
 
       // ConversationList should not show skeleton (isLoading=false)
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
   });
 
@@ -180,7 +222,9 @@ describe("InboxPanel", () => {
 
       // Should render empty state from ConversationListEmpty
       expect(screen.getByText("No conversations")).toBeInTheDocument();
-      expect(screen.getByText("Start a booking to begin messaging")).toBeInTheDocument();
+      expect(
+        screen.getByText("Start a booking to begin messaging")
+      ).toBeInTheDocument();
     });
 
     it("handles conversations with special characters in bookingId", () => {
@@ -201,12 +245,16 @@ describe("InboxPanel", () => {
 
     it("handles pathname with multiple booking patterns", () => {
       // Pathname with multiple potential matches - should take first one
-      asMock(usePathname).mockReturnValue("/bookings/booking-123/messages/booking-456");
+      asMock(usePathname).mockReturnValue(
+        "/bookings/booking-123/messages/booking-456"
+      );
 
       render(<InboxPanel {...defaultProps} />);
 
       // Should extract booking-123 (first match)
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
 
     it("handles pathname with trailing slash", () => {
@@ -215,7 +263,9 @@ describe("InboxPanel", () => {
       render(<InboxPanel {...defaultProps} />);
 
       // Should still extract bookingId correctly
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
   });
 
@@ -256,7 +306,9 @@ describe("InboxPanel", () => {
         const { unmount } = render(<InboxPanel {...defaultProps} />);
 
         // Should render without errors
-        expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+        expect(
+          screen.getByText("Coffee Shop Window Display")
+        ).toBeInTheDocument();
         unmount();
       });
     });
@@ -272,11 +324,16 @@ describe("InboxPanel", () => {
       testCases.forEach((pathname) => {
         asMock(usePathname).mockReturnValue(pathname);
         const { unmount } = render(
-          <InboxPanel {...defaultProps} initialSelectedBookingId="booking-123" />
+          <InboxPanel
+            {...defaultProps}
+            initialSelectedBookingId="booking-123"
+          />
         );
 
         // Should fall back to initialSelectedBookingId
-        expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+        expect(
+          screen.getByText("Coffee Shop Window Display")
+        ).toBeInTheDocument();
         unmount();
       });
     });

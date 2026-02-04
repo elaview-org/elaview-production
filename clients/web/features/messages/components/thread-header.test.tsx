@@ -1,5 +1,5 @@
 import { render, screen, userEvent } from "@/test/utils";
-import { describe, it, expect,  mock } from "bun:test";
+import { describe, it, expect, mock } from "bun:test";
 import { ThreadHeader } from "./thread-header";
 import type { ThreadContext } from "@/types/messages";
 import { mockThreadContext } from "@/features/conversations/mock-data";
@@ -20,7 +20,9 @@ describe("ThreadHeader", () => {
       const context = createThreadContext();
       render(<ThreadHeader context={context} />);
 
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
     });
 
     it("renders booking ID", () => {
@@ -323,7 +325,11 @@ describe("ThreadHeader", () => {
       const context = createThreadContext();
 
       render(
-        <ThreadHeader context={context} showBackButton={true} onBack={undefined} />
+        <ThreadHeader
+          context={context}
+          showBackButton={true}
+          onBack={undefined}
+        />
       );
 
       const backButton = screen.getByRole("button", {
@@ -338,7 +344,9 @@ describe("ThreadHeader", () => {
     it("renders correctly with mockThreadContext", () => {
       render(<ThreadHeader context={mockThreadContext} />);
 
-      expect(screen.getByText("Coffee Shop Window Display")).toBeInTheDocument();
+      expect(
+        screen.getByText("Coffee Shop Window Display")
+      ).toBeInTheDocument();
       expect(screen.getByText("Booking #123")).toBeInTheDocument();
       expect(screen.getByText("Paid")).toBeInTheDocument();
     });

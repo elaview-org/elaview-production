@@ -52,6 +52,8 @@ public static class Services {
             .AddScoped<ITransactionRepository, TransactionRepository>()
             .AddScoped<IStripeConnectService, StripeConnectService>()
             .AddScoped<IStripeConnectRepository, StripeConnectRepository>()
+            .AddScoped<ISavedPaymentMethodService, SavedPaymentMethodService>()
+            .AddScoped<ISavedPaymentMethodRepository, SavedPaymentMethodRepository>()
             .AddScoped<INotificationService, NotificationService>()
             .AddScoped<INotificationRepository, NotificationRepository>()
             .AddScoped<INotificationPreferenceRepository,

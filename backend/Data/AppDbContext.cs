@@ -33,6 +33,8 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<NotificationPreference> NotificationPreferences { get; set; } =
         null!;
 
+    public DbSet<SavedPaymentMethod> SavedPaymentMethods { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
 
@@ -64,5 +66,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
         new NotificationConfig().Configure(modelBuilder.Entity<Notification>());
         new NotificationPreferenceConfig().Configure(
             modelBuilder.Entity<NotificationPreference>());
+        new SavedPaymentMethodConfig().Configure(
+            modelBuilder.Entity<SavedPaymentMethod>());
     }
 }

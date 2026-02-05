@@ -9,23 +9,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/primitives/select";
-import { NotificationType } from "@/types/gql/graphql";
+import { NotificationType } from "@/types/gql";
 import {
   ADVERTISER_NOTIFICATIONS,
   ADVERTISER_NOTIFICATION_LABELS,
 } from "@/app/(dashboard)/settings/constants";
 
-interface NotificationsFiltersProps {
+type Props = {
   filter: "all" | "unread" | NotificationType;
   onFilterChange: (filter: "all" | "unread" | NotificationType) => void;
   unreadCount?: number;
-}
+};
 
-export function NotificationsFilters({
+export default function NotificationsFilters({
   filter,
   onFilterChange,
   unreadCount = 0,
-}: NotificationsFiltersProps) {
+}: Props) {
   const tabValue = filter === "all" || filter === "unread" ? filter : "custom";
 
   return (

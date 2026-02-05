@@ -1,6 +1,4 @@
-import MediaCard, {
-  MediaCardSkeleton,
-} from "@/components/composed/media-card";
+import MediaCard, { MediaCardSkeleton } from "@/components/composed/media-card";
 import { SPACE_TYPE } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";

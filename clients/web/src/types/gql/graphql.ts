@@ -1,51 +1,65 @@
 /* eslint-disable */
-import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
+import { TypedDocumentNode as DocumentNode } from "@graphql-typed-document-node/core";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = T | null | undefined;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K];
+};
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>;
+};
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>;
+};
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T,
+> = { [_ in K]?: never };
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends " $fragmentName" | "__typename" ? T[P] : never;
+    };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
+  ID: { input: string; output: string };
+  String: { input: string; output: string };
+  Boolean: { input: boolean; output: boolean };
+  Int: { input: number; output: number };
+  Float: { input: number; output: number };
   /** The `DateTime` scalar represents an ISO-8601 compliant date time type. */
-  DateTime: { input: string; output: string; }
+  DateTime: { input: string; output: string };
   /** The `Decimal` scalar type represents a decimal floating-point number. */
-  Decimal: { input: number; output: number; }
-  UUID: { input: string; output: string; }
+  Decimal: { input: number; output: number };
+  UUID: { input: string; output: string };
 };
 
 export type AdvertiserProfile = {
-  __typename: 'AdvertiserProfile';
+  __typename: "AdvertiserProfile";
   campaigns: Maybe<CampaignsConnection>;
-  companyName: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['UUID']['output'];
-  industry: Maybe<Scalars['String']['output']>;
-  onboardingComplete: Scalars['Boolean']['output'];
-  stripeAccountDisconnectedAt: Maybe<Scalars['DateTime']['output']>;
-  stripeAccountDisconnectedNotifiedAt: Maybe<Scalars['DateTime']['output']>;
-  stripeAccountId: Maybe<Scalars['String']['output']>;
-  stripeAccountStatus: Maybe<Scalars['String']['output']>;
-  stripeLastAccountHealthCheck: Maybe<Scalars['DateTime']['output']>;
-  totalSpend: Scalars['Decimal']['output'];
+  companyName: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["UUID"]["output"];
+  industry: Maybe<Scalars["String"]["output"]>;
+  onboardingComplete: Scalars["Boolean"]["output"];
+  savedPaymentMethods: Array<SavedPaymentMethod>;
+  stripeAccountDisconnectedAt: Maybe<Scalars["DateTime"]["output"]>;
+  stripeAccountDisconnectedNotifiedAt: Maybe<Scalars["DateTime"]["output"]>;
+  stripeAccountId: Maybe<Scalars["String"]["output"]>;
+  stripeAccountStatus: Maybe<Scalars["String"]["output"]>;
+  stripeCustomerId: Maybe<Scalars["String"]["output"]>;
+  stripeLastAccountHealthCheck: Maybe<Scalars["DateTime"]["output"]>;
+  totalSpend: Scalars["Decimal"]["output"];
   user: User;
-  userId: Scalars['UUID']['output'];
-  website: Maybe<Scalars['String']['output']>;
+  userId: Scalars["UUID"]["output"];
+  website: Maybe<Scalars["String"]["output"]>;
 };
 
-
 export type AdvertiserProfileCampaignsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<CampaignSortInput>>;
   where?: InputMaybe<CampaignFilterInput>;
 };
@@ -59,10 +73,12 @@ export type AdvertiserProfileFilterInput = {
   industry?: InputMaybe<StringOperationFilterInput>;
   onboardingComplete?: InputMaybe<BooleanOperationFilterInput>;
   or?: InputMaybe<Array<AdvertiserProfileFilterInput>>;
+  savedPaymentMethods?: InputMaybe<ListFilterInputTypeOfSavedPaymentMethodFilterInput>;
   stripeAccountDisconnectedAt?: InputMaybe<DateTimeOperationFilterInput>;
   stripeAccountDisconnectedNotifiedAt?: InputMaybe<DateTimeOperationFilterInput>;
   stripeAccountId?: InputMaybe<StringOperationFilterInput>;
   stripeAccountStatus?: InputMaybe<StringOperationFilterInput>;
+  stripeCustomerId?: InputMaybe<StringOperationFilterInput>;
   stripeLastAccountHealthCheck?: InputMaybe<DateTimeOperationFilterInput>;
   user?: InputMaybe<UserFilterInput>;
   userId?: InputMaybe<UuidOperationFilterInput>;
@@ -79,6 +95,7 @@ export type AdvertiserProfileSortInput = {
   stripeAccountDisconnectedNotifiedAt?: InputMaybe<SortEnumType>;
   stripeAccountId?: InputMaybe<SortEnumType>;
   stripeAccountStatus?: InputMaybe<SortEnumType>;
+  stripeCustomerId?: InputMaybe<SortEnumType>;
   stripeLastAccountHealthCheck?: InputMaybe<SortEnumType>;
   user?: InputMaybe<UserSortInput>;
   userId?: InputMaybe<SortEnumType>;
@@ -88,74 +105,74 @@ export type AdvertiserProfileSortInput = {
 /** Defines when a policy shall be executed. */
 export enum ApplyPolicy {
   /** After the resolver was executed. */
-  AfterResolver = 'AFTER_RESOLVER',
+  AfterResolver = "AFTER_RESOLVER",
   /** Before the resolver was executed. */
-  BeforeResolver = 'BEFORE_RESOLVER',
+  BeforeResolver = "BEFORE_RESOLVER",
   /** The policy is applied in the validation step before the execution. */
-  Validation = 'VALIDATION'
+  Validation = "VALIDATION",
 }
 
-export type ApproveBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+export type ApproveBookingError =
+  | ForbiddenError
+  | InvalidStatusTransitionError
+  | NotFoundError;
 
 export type ApproveBookingInput = {
-  id: Scalars['ID']['input'];
-  ownerNotes?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars["ID"]["input"];
+  ownerNotes?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type ApproveBookingPayload = {
-  __typename: 'ApproveBookingPayload';
+  __typename: "ApproveBookingPayload";
   booking: Maybe<Booking>;
   errors: Maybe<Array<ApproveBookingError>>;
 };
 
 export type Booking = {
-  __typename: 'Booking';
-  advertiserNotes: Maybe<Scalars['String']['output']>;
+  __typename: "Booking";
+  advertiserNotes: Maybe<Scalars["String"]["output"]>;
   campaign: Maybe<Campaign>;
-  campaignId: Scalars['UUID']['output'];
-  cancellationReason: Maybe<Scalars['String']['output']>;
-  cancelledAt: Maybe<Scalars['DateTime']['output']>;
+  campaignId: Scalars["UUID"]["output"];
+  cancellationReason: Maybe<Scalars["String"]["output"]>;
+  cancelledAt: Maybe<Scalars["DateTime"]["output"]>;
   cancelledByUser: Maybe<User>;
-  cancelledByUserId: Maybe<Scalars['UUID']['output']>;
-  createdAt: Scalars['DateTime']['output'];
+  cancelledByUserId: Maybe<Scalars["UUID"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
   dispute: Maybe<BookingDispute>;
-  endDate: Scalars['DateTime']['output'];
-  fileDownloadedAt: Maybe<Scalars['DateTime']['output']>;
-  id: Scalars['UUID']['output'];
-  installationFee: Scalars['Decimal']['output'];
-  ownerNotes: Maybe<Scalars['String']['output']>;
-  ownerPayoutAmount: Scalars['Decimal']['output'];
+  endDate: Scalars["DateTime"]["output"];
+  fileDownloadedAt: Maybe<Scalars["DateTime"]["output"]>;
+  id: Scalars["UUID"]["output"];
+  installationFee: Scalars["Decimal"]["output"];
+  ownerNotes: Maybe<Scalars["String"]["output"]>;
+  ownerPayoutAmount: Scalars["Decimal"]["output"];
   payments: Array<Payment>;
   payouts: Array<Payout>;
-  platformFeeAmount: Scalars['Decimal']['output'];
-  platformFeePercent: Scalars['Decimal']['output'];
-  pricePerDay: Scalars['Decimal']['output'];
+  platformFeeAmount: Scalars["Decimal"]["output"];
+  platformFeePercent: Scalars["Decimal"]["output"];
+  pricePerDay: Scalars["Decimal"]["output"];
   proof: Maybe<BookingProof>;
-  rejectedAt: Maybe<Scalars['DateTime']['output']>;
-  rejectionReason: Maybe<Scalars['String']['output']>;
+  rejectedAt: Maybe<Scalars["DateTime"]["output"]>;
+  rejectionReason: Maybe<Scalars["String"]["output"]>;
   reviews: Array<Review>;
   space: Maybe<Space>;
-  spaceId: Scalars['UUID']['output'];
-  startDate: Scalars['DateTime']['output'];
+  spaceId: Scalars["UUID"]["output"];
+  startDate: Scalars["DateTime"]["output"];
   status: BookingStatus;
-  subtotalAmount: Scalars['Decimal']['output'];
-  totalAmount: Scalars['Decimal']['output'];
-  totalDays: Scalars['Int']['output'];
-  updatedAt: Scalars['DateTime']['output'];
+  subtotalAmount: Scalars["Decimal"]["output"];
+  totalAmount: Scalars["Decimal"]["output"];
+  totalDays: Scalars["Int"]["output"];
+  updatedAt: Scalars["DateTime"]["output"];
 };
-
 
 export type BookingPaymentsArgs = {
   order?: InputMaybe<Array<PaymentSortInput>>;
   where?: InputMaybe<PaymentFilterInput>;
 };
 
-
 export type BookingPayoutsArgs = {
   order?: InputMaybe<Array<PayoutSortInput>>;
   where?: InputMaybe<PayoutFilterInput>;
 };
-
 
 export type BookingReviewsArgs = {
   order?: InputMaybe<Array<ReviewSortInput>>;
@@ -163,22 +180,22 @@ export type BookingReviewsArgs = {
 };
 
 export type BookingDispute = {
-  __typename: 'BookingDispute';
+  __typename: "BookingDispute";
   booking: Booking;
-  bookingId: Scalars['UUID']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  disputedAt: Scalars['DateTime']['output'];
+  bookingId: Scalars["UUID"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  disputedAt: Scalars["DateTime"]["output"];
   disputedByUser: User;
-  disputedByUserId: Scalars['UUID']['output'];
-  id: Scalars['UUID']['output'];
+  disputedByUserId: Scalars["UUID"]["output"];
+  id: Scalars["UUID"]["output"];
   issueType: DisputeIssueType;
-  photos: Array<Scalars['String']['output']>;
-  reason: Scalars['String']['output'];
-  resolutionAction: Maybe<Scalars['String']['output']>;
-  resolutionNotes: Maybe<Scalars['String']['output']>;
-  resolvedAt: Maybe<Scalars['DateTime']['output']>;
+  photos: Array<Scalars["String"]["output"]>;
+  reason: Scalars["String"]["output"];
+  resolutionAction: Maybe<Scalars["String"]["output"]>;
+  resolutionNotes: Maybe<Scalars["String"]["output"]>;
+  resolvedAt: Maybe<Scalars["DateTime"]["output"]>;
   resolvedByUser: Maybe<User>;
-  resolvedByUserId: Maybe<Scalars['UUID']['output']>;
+  resolvedByUserId: Maybe<Scalars["UUID"]["output"]>;
 };
 
 export type BookingDisputeFilterInput = {
@@ -256,19 +273,19 @@ export type BookingFilterInput = {
 };
 
 export type BookingProof = {
-  __typename: 'BookingProof';
-  autoApproveAt: Scalars['DateTime']['output'];
+  __typename: "BookingProof";
+  autoApproveAt: Scalars["DateTime"]["output"];
   booking: Booking;
-  bookingId: Scalars['UUID']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['UUID']['output'];
-  photos: Array<Scalars['String']['output']>;
-  rejectionReason: Maybe<Scalars['String']['output']>;
-  reviewedAt: Maybe<Scalars['DateTime']['output']>;
+  bookingId: Scalars["UUID"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["UUID"]["output"];
+  photos: Array<Scalars["String"]["output"]>;
+  rejectionReason: Maybe<Scalars["String"]["output"]>;
+  reviewedAt: Maybe<Scalars["DateTime"]["output"]>;
   reviewedByUser: Maybe<User>;
-  reviewedByUserId: Maybe<Scalars['UUID']['output']>;
+  reviewedByUserId: Maybe<Scalars["UUID"]["output"]>;
   status: ProofStatus;
-  submittedAt: Scalars['DateTime']['output'];
+  submittedAt: Scalars["DateTime"]["output"];
 };
 
 export type BookingProofFilterInput = {
@@ -335,16 +352,16 @@ export type BookingSortInput = {
 };
 
 export enum BookingStatus {
-  Approved = 'APPROVED',
-  Cancelled = 'CANCELLED',
-  Completed = 'COMPLETED',
-  Disputed = 'DISPUTED',
-  FileDownloaded = 'FILE_DOWNLOADED',
-  Installed = 'INSTALLED',
-  Paid = 'PAID',
-  PendingApproval = 'PENDING_APPROVAL',
-  Rejected = 'REJECTED',
-  Verified = 'VERIFIED'
+  Approved = "APPROVED",
+  Cancelled = "CANCELLED",
+  Completed = "COMPLETED",
+  Disputed = "DISPUTED",
+  FileDownloaded = "FILE_DOWNLOADED",
+  Installed = "INSTALLED",
+  Paid = "PAID",
+  PendingApproval = "PENDING_APPROVAL",
+  Rejected = "REJECTED",
+  Verified = "VERIFIED",
 }
 
 export type BookingStatusOperationFilterInput = {
@@ -356,7 +373,7 @@ export type BookingStatusOperationFilterInput = {
 
 /** A connection to a list of items. */
 export type BookingsConnection = {
-  __typename: 'BookingsConnection';
+  __typename: "BookingsConnection";
   /** A list of edges. */
   edges: Maybe<Array<BookingsEdge>>;
   /** A flattened list of the nodes. */
@@ -367,16 +384,16 @@ export type BookingsConnection = {
 
 /** An edge in a connection. */
 export type BookingsEdge = {
-  __typename: 'BookingsEdge';
+  __typename: "BookingsEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Booking;
 };
 
 /** A connection to a list of items. */
 export type BookingsRequiringActionConnection = {
-  __typename: 'BookingsRequiringActionConnection';
+  __typename: "BookingsRequiringActionConnection";
   /** A list of edges. */
   edges: Maybe<Array<BookingsRequiringActionEdge>>;
   /** A flattened list of the nodes. */
@@ -387,45 +404,44 @@ export type BookingsRequiringActionConnection = {
 
 /** An edge in a connection. */
 export type BookingsRequiringActionEdge = {
-  __typename: 'BookingsRequiringActionEdge';
+  __typename: "BookingsRequiringActionEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Booking;
 };
 
 export type BooleanOperationFilterInput = {
-  eq?: InputMaybe<Scalars['Boolean']['input']>;
-  neq?: InputMaybe<Scalars['Boolean']['input']>;
+  eq?: InputMaybe<Scalars["Boolean"]["input"]>;
+  neq?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type Campaign = {
-  __typename: 'Campaign';
+  __typename: "Campaign";
   advertiser: Maybe<AdvertiserProfile>;
   advertiserProfile: AdvertiserProfile;
-  advertiserProfileId: Scalars['UUID']['output'];
+  advertiserProfileId: Scalars["UUID"]["output"];
   bookings: Maybe<BookingsConnection>;
-  createdAt: Scalars['DateTime']['output'];
-  description: Maybe<Scalars['String']['output']>;
-  endDate: Maybe<Scalars['DateTime']['output']>;
-  goals: Maybe<Scalars['String']['output']>;
-  id: Scalars['UUID']['output'];
-  imageUrl: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  spacesCount: Scalars['Int']['output'];
-  startDate: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars["DateTime"]["output"];
+  description: Maybe<Scalars["String"]["output"]>;
+  endDate: Maybe<Scalars["DateTime"]["output"]>;
+  goals: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["UUID"]["output"];
+  imageUrl: Scalars["String"]["output"];
+  name: Scalars["String"]["output"];
+  spacesCount: Scalars["Int"]["output"];
+  startDate: Maybe<Scalars["DateTime"]["output"]>;
   status: CampaignStatus;
-  targetAudience: Maybe<Scalars['String']['output']>;
-  totalBudget: Maybe<Scalars['Decimal']['output']>;
-  totalSpend: Scalars['Decimal']['output'];
+  targetAudience: Maybe<Scalars["String"]["output"]>;
+  totalBudget: Maybe<Scalars["Decimal"]["output"]>;
+  totalSpend: Scalars["Decimal"]["output"];
 };
 
-
 export type CampaignBookingsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<BookingSortInput>>;
   where?: InputMaybe<BookingFilterInput>;
 };
@@ -466,11 +482,11 @@ export type CampaignSortInput = {
 };
 
 export enum CampaignStatus {
-  Active = 'ACTIVE',
-  Cancelled = 'CANCELLED',
-  Completed = 'COMPLETED',
-  Draft = 'DRAFT',
-  Submitted = 'SUBMITTED'
+  Active = "ACTIVE",
+  Cancelled = "CANCELLED",
+  Completed = "COMPLETED",
+  Draft = "DRAFT",
+  Submitted = "SUBMITTED",
 }
 
 export type CampaignStatusOperationFilterInput = {
@@ -482,7 +498,7 @@ export type CampaignStatusOperationFilterInput = {
 
 /** A connection to a list of items. */
 export type CampaignsConnection = {
-  __typename: 'CampaignsConnection';
+  __typename: "CampaignsConnection";
   /** A list of edges. */
   edges: Maybe<Array<CampaignsEdge>>;
   /** A flattened list of the nodes. */
@@ -493,22 +509,25 @@ export type CampaignsConnection = {
 
 /** An edge in a connection. */
 export type CampaignsEdge = {
-  __typename: 'CampaignsEdge';
+  __typename: "CampaignsEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Campaign;
 };
 
-export type CancelBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+export type CancelBookingError =
+  | ForbiddenError
+  | InvalidStatusTransitionError
+  | NotFoundError;
 
 export type CancelBookingInput = {
-  id: Scalars['ID']['input'];
-  reason: Scalars['String']['input'];
+  id: Scalars["ID"]["input"];
+  reason: Scalars["String"]["input"];
 };
 
 export type CancelBookingPayload = {
-  __typename: 'CancelBookingPayload';
+  __typename: "CancelBookingPayload";
   booking: Maybe<Booking>;
   errors: Maybe<Array<CancelBookingError>>;
 };
@@ -516,11 +535,11 @@ export type CancelBookingPayload = {
 export type CancelCampaignError = ForbiddenError | NotFoundError;
 
 export type CancelCampaignInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type CancelCampaignPayload = {
-  __typename: 'CancelCampaignPayload';
+  __typename: "CancelCampaignPayload";
   campaign: Maybe<Campaign>;
   errors: Maybe<Array<CancelCampaignError>>;
 };
@@ -528,62 +547,73 @@ export type CancelCampaignPayload = {
 export type ChangePasswordError = NotFoundError | ValidationError;
 
 export type ChangePasswordInput = {
-  currentPassword: Scalars['String']['input'];
-  newPassword: Scalars['String']['input'];
+  currentPassword: Scalars["String"]["input"];
+  newPassword: Scalars["String"]["input"];
 };
 
 export type ChangePasswordPayload = {
-  __typename: 'ChangePasswordPayload';
+  __typename: "ChangePasswordPayload";
   errors: Maybe<Array<ChangePasswordError>>;
-  success: Maybe<Scalars['Boolean']['output']>;
+  success: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type ConfirmPaymentError = NotFoundError | PaymentError;
 
 export type ConfirmPaymentInput = {
-  paymentIntentId: Scalars['String']['input'];
+  paymentIntentId: Scalars["String"]["input"];
 };
 
 export type ConfirmPaymentPayload = {
-  __typename: 'ConfirmPaymentPayload';
+  __typename: "ConfirmPaymentPayload";
   errors: Maybe<Array<ConfirmPaymentError>>;
   payment: Maybe<Payment>;
 };
 
+export type ConfirmSetupIntentError = NotFoundError | PaymentError;
+
+export type ConfirmSetupIntentInput = {
+  setupIntentId: Scalars["String"]["input"];
+};
+
+export type ConfirmSetupIntentPayload = {
+  __typename: "ConfirmSetupIntentPayload";
+  errors: Maybe<Array<ConfirmSetupIntentError>>;
+  paymentMethod: Maybe<SavedPaymentMethod>;
+};
+
 export type ConflictError = Error & {
-  __typename: 'ConflictError';
-  code: Scalars['String']['output'];
-  message: Scalars['String']['output'];
-  reason: Scalars['String']['output'];
-  resource: Scalars['String']['output'];
+  __typename: "ConflictError";
+  code: Scalars["String"]["output"];
+  message: Scalars["String"]["output"];
+  reason: Scalars["String"]["output"];
+  resource: Scalars["String"]["output"];
 };
 
 export type ConnectStripeAccountError = NotFoundError | PaymentError;
 
 export type ConnectStripeAccountPayload = {
-  __typename: 'ConnectStripeAccountPayload';
-  accountId: Maybe<Scalars['String']['output']>;
+  __typename: "ConnectStripeAccountPayload";
+  accountId: Maybe<Scalars["String"]["output"]>;
   errors: Maybe<Array<ConnectStripeAccountError>>;
-  onboardingUrl: Maybe<Scalars['String']['output']>;
+  onboardingUrl: Maybe<Scalars["String"]["output"]>;
 };
 
 export type Conversation = {
-  __typename: 'Conversation';
+  __typename: "Conversation";
   booking: Maybe<Booking>;
-  bookingId: Maybe<Scalars['UUID']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['UUID']['output'];
+  bookingId: Maybe<Scalars["UUID"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["UUID"]["output"];
   messages: Maybe<MessagesConnection>;
   participants: Array<ConversationParticipant>;
-  updatedAt: Scalars['DateTime']['output'];
+  updatedAt: Scalars["DateTime"]["output"];
 };
 
-
 export type ConversationMessagesArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<MessageSortInput>>;
   where?: InputMaybe<MessageFilterInput>;
 };
@@ -601,15 +631,15 @@ export type ConversationFilterInput = {
 };
 
 export type ConversationParticipant = {
-  __typename: 'ConversationParticipant';
+  __typename: "ConversationParticipant";
   conversation: Conversation;
-  conversationId: Scalars['UUID']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['UUID']['output'];
-  joinedAt: Scalars['DateTime']['output'];
-  lastReadAt: Maybe<Scalars['DateTime']['output']>;
+  conversationId: Scalars["UUID"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["UUID"]["output"];
+  joinedAt: Scalars["DateTime"]["output"];
+  lastReadAt: Maybe<Scalars["DateTime"]["output"]>;
   user: User;
-  userId: Scalars['UUID']['output'];
+  userId: Scalars["UUID"]["output"];
 };
 
 export type ConversationParticipantFilterInput = {
@@ -636,26 +666,29 @@ export type ConversationSortInput = {
 export type CreateBookingConversationError = NotFoundError;
 
 export type CreateBookingConversationInput = {
-  bookingId: Scalars['ID']['input'];
+  bookingId: Scalars["ID"]["input"];
 };
 
 export type CreateBookingConversationPayload = {
-  __typename: 'CreateBookingConversationPayload';
+  __typename: "CreateBookingConversationPayload";
   conversation: Maybe<Conversation>;
   errors: Maybe<Array<CreateBookingConversationError>>;
 };
 
-export type CreateBookingError = ConflictError | NotFoundError | ValidationError;
+export type CreateBookingError =
+  | ConflictError
+  | NotFoundError
+  | ValidationError;
 
 export type CreateBookingInput = {
-  advertiserNotes?: InputMaybe<Scalars['String']['input']>;
-  endDate: Scalars['DateTime']['input'];
-  spaceId: Scalars['UUID']['input'];
-  startDate: Scalars['DateTime']['input'];
+  advertiserNotes?: InputMaybe<Scalars["String"]["input"]>;
+  endDate: Scalars["DateTime"]["input"];
+  spaceId: Scalars["UUID"]["input"];
+  startDate: Scalars["DateTime"]["input"];
 };
 
 export type CreateBookingPayload = {
-  __typename: 'CreateBookingPayload';
+  __typename: "CreateBookingPayload";
   booking: Maybe<Booking>;
   errors: Maybe<Array<CreateBookingError>>;
 };
@@ -663,204 +696,238 @@ export type CreateBookingPayload = {
 export type CreateCampaignError = NotFoundError;
 
 export type CreateCampaignInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  endDate?: InputMaybe<Scalars['DateTime']['input']>;
-  goals?: InputMaybe<Scalars['String']['input']>;
-  imageUrl: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  startDate?: InputMaybe<Scalars['DateTime']['input']>;
-  targetAudience?: InputMaybe<Scalars['String']['input']>;
-  totalBudget?: InputMaybe<Scalars['Decimal']['input']>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  endDate?: InputMaybe<Scalars["DateTime"]["input"]>;
+  goals?: InputMaybe<Scalars["String"]["input"]>;
+  imageUrl: Scalars["String"]["input"];
+  name: Scalars["String"]["input"];
+  startDate?: InputMaybe<Scalars["DateTime"]["input"]>;
+  targetAudience?: InputMaybe<Scalars["String"]["input"]>;
+  totalBudget?: InputMaybe<Scalars["Decimal"]["input"]>;
 };
 
 export type CreateCampaignPayload = {
-  __typename: 'CreateCampaignPayload';
+  __typename: "CreateCampaignPayload";
   campaign: Maybe<Campaign>;
   errors: Maybe<Array<CreateCampaignError>>;
 };
 
-export type CreatePaymentIntentError = ConflictError | ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+export type CreatePaymentIntentError =
+  | ConflictError
+  | ForbiddenError
+  | InvalidStatusTransitionError
+  | NotFoundError;
 
 export type CreatePaymentIntentInput = {
-  bookingId: Scalars['ID']['input'];
+  bookingId: Scalars["ID"]["input"];
 };
 
 export type CreatePaymentIntentPayload = {
-  __typename: 'CreatePaymentIntentPayload';
-  amount: Maybe<Scalars['Decimal']['output']>;
-  clientSecret: Maybe<Scalars['String']['output']>;
+  __typename: "CreatePaymentIntentPayload";
+  amount: Maybe<Scalars["Decimal"]["output"]>;
+  clientSecret: Maybe<Scalars["String"]["output"]>;
   errors: Maybe<Array<CreatePaymentIntentError>>;
-  paymentIntentId: Maybe<Scalars['String']['output']>;
+  paymentIntentId: Maybe<Scalars["String"]["output"]>;
 };
 
 export type CreateReviewError = ConflictError | ForbiddenError | NotFoundError;
 
 export type CreateReviewInput = {
-  comment?: InputMaybe<Scalars['String']['input']>;
-  rating: Scalars['Int']['input'];
+  comment?: InputMaybe<Scalars["String"]["input"]>;
+  rating: Scalars["Int"]["input"];
 };
 
 export type CreateReviewPayload = {
-  __typename: 'CreateReviewPayload';
+  __typename: "CreateReviewPayload";
   errors: Maybe<Array<CreateReviewError>>;
   review: Maybe<Review>;
+};
+
+export type CreateSetupIntentError = NotFoundError | PaymentError;
+
+export type CreateSetupIntentPayload = {
+  __typename: "CreateSetupIntentPayload";
+  clientSecret: Maybe<Scalars["String"]["output"]>;
+  errors: Maybe<Array<CreateSetupIntentError>>;
+  setupIntentId: Maybe<Scalars["String"]["output"]>;
 };
 
 export type CreateSpaceError = NotFoundError | ValidationError;
 
 export type CreateSpaceInput = {
-  address: Scalars['String']['input'];
-  availableFrom?: InputMaybe<Scalars['DateTime']['input']>;
-  availableTo?: InputMaybe<Scalars['DateTime']['input']>;
-  city: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  dimensions?: InputMaybe<Scalars['String']['input']>;
-  dimensionsText?: InputMaybe<Scalars['String']['input']>;
-  height?: InputMaybe<Scalars['Float']['input']>;
-  images?: InputMaybe<Array<Scalars['String']['input']>>;
-  installationFee?: InputMaybe<Scalars['Decimal']['input']>;
-  latitude: Scalars['Float']['input'];
-  longitude: Scalars['Float']['input'];
-  maxDuration?: InputMaybe<Scalars['Int']['input']>;
-  minDuration: Scalars['Int']['input'];
-  pricePerDay: Scalars['Decimal']['input'];
-  state: Scalars['String']['input'];
-  title: Scalars['String']['input'];
-  traffic?: InputMaybe<Scalars['String']['input']>;
+  address: Scalars["String"]["input"];
+  availableFrom?: InputMaybe<Scalars["DateTime"]["input"]>;
+  availableTo?: InputMaybe<Scalars["DateTime"]["input"]>;
+  city: Scalars["String"]["input"];
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  dimensions?: InputMaybe<Scalars["String"]["input"]>;
+  dimensionsText?: InputMaybe<Scalars["String"]["input"]>;
+  height?: InputMaybe<Scalars["Float"]["input"]>;
+  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  installationFee?: InputMaybe<Scalars["Decimal"]["input"]>;
+  latitude: Scalars["Float"]["input"];
+  longitude: Scalars["Float"]["input"];
+  maxDuration?: InputMaybe<Scalars["Int"]["input"]>;
+  minDuration: Scalars["Int"]["input"];
+  pricePerDay: Scalars["Decimal"]["input"];
+  state: Scalars["String"]["input"];
+  title: Scalars["String"]["input"];
+  traffic?: InputMaybe<Scalars["String"]["input"]>;
   type: SpaceType;
-  width?: InputMaybe<Scalars['Float']['input']>;
-  zipCode?: InputMaybe<Scalars['String']['input']>;
+  width?: InputMaybe<Scalars["Float"]["input"]>;
+  zipCode?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type CreateSpacePayload = {
-  __typename: 'CreateSpacePayload';
+  __typename: "CreateSpacePayload";
   errors: Maybe<Array<CreateSpaceError>>;
   space: Maybe<Space>;
 };
 
 export type DateTimeOperationFilterInput = {
-  eq?: InputMaybe<Scalars['DateTime']['input']>;
-  gt?: InputMaybe<Scalars['DateTime']['input']>;
-  gte?: InputMaybe<Scalars['DateTime']['input']>;
-  in?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
-  lt?: InputMaybe<Scalars['DateTime']['input']>;
-  lte?: InputMaybe<Scalars['DateTime']['input']>;
-  neq?: InputMaybe<Scalars['DateTime']['input']>;
-  ngt?: InputMaybe<Scalars['DateTime']['input']>;
-  ngte?: InputMaybe<Scalars['DateTime']['input']>;
-  nin?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
-  nlt?: InputMaybe<Scalars['DateTime']['input']>;
-  nlte?: InputMaybe<Scalars['DateTime']['input']>;
+  eq?: InputMaybe<Scalars["DateTime"]["input"]>;
+  gt?: InputMaybe<Scalars["DateTime"]["input"]>;
+  gte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  in?: InputMaybe<Array<InputMaybe<Scalars["DateTime"]["input"]>>>;
+  lt?: InputMaybe<Scalars["DateTime"]["input"]>;
+  lte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  neq?: InputMaybe<Scalars["DateTime"]["input"]>;
+  ngt?: InputMaybe<Scalars["DateTime"]["input"]>;
+  ngte?: InputMaybe<Scalars["DateTime"]["input"]>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars["DateTime"]["input"]>>>;
+  nlt?: InputMaybe<Scalars["DateTime"]["input"]>;
+  nlte?: InputMaybe<Scalars["DateTime"]["input"]>;
 };
 
-export type DeactivateSpaceError = ConflictError | ForbiddenError | NotFoundError;
+export type DeactivateSpaceError =
+  | ConflictError
+  | ForbiddenError
+  | NotFoundError;
 
 export type DeactivateSpaceInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type DeactivateSpacePayload = {
-  __typename: 'DeactivateSpacePayload';
+  __typename: "DeactivateSpacePayload";
   errors: Maybe<Array<DeactivateSpaceError>>;
   space: Maybe<Space>;
 };
 
 export type DecimalOperationFilterInput = {
-  eq?: InputMaybe<Scalars['Decimal']['input']>;
-  gt?: InputMaybe<Scalars['Decimal']['input']>;
-  gte?: InputMaybe<Scalars['Decimal']['input']>;
-  in?: InputMaybe<Array<InputMaybe<Scalars['Decimal']['input']>>>;
-  lt?: InputMaybe<Scalars['Decimal']['input']>;
-  lte?: InputMaybe<Scalars['Decimal']['input']>;
-  neq?: InputMaybe<Scalars['Decimal']['input']>;
-  ngt?: InputMaybe<Scalars['Decimal']['input']>;
-  ngte?: InputMaybe<Scalars['Decimal']['input']>;
-  nin?: InputMaybe<Array<InputMaybe<Scalars['Decimal']['input']>>>;
-  nlt?: InputMaybe<Scalars['Decimal']['input']>;
-  nlte?: InputMaybe<Scalars['Decimal']['input']>;
+  eq?: InputMaybe<Scalars["Decimal"]["input"]>;
+  gt?: InputMaybe<Scalars["Decimal"]["input"]>;
+  gte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  in?: InputMaybe<Array<InputMaybe<Scalars["Decimal"]["input"]>>>;
+  lt?: InputMaybe<Scalars["Decimal"]["input"]>;
+  lte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  neq?: InputMaybe<Scalars["Decimal"]["input"]>;
+  ngt?: InputMaybe<Scalars["Decimal"]["input"]>;
+  ngte?: InputMaybe<Scalars["Decimal"]["input"]>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars["Decimal"]["input"]>>>;
+  nlt?: InputMaybe<Scalars["Decimal"]["input"]>;
+  nlte?: InputMaybe<Scalars["Decimal"]["input"]>;
 };
 
-export type DeleteCampaignError = ConflictError | ForbiddenError | NotFoundError;
+export type DeleteCampaignError =
+  | ConflictError
+  | ForbiddenError
+  | NotFoundError;
 
 export type DeleteCampaignInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type DeleteCampaignPayload = {
-  __typename: 'DeleteCampaignPayload';
+  __typename: "DeleteCampaignPayload";
   errors: Maybe<Array<DeleteCampaignError>>;
-  success: Maybe<Scalars['Boolean']['output']>;
+  success: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type DeleteMyAccountError = NotFoundError | ValidationError;
 
 export type DeleteMyAccountInput = {
-  password: Scalars['String']['input'];
+  password: Scalars["String"]["input"];
 };
 
 export type DeleteMyAccountPayload = {
-  __typename: 'DeleteMyAccountPayload';
+  __typename: "DeleteMyAccountPayload";
   errors: Maybe<Array<DeleteMyAccountError>>;
-  success: Maybe<Scalars['Boolean']['output']>;
+  success: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type DeleteNotificationInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type DeleteNotificationPayload = {
-  __typename: 'DeleteNotificationPayload';
-  success: Scalars['Boolean']['output'];
+  __typename: "DeleteNotificationPayload";
+  success: Scalars["Boolean"]["output"];
+};
+
+export type DeletePaymentMethodError = ForbiddenError | NotFoundError;
+
+export type DeletePaymentMethodInput = {
+  paymentMethodId: Scalars["UUID"]["input"];
+};
+
+export type DeletePaymentMethodPayload = {
+  __typename: "DeletePaymentMethodPayload";
+  errors: Maybe<Array<DeletePaymentMethodError>>;
+  success: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type DeleteReviewInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type DeleteReviewPayload = {
-  __typename: 'DeleteReviewPayload';
-  success: Scalars['Boolean']['output'];
+  __typename: "DeleteReviewPayload";
+  success: Scalars["Boolean"]["output"];
 };
 
 export type DeleteSpaceError = ConflictError | ForbiddenError | NotFoundError;
 
 export type DeleteSpaceInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type DeleteSpacePayload = {
-  __typename: 'DeleteSpacePayload';
+  __typename: "DeleteSpacePayload";
   errors: Maybe<Array<DeleteSpaceError>>;
-  success: Maybe<Scalars['Boolean']['output']>;
+  success: Maybe<Scalars["Boolean"]["output"]>;
 };
 
 export type DeleteUserError = NotFoundError;
 
 export type DeleteUserInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type DeleteUserPayload = {
-  __typename: 'DeleteUserPayload';
+  __typename: "DeleteUserPayload";
   errors: Maybe<Array<DeleteUserError>>;
-  success: Maybe<Scalars['Boolean']['output']>;
+  success: Maybe<Scalars["Boolean"]["output"]>;
 };
 
-export type DisconnectStripeAccountError = NotFoundError | PaymentError | ValidationError;
+export type DisconnectStripeAccountError =
+  | NotFoundError
+  | PaymentError
+  | ValidationError;
 
 export type DisconnectStripeAccountPayload = {
-  __typename: 'DisconnectStripeAccountPayload';
+  __typename: "DisconnectStripeAccountPayload";
   errors: Maybe<Array<DisconnectStripeAccountError>>;
   profile: Maybe<SpaceOwnerProfile>;
 };
 
 export enum DisputeIssueType {
-  DamageToCreative = 'DAMAGE_TO_CREATIVE',
-  MisleadingListing = 'MISLEADING_LISTING',
-  NotVisible = 'NOT_VISIBLE',
-  PoorQuality = 'POOR_QUALITY',
-  SafetyIssue = 'SAFETY_ISSUE',
-  WrongLocation = 'WRONG_LOCATION'
+  DamageToCreative = "DAMAGE_TO_CREATIVE",
+  MisleadingListing = "MISLEADING_LISTING",
+  NotVisible = "NOT_VISIBLE",
+  PoorQuality = "POOR_QUALITY",
+  SafetyIssue = "SAFETY_ISSUE",
+  WrongLocation = "WRONG_LOCATION",
 }
 
 export type DisputeIssueTypeOperationFilterInput = {
@@ -871,43 +938,43 @@ export type DisputeIssueTypeOperationFilterInput = {
 };
 
 export type EarningsSummary = {
-  __typename: 'EarningsSummary';
-  availableBalance: Maybe<Scalars['Decimal']['output']>;
-  lastMonthEarnings: Maybe<Scalars['Decimal']['output']>;
-  pendingPayouts: Maybe<Scalars['Decimal']['output']>;
-  thisMonthEarnings: Maybe<Scalars['Decimal']['output']>;
-  totalEarnings: Maybe<Scalars['Decimal']['output']>;
+  __typename: "EarningsSummary";
+  availableBalance: Maybe<Scalars["Decimal"]["output"]>;
+  lastMonthEarnings: Maybe<Scalars["Decimal"]["output"]>;
+  pendingPayouts: Maybe<Scalars["Decimal"]["output"]>;
+  thisMonthEarnings: Maybe<Scalars["Decimal"]["output"]>;
+  totalEarnings: Maybe<Scalars["Decimal"]["output"]>;
 };
 
 export type Error = {
-  message: Scalars['String']['output'];
+  message: Scalars["String"]["output"];
 };
 
 export type FloatOperationFilterInput = {
-  eq?: InputMaybe<Scalars['Float']['input']>;
-  gt?: InputMaybe<Scalars['Float']['input']>;
-  gte?: InputMaybe<Scalars['Float']['input']>;
-  in?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
-  lt?: InputMaybe<Scalars['Float']['input']>;
-  lte?: InputMaybe<Scalars['Float']['input']>;
-  neq?: InputMaybe<Scalars['Float']['input']>;
-  ngt?: InputMaybe<Scalars['Float']['input']>;
-  ngte?: InputMaybe<Scalars['Float']['input']>;
-  nin?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
-  nlt?: InputMaybe<Scalars['Float']['input']>;
-  nlte?: InputMaybe<Scalars['Float']['input']>;
+  eq?: InputMaybe<Scalars["Float"]["input"]>;
+  gt?: InputMaybe<Scalars["Float"]["input"]>;
+  gte?: InputMaybe<Scalars["Float"]["input"]>;
+  in?: InputMaybe<Array<InputMaybe<Scalars["Float"]["input"]>>>;
+  lt?: InputMaybe<Scalars["Float"]["input"]>;
+  lte?: InputMaybe<Scalars["Float"]["input"]>;
+  neq?: InputMaybe<Scalars["Float"]["input"]>;
+  ngt?: InputMaybe<Scalars["Float"]["input"]>;
+  ngte?: InputMaybe<Scalars["Float"]["input"]>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars["Float"]["input"]>>>;
+  nlt?: InputMaybe<Scalars["Float"]["input"]>;
+  nlte?: InputMaybe<Scalars["Float"]["input"]>;
 };
 
 export type ForbiddenError = Error & {
-  __typename: 'ForbiddenError';
-  action: Scalars['String']['output'];
-  code: Scalars['String']['output'];
-  message: Scalars['String']['output'];
+  __typename: "ForbiddenError";
+  action: Scalars["String"]["output"];
+  code: Scalars["String"]["output"];
+  message: Scalars["String"]["output"];
 };
 
 /** A connection to a list of items. */
 export type IncomingBookingRequestsConnection = {
-  __typename: 'IncomingBookingRequestsConnection';
+  __typename: "IncomingBookingRequestsConnection";
   /** A list of edges. */
   edges: Maybe<Array<IncomingBookingRequestsEdge>>;
   /** A flattened list of the nodes. */
@@ -918,149 +985,162 @@ export type IncomingBookingRequestsConnection = {
 
 /** An edge in a connection. */
 export type IncomingBookingRequestsEdge = {
-  __typename: 'IncomingBookingRequestsEdge';
+  __typename: "IncomingBookingRequestsEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Booking;
 };
 
 export type IntOperationFilterInput = {
-  eq?: InputMaybe<Scalars['Int']['input']>;
-  gt?: InputMaybe<Scalars['Int']['input']>;
-  gte?: InputMaybe<Scalars['Int']['input']>;
-  in?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
-  lt?: InputMaybe<Scalars['Int']['input']>;
-  lte?: InputMaybe<Scalars['Int']['input']>;
-  neq?: InputMaybe<Scalars['Int']['input']>;
-  ngt?: InputMaybe<Scalars['Int']['input']>;
-  ngte?: InputMaybe<Scalars['Int']['input']>;
-  nin?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
-  nlt?: InputMaybe<Scalars['Int']['input']>;
-  nlte?: InputMaybe<Scalars['Int']['input']>;
+  eq?: InputMaybe<Scalars["Int"]["input"]>;
+  gt?: InputMaybe<Scalars["Int"]["input"]>;
+  gte?: InputMaybe<Scalars["Int"]["input"]>;
+  in?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  lt?: InputMaybe<Scalars["Int"]["input"]>;
+  lte?: InputMaybe<Scalars["Int"]["input"]>;
+  neq?: InputMaybe<Scalars["Int"]["input"]>;
+  ngt?: InputMaybe<Scalars["Int"]["input"]>;
+  ngte?: InputMaybe<Scalars["Int"]["input"]>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars["Int"]["input"]>>>;
+  nlt?: InputMaybe<Scalars["Int"]["input"]>;
+  nlte?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type InvalidStatusTransitionError = Error & {
-  __typename: 'InvalidStatusTransitionError';
-  code: Scalars['String']['output'];
-  fromStatus: Scalars['String']['output'];
-  message: Scalars['String']['output'];
-  toStatus: Scalars['String']['output'];
+  __typename: "InvalidStatusTransitionError";
+  code: Scalars["String"]["output"];
+  fromStatus: Scalars["String"]["output"];
+  message: Scalars["String"]["output"];
+  toStatus: Scalars["String"]["output"];
 };
 
 export type KeyValuePairOfStringAndString__ = {
-  __typename: 'KeyValuePairOfStringAndString__';
-  key: Scalars['String']['output'];
-  value: Array<Scalars['String']['output']>;
+  __typename: "KeyValuePairOfStringAndString__";
+  key: Scalars["String"]["output"];
+  value: Array<Scalars["String"]["output"]>;
 };
 
 export type ListFilterInputTypeOfBookingFilterInput = {
   all?: InputMaybe<BookingFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
   none?: InputMaybe<BookingFilterInput>;
   some?: InputMaybe<BookingFilterInput>;
 };
 
 export type ListFilterInputTypeOfCampaignFilterInput = {
   all?: InputMaybe<CampaignFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
   none?: InputMaybe<CampaignFilterInput>;
   some?: InputMaybe<CampaignFilterInput>;
 };
 
 export type ListFilterInputTypeOfConversationParticipantFilterInput = {
   all?: InputMaybe<ConversationParticipantFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
   none?: InputMaybe<ConversationParticipantFilterInput>;
   some?: InputMaybe<ConversationParticipantFilterInput>;
 };
 
 export type ListFilterInputTypeOfMessageFilterInput = {
   all?: InputMaybe<MessageFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
   none?: InputMaybe<MessageFilterInput>;
   some?: InputMaybe<MessageFilterInput>;
 };
 
 export type ListFilterInputTypeOfPaymentFilterInput = {
   all?: InputMaybe<PaymentFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
   none?: InputMaybe<PaymentFilterInput>;
   some?: InputMaybe<PaymentFilterInput>;
 };
 
 export type ListFilterInputTypeOfPayoutFilterInput = {
   all?: InputMaybe<PayoutFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
   none?: InputMaybe<PayoutFilterInput>;
   some?: InputMaybe<PayoutFilterInput>;
 };
 
 export type ListFilterInputTypeOfRefundFilterInput = {
   all?: InputMaybe<RefundFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
   none?: InputMaybe<RefundFilterInput>;
   some?: InputMaybe<RefundFilterInput>;
 };
 
 export type ListFilterInputTypeOfReviewFilterInput = {
   all?: InputMaybe<ReviewFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
   none?: InputMaybe<ReviewFilterInput>;
   some?: InputMaybe<ReviewFilterInput>;
 };
 
+export type ListFilterInputTypeOfSavedPaymentMethodFilterInput = {
+  all?: InputMaybe<SavedPaymentMethodFilterInput>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
+  none?: InputMaybe<SavedPaymentMethodFilterInput>;
+  some?: InputMaybe<SavedPaymentMethodFilterInput>;
+};
+
 export type ListFilterInputTypeOfSpaceFilterInput = {
   all?: InputMaybe<SpaceFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
   none?: InputMaybe<SpaceFilterInput>;
   some?: InputMaybe<SpaceFilterInput>;
 };
 
 export type ListStringOperationFilterInput = {
   all?: InputMaybe<StringOperationFilterInput>;
-  any?: InputMaybe<Scalars['Boolean']['input']>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
   none?: InputMaybe<StringOperationFilterInput>;
   some?: InputMaybe<StringOperationFilterInput>;
 };
 
 export type MarkAllNotificationsReadPayload = {
-  __typename: 'MarkAllNotificationsReadPayload';
-  count: Scalars['Int']['output'];
+  __typename: "MarkAllNotificationsReadPayload";
+  count: Scalars["Int"]["output"];
 };
 
 export type MarkConversationReadError = ForbiddenError;
 
 export type MarkConversationReadInput = {
-  conversationId: Scalars['ID']['input'];
+  conversationId: Scalars["ID"]["input"];
 };
 
 export type MarkConversationReadPayload = {
-  __typename: 'MarkConversationReadPayload';
+  __typename: "MarkConversationReadPayload";
   errors: Maybe<Array<MarkConversationReadError>>;
   participant: Maybe<ConversationParticipant>;
 };
 
-export type MarkFileDownloadedError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+export type MarkFileDownloadedError =
+  | ForbiddenError
+  | InvalidStatusTransitionError
+  | NotFoundError;
 
 export type MarkFileDownloadedInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type MarkFileDownloadedPayload = {
-  __typename: 'MarkFileDownloadedPayload';
+  __typename: "MarkFileDownloadedPayload";
   booking: Maybe<Booking>;
   errors: Maybe<Array<MarkFileDownloadedError>>;
 };
 
-export type MarkInstalledError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+export type MarkInstalledError =
+  | ForbiddenError
+  | InvalidStatusTransitionError
+  | NotFoundError;
 
 export type MarkInstalledInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type MarkInstalledPayload = {
-  __typename: 'MarkInstalledPayload';
+  __typename: "MarkInstalledPayload";
   booking: Maybe<Booking>;
   errors: Maybe<Array<MarkInstalledError>>;
 };
@@ -1068,25 +1148,25 @@ export type MarkInstalledPayload = {
 export type MarkNotificationReadError = NotFoundError;
 
 export type MarkNotificationReadInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type MarkNotificationReadPayload = {
-  __typename: 'MarkNotificationReadPayload';
+  __typename: "MarkNotificationReadPayload";
   errors: Maybe<Array<MarkNotificationReadError>>;
   notification: Maybe<Notification>;
 };
 
 export type Message = {
-  __typename: 'Message';
-  attachments: Maybe<Array<Scalars['String']['output']>>;
-  content: Scalars['String']['output'];
+  __typename: "Message";
+  attachments: Maybe<Array<Scalars["String"]["output"]>>;
+  content: Scalars["String"]["output"];
   conversation: Conversation;
-  conversationId: Scalars['UUID']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['UUID']['output'];
+  conversationId: Scalars["UUID"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["UUID"]["output"];
   senderUser: User;
-  senderUserId: Scalars['UUID']['output'];
+  senderUserId: Scalars["UUID"]["output"];
   type: MessageType;
 };
 
@@ -1116,14 +1196,14 @@ export type MessageSortInput = {
 };
 
 export enum MessageType {
-  CorrectionRequest = 'CORRECTION_REQUEST',
-  ProofApproved = 'PROOF_APPROVED',
-  ProofDisputed = 'PROOF_DISPUTED',
-  ProofRejected = 'PROOF_REJECTED',
-  ProofSubmission = 'PROOF_SUBMISSION',
-  QualityConcern = 'QUALITY_CONCERN',
-  System = 'SYSTEM',
-  Text = 'TEXT'
+  CorrectionRequest = "CORRECTION_REQUEST",
+  ProofApproved = "PROOF_APPROVED",
+  ProofDisputed = "PROOF_DISPUTED",
+  ProofRejected = "PROOF_REJECTED",
+  ProofSubmission = "PROOF_SUBMISSION",
+  QualityConcern = "QUALITY_CONCERN",
+  System = "SYSTEM",
+  Text = "TEXT",
 }
 
 export type MessageTypeOperationFilterInput = {
@@ -1135,7 +1215,7 @@ export type MessageTypeOperationFilterInput = {
 
 /** A connection to a list of items. */
 export type MessagesByConversationConnection = {
-  __typename: 'MessagesByConversationConnection';
+  __typename: "MessagesByConversationConnection";
   /** A list of edges. */
   edges: Maybe<Array<MessagesByConversationEdge>>;
   /** A flattened list of the nodes. */
@@ -1146,16 +1226,16 @@ export type MessagesByConversationConnection = {
 
 /** An edge in a connection. */
 export type MessagesByConversationEdge = {
-  __typename: 'MessagesByConversationEdge';
+  __typename: "MessagesByConversationEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Message;
 };
 
 /** A connection to a list of items. */
 export type MessagesConnection = {
-  __typename: 'MessagesConnection';
+  __typename: "MessagesConnection";
   /** A list of edges. */
   edges: Maybe<Array<MessagesEdge>>;
   /** A flattened list of the nodes. */
@@ -1166,31 +1246,34 @@ export type MessagesConnection = {
 
 /** An edge in a connection. */
 export type MessagesEdge = {
-  __typename: 'MessagesEdge';
+  __typename: "MessagesEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Message;
 };
 
 export type Mutation = {
-  __typename: 'Mutation';
+  __typename: "Mutation";
   approveBooking: ApproveBookingPayload;
   cancelBooking: CancelBookingPayload;
   cancelCampaign: CancelCampaignPayload;
   changePassword: ChangePasswordPayload;
   confirmPayment: ConfirmPaymentPayload;
+  confirmSetupIntent: ConfirmSetupIntentPayload;
   connectStripeAccount: ConnectStripeAccountPayload;
   createBooking: CreateBookingPayload;
   createBookingConversation: CreateBookingConversationPayload;
   createCampaign: CreateCampaignPayload;
   createPaymentIntent: CreatePaymentIntentPayload;
   createReview: CreateReviewPayload;
+  createSetupIntent: CreateSetupIntentPayload;
   createSpace: CreateSpacePayload;
   deactivateSpace: DeactivateSpacePayload;
   deleteCampaign: DeleteCampaignPayload;
   deleteMyAccount: DeleteMyAccountPayload;
   deleteNotification: DeleteNotificationPayload;
+  deletePaymentMethod: DeletePaymentMethodPayload;
   deleteReview: DeleteReviewPayload;
   deleteSpace: DeleteSpacePayload;
   deleteUser: DeleteUserPayload;
@@ -1207,6 +1290,7 @@ export type Mutation = {
   requestRefund: RequestRefundPayload;
   retryPayout: RetryPayoutPayload;
   sendMessage: SendMessagePayload;
+  setDefaultPaymentMethod: SetDefaultPaymentMethodPayload;
   submitCampaign: SubmitCampaignPayload;
   updateAdvertiserProfile: UpdateAdvertiserProfilePayload;
   updateCampaign: UpdateCampaignPayload;
@@ -1217,186 +1301,162 @@ export type Mutation = {
   updateSpaceOwnerProfile: UpdateSpaceOwnerProfilePayload;
 };
 
-
 export type MutationApproveBookingArgs = {
   input: ApproveBookingInput;
 };
-
 
 export type MutationCancelBookingArgs = {
   input: CancelBookingInput;
 };
 
-
 export type MutationCancelCampaignArgs = {
   input: CancelCampaignInput;
 };
-
 
 export type MutationChangePasswordArgs = {
   input: ChangePasswordInput;
 };
 
-
 export type MutationConfirmPaymentArgs = {
   input: ConfirmPaymentInput;
 };
 
-
-export type MutationCreateBookingArgs = {
-  campaignId: Scalars['ID']['input'];
-  input: CreateBookingInput;
+export type MutationConfirmSetupIntentArgs = {
+  input: ConfirmSetupIntentInput;
 };
 
+export type MutationCreateBookingArgs = {
+  campaignId: Scalars["ID"]["input"];
+  input: CreateBookingInput;
+};
 
 export type MutationCreateBookingConversationArgs = {
   input: CreateBookingConversationInput;
 };
 
-
 export type MutationCreateCampaignArgs = {
   input: CreateCampaignInput;
 };
-
 
 export type MutationCreatePaymentIntentArgs = {
   input: CreatePaymentIntentInput;
 };
 
-
 export type MutationCreateReviewArgs = {
-  bookingId: Scalars['ID']['input'];
+  bookingId: Scalars["ID"]["input"];
   input: CreateReviewInput;
 };
-
 
 export type MutationCreateSpaceArgs = {
   input: CreateSpaceInput;
 };
 
-
 export type MutationDeactivateSpaceArgs = {
   input: DeactivateSpaceInput;
 };
-
 
 export type MutationDeleteCampaignArgs = {
   input: DeleteCampaignInput;
 };
 
-
 export type MutationDeleteMyAccountArgs = {
   input: DeleteMyAccountInput;
 };
-
 
 export type MutationDeleteNotificationArgs = {
   input: DeleteNotificationInput;
 };
 
+export type MutationDeletePaymentMethodArgs = {
+  input: DeletePaymentMethodInput;
+};
 
 export type MutationDeleteReviewArgs = {
   input: DeleteReviewInput;
 };
 
-
 export type MutationDeleteSpaceArgs = {
   input: DeleteSpaceInput;
 };
-
 
 export type MutationDeleteUserArgs = {
   input: DeleteUserInput;
 };
 
-
 export type MutationMarkConversationReadArgs = {
   input: MarkConversationReadInput;
 };
-
 
 export type MutationMarkFileDownloadedArgs = {
   input: MarkFileDownloadedInput;
 };
 
-
 export type MutationMarkInstalledArgs = {
   input: MarkInstalledInput;
 };
-
 
 export type MutationMarkNotificationReadArgs = {
   input: MarkNotificationReadInput;
 };
 
-
 export type MutationProcessPayoutArgs = {
   input: ProcessPayoutInput;
 };
-
 
 export type MutationReactivateSpaceArgs = {
   input: ReactivateSpaceInput;
 };
 
-
 export type MutationRejectBookingArgs = {
   input: RejectBookingInput;
 };
-
 
 export type MutationRequestRefundArgs = {
   input: RequestRefundInput;
 };
 
-
 export type MutationRetryPayoutArgs = {
   input: RetryPayoutInput;
 };
-
 
 export type MutationSendMessageArgs = {
   input: SendMessageInput;
 };
 
+export type MutationSetDefaultPaymentMethodArgs = {
+  input: SetDefaultPaymentMethodInput;
+};
 
 export type MutationSubmitCampaignArgs = {
   input: SubmitCampaignInput;
 };
 
-
 export type MutationUpdateAdvertiserProfileArgs = {
   input: UpdateAdvertiserProfileInput;
 };
 
-
 export type MutationUpdateCampaignArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
   input: UpdateCampaignInput;
 };
-
 
 export type MutationUpdateCurrentUserArgs = {
   input: UpdateCurrentUserInput;
 };
 
-
 export type MutationUpdateNotificationPreferenceArgs = {
   input: UpdateNotificationPreferenceInput;
 };
 
-
 export type MutationUpdateReviewArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
   input: UpdateReviewInput;
 };
 
-
 export type MutationUpdateSpaceArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
   input: UpdateSpaceInput;
 };
-
 
 export type MutationUpdateSpaceOwnerProfileArgs = {
   input: UpdateSpaceOwnerProfileInput;
@@ -1404,7 +1464,7 @@ export type MutationUpdateSpaceOwnerProfileArgs = {
 
 /** A connection to a list of items. */
 export type MyBookingsAsAdvertiserConnection = {
-  __typename: 'MyBookingsAsAdvertiserConnection';
+  __typename: "MyBookingsAsAdvertiserConnection";
   /** A list of edges. */
   edges: Maybe<Array<MyBookingsAsAdvertiserEdge>>;
   /** A flattened list of the nodes. */
@@ -1412,21 +1472,21 @@ export type MyBookingsAsAdvertiserConnection = {
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
   /** Identifies the total count of items in the connection. */
-  totalCount: Scalars['Int']['output'];
+  totalCount: Scalars["Int"]["output"];
 };
 
 /** An edge in a connection. */
 export type MyBookingsAsAdvertiserEdge = {
-  __typename: 'MyBookingsAsAdvertiserEdge';
+  __typename: "MyBookingsAsAdvertiserEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Booking;
 };
 
 /** A connection to a list of items. */
 export type MyBookingsAsOwnerConnection = {
-  __typename: 'MyBookingsAsOwnerConnection';
+  __typename: "MyBookingsAsOwnerConnection";
   /** A list of edges. */
   edges: Maybe<Array<MyBookingsAsOwnerEdge>>;
   /** A flattened list of the nodes. */
@@ -1434,21 +1494,21 @@ export type MyBookingsAsOwnerConnection = {
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
   /** Identifies the total count of items in the connection. */
-  totalCount: Scalars['Int']['output'];
+  totalCount: Scalars["Int"]["output"];
 };
 
 /** An edge in a connection. */
 export type MyBookingsAsOwnerEdge = {
-  __typename: 'MyBookingsAsOwnerEdge';
+  __typename: "MyBookingsAsOwnerEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Booking;
 };
 
 /** A connection to a list of items. */
 export type MyCampaignsConnection = {
-  __typename: 'MyCampaignsConnection';
+  __typename: "MyCampaignsConnection";
   /** A list of edges. */
   edges: Maybe<Array<MyCampaignsEdge>>;
   /** A flattened list of the nodes. */
@@ -1459,16 +1519,16 @@ export type MyCampaignsConnection = {
 
 /** An edge in a connection. */
 export type MyCampaignsEdge = {
-  __typename: 'MyCampaignsEdge';
+  __typename: "MyCampaignsEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Campaign;
 };
 
 /** A connection to a list of items. */
 export type MyConversationsConnection = {
-  __typename: 'MyConversationsConnection';
+  __typename: "MyConversationsConnection";
   /** A list of edges. */
   edges: Maybe<Array<MyConversationsEdge>>;
   /** A flattened list of the nodes. */
@@ -1479,16 +1539,16 @@ export type MyConversationsConnection = {
 
 /** An edge in a connection. */
 export type MyConversationsEdge = {
-  __typename: 'MyConversationsEdge';
+  __typename: "MyConversationsEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Conversation;
 };
 
 /** A connection to a list of items. */
 export type MyNotificationsConnection = {
-  __typename: 'MyNotificationsConnection';
+  __typename: "MyNotificationsConnection";
   /** A list of edges. */
   edges: Maybe<Array<MyNotificationsEdge>>;
   /** A flattened list of the nodes. */
@@ -1499,16 +1559,16 @@ export type MyNotificationsConnection = {
 
 /** An edge in a connection. */
 export type MyNotificationsEdge = {
-  __typename: 'MyNotificationsEdge';
+  __typename: "MyNotificationsEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Notification;
 };
 
 /** A connection to a list of items. */
 export type MyPayoutsConnection = {
-  __typename: 'MyPayoutsConnection';
+  __typename: "MyPayoutsConnection";
   /** A list of edges. */
   edges: Maybe<Array<MyPayoutsEdge>>;
   /** A flattened list of the nodes. */
@@ -1519,16 +1579,16 @@ export type MyPayoutsConnection = {
 
 /** An edge in a connection. */
 export type MyPayoutsEdge = {
-  __typename: 'MyPayoutsEdge';
+  __typename: "MyPayoutsEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Payout;
 };
 
 /** A connection to a list of items. */
 export type MyReviewsConnection = {
-  __typename: 'MyReviewsConnection';
+  __typename: "MyReviewsConnection";
   /** A list of edges. */
   edges: Maybe<Array<MyReviewsEdge>>;
   /** A flattened list of the nodes. */
@@ -1539,16 +1599,16 @@ export type MyReviewsConnection = {
 
 /** An edge in a connection. */
 export type MyReviewsEdge = {
-  __typename: 'MyReviewsEdge';
+  __typename: "MyReviewsEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Review;
 };
 
 /** A connection to a list of items. */
 export type MySpacesConnection = {
-  __typename: 'MySpacesConnection';
+  __typename: "MySpacesConnection";
   /** A list of edges. */
   edges: Maybe<Array<MySpacesEdge>>;
   /** A flattened list of the nodes. */
@@ -1556,39 +1616,39 @@ export type MySpacesConnection = {
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
   /** Identifies the total count of items in the connection. */
-  totalCount: Scalars['Int']['output'];
+  totalCount: Scalars["Int"]["output"];
 };
 
 /** An edge in a connection. */
 export type MySpacesEdge = {
-  __typename: 'MySpacesEdge';
+  __typename: "MySpacesEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Space;
 };
 
 export type NotFoundError = Error & {
-  __typename: 'NotFoundError';
-  code: Scalars['String']['output'];
-  entityId: Scalars['UUID']['output'];
-  entityType: Scalars['String']['output'];
-  message: Scalars['String']['output'];
+  __typename: "NotFoundError";
+  code: Scalars["String"]["output"];
+  entityId: Scalars["UUID"]["output"];
+  entityType: Scalars["String"]["output"];
+  message: Scalars["String"]["output"];
 };
 
 export type Notification = {
-  __typename: 'Notification';
-  body: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  entityId: Maybe<Scalars['UUID']['output']>;
-  entityType: Maybe<Scalars['String']['output']>;
-  id: Scalars['UUID']['output'];
-  isRead: Scalars['Boolean']['output'];
-  readAt: Maybe<Scalars['DateTime']['output']>;
-  title: Scalars['String']['output'];
+  __typename: "Notification";
+  body: Scalars["String"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  entityId: Maybe<Scalars["UUID"]["output"]>;
+  entityType: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["UUID"]["output"];
+  isRead: Scalars["Boolean"]["output"];
+  readAt: Maybe<Scalars["DateTime"]["output"]>;
+  title: Scalars["String"]["output"];
   type: NotificationType;
   user: User;
-  userId: Scalars['UUID']['output'];
+  userId: Scalars["UUID"]["output"];
 };
 
 export type NotificationFilterInput = {
@@ -1608,15 +1668,15 @@ export type NotificationFilterInput = {
 };
 
 export type NotificationPreference = {
-  __typename: 'NotificationPreference';
-  createdAt: Scalars['DateTime']['output'];
-  emailEnabled: Scalars['Boolean']['output'];
-  id: Scalars['UUID']['output'];
-  inAppEnabled: Scalars['Boolean']['output'];
+  __typename: "NotificationPreference";
+  createdAt: Scalars["DateTime"]["output"];
+  emailEnabled: Scalars["Boolean"]["output"];
+  id: Scalars["UUID"]["output"];
+  inAppEnabled: Scalars["Boolean"]["output"];
   notificationType: NotificationType;
-  pushEnabled: Scalars['Boolean']['output'];
+  pushEnabled: Scalars["Boolean"]["output"];
   user: User;
-  userId: Scalars['UUID']['output'];
+  userId: Scalars["UUID"]["output"];
 };
 
 export type NotificationSortInput = {
@@ -1634,28 +1694,28 @@ export type NotificationSortInput = {
 };
 
 export enum NotificationType {
-  BookingApproved = 'BOOKING_APPROVED',
-  BookingCancelled = 'BOOKING_CANCELLED',
-  BookingRejected = 'BOOKING_REJECTED',
-  BookingRequested = 'BOOKING_REQUESTED',
-  DisputeFiled = 'DISPUTE_FILED',
-  DisputeResolved = 'DISPUTE_RESOLVED',
-  MessageReceived = 'MESSAGE_RECEIVED',
-  PaymentFailed = 'PAYMENT_FAILED',
-  PaymentReceived = 'PAYMENT_RECEIVED',
-  PaymentReminder = 'PAYMENT_REMINDER',
-  PayoutProcessed = 'PAYOUT_PROCESSED',
-  ProofApproved = 'PROOF_APPROVED',
-  ProofDisputed = 'PROOF_DISPUTED',
-  ProofRejected = 'PROOF_REJECTED',
-  ProofUploaded = 'PROOF_UPLOADED',
-  RefundProcessed = 'REFUND_PROCESSED',
-  SessionExpired = 'SESSION_EXPIRED',
-  SpaceApproved = 'SPACE_APPROVED',
-  SpaceReactivated = 'SPACE_REACTIVATED',
-  SpaceRejected = 'SPACE_REJECTED',
-  SpaceSuspended = 'SPACE_SUSPENDED',
-  SystemUpdate = 'SYSTEM_UPDATE'
+  BookingApproved = "BOOKING_APPROVED",
+  BookingCancelled = "BOOKING_CANCELLED",
+  BookingRejected = "BOOKING_REJECTED",
+  BookingRequested = "BOOKING_REQUESTED",
+  DisputeFiled = "DISPUTE_FILED",
+  DisputeResolved = "DISPUTE_RESOLVED",
+  MessageReceived = "MESSAGE_RECEIVED",
+  PaymentFailed = "PAYMENT_FAILED",
+  PaymentReceived = "PAYMENT_RECEIVED",
+  PaymentReminder = "PAYMENT_REMINDER",
+  PayoutProcessed = "PAYOUT_PROCESSED",
+  ProofApproved = "PROOF_APPROVED",
+  ProofDisputed = "PROOF_DISPUTED",
+  ProofRejected = "PROOF_REJECTED",
+  ProofUploaded = "PROOF_UPLOADED",
+  RefundProcessed = "REFUND_PROCESSED",
+  SessionExpired = "SESSION_EXPIRED",
+  SpaceApproved = "SPACE_APPROVED",
+  SpaceReactivated = "SPACE_REACTIVATED",
+  SpaceRejected = "SPACE_REJECTED",
+  SpaceSuspended = "SPACE_SUSPENDED",
+  SystemUpdate = "SYSTEM_UPDATE",
 }
 
 export type NotificationTypeOperationFilterInput = {
@@ -1667,50 +1727,49 @@ export type NotificationTypeOperationFilterInput = {
 
 /** Information about pagination in a connection. */
 export type PageInfo = {
-  __typename: 'PageInfo';
+  __typename: "PageInfo";
   /** When paginating forwards, the cursor to continue. */
-  endCursor: Maybe<Scalars['String']['output']>;
+  endCursor: Maybe<Scalars["String"]["output"]>;
   /** Indicates whether more edges exist following the set defined by the clients arguments. */
-  hasNextPage: Scalars['Boolean']['output'];
+  hasNextPage: Scalars["Boolean"]["output"];
   /** Indicates whether more edges exist prior the set defined by the clients arguments. */
-  hasPreviousPage: Scalars['Boolean']['output'];
+  hasPreviousPage: Scalars["Boolean"]["output"];
   /** When paginating backwards, the cursor to continue. */
-  startCursor: Maybe<Scalars['String']['output']>;
+  startCursor: Maybe<Scalars["String"]["output"]>;
 };
 
 export type Payment = {
-  __typename: 'Payment';
-  amount: Scalars['Decimal']['output'];
+  __typename: "Payment";
+  amount: Scalars["Decimal"]["output"];
   booking: Booking;
-  bookingId: Scalars['UUID']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  failureReason: Maybe<Scalars['String']['output']>;
-  id: Scalars['UUID']['output'];
-  paidAt: Maybe<Scalars['DateTime']['output']>;
+  bookingId: Scalars["UUID"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  failureReason: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["UUID"]["output"];
+  paidAt: Maybe<Scalars["DateTime"]["output"]>;
   refunds: Maybe<RefundsConnection>;
   status: PaymentStatus;
-  stripeChargeId: Maybe<Scalars['String']['output']>;
-  stripeFee: Maybe<Scalars['Decimal']['output']>;
-  stripePaymentIntentId: Scalars['String']['output'];
+  stripeChargeId: Maybe<Scalars["String"]["output"]>;
+  stripeFee: Maybe<Scalars["Decimal"]["output"]>;
+  stripePaymentIntentId: Scalars["String"]["output"];
   type: PaymentType;
 };
 
-
 export type PaymentRefundsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<RefundSortInput>>;
   where?: InputMaybe<RefundFilterInput>;
 };
 
 export type PaymentError = Error & {
-  __typename: 'PaymentError';
-  code: Scalars['String']['output'];
-  message: Scalars['String']['output'];
-  operation: Scalars['String']['output'];
-  reason: Scalars['String']['output'];
+  __typename: "PaymentError";
+  code: Scalars["String"]["output"];
+  message: Scalars["String"]["output"];
+  operation: Scalars["String"]["output"];
+  reason: Scalars["String"]["output"];
 };
 
 export type PaymentFilterInput = {
@@ -1747,11 +1806,11 @@ export type PaymentSortInput = {
 };
 
 export enum PaymentStatus {
-  Failed = 'FAILED',
-  PartiallyRefunded = 'PARTIALLY_REFUNDED',
-  Pending = 'PENDING',
-  Refunded = 'REFUNDED',
-  Succeeded = 'SUCCEEDED'
+  Failed = "FAILED",
+  PartiallyRefunded = "PARTIALLY_REFUNDED",
+  Pending = "PENDING",
+  Refunded = "REFUNDED",
+  Succeeded = "SUCCEEDED",
 }
 
 export type PaymentStatusOperationFilterInput = {
@@ -1762,9 +1821,9 @@ export type PaymentStatusOperationFilterInput = {
 };
 
 export enum PaymentType {
-  Balance = 'BALANCE',
-  Deposit = 'DEPOSIT',
-  Full = 'FULL'
+  Balance = "BALANCE",
+  Deposit = "DEPOSIT",
+  Full = "FULL",
 }
 
 export type PaymentTypeOperationFilterInput = {
@@ -1776,7 +1835,7 @@ export type PaymentTypeOperationFilterInput = {
 
 /** A connection to a list of items. */
 export type PaymentsByBookingConnection = {
-  __typename: 'PaymentsByBookingConnection';
+  __typename: "PaymentsByBookingConnection";
   /** A list of edges. */
   edges: Maybe<Array<PaymentsByBookingEdge>>;
   /** A flattened list of the nodes. */
@@ -1787,29 +1846,29 @@ export type PaymentsByBookingConnection = {
 
 /** An edge in a connection. */
 export type PaymentsByBookingEdge = {
-  __typename: 'PaymentsByBookingEdge';
+  __typename: "PaymentsByBookingEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Payment;
 };
 
 export type Payout = {
-  __typename: 'Payout';
-  amount: Scalars['Decimal']['output'];
-  attemptCount: Scalars['Int']['output'];
+  __typename: "Payout";
+  amount: Scalars["Decimal"]["output"];
+  attemptCount: Scalars["Int"]["output"];
   booking: Booking;
-  bookingId: Scalars['UUID']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  failureReason: Maybe<Scalars['String']['output']>;
-  id: Scalars['UUID']['output'];
-  lastAttemptAt: Maybe<Scalars['DateTime']['output']>;
-  processedAt: Maybe<Scalars['DateTime']['output']>;
+  bookingId: Scalars["UUID"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  failureReason: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["UUID"]["output"];
+  lastAttemptAt: Maybe<Scalars["DateTime"]["output"]>;
+  processedAt: Maybe<Scalars["DateTime"]["output"]>;
   spaceOwnerProfile: SpaceOwnerProfile;
-  spaceOwnerProfileId: Scalars['UUID']['output'];
+  spaceOwnerProfileId: Scalars["UUID"]["output"];
   stage: PayoutStage;
   status: PayoutStatus;
-  stripeTransferId: Maybe<Scalars['String']['output']>;
+  stripeTransferId: Maybe<Scalars["String"]["output"]>;
 };
 
 export type PayoutFilterInput = {
@@ -1832,9 +1891,9 @@ export type PayoutFilterInput = {
 };
 
 export enum PayoutSchedule {
-  Biweekly = 'BIWEEKLY',
-  Monthly = 'MONTHLY',
-  Weekly = 'WEEKLY'
+  Biweekly = "BIWEEKLY",
+  Monthly = "MONTHLY",
+  Weekly = "WEEKLY",
 }
 
 export type PayoutScheduleOperationFilterInput = {
@@ -1862,8 +1921,8 @@ export type PayoutSortInput = {
 };
 
 export enum PayoutStage {
-  Stage1 = 'STAGE1',
-  Stage2 = 'STAGE2'
+  Stage1 = "STAGE1",
+  Stage2 = "STAGE2",
 }
 
 export type PayoutStageOperationFilterInput = {
@@ -1874,11 +1933,11 @@ export type PayoutStageOperationFilterInput = {
 };
 
 export enum PayoutStatus {
-  Completed = 'COMPLETED',
-  Failed = 'FAILED',
-  PartiallyPaid = 'PARTIALLY_PAID',
-  Pending = 'PENDING',
-  Processing = 'PROCESSING'
+  Completed = "COMPLETED",
+  Failed = "FAILED",
+  PartiallyPaid = "PARTIALLY_PAID",
+  Pending = "PENDING",
+  Processing = "PROCESSING",
 }
 
 export type PayoutStatusOperationFilterInput = {
@@ -1891,19 +1950,19 @@ export type PayoutStatusOperationFilterInput = {
 export type ProcessPayoutError = ConflictError | NotFoundError | PaymentError;
 
 export type ProcessPayoutInput = {
-  bookingId: Scalars['ID']['input'];
+  bookingId: Scalars["ID"]["input"];
   stage: PayoutStage;
 };
 
 export type ProcessPayoutPayload = {
-  __typename: 'ProcessPayoutPayload';
+  __typename: "ProcessPayoutPayload";
   errors: Maybe<Array<ProcessPayoutError>>;
   payout: Maybe<Payout>;
 };
 
 export enum ProfileType {
-  Advertiser = 'ADVERTISER',
-  SpaceOwner = 'SPACE_OWNER'
+  Advertiser = "ADVERTISER",
+  SpaceOwner = "SPACE_OWNER",
 }
 
 export type ProfileTypeOperationFilterInput = {
@@ -1914,12 +1973,12 @@ export type ProfileTypeOperationFilterInput = {
 };
 
 export enum ProofStatus {
-  Approved = 'APPROVED',
-  CorrectionRequested = 'CORRECTION_REQUESTED',
-  Disputed = 'DISPUTED',
-  Pending = 'PENDING',
-  Rejected = 'REJECTED',
-  UnderReview = 'UNDER_REVIEW'
+  Approved = "APPROVED",
+  CorrectionRequested = "CORRECTION_REQUESTED",
+  Disputed = "DISPUTED",
+  Pending = "PENDING",
+  Rejected = "REJECTED",
+  UnderReview = "UNDER_REVIEW",
 }
 
 export type ProofStatusOperationFilterInput = {
@@ -1930,7 +1989,7 @@ export type ProofStatusOperationFilterInput = {
 };
 
 export type Query = {
-  __typename: 'Query';
+  __typename: "Query";
   bookingById: Maybe<Booking>;
   bookingsRequiringAction: Maybe<BookingsRequiringActionConnection>;
   campaignById: Maybe<Campaign>;
@@ -1946,6 +2005,7 @@ export type Query = {
   myNotifications: Maybe<MyNotificationsConnection>;
   myPayouts: Maybe<MyPayoutsConnection>;
   myReviews: Maybe<MyReviewsConnection>;
+  mySavedPaymentMethods: Array<SavedPaymentMethod>;
   mySpaces: Maybe<MySpacesConnection>;
   paymentById: Maybe<Payment>;
   paymentsByBooking: Maybe<PaymentsByBookingConnection>;
@@ -1955,186 +2015,170 @@ export type Query = {
   spaceById: Maybe<Space>;
   spaces: Maybe<SpacesConnection>;
   transactionsByBooking: Maybe<TransactionsByBookingConnection>;
-  unreadConversationsCount: Scalars['Int']['output'];
-  unreadNotificationsCount: Scalars['Int']['output'];
+  unreadConversationsCount: Scalars["Int"]["output"];
+  unreadNotificationsCount: Scalars["Int"]["output"];
 };
-
 
 export type QueryBookingByIdArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
-
 
 export type QueryBookingsRequiringActionArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
 };
-
 
 export type QueryCampaignByIdArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
-
 export type QueryIncomingBookingRequestsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<BookingSortInput>>;
 };
 
-
 export type QueryMessagesByConversationArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  conversationId: Scalars['ID']['input'];
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  conversationId: Scalars["ID"]["input"];
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<MessageSortInput>>;
   where?: InputMaybe<MessageFilterInput>;
 };
 
-
 export type QueryMyBookingsAsAdvertiserArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<BookingSortInput>>;
   where?: InputMaybe<BookingFilterInput>;
 };
-
 
 export type QueryMyBookingsAsOwnerArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<BookingSortInput>>;
   where?: InputMaybe<BookingFilterInput>;
 };
 
-
 export type QueryMyCampaignsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<CampaignSortInput>>;
   where?: InputMaybe<CampaignFilterInput>;
 };
 
-
 export type QueryMyConversationsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<ConversationSortInput>>;
   where?: InputMaybe<ConversationFilterInput>;
 };
 
-
 export type QueryMyNotificationsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<NotificationSortInput>>;
   where?: InputMaybe<NotificationFilterInput>;
 };
 
-
 export type QueryMyPayoutsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<PayoutSortInput>>;
   where?: InputMaybe<PayoutFilterInput>;
 };
 
-
 export type QueryMyReviewsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<ReviewSortInput>>;
 };
 
+export type QueryMySavedPaymentMethodsArgs = {
+  order?: InputMaybe<Array<SavedPaymentMethodSortInput>>;
+  where?: InputMaybe<SavedPaymentMethodFilterInput>;
+};
 
 export type QueryMySpacesArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<SpaceSortInput>>;
   where?: InputMaybe<SpaceFilterInput>;
 };
 
-
 export type QueryPaymentByIdArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
-
 export type QueryPaymentsByBookingArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  bookingId: Scalars['ID']['input'];
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  bookingId: Scalars["ID"]["input"];
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<PaymentSortInput>>;
   where?: InputMaybe<PaymentFilterInput>;
 };
 
-
 export type QueryPayoutByIdArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
-
 export type QueryReviewByBookingArgs = {
-  bookingId: Scalars['ID']['input'];
+  bookingId: Scalars["ID"]["input"];
   reviewerType: ReviewerType;
 };
 
-
 export type QueryReviewsBySpaceArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<ReviewSortInput>>;
-  spaceId: Scalars['ID']['input'];
+  spaceId: Scalars["ID"]["input"];
 };
-
 
 export type QuerySpaceByIdArgs = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
-
 export type QuerySpacesArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<SpaceSortInput>>;
   where?: InputMaybe<SpaceFilterInput>;
 };
 
-
 export type QueryTransactionsByBookingArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  bookingId: Scalars['ID']['input'];
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  bookingId: Scalars["ID"]["input"];
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<TransactionSortInput>>;
   where?: InputMaybe<TransactionFilterInput>;
 };
@@ -2142,36 +2186,39 @@ export type QueryTransactionsByBookingArgs = {
 export type ReactivateSpaceError = ForbiddenError | NotFoundError;
 
 export type ReactivateSpaceInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type ReactivateSpacePayload = {
-  __typename: 'ReactivateSpacePayload';
+  __typename: "ReactivateSpacePayload";
   errors: Maybe<Array<ReactivateSpaceError>>;
   space: Maybe<Space>;
 };
 
-export type RefreshStripeAccountStatusError = NotFoundError | PaymentError | ValidationError;
+export type RefreshStripeAccountStatusError =
+  | NotFoundError
+  | PaymentError
+  | ValidationError;
 
 export type RefreshStripeAccountStatusPayload = {
-  __typename: 'RefreshStripeAccountStatusPayload';
+  __typename: "RefreshStripeAccountStatusPayload";
   errors: Maybe<Array<RefreshStripeAccountStatusError>>;
   profile: Maybe<SpaceOwnerProfile>;
 };
 
 export type Refund = {
-  __typename: 'Refund';
-  amount: Scalars['Decimal']['output'];
+  __typename: "Refund";
+  amount: Scalars["Decimal"]["output"];
   booking: Booking;
-  bookingId: Scalars['UUID']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['UUID']['output'];
+  bookingId: Scalars["UUID"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["UUID"]["output"];
   payment: Payment;
-  paymentId: Scalars['UUID']['output'];
-  processedAt: Maybe<Scalars['DateTime']['output']>;
-  reason: Scalars['String']['output'];
+  paymentId: Scalars["UUID"]["output"];
+  processedAt: Maybe<Scalars["DateTime"]["output"]>;
+  reason: Scalars["String"]["output"];
   status: RefundStatus;
-  stripeRefundId: Maybe<Scalars['String']['output']>;
+  stripeRefundId: Maybe<Scalars["String"]["output"]>;
 };
 
 export type RefundFilterInput = {
@@ -2205,9 +2252,9 @@ export type RefundSortInput = {
 };
 
 export enum RefundStatus {
-  Failed = 'FAILED',
-  Pending = 'PENDING',
-  Succeeded = 'SUCCEEDED'
+  Failed = "FAILED",
+  Pending = "PENDING",
+  Succeeded = "SUCCEEDED",
 }
 
 export type RefundStatusOperationFilterInput = {
@@ -2219,7 +2266,7 @@ export type RefundStatusOperationFilterInput = {
 
 /** A connection to a list of items. */
 export type RefundsConnection = {
-  __typename: 'RefundsConnection';
+  __typename: "RefundsConnection";
   /** A list of edges. */
   edges: Maybe<Array<RefundsEdge>>;
   /** A flattened list of the nodes. */
@@ -2230,65 +2277,75 @@ export type RefundsConnection = {
 
 /** An edge in a connection. */
 export type RefundsEdge = {
-  __typename: 'RefundsEdge';
+  __typename: "RefundsEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Refund;
 };
 
-export type RejectBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+export type RejectBookingError =
+  | ForbiddenError
+  | InvalidStatusTransitionError
+  | NotFoundError;
 
 export type RejectBookingInput = {
-  id: Scalars['ID']['input'];
-  reason: Scalars['String']['input'];
+  id: Scalars["ID"]["input"];
+  reason: Scalars["String"]["input"];
 };
 
 export type RejectBookingPayload = {
-  __typename: 'RejectBookingPayload';
+  __typename: "RejectBookingPayload";
   booking: Maybe<Booking>;
   errors: Maybe<Array<RejectBookingError>>;
 };
 
-export type RequestRefundError = InvalidStatusTransitionError | NotFoundError | PaymentError | ValidationError;
+export type RequestRefundError =
+  | InvalidStatusTransitionError
+  | NotFoundError
+  | PaymentError
+  | ValidationError;
 
 export type RequestRefundInput = {
-  amount: Scalars['Decimal']['input'];
-  paymentId: Scalars['ID']['input'];
-  reason: Scalars['String']['input'];
+  amount: Scalars["Decimal"]["input"];
+  paymentId: Scalars["ID"]["input"];
+  reason: Scalars["String"]["input"];
 };
 
 export type RequestRefundPayload = {
-  __typename: 'RequestRefundPayload';
+  __typename: "RequestRefundPayload";
   errors: Maybe<Array<RequestRefundError>>;
   refund: Maybe<Refund>;
 };
 
-export type RetryPayoutError = InvalidStatusTransitionError | NotFoundError | PaymentError;
+export type RetryPayoutError =
+  | InvalidStatusTransitionError
+  | NotFoundError
+  | PaymentError;
 
 export type RetryPayoutInput = {
-  payoutId: Scalars['ID']['input'];
+  payoutId: Scalars["ID"]["input"];
 };
 
 export type RetryPayoutPayload = {
-  __typename: 'RetryPayoutPayload';
+  __typename: "RetryPayoutPayload";
   errors: Maybe<Array<RetryPayoutError>>;
   payout: Maybe<Payout>;
 };
 
 export type Review = {
-  __typename: 'Review';
+  __typename: "Review";
   booking: Booking;
-  bookingId: Scalars['UUID']['output'];
-  comment: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['UUID']['output'];
-  rating: Scalars['Int']['output'];
+  bookingId: Scalars["UUID"]["output"];
+  comment: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["UUID"]["output"];
+  rating: Scalars["Int"]["output"];
   reviewer: Maybe<ReviewerInfo>;
-  reviewerProfileId: Scalars['UUID']['output'];
+  reviewerProfileId: Scalars["UUID"]["output"];
   reviewerType: ReviewerType;
   space: Space;
-  spaceId: Scalars['UUID']['output'];
+  spaceId: Scalars["UUID"]["output"];
 };
 
 export type ReviewFilterInput = {
@@ -2320,15 +2377,15 @@ export type ReviewSortInput = {
 };
 
 export type ReviewerInfo = {
-  __typename: 'ReviewerInfo';
-  avatar: Maybe<Scalars['String']['output']>;
-  companyName: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
+  __typename: "ReviewerInfo";
+  avatar: Maybe<Scalars["String"]["output"]>;
+  companyName: Maybe<Scalars["String"]["output"]>;
+  name: Scalars["String"]["output"];
 };
 
 export enum ReviewerType {
-  Advertiser = 'ADVERTISER',
-  SpaceOwner = 'SPACE_OWNER'
+  Advertiser = "ADVERTISER",
+  SpaceOwner = "SPACE_OWNER",
 }
 
 export type ReviewerTypeOperationFilterInput = {
@@ -2340,7 +2397,7 @@ export type ReviewerTypeOperationFilterInput = {
 
 /** A connection to a list of items. */
 export type ReviewsBySpaceConnection = {
-  __typename: 'ReviewsBySpaceConnection';
+  __typename: "ReviewsBySpaceConnection";
   /** A list of edges. */
   edges: Maybe<Array<ReviewsBySpaceEdge>>;
   /** A flattened list of the nodes. */
@@ -2351,16 +2408,16 @@ export type ReviewsBySpaceConnection = {
 
 /** An edge in a connection. */
 export type ReviewsBySpaceEdge = {
-  __typename: 'ReviewsBySpaceEdge';
+  __typename: "ReviewsBySpaceEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Review;
 };
 
 /** A connection to a list of items. */
 export type ReviewsConnection = {
-  __typename: 'ReviewsConnection';
+  __typename: "ReviewsConnection";
   /** A list of edges. */
   edges: Maybe<Array<ReviewsEdge>>;
   /** A flattened list of the nodes. */
@@ -2371,86 +2428,138 @@ export type ReviewsConnection = {
 
 /** An edge in a connection. */
 export type ReviewsEdge = {
-  __typename: 'ReviewsEdge';
+  __typename: "ReviewsEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Review;
+};
+
+export type SavedPaymentMethod = {
+  __typename: "SavedPaymentMethod";
+  advertiserProfile: AdvertiserProfile;
+  advertiserProfileId: Scalars["UUID"]["output"];
+  brand: Scalars["String"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  expMonth: Scalars["Int"]["output"];
+  expYear: Scalars["Int"]["output"];
+  id: Scalars["UUID"]["output"];
+  isDefault: Scalars["Boolean"]["output"];
+  last4: Scalars["String"]["output"];
+  stripePaymentMethodId: Scalars["String"]["output"];
+};
+
+export type SavedPaymentMethodFilterInput = {
+  advertiserProfile?: InputMaybe<AdvertiserProfileFilterInput>;
+  advertiserProfileId?: InputMaybe<UuidOperationFilterInput>;
+  and?: InputMaybe<Array<SavedPaymentMethodFilterInput>>;
+  brand?: InputMaybe<StringOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  expMonth?: InputMaybe<IntOperationFilterInput>;
+  expYear?: InputMaybe<IntOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  isDefault?: InputMaybe<BooleanOperationFilterInput>;
+  last4?: InputMaybe<StringOperationFilterInput>;
+  or?: InputMaybe<Array<SavedPaymentMethodFilterInput>>;
+  stripePaymentMethodId?: InputMaybe<StringOperationFilterInput>;
+};
+
+export type SavedPaymentMethodSortInput = {
+  advertiserProfile?: InputMaybe<AdvertiserProfileSortInput>;
+  advertiserProfileId?: InputMaybe<SortEnumType>;
+  brand?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  expMonth?: InputMaybe<SortEnumType>;
+  expYear?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  isDefault?: InputMaybe<SortEnumType>;
+  last4?: InputMaybe<SortEnumType>;
+  stripePaymentMethodId?: InputMaybe<SortEnumType>;
 };
 
 export type SendMessageError = ForbiddenError;
 
 export type SendMessageInput = {
-  attachments?: InputMaybe<Array<Scalars['String']['input']>>;
-  content: Scalars['String']['input'];
-  conversationId: Scalars['ID']['input'];
+  attachments?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  content: Scalars["String"]["input"];
+  conversationId: Scalars["ID"]["input"];
   type?: InputMaybe<MessageType>;
 };
 
 export type SendMessagePayload = {
-  __typename: 'SendMessagePayload';
+  __typename: "SendMessagePayload";
   errors: Maybe<Array<SendMessageError>>;
   message: Maybe<Message>;
 };
 
+export type SetDefaultPaymentMethodError = ForbiddenError | NotFoundError;
+
+export type SetDefaultPaymentMethodInput = {
+  paymentMethodId: Scalars["UUID"]["input"];
+};
+
+export type SetDefaultPaymentMethodPayload = {
+  __typename: "SetDefaultPaymentMethodPayload";
+  errors: Maybe<Array<SetDefaultPaymentMethodError>>;
+  paymentMethod: Maybe<SavedPaymentMethod>;
+};
+
 export enum SortEnumType {
-  Asc = 'ASC',
-  Desc = 'DESC'
+  Asc = "ASC",
+  Desc = "DESC",
 }
 
 export type Space = {
-  __typename: 'Space';
-  address: Scalars['String']['output'];
-  availableFrom: Maybe<Scalars['DateTime']['output']>;
-  availableTo: Maybe<Scalars['DateTime']['output']>;
-  averageRating: Maybe<Scalars['Float']['output']>;
+  __typename: "Space";
+  address: Scalars["String"]["output"];
+  availableFrom: Maybe<Scalars["DateTime"]["output"]>;
+  availableTo: Maybe<Scalars["DateTime"]["output"]>;
+  averageRating: Maybe<Scalars["Float"]["output"]>;
   bookings: Maybe<BookingsConnection>;
-  city: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  description: Maybe<Scalars['String']['output']>;
-  dimensions: Maybe<Scalars['String']['output']>;
-  dimensionsText: Maybe<Scalars['String']['output']>;
-  height: Maybe<Scalars['Float']['output']>;
-  id: Scalars['UUID']['output'];
-  images: Array<Scalars['String']['output']>;
-  installationFee: Maybe<Scalars['Decimal']['output']>;
-  latitude: Scalars['Float']['output'];
-  longitude: Scalars['Float']['output'];
-  maxDuration: Maybe<Scalars['Int']['output']>;
-  minDuration: Scalars['Int']['output'];
+  city: Scalars["String"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  description: Maybe<Scalars["String"]["output"]>;
+  dimensions: Maybe<Scalars["String"]["output"]>;
+  dimensionsText: Maybe<Scalars["String"]["output"]>;
+  height: Maybe<Scalars["Float"]["output"]>;
+  id: Scalars["UUID"]["output"];
+  images: Array<Scalars["String"]["output"]>;
+  installationFee: Maybe<Scalars["Decimal"]["output"]>;
+  latitude: Scalars["Float"]["output"];
+  longitude: Scalars["Float"]["output"];
+  maxDuration: Maybe<Scalars["Int"]["output"]>;
+  minDuration: Scalars["Int"]["output"];
   owner: Maybe<SpaceOwnerProfile>;
-  pricePerDay: Scalars['Decimal']['output'];
-  rejectionReason: Maybe<Scalars['String']['output']>;
+  pricePerDay: Scalars["Decimal"]["output"];
+  rejectionReason: Maybe<Scalars["String"]["output"]>;
   reviews: Maybe<ReviewsConnection>;
   spaceOwnerProfile: SpaceOwnerProfile;
-  spaceOwnerProfileId: Scalars['UUID']['output'];
-  state: Scalars['String']['output'];
+  spaceOwnerProfileId: Scalars["UUID"]["output"];
+  state: Scalars["String"]["output"];
   status: SpaceStatus;
-  title: Scalars['String']['output'];
-  totalBookings: Scalars['Int']['output'];
-  totalRevenue: Scalars['Decimal']['output'];
-  traffic: Maybe<Scalars['String']['output']>;
+  title: Scalars["String"]["output"];
+  totalBookings: Scalars["Int"]["output"];
+  totalRevenue: Scalars["Decimal"]["output"];
+  traffic: Maybe<Scalars["String"]["output"]>;
   type: SpaceType;
-  width: Maybe<Scalars['Float']['output']>;
-  zipCode: Maybe<Scalars['String']['output']>;
+  width: Maybe<Scalars["Float"]["output"]>;
+  zipCode: Maybe<Scalars["String"]["output"]>;
 };
 
-
 export type SpaceBookingsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<BookingSortInput>>;
   where?: InputMaybe<BookingFilterInput>;
 };
 
-
 export type SpaceReviewsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<ReviewSortInput>>;
   where?: InputMaybe<ReviewFilterInput>;
 };
@@ -2493,41 +2602,41 @@ export type SpaceFilterInput = {
 };
 
 export type SpaceOwnerProfile = {
-  __typename: 'SpaceOwnerProfile';
-  businessName: Maybe<Scalars['String']['output']>;
-  businessType: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  id: Scalars['UUID']['output'];
-  onboardingComplete: Scalars['Boolean']['output'];
+  __typename: "SpaceOwnerProfile";
+  averageResponseTime: Scalars["Int"]["output"];
+  businessName: Maybe<Scalars["String"]["output"]>;
+  businessType: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  id: Scalars["UUID"]["output"];
+  onboardingComplete: Scalars["Boolean"]["output"];
   payoutSchedule: PayoutSchedule;
   payouts: Array<Payout>;
+  responseRate: Scalars["Float"]["output"];
   reviews: Maybe<ReviewsConnection>;
   spaces: Maybe<SpacesConnection>;
-  stripeAccountDisconnectedAt: Maybe<Scalars['DateTime']['output']>;
-  stripeAccountDisconnectedNotifiedAt: Maybe<Scalars['DateTime']['output']>;
-  stripeAccountId: Maybe<Scalars['String']['output']>;
-  stripeAccountStatus: Maybe<Scalars['String']['output']>;
-  stripeLastAccountHealthCheck: Maybe<Scalars['DateTime']['output']>;
+  stripeAccountDisconnectedAt: Maybe<Scalars["DateTime"]["output"]>;
+  stripeAccountDisconnectedNotifiedAt: Maybe<Scalars["DateTime"]["output"]>;
+  stripeAccountId: Maybe<Scalars["String"]["output"]>;
+  stripeAccountStatus: Maybe<Scalars["String"]["output"]>;
+  stripeLastAccountHealthCheck: Maybe<Scalars["DateTime"]["output"]>;
   user: User;
-  userId: Scalars['UUID']['output'];
+  userId: Scalars["UUID"]["output"];
 };
 
-
 export type SpaceOwnerProfileReviewsArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<ReviewSortInput>>;
   where?: InputMaybe<ReviewFilterInput>;
 };
 
-
 export type SpaceOwnerProfileSpacesArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<SpaceSortInput>>;
   where?: InputMaybe<SpaceFilterInput>;
 };
@@ -2601,11 +2710,11 @@ export type SpaceSortInput = {
 };
 
 export enum SpaceStatus {
-  Active = 'ACTIVE',
-  Inactive = 'INACTIVE',
-  PendingApproval = 'PENDING_APPROVAL',
-  Rejected = 'REJECTED',
-  Suspended = 'SUSPENDED'
+  Active = "ACTIVE",
+  Inactive = "INACTIVE",
+  PendingApproval = "PENDING_APPROVAL",
+  Rejected = "REJECTED",
+  Suspended = "SUSPENDED",
 }
 
 export type SpaceStatusOperationFilterInput = {
@@ -2616,13 +2725,13 @@ export type SpaceStatusOperationFilterInput = {
 };
 
 export enum SpaceType {
-  Billboard = 'BILLBOARD',
-  DigitalDisplay = 'DIGITAL_DISPLAY',
-  Other = 'OTHER',
-  Storefront = 'STOREFRONT',
-  Transit = 'TRANSIT',
-  VehicleWrap = 'VEHICLE_WRAP',
-  WindowDisplay = 'WINDOW_DISPLAY'
+  Billboard = "BILLBOARD",
+  DigitalDisplay = "DIGITAL_DISPLAY",
+  Other = "OTHER",
+  Storefront = "STOREFRONT",
+  Transit = "TRANSIT",
+  VehicleWrap = "VEHICLE_WRAP",
+  WindowDisplay = "WINDOW_DISPLAY",
 }
 
 export type SpaceTypeOperationFilterInput = {
@@ -2634,7 +2743,7 @@ export type SpaceTypeOperationFilterInput = {
 
 /** A connection to a list of items. */
 export type SpacesConnection = {
-  __typename: 'SpacesConnection';
+  __typename: "SpacesConnection";
   /** A list of edges. */
   edges: Maybe<Array<SpacesEdge>>;
   /** A flattened list of the nodes. */
@@ -2642,87 +2751,86 @@ export type SpacesConnection = {
   /** Information to aid in pagination. */
   pageInfo: PageInfo;
   /** Identifies the total count of items in the connection. */
-  totalCount: Scalars['Int']['output'];
+  totalCount: Scalars["Int"]["output"];
 };
 
 /** An edge in a connection. */
 export type SpacesEdge = {
-  __typename: 'SpacesEdge';
+  __typename: "SpacesEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Space;
 };
 
 export type StringOperationFilterInput = {
   and?: InputMaybe<Array<StringOperationFilterInput>>;
-  contains?: InputMaybe<Scalars['String']['input']>;
-  endsWith?: InputMaybe<Scalars['String']['input']>;
-  eq?: InputMaybe<Scalars['String']['input']>;
-  in?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  ncontains?: InputMaybe<Scalars['String']['input']>;
-  nendsWith?: InputMaybe<Scalars['String']['input']>;
-  neq?: InputMaybe<Scalars['String']['input']>;
-  nin?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  nstartsWith?: InputMaybe<Scalars['String']['input']>;
+  contains?: InputMaybe<Scalars["String"]["input"]>;
+  endsWith?: InputMaybe<Scalars["String"]["input"]>;
+  eq?: InputMaybe<Scalars["String"]["input"]>;
+  in?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  ncontains?: InputMaybe<Scalars["String"]["input"]>;
+  nendsWith?: InputMaybe<Scalars["String"]["input"]>;
+  neq?: InputMaybe<Scalars["String"]["input"]>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars["String"]["input"]>>>;
+  nstartsWith?: InputMaybe<Scalars["String"]["input"]>;
   or?: InputMaybe<Array<StringOperationFilterInput>>;
-  startsWith?: InputMaybe<Scalars['String']['input']>;
+  startsWith?: InputMaybe<Scalars["String"]["input"]>;
 };
 
-export type SubmitCampaignError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+export type SubmitCampaignError =
+  | ForbiddenError
+  | InvalidStatusTransitionError
+  | NotFoundError;
 
 export type SubmitCampaignInput = {
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 };
 
 export type SubmitCampaignPayload = {
-  __typename: 'SubmitCampaignPayload';
+  __typename: "SubmitCampaignPayload";
   campaign: Maybe<Campaign>;
   errors: Maybe<Array<SubmitCampaignError>>;
 };
 
 export type Subscription = {
-  __typename: 'Subscription';
+  __typename: "Subscription";
   onBookingUpdate: Booking;
   onMessage: Message;
   onNotification: Notification;
   onProofUpdate: BookingProof;
 };
 
-
 export type SubscriptionOnBookingUpdateArgs = {
-  bookingId: Scalars['ID']['input'];
+  bookingId: Scalars["ID"]["input"];
 };
-
 
 export type SubscriptionOnMessageArgs = {
-  conversationId: Scalars['ID']['input'];
+  conversationId: Scalars["ID"]["input"];
 };
-
 
 export type SubscriptionOnNotificationArgs = {
-  userId: Scalars['ID']['input'];
+  userId: Scalars["ID"]["input"];
 };
 
-
 export type SubscriptionOnProofUpdateArgs = {
-  bookingId: Scalars['ID']['input'];
+  bookingId: Scalars["ID"]["input"];
 };
 
 export type Transaction = {
-  __typename: 'Transaction';
-  amount: Scalars['Decimal']['output'];
+  __typename: "Transaction";
+  amount: Scalars["Decimal"]["output"];
   booking: Maybe<Booking>;
-  bookingId: Maybe<Scalars['UUID']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  currency: Scalars['String']['output'];
-  description: Scalars['String']['output'];
-  id: Scalars['UUID']['output'];
-  referenceId: Scalars['UUID']['output'];
-  referenceType: Scalars['String']['output'];
+  bookingId: Maybe<Scalars["UUID"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  currency: Scalars["String"]["output"];
+  description: Scalars["String"]["output"];
+  id: Scalars["UUID"]["output"];
+  referenceId: Scalars["UUID"]["output"];
+  referenceType: Scalars["String"]["output"];
   type: TransactionType;
   user: Maybe<User>;
-  userId: Maybe<Scalars['UUID']['output']>;
+  userId: Maybe<Scalars["UUID"]["output"]>;
 };
 
 export type TransactionFilterInput = {
@@ -2758,10 +2866,10 @@ export type TransactionSortInput = {
 };
 
 export enum TransactionType {
-  Payment = 'PAYMENT',
-  Payout = 'PAYOUT',
-  PlatformFee = 'PLATFORM_FEE',
-  Refund = 'REFUND'
+  Payment = "PAYMENT",
+  Payout = "PAYOUT",
+  PlatformFee = "PLATFORM_FEE",
+  Refund = "REFUND",
 }
 
 export type TransactionTypeOperationFilterInput = {
@@ -2773,7 +2881,7 @@ export type TransactionTypeOperationFilterInput = {
 
 /** A connection to a list of items. */
 export type TransactionsByBookingConnection = {
-  __typename: 'TransactionsByBookingConnection';
+  __typename: "TransactionsByBookingConnection";
   /** A list of edges. */
   edges: Maybe<Array<TransactionsByBookingEdge>>;
   /** A flattened list of the nodes. */
@@ -2784,9 +2892,9 @@ export type TransactionsByBookingConnection = {
 
 /** An edge in a connection. */
 export type TransactionsByBookingEdge = {
-  __typename: 'TransactionsByBookingEdge';
+  __typename: "TransactionsByBookingEdge";
   /** A cursor for use in pagination. */
-  cursor: Scalars['String']['output'];
+  cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Transaction;
 };
@@ -2794,32 +2902,35 @@ export type TransactionsByBookingEdge = {
 export type UpdateAdvertiserProfileError = NotFoundError;
 
 export type UpdateAdvertiserProfileInput = {
-  companyName?: InputMaybe<Scalars['String']['input']>;
-  industry?: InputMaybe<Scalars['String']['input']>;
-  website?: InputMaybe<Scalars['String']['input']>;
+  companyName?: InputMaybe<Scalars["String"]["input"]>;
+  industry?: InputMaybe<Scalars["String"]["input"]>;
+  website?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UpdateAdvertiserProfilePayload = {
-  __typename: 'UpdateAdvertiserProfilePayload';
+  __typename: "UpdateAdvertiserProfilePayload";
   advertiserProfile: Maybe<AdvertiserProfile>;
   errors: Maybe<Array<UpdateAdvertiserProfileError>>;
 };
 
-export type UpdateCampaignError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
+export type UpdateCampaignError =
+  | ForbiddenError
+  | InvalidStatusTransitionError
+  | NotFoundError;
 
 export type UpdateCampaignInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  endDate?: InputMaybe<Scalars['DateTime']['input']>;
-  goals?: InputMaybe<Scalars['String']['input']>;
-  imageUrl?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  startDate?: InputMaybe<Scalars['DateTime']['input']>;
-  targetAudience?: InputMaybe<Scalars['String']['input']>;
-  totalBudget?: InputMaybe<Scalars['Decimal']['input']>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  endDate?: InputMaybe<Scalars["DateTime"]["input"]>;
+  goals?: InputMaybe<Scalars["String"]["input"]>;
+  imageUrl?: InputMaybe<Scalars["String"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  startDate?: InputMaybe<Scalars["DateTime"]["input"]>;
+  targetAudience?: InputMaybe<Scalars["String"]["input"]>;
+  totalBudget?: InputMaybe<Scalars["Decimal"]["input"]>;
 };
 
 export type UpdateCampaignPayload = {
-  __typename: 'UpdateCampaignPayload';
+  __typename: "UpdateCampaignPayload";
   campaign: Maybe<Campaign>;
   errors: Maybe<Array<UpdateCampaignError>>;
 };
@@ -2831,32 +2942,35 @@ export type UpdateCurrentUserInput = {
 };
 
 export type UpdateCurrentUserPayload = {
-  __typename: 'UpdateCurrentUserPayload';
+  __typename: "UpdateCurrentUserPayload";
   errors: Maybe<Array<UpdateCurrentUserError>>;
   user: Maybe<User>;
 };
 
 export type UpdateNotificationPreferenceInput = {
-  emailEnabled?: InputMaybe<Scalars['Boolean']['input']>;
-  inAppEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  emailEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
+  inAppEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
   notificationType: NotificationType;
-  pushEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  pushEnabled?: InputMaybe<Scalars["Boolean"]["input"]>;
 };
 
 export type UpdateNotificationPreferencePayload = {
-  __typename: 'UpdateNotificationPreferencePayload';
+  __typename: "UpdateNotificationPreferencePayload";
   preference: NotificationPreference;
 };
 
-export type UpdateReviewError = ForbiddenError | NotFoundError | ValidationError;
+export type UpdateReviewError =
+  | ForbiddenError
+  | NotFoundError
+  | ValidationError;
 
 export type UpdateReviewInput = {
-  comment?: InputMaybe<Scalars['String']['input']>;
-  rating?: InputMaybe<Scalars['Int']['input']>;
+  comment?: InputMaybe<Scalars["String"]["input"]>;
+  rating?: InputMaybe<Scalars["Int"]["input"]>;
 };
 
 export type UpdateReviewPayload = {
-  __typename: 'UpdateReviewPayload';
+  __typename: "UpdateReviewPayload";
   errors: Maybe<Array<UpdateReviewError>>;
   review: Maybe<Review>;
 };
@@ -2864,57 +2978,57 @@ export type UpdateReviewPayload = {
 export type UpdateSpaceError = ForbiddenError | NotFoundError | ValidationError;
 
 export type UpdateSpaceInput = {
-  availableFrom?: InputMaybe<Scalars['DateTime']['input']>;
-  availableTo?: InputMaybe<Scalars['DateTime']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  images?: InputMaybe<Array<Scalars['String']['input']>>;
-  installationFee?: InputMaybe<Scalars['Decimal']['input']>;
-  maxDuration?: InputMaybe<Scalars['Int']['input']>;
-  minDuration?: InputMaybe<Scalars['Int']['input']>;
-  pricePerDay?: InputMaybe<Scalars['Decimal']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  traffic?: InputMaybe<Scalars['String']['input']>;
+  availableFrom?: InputMaybe<Scalars["DateTime"]["input"]>;
+  availableTo?: InputMaybe<Scalars["DateTime"]["input"]>;
+  description?: InputMaybe<Scalars["String"]["input"]>;
+  images?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  installationFee?: InputMaybe<Scalars["Decimal"]["input"]>;
+  maxDuration?: InputMaybe<Scalars["Int"]["input"]>;
+  minDuration?: InputMaybe<Scalars["Int"]["input"]>;
+  pricePerDay?: InputMaybe<Scalars["Decimal"]["input"]>;
+  title?: InputMaybe<Scalars["String"]["input"]>;
+  traffic?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type UpdateSpaceOwnerProfileError = NotFoundError;
 
 export type UpdateSpaceOwnerProfileInput = {
-  businessName?: InputMaybe<Scalars['String']['input']>;
-  businessType?: InputMaybe<Scalars['String']['input']>;
+  businessName?: InputMaybe<Scalars["String"]["input"]>;
+  businessType?: InputMaybe<Scalars["String"]["input"]>;
   payoutSchedule?: InputMaybe<PayoutSchedule>;
 };
 
 export type UpdateSpaceOwnerProfilePayload = {
-  __typename: 'UpdateSpaceOwnerProfilePayload';
+  __typename: "UpdateSpaceOwnerProfilePayload";
   errors: Maybe<Array<UpdateSpaceOwnerProfileError>>;
   spaceOwnerProfile: Maybe<SpaceOwnerProfile>;
 };
 
 export type UpdateSpacePayload = {
-  __typename: 'UpdateSpacePayload';
+  __typename: "UpdateSpacePayload";
   errors: Maybe<Array<UpdateSpaceError>>;
   space: Maybe<Space>;
 };
 
 export type UpdateUserInput = {
   activeProfileType?: InputMaybe<ProfileType>;
-  avatar?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  phone?: InputMaybe<Scalars['String']['input']>;
+  avatar?: InputMaybe<Scalars["String"]["input"]>;
+  name?: InputMaybe<Scalars["String"]["input"]>;
+  phone?: InputMaybe<Scalars["String"]["input"]>;
 };
 
 export type User = {
-  __typename: 'User';
+  __typename: "User";
   activeProfileType: ProfileType;
   advertiserProfile: Maybe<AdvertiserProfile>;
-  avatar: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
-  email: Scalars['String']['output'];
-  id: Scalars['UUID']['output'];
-  lastLoginAt: Maybe<Scalars['DateTime']['output']>;
-  name: Scalars['String']['output'];
-  password: Scalars['String']['output'];
-  phone: Maybe<Scalars['String']['output']>;
+  avatar: Maybe<Scalars["String"]["output"]>;
+  createdAt: Scalars["DateTime"]["output"];
+  email: Scalars["String"]["output"];
+  id: Scalars["UUID"]["output"];
+  lastLoginAt: Maybe<Scalars["DateTime"]["output"]>;
+  name: Scalars["String"]["output"];
+  password: Scalars["String"]["output"];
+  phone: Maybe<Scalars["String"]["output"]>;
   role: UserRole;
   spaceOwnerProfile: Maybe<SpaceOwnerProfile>;
   status: UserStatus;
@@ -2939,9 +3053,9 @@ export type UserFilterInput = {
 };
 
 export enum UserRole {
-  Admin = 'ADMIN',
-  Marketing = 'MARKETING',
-  User = 'USER'
+  Admin = "ADMIN",
+  Marketing = "MARKETING",
+  User = "USER",
 }
 
 export type UserRoleOperationFilterInput = {
@@ -2968,9 +3082,9 @@ export type UserSortInput = {
 };
 
 export enum UserStatus {
-  Active = 'ACTIVE',
-  Deleted = 'DELETED',
-  Suspended = 'SUSPENDED'
+  Active = "ACTIVE",
+  Deleted = "DELETED",
+  Suspended = "SUSPENDED",
 }
 
 export type UserStatusOperationFilterInput = {
@@ -2981,423 +3095,8656 @@ export type UserStatusOperationFilterInput = {
 };
 
 export type UuidOperationFilterInput = {
-  eq?: InputMaybe<Scalars['UUID']['input']>;
-  gt?: InputMaybe<Scalars['UUID']['input']>;
-  gte?: InputMaybe<Scalars['UUID']['input']>;
-  in?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
-  lt?: InputMaybe<Scalars['UUID']['input']>;
-  lte?: InputMaybe<Scalars['UUID']['input']>;
-  neq?: InputMaybe<Scalars['UUID']['input']>;
-  ngt?: InputMaybe<Scalars['UUID']['input']>;
-  ngte?: InputMaybe<Scalars['UUID']['input']>;
-  nin?: InputMaybe<Array<InputMaybe<Scalars['UUID']['input']>>>;
-  nlt?: InputMaybe<Scalars['UUID']['input']>;
-  nlte?: InputMaybe<Scalars['UUID']['input']>;
+  eq?: InputMaybe<Scalars["UUID"]["input"]>;
+  gt?: InputMaybe<Scalars["UUID"]["input"]>;
+  gte?: InputMaybe<Scalars["UUID"]["input"]>;
+  in?: InputMaybe<Array<InputMaybe<Scalars["UUID"]["input"]>>>;
+  lt?: InputMaybe<Scalars["UUID"]["input"]>;
+  lte?: InputMaybe<Scalars["UUID"]["input"]>;
+  neq?: InputMaybe<Scalars["UUID"]["input"]>;
+  ngt?: InputMaybe<Scalars["UUID"]["input"]>;
+  ngte?: InputMaybe<Scalars["UUID"]["input"]>;
+  nin?: InputMaybe<Array<InputMaybe<Scalars["UUID"]["input"]>>>;
+  nlt?: InputMaybe<Scalars["UUID"]["input"]>;
+  nlte?: InputMaybe<Scalars["UUID"]["input"]>;
 };
 
 export type ValidationError = Error & {
-  __typename: 'ValidationError';
-  code: Scalars['String']['output'];
+  __typename: "ValidationError";
+  code: Scalars["String"]["output"];
   errors: Array<KeyValuePairOfStringAndString__>;
-  message: Scalars['String']['output'];
+  message: Scalars["String"]["output"];
 };
 
-export type BookingCard_AdvertiserBookingFragmentFragment = { __typename: 'Booking', id: string, status: BookingStatus, startDate: string, endDate: string, totalAmount: number, space: { __typename: 'Space', title: string, images: Array<string>, city: string, state: string, owner: { __typename: 'SpaceOwnerProfile', businessName: string | null } | null } | null, campaign: { __typename: 'Campaign', name: string } | null } & { ' $fragmentName'?: 'BookingCard_AdvertiserBookingFragmentFragment' };
+export type BookingCard_AdvertiserBookingFragmentFragment = {
+  __typename: "Booking";
+  id: string;
+  status: BookingStatus;
+  startDate: string;
+  endDate: string;
+  totalAmount: number;
+  space: {
+    __typename: "Space";
+    title: string;
+    images: Array<string>;
+    city: string;
+    state: string;
+    owner: {
+      __typename: "SpaceOwnerProfile";
+      businessName: string | null;
+    } | null;
+  } | null;
+  campaign: { __typename: "Campaign"; name: string } | null;
+} & { " $fragmentName"?: "BookingCard_AdvertiserBookingFragmentFragment" };
 
-export type BookingsTable_AdvertiserBookingFragmentFragment = { __typename: 'Booking', id: string, status: BookingStatus, startDate: string, endDate: string, totalAmount: number, space: { __typename: 'Space', title: string, images: Array<string>, city: string, state: string, owner: { __typename: 'SpaceOwnerProfile', businessName: string | null } | null } | null, campaign: { __typename: 'Campaign', name: string } | null } & { ' $fragmentName'?: 'BookingsTable_AdvertiserBookingFragmentFragment' };
+export type BookingsTable_AdvertiserBookingFragmentFragment = {
+  __typename: "Booking";
+  id: string;
+  status: BookingStatus;
+  startDate: string;
+  endDate: string;
+  totalAmount: number;
+  space: {
+    __typename: "Space";
+    title: string;
+    images: Array<string>;
+    city: string;
+    state: string;
+    owner: {
+      __typename: "SpaceOwnerProfile";
+      businessName: string | null;
+    } | null;
+  } | null;
+  campaign: { __typename: "Campaign"; name: string } | null;
+} & { " $fragmentName"?: "BookingsTable_AdvertiserBookingFragmentFragment" };
 
-export type AdvertiserBookingsQueryVariables = Exact<{ [key: string]: never; }>;
+export type AdvertiserBookingsQueryVariables = Exact<{ [key: string]: never }>;
 
+export type AdvertiserBookingsQuery = {
+  myBookingsAsAdvertiser: {
+    __typename: "MyBookingsAsAdvertiserConnection";
+    nodes: Array<
+      { __typename: "Booking"; id: string } & {
+        " $fragmentRefs"?: {
+          BookingCard_AdvertiserBookingFragmentFragment: BookingCard_AdvertiserBookingFragmentFragment;
+          BookingsTable_AdvertiserBookingFragmentFragment: BookingsTable_AdvertiserBookingFragmentFragment;
+        };
+      }
+    > | null;
+  } | null;
+};
 
-export type AdvertiserBookingsQuery = { myBookingsAsAdvertiser: { __typename: 'MyBookingsAsAdvertiserConnection', nodes: Array<(
-      { __typename: 'Booking', id: string }
-      & { ' $fragmentRefs'?: { 'BookingCard_AdvertiserBookingFragmentFragment': BookingCard_AdvertiserBookingFragmentFragment;'BookingsTable_AdvertiserBookingFragmentFragment': BookingsTable_AdvertiserBookingFragmentFragment } }
-    )> | null } | null };
+export type CampaignCard_CampaignFragmentFragment = {
+  __typename: "Campaign";
+  id: string;
+  name: string;
+  description: string | null;
+  status: CampaignStatus;
+  startDate: string | null;
+  endDate: string | null;
+  totalBudget: number | null;
+  imageUrl: string;
+  bookings: {
+    __typename: "BookingsConnection";
+    nodes: Array<{ __typename: "Booking"; id: string }> | null;
+  } | null;
+} & { " $fragmentName"?: "CampaignCard_CampaignFragmentFragment" };
 
-export type CampaignCard_CampaignFragmentFragment = { __typename: 'Campaign', id: string, name: string, description: string | null, status: CampaignStatus, startDate: string | null, endDate: string | null, totalBudget: number | null, imageUrl: string, bookings: { __typename: 'BookingsConnection', nodes: Array<{ __typename: 'Booking', id: string }> | null } | null } & { ' $fragmentName'?: 'CampaignCard_CampaignFragmentFragment' };
+export type CampaignsTable_CampaignFragmentFragment = {
+  __typename: "Campaign";
+  id: string;
+  name: string;
+  description: string | null;
+  status: CampaignStatus;
+  startDate: string | null;
+  endDate: string | null;
+  totalBudget: number | null;
+  imageUrl: string;
+  bookings: {
+    __typename: "BookingsConnection";
+    nodes: Array<{ __typename: "Booking"; id: string }> | null;
+  } | null;
+} & { " $fragmentName"?: "CampaignsTable_CampaignFragmentFragment" };
 
-export type CampaignsTable_CampaignFragmentFragment = { __typename: 'Campaign', id: string, name: string, description: string | null, status: CampaignStatus, startDate: string | null, endDate: string | null, totalBudget: number | null, imageUrl: string, bookings: { __typename: 'BookingsConnection', nodes: Array<{ __typename: 'Booking', id: string }> | null } | null } & { ' $fragmentName'?: 'CampaignsTable_CampaignFragmentFragment' };
+export type AdvertiserCampaignsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type AdvertiserCampaignsQueryVariables = Exact<{ [key: string]: never; }>;
+export type AdvertiserCampaignsQuery = {
+  myCampaigns: {
+    __typename: "MyCampaignsConnection";
+    nodes: Array<
+      { __typename: "Campaign"; id: string } & {
+        " $fragmentRefs"?: {
+          CampaignCard_CampaignFragmentFragment: CampaignCard_CampaignFragmentFragment;
+          CampaignsTable_CampaignFragmentFragment: CampaignsTable_CampaignFragmentFragment;
+        };
+      }
+    > | null;
+  } | null;
+};
 
+export type DiscoverSpaceCard_SpaceFragmentFragment = {
+  __typename: "Space";
+  id: string;
+  title: string;
+  description: string | null;
+  city: string;
+  state: string;
+  images: Array<string>;
+  type: SpaceType;
+  pricePerDay: number;
+} & { " $fragmentName"?: "DiscoverSpaceCard_SpaceFragmentFragment" };
 
-export type AdvertiserCampaignsQuery = { myCampaigns: { __typename: 'MyCampaignsConnection', nodes: Array<(
-      { __typename: 'Campaign', id: string }
-      & { ' $fragmentRefs'?: { 'CampaignCard_CampaignFragmentFragment': CampaignCard_CampaignFragmentFragment;'CampaignsTable_CampaignFragmentFragment': CampaignsTable_CampaignFragmentFragment } }
-    )> | null } | null };
+export type DiscoverMap_SpaceFragmentFragment = {
+  __typename: "Space";
+  id: string;
+  title: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string | null;
+  latitude: number;
+  longitude: number;
+  pricePerDay: number;
+  type: SpaceType;
+  images: Array<string>;
+  width: number | null;
+  height: number | null;
+} & { " $fragmentName"?: "DiscoverMap_SpaceFragmentFragment" };
 
-export type DiscoverSpaceCard_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, description: string | null, city: string, state: string, images: Array<string>, type: SpaceType, pricePerDay: number } & { ' $fragmentName'?: 'DiscoverSpaceCard_SpaceFragmentFragment' };
+export type DiscoverTable_SpaceFragmentFragment = {
+  __typename: "Space";
+  id: string;
+  title: string;
+  city: string;
+  state: string;
+  images: Array<string>;
+  type: SpaceType;
+  pricePerDay: number;
+} & { " $fragmentName"?: "DiscoverTable_SpaceFragmentFragment" };
 
-export type DiscoverMap_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, address: string, city: string, state: string, zipCode: string | null, latitude: number, longitude: number, pricePerDay: number, type: SpaceType, images: Array<string>, width: number | null, height: number | null } & { ' $fragmentName'?: 'DiscoverMap_SpaceFragmentFragment' };
+export type DiscoverSpacesQueryVariables = Exact<{ [key: string]: never }>;
 
-export type DiscoverTable_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, city: string, state: string, images: Array<string>, type: SpaceType, pricePerDay: number } & { ' $fragmentName'?: 'DiscoverTable_SpaceFragmentFragment' };
+export type DiscoverSpacesQuery = {
+  spaces: {
+    __typename: "SpacesConnection";
+    nodes: Array<
+      { __typename: "Space"; id: string } & {
+        " $fragmentRefs"?: {
+          DiscoverSpaceCard_SpaceFragmentFragment: DiscoverSpaceCard_SpaceFragmentFragment;
+          DiscoverTable_SpaceFragmentFragment: DiscoverTable_SpaceFragmentFragment;
+          DiscoverMap_SpaceFragmentFragment: DiscoverMap_SpaceFragmentFragment;
+        };
+      }
+    > | null;
+  } | null;
+};
 
-export type DiscoverSpacesQueryVariables = Exact<{ [key: string]: never; }>;
+export type BookingCard_BookingFragmentFragment = {
+  __typename: "Booking";
+  id: string;
+  status: BookingStatus;
+  startDate: string;
+  endDate: string;
+  ownerPayoutAmount: number;
+  space: { __typename: "Space"; title: string; images: Array<string> } | null;
+  campaign: {
+    __typename: "Campaign";
+    name: string;
+    advertiserProfile: {
+      __typename: "AdvertiserProfile";
+      companyName: string | null;
+    };
+  } | null;
+} & { " $fragmentName"?: "BookingCard_BookingFragmentFragment" };
 
+export type BookingsTable_BookingFragmentFragment = {
+  __typename: "Booking";
+  id: string;
+  status: BookingStatus;
+  startDate: string;
+  endDate: string;
+  ownerPayoutAmount: number;
+  space: { __typename: "Space"; title: string; images: Array<string> } | null;
+  campaign: {
+    __typename: "Campaign";
+    name: string;
+    advertiserProfile: {
+      __typename: "AdvertiserProfile";
+      companyName: string | null;
+    };
+  } | null;
+} & { " $fragmentName"?: "BookingsTable_BookingFragmentFragment" };
 
-export type DiscoverSpacesQuery = { spaces: { __typename: 'SpacesConnection', nodes: Array<(
-      { __typename: 'Space', id: string }
-      & { ' $fragmentRefs'?: { 'DiscoverSpaceCard_SpaceFragmentFragment': DiscoverSpaceCard_SpaceFragmentFragment;'DiscoverTable_SpaceFragmentFragment': DiscoverTable_SpaceFragmentFragment;'DiscoverMap_SpaceFragmentFragment': DiscoverMap_SpaceFragmentFragment } }
-    )> | null } | null };
+export type SpaceOwnerBookingsQueryVariables = Exact<{ [key: string]: never }>;
 
-export type BookingCard_BookingFragmentFragment = { __typename: 'Booking', id: string, status: BookingStatus, startDate: string, endDate: string, ownerPayoutAmount: number, space: { __typename: 'Space', title: string, images: Array<string> } | null, campaign: { __typename: 'Campaign', name: string, advertiserProfile: { __typename: 'AdvertiserProfile', companyName: string | null } } | null } & { ' $fragmentName'?: 'BookingCard_BookingFragmentFragment' };
+export type SpaceOwnerBookingsQuery = {
+  myBookingsAsOwner: {
+    __typename: "MyBookingsAsOwnerConnection";
+    nodes: Array<
+      { __typename: "Booking"; id: string } & {
+        " $fragmentRefs"?: {
+          BookingCard_BookingFragmentFragment: BookingCard_BookingFragmentFragment;
+          BookingsTable_BookingFragmentFragment: BookingsTable_BookingFragmentFragment;
+        };
+      }
+    > | null;
+  } | null;
+};
 
-export type BookingsTable_BookingFragmentFragment = { __typename: 'Booking', id: string, status: BookingStatus, startDate: string, endDate: string, ownerPayoutAmount: number, space: { __typename: 'Space', title: string, images: Array<string> } | null, campaign: { __typename: 'Campaign', name: string, advertiserProfile: { __typename: 'AdvertiserProfile', companyName: string | null } } | null } & { ' $fragmentName'?: 'BookingsTable_BookingFragmentFragment' };
+export type BalanceCards_EarningsSummaryFragmentFragment = {
+  __typename: "EarningsSummary";
+  availableBalance: number | null;
+  pendingPayouts: number | null;
+  thisMonthEarnings: number | null;
+  lastMonthEarnings: number | null;
+  totalEarnings: number | null;
+} & { " $fragmentName"?: "BalanceCards_EarningsSummaryFragmentFragment" };
 
-export type SpaceOwnerBookingsQueryVariables = Exact<{ [key: string]: never; }>;
+export type SpaceOwnerEarningsQueryVariables = Exact<{ [key: string]: never }>;
 
+export type SpaceOwnerEarningsQuery = {
+  earningsSummary: { __typename: "EarningsSummary" } & {
+    " $fragmentRefs"?: {
+      BalanceCards_EarningsSummaryFragmentFragment: BalanceCards_EarningsSummaryFragmentFragment;
+    };
+  };
+  myPayouts: {
+    __typename: "MyPayoutsConnection";
+    nodes: Array<
+      {
+        __typename: "Payout";
+        id: string;
+        amount: number;
+        processedAt: string | null;
+      } & {
+        " $fragmentRefs"?: {
+          PayoutsTable_PayoutFragmentFragment: PayoutsTable_PayoutFragmentFragment;
+        };
+      }
+    > | null;
+  } | null;
+};
 
-export type SpaceOwnerBookingsQuery = { myBookingsAsOwner: { __typename: 'MyBookingsAsOwnerConnection', nodes: Array<(
-      { __typename: 'Booking', id: string }
-      & { ' $fragmentRefs'?: { 'BookingCard_BookingFragmentFragment': BookingCard_BookingFragmentFragment;'BookingsTable_BookingFragmentFragment': BookingsTable_BookingFragmentFragment } }
-    )> | null } | null };
+export type PayoutsTable_PayoutFragmentFragment = {
+  __typename: "Payout";
+  id: string;
+  amount: number;
+  stage: PayoutStage;
+  status: PayoutStatus;
+  processedAt: string | null;
+  booking: {
+    __typename: "Booking";
+    id: string;
+    space: { __typename: "Space"; title: string } | null;
+  };
+} & { " $fragmentName"?: "PayoutsTable_PayoutFragmentFragment" };
 
-export type BalanceCards_EarningsSummaryFragmentFragment = { __typename: 'EarningsSummary', availableBalance: number | null, pendingPayouts: number | null, thisMonthEarnings: number | null, lastMonthEarnings: number | null, totalEarnings: number | null } & { ' $fragmentName'?: 'BalanceCards_EarningsSummaryFragmentFragment' };
+export type SpaceCard_SpaceFragmentFragment = {
+  __typename: "Space";
+  id: string;
+  title: string;
+  description: string | null;
+  city: string;
+  state: string;
+  images: Array<string>;
+  type: SpaceType;
+  status: SpaceStatus;
+  createdAt: string;
+} & { " $fragmentName"?: "SpaceCard_SpaceFragmentFragment" };
 
-export type SpaceOwnerEarningsQueryVariables = Exact<{ [key: string]: never; }>;
+export type ListingsTable_SpaceFragmentFragment = {
+  __typename: "Space";
+  id: string;
+  title: string;
+  city: string;
+  state: string;
+  images: Array<string>;
+  type: SpaceType;
+  status: SpaceStatus;
+  createdAt: string;
+} & { " $fragmentName"?: "ListingsTable_SpaceFragmentFragment" };
 
+export type Details_SpaceFragmentFragment = {
+  __typename: "Space";
+  id: string;
+  description: string | null;
+  type: SpaceType;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string | null;
+  traffic: string | null;
+  pricePerDay: number;
+  installationFee: number | null;
+  minDuration: number;
+  maxDuration: number | null;
+  width: number | null;
+  height: number | null;
+  dimensionsText: string | null;
+  availableFrom: string | null;
+  availableTo: string | null;
+} & { " $fragmentName"?: "Details_SpaceFragmentFragment" };
 
-export type SpaceOwnerEarningsQuery = { earningsSummary: (
-    { __typename: 'EarningsSummary' }
-    & { ' $fragmentRefs'?: { 'BalanceCards_EarningsSummaryFragmentFragment': BalanceCards_EarningsSummaryFragmentFragment } }
-  ), myPayouts: { __typename: 'MyPayoutsConnection', nodes: Array<(
-      { __typename: 'Payout', id: string, amount: number, processedAt: string | null }
-      & { ' $fragmentRefs'?: { 'PayoutsTable_PayoutFragmentFragment': PayoutsTable_PayoutFragmentFragment } }
-    )> | null } | null };
+export type Gallery_SpaceFragmentFragment = {
+  __typename: "Space";
+  id: string;
+  title: string;
+  images: Array<string>;
+} & { " $fragmentName"?: "Gallery_SpaceFragmentFragment" };
 
-export type PayoutsTable_PayoutFragmentFragment = { __typename: 'Payout', id: string, amount: number, stage: PayoutStage, status: PayoutStatus, processedAt: string | null, booking: { __typename: 'Booking', id: string, space: { __typename: 'Space', title: string } | null } } & { ' $fragmentName'?: 'PayoutsTable_PayoutFragmentFragment' };
-
-export type SpaceCard_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, description: string | null, city: string, state: string, images: Array<string>, type: SpaceType, status: SpaceStatus, createdAt: string } & { ' $fragmentName'?: 'SpaceCard_SpaceFragmentFragment' };
-
-export type ListingsTable_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, city: string, state: string, images: Array<string>, type: SpaceType, status: SpaceStatus, createdAt: string } & { ' $fragmentName'?: 'ListingsTable_SpaceFragmentFragment' };
-
-export type Details_SpaceFragmentFragment = { __typename: 'Space', id: string, description: string | null, type: SpaceType, address: string, city: string, state: string, zipCode: string | null, traffic: string | null, pricePerDay: number, installationFee: number | null, minDuration: number, maxDuration: number | null, width: number | null, height: number | null, dimensionsText: string | null, availableFrom: string | null, availableTo: string | null } & { ' $fragmentName'?: 'Details_SpaceFragmentFragment' };
-
-export type Gallery_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, images: Array<string> } & { ' $fragmentName'?: 'Gallery_SpaceFragmentFragment' };
-
-export type Header_SpaceFragmentFragment = { __typename: 'Space', title: string, status: SpaceStatus } & { ' $fragmentName'?: 'Header_SpaceFragmentFragment' };
+export type Header_SpaceFragmentFragment = {
+  __typename: "Space";
+  title: string;
+  status: SpaceStatus;
+} & { " $fragmentName"?: "Header_SpaceFragmentFragment" };
 
 export type SpaceDetailQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 }>;
 
+export type SpaceDetailQuery = {
+  spaceById:
+    | ({ __typename: "Space"; id: string } & {
+        " $fragmentRefs"?: {
+          Header_SpaceFragmentFragment: Header_SpaceFragmentFragment;
+          Gallery_SpaceFragmentFragment: Gallery_SpaceFragmentFragment;
+          Details_SpaceFragmentFragment: Details_SpaceFragmentFragment;
+          Performance_SpaceFragmentFragment: Performance_SpaceFragmentFragment;
+        };
+      })
+    | null;
+};
 
-export type SpaceDetailQuery = { spaceById: (
-    { __typename: 'Space', id: string }
-    & { ' $fragmentRefs'?: { 'Header_SpaceFragmentFragment': Header_SpaceFragmentFragment;'Gallery_SpaceFragmentFragment': Gallery_SpaceFragmentFragment;'Details_SpaceFragmentFragment': Details_SpaceFragmentFragment;'Performance_SpaceFragmentFragment': Performance_SpaceFragmentFragment } }
-  ) | null };
-
-export type Performance_SpaceFragmentFragment = { __typename: 'Space', totalBookings: number, totalRevenue: number, averageRating: number | null } & { ' $fragmentName'?: 'Performance_SpaceFragmentFragment' };
+export type Performance_SpaceFragmentFragment = {
+  __typename: "Space";
+  totalBookings: number;
+  totalRevenue: number;
+  averageRating: number | null;
+} & { " $fragmentName"?: "Performance_SpaceFragmentFragment" };
 
 export type SpaceOwnerListingsQueryVariables = Exact<{
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-  after?: InputMaybe<Scalars['String']['input']>;
-  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  last?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  before?: InputMaybe<Scalars["String"]["input"]>;
   order?: InputMaybe<Array<SpaceSortInput> | SpaceSortInput>;
   where?: InputMaybe<SpaceFilterInput>;
-  gridView: Scalars['Boolean']['input'];
-  tableView: Scalars['Boolean']['input'];
+  gridView: Scalars["Boolean"]["input"];
+  tableView: Scalars["Boolean"]["input"];
 }>;
 
+export type SpaceOwnerListingsQuery = {
+  mySpaces: {
+    __typename: "MySpacesConnection";
+    nodes: Array<
+      { __typename: "Space"; id: string } & {
+        " $fragmentRefs"?: {
+          SpaceCard_SpaceFragmentFragment: SpaceCard_SpaceFragmentFragment;
+          ListingsTable_SpaceFragmentFragment: ListingsTable_SpaceFragmentFragment;
+        };
+      }
+    > | null;
+    pageInfo: {
+      __typename: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor: string | null;
+      endCursor: string | null;
+    };
+  } | null;
+};
 
-export type SpaceOwnerListingsQuery = { mySpaces: { __typename: 'MySpacesConnection', nodes: Array<(
-      { __typename: 'Space', id: string }
-      & { ' $fragmentRefs'?: { 'SpaceCard_SpaceFragmentFragment': SpaceCard_SpaceFragmentFragment;'ListingsTable_SpaceFragmentFragment': ListingsTable_SpaceFragmentFragment } }
-    )> | null, pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null } } | null };
+export type OverviewActiveBookingsBookingCard_BookingFragmentFragment = {
+  __typename: "Booking";
+  id: string;
+  status: BookingStatus;
+  startDate: string;
+  endDate: string;
+  campaign: {
+    __typename: "Campaign";
+    advertiser: {
+      __typename: "AdvertiserProfile";
+      user: { __typename: "User"; name: string };
+    } | null;
+  } | null;
+  space: { __typename: "Space"; id: string; title: string } | null;
+} & {
+  " $fragmentName"?: "OverviewActiveBookingsBookingCard_BookingFragmentFragment";
+};
 
-export type OverviewActiveBookingsBookingCard_BookingFragmentFragment = { __typename: 'Booking', id: string, status: BookingStatus, startDate: string, endDate: string, campaign: { __typename: 'Campaign', advertiser: { __typename: 'AdvertiserProfile', user: { __typename: 'User', name: string } } | null } | null, space: { __typename: 'Space', id: string, title: string } | null } & { ' $fragmentName'?: 'OverviewActiveBookingsBookingCard_BookingFragmentFragment' };
+export type OverviewActiveBookings_QueryFragmentFragment = {
+  myBookingsAsOwner: {
+    __typename: "MyBookingsAsOwnerConnection";
+    nodes: Array<
+      { __typename: "Booking" } & {
+        " $fragmentRefs"?: {
+          OverviewActiveBookingsBookingCard_BookingFragmentFragment: OverviewActiveBookingsBookingCard_BookingFragmentFragment;
+        };
+      }
+    > | null;
+  } | null;
+} & { " $fragmentName"?: "OverviewActiveBookings_QueryFragmentFragment" };
 
-export type OverviewActiveBookings_QueryFragmentFragment = { myBookingsAsOwner: { __typename: 'MyBookingsAsOwnerConnection', nodes: Array<(
-      { __typename: 'Booking' }
-      & { ' $fragmentRefs'?: { 'OverviewActiveBookingsBookingCard_BookingFragmentFragment': OverviewActiveBookingsBookingCard_BookingFragmentFragment } }
-    )> | null } | null } & { ' $fragmentName'?: 'OverviewActiveBookings_QueryFragmentFragment' };
+export type OverviewPendingRequests_QueryFragmentFragment = {
+  incomingBookingRequests: {
+    __typename: "IncomingBookingRequestsConnection";
+    nodes: Array<
+      { __typename: "Booking" } & {
+        " $fragmentRefs"?: {
+          OverviewPendingRequestsRequestCard_BookingFragmentFragment: OverviewPendingRequestsRequestCard_BookingFragmentFragment;
+        };
+      }
+    > | null;
+  } | null;
+} & { " $fragmentName"?: "OverviewPendingRequests_QueryFragmentFragment" };
 
-export type OverviewPendingRequests_QueryFragmentFragment = { incomingBookingRequests: { __typename: 'IncomingBookingRequestsConnection', nodes: Array<(
-      { __typename: 'Booking' }
-      & { ' $fragmentRefs'?: { 'OverviewPendingRequestsRequestCard_BookingFragmentFragment': OverviewPendingRequestsRequestCard_BookingFragmentFragment } }
-    )> | null } | null } & { ' $fragmentName'?: 'OverviewPendingRequests_QueryFragmentFragment' };
+export type OverviewPendingRequestsRequestCard_BookingFragmentFragment = {
+  __typename: "Booking";
+  id: string;
+  startDate: string;
+  endDate: string;
+  totalAmount: number;
+  createdAt: string;
+  campaign: {
+    __typename: "Campaign";
+    advertiser: {
+      __typename: "AdvertiserProfile";
+      user: { __typename: "User"; name: string; avatar: string | null };
+    } | null;
+  } | null;
+  space: { __typename: "Space"; id: string; title: string } | null;
+} & {
+  " $fragmentName"?: "OverviewPendingRequestsRequestCard_BookingFragmentFragment";
+};
 
-export type OverviewPendingRequestsRequestCard_BookingFragmentFragment = { __typename: 'Booking', id: string, startDate: string, endDate: string, totalAmount: number, createdAt: string, campaign: { __typename: 'Campaign', advertiser: { __typename: 'AdvertiserProfile', user: { __typename: 'User', name: string, avatar: string | null } } | null } | null, space: { __typename: 'Space', id: string, title: string } | null } & { ' $fragmentName'?: 'OverviewPendingRequestsRequestCard_BookingFragmentFragment' };
+export type OverviewStatCards_QueryFragmentFragment = {
+  earningsSummary: {
+    __typename: "EarningsSummary";
+    availableBalance: number | null;
+    pendingPayouts: number | null;
+    thisMonthEarnings: number | null;
+    lastMonthEarnings: number | null;
+  };
+} & { " $fragmentName"?: "OverviewStatCards_QueryFragmentFragment" };
 
-export type OverviewStatCards_QueryFragmentFragment = { earningsSummary: { __typename: 'EarningsSummary', availableBalance: number | null, pendingPayouts: number | null, thisMonthEarnings: number | null, lastMonthEarnings: number | null } } & { ' $fragmentName'?: 'OverviewStatCards_QueryFragmentFragment' };
+export type OverviewTopSpaces_QueryFragmentFragment = {
+  me: {
+    __typename: "User";
+    spaceOwnerProfile: {
+      __typename: "SpaceOwnerProfile";
+      spaces: {
+        __typename: "SpacesConnection";
+        nodes: Array<
+          { __typename: "Space" } & {
+            " $fragmentRefs"?: {
+              OverviewTopSpacesSpaceCard_SpaceFragmentFragment: OverviewTopSpacesSpaceCard_SpaceFragmentFragment;
+            };
+          }
+        > | null;
+      } | null;
+    } | null;
+  } | null;
+} & { " $fragmentName"?: "OverviewTopSpaces_QueryFragmentFragment" };
 
-export type OverviewTopSpaces_QueryFragmentFragment = { me: { __typename: 'User', spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', spaces: { __typename: 'SpacesConnection', nodes: Array<(
-          { __typename: 'Space' }
-          & { ' $fragmentRefs'?: { 'OverviewTopSpacesSpaceCard_SpaceFragmentFragment': OverviewTopSpacesSpaceCard_SpaceFragmentFragment } }
-        )> | null } | null } | null } | null } & { ' $fragmentName'?: 'OverviewTopSpaces_QueryFragmentFragment' };
+export type OverviewTopSpacesSpaceCard_SpaceFragmentFragment = {
+  __typename: "Space";
+  id: string;
+  title: string;
+  images: Array<string>;
+  totalBookings: number;
+  totalRevenue: number;
+  averageRating: number | null;
+  status: SpaceStatus;
+} & { " $fragmentName"?: "OverviewTopSpacesSpaceCard_SpaceFragmentFragment" };
 
-export type OverviewTopSpacesSpaceCard_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, images: Array<string>, totalBookings: number, totalRevenue: number, averageRating: number | null, status: SpaceStatus } & { ' $fragmentName'?: 'OverviewTopSpacesSpaceCard_SpaceFragmentFragment' };
+export type OverviewDataQueryVariables = Exact<{ [key: string]: never }>;
 
-export type OverviewDataQueryVariables = Exact<{ [key: string]: never; }>;
+export type OverviewDataQuery = {
+  " $fragmentRefs"?: {
+    OverviewStatCards_QueryFragmentFragment: OverviewStatCards_QueryFragmentFragment;
+    OverviewPendingRequests_QueryFragmentFragment: OverviewPendingRequests_QueryFragmentFragment;
+    OverviewActiveBookings_QueryFragmentFragment: OverviewActiveBookings_QueryFragmentFragment;
+    OverviewTopSpaces_QueryFragmentFragment: OverviewTopSpaces_QueryFragmentFragment;
+  };
+};
 
+export type DashboardUserQueryVariables = Exact<{ [key: string]: never }>;
 
-export type OverviewDataQuery = { ' $fragmentRefs'?: { 'OverviewStatCards_QueryFragmentFragment': OverviewStatCards_QueryFragmentFragment;'OverviewPendingRequests_QueryFragmentFragment': OverviewPendingRequests_QueryFragmentFragment;'OverviewActiveBookings_QueryFragmentFragment': OverviewActiveBookings_QueryFragmentFragment;'OverviewTopSpaces_QueryFragmentFragment': OverviewTopSpaces_QueryFragmentFragment } };
-
-export type DashboardUserQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type DashboardUserQuery = { me: (
-    { __typename: 'User', id: string }
-    & { ' $fragmentRefs'?: { 'NavigationSection_UserFragmentFragment': NavigationSection_UserFragmentFragment;'UserSection_UserFragmentFragment': UserSection_UserFragmentFragment;'RoleBasedView_UserFragmentFragment': RoleBasedView_UserFragmentFragment } }
-  ) | null };
+export type DashboardUserQuery = {
+  me:
+    | ({ __typename: "User"; id: string } & {
+        " $fragmentRefs"?: {
+          NavigationSection_UserFragmentFragment: NavigationSection_UserFragmentFragment;
+          UserSection_UserFragmentFragment: UserSection_UserFragmentFragment;
+          RoleBasedView_UserFragmentFragment: RoleBasedView_UserFragmentFragment;
+        };
+      })
+    | null;
+};
 
 export type SendMessageMutationVariables = Exact<{
   input: SendMessageInput;
 }>;
 
-
-export type SendMessageMutation = { sendMessage: { __typename: 'SendMessagePayload', message: { __typename: 'Message', id: string, content: string, type: MessageType, attachments: Array<string> | null, createdAt: string, senderUser: { __typename: 'User', id: string, name: string, avatar: string | null } } | null, errors: Array<{ __typename: 'ForbiddenError', message: string }> | null } };
+export type SendMessageMutation = {
+  sendMessage: {
+    __typename: "SendMessagePayload";
+    message: {
+      __typename: "Message";
+      id: string;
+      content: string;
+      type: MessageType;
+      attachments: Array<string> | null;
+      createdAt: string;
+      senderUser: {
+        __typename: "User";
+        id: string;
+        name: string;
+        avatar: string | null;
+      };
+    } | null;
+    errors: Array<{ __typename: "ForbiddenError"; message: string }> | null;
+  };
+};
 
 export type MarkConversationReadMutationVariables = Exact<{
   input: MarkConversationReadInput;
 }>;
 
+export type MarkConversationReadMutation = {
+  markConversationRead: {
+    __typename: "MarkConversationReadPayload";
+    participant: {
+      __typename: "ConversationParticipant";
+      id: string;
+      lastReadAt: string | null;
+    } | null;
+    errors: Array<{ __typename: "ForbiddenError"; message: string }> | null;
+  };
+};
 
-export type MarkConversationReadMutation = { markConversationRead: { __typename: 'MarkConversationReadPayload', participant: { __typename: 'ConversationParticipant', id: string, lastReadAt: string | null } | null, errors: Array<{ __typename: 'ForbiddenError', message: string }> | null } };
+export type LoadEarlierMessagesQueryVariables = Exact<{
+  conversationId: Scalars["ID"]["input"];
+  before?: InputMaybe<Scalars["String"]["input"]>;
+}>;
+
+export type LoadEarlierMessagesQuery = {
+  messagesByConversation: {
+    __typename: "MessagesByConversationConnection";
+    nodes: Array<{
+      __typename: "Message";
+      id: string;
+      content: string;
+      type: MessageType;
+      attachments: Array<string> | null;
+      createdAt: string;
+      senderUser: {
+        __typename: "User";
+        id: string;
+        name: string;
+        avatar: string | null;
+      };
+    }> | null;
+    pageInfo: {
+      __typename: "PageInfo";
+      hasPreviousPage: boolean;
+      startCursor: string | null;
+    };
+  } | null;
+};
+
+export type MessageBubble_MessageFragmentFragment = {
+  __typename: "Message";
+  id: string;
+  content: string;
+  type: MessageType;
+  attachments: Array<string> | null;
+  createdAt: string;
+  senderUser: {
+    __typename: "User";
+    id: string;
+    name: string;
+    avatar: string | null;
+  };
+} & { " $fragmentName"?: "MessageBubble_MessageFragmentFragment" };
 
 export type OnMessageSubscriptionVariables = Exact<{
-  conversationId: Scalars['ID']['input'];
+  conversationId: Scalars["ID"]["input"];
 }>;
 
+export type OnMessageSubscription = {
+  onMessage: {
+    __typename: "Message";
+    id: string;
+    content: string;
+    type: MessageType;
+    attachments: Array<string> | null;
+    createdAt: string;
+    senderUser: {
+      __typename: "User";
+      id: string;
+      name: string;
+      avatar: string | null;
+    };
+  };
+};
 
-export type OnMessageSubscription = { onMessage: { __typename: 'Message', id: string, content: string, type: MessageType, attachments: Array<string> | null, createdAt: string, senderUser: { __typename: 'User', id: string, name: string, avatar: string | null } } };
+export type ThreadHeader_ConversationFragmentFragment = {
+  __typename: "Conversation";
+  id: string;
+  booking: {
+    __typename: "Booking";
+    id: string;
+    status: BookingStatus;
+    startDate: string;
+    endDate: string;
+    totalAmount: number;
+    pricePerDay: number;
+    totalDays: number;
+    installationFee: number;
+    space: {
+      __typename: "Space";
+      id: string;
+      title: string;
+      images: Array<string>;
+      address: string;
+      city: string;
+      state: string;
+    } | null;
+  } | null;
+} & { " $fragmentName"?: "ThreadHeader_ConversationFragmentFragment" };
+
+export type MessagesDataQueryVariables = Exact<{ [key: string]: never }>;
+
+export type MessagesDataQuery = {
+  unreadConversationsCount: number;
+  me: { __typename: "User"; id: string } | null;
+  myConversations: {
+    __typename: "MyConversationsConnection";
+    nodes: Array<
+      { __typename: "Conversation" } & {
+        " $fragmentRefs"?: {
+          ConversationItem_ConversationFragmentFragment: ConversationItem_ConversationFragmentFragment;
+        };
+      }
+    > | null;
+  } | null;
+};
 
 export type ThreadDataQueryVariables = Exact<{
-  conversationId: Scalars['ID']['input'];
+  conversationId: Scalars["ID"]["input"];
 }>;
 
+export type ThreadDataQuery = {
+  unreadConversationsCount: number;
+  me: { __typename: "User"; id: string } | null;
+  myConversations: {
+    __typename: "MyConversationsConnection";
+    nodes: Array<
+      { __typename: "Conversation" } & {
+        " $fragmentRefs"?: {
+          ConversationItem_ConversationFragmentFragment: ConversationItem_ConversationFragmentFragment;
+          ThreadHeader_ConversationFragmentFragment: ThreadHeader_ConversationFragmentFragment;
+        };
+      }
+    > | null;
+  } | null;
+  messagesByConversation: {
+    __typename: "MessagesByConversationConnection";
+    nodes: Array<
+      { __typename: "Message" } & {
+        " $fragmentRefs"?: {
+          MessageBubble_MessageFragmentFragment: MessageBubble_MessageFragmentFragment;
+        };
+      }
+    > | null;
+    pageInfo: {
+      __typename: "PageInfo";
+      hasPreviousPage: boolean;
+      startCursor: string | null;
+    };
+  } | null;
+};
 
-export type ThreadDataQuery = { me: { __typename: 'User', id: string } | null, myConversations: { __typename: 'MyConversationsConnection', nodes: Array<{ __typename: 'Conversation', id: string, updatedAt: string, booking: { __typename: 'Booking', id: string, status: BookingStatus, space: { __typename: 'Space', id: string, title: string } | null } | null, participants: Array<{ __typename: 'ConversationParticipant', lastReadAt: string | null, user: { __typename: 'User', id: string, name: string, avatar: string | null } }>, messages: { __typename: 'MessagesConnection', nodes: Array<{ __typename: 'Message', id: string, content: string, type: MessageType, createdAt: string, senderUser: { __typename: 'User', id: string } }> | null } | null }> | null } | null, messagesByConversation: { __typename: 'MessagesByConversationConnection', nodes: Array<{ __typename: 'Message', id: string, content: string, type: MessageType, attachments: Array<string> | null, createdAt: string, senderUser: { __typename: 'User', id: string, name: string, avatar: string | null } }> | null, pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, endCursor: string | null } } | null };
+export type ConversationItem_ConversationFragmentFragment = {
+  __typename: "Conversation";
+  id: string;
+  updatedAt: string;
+  booking: {
+    __typename: "Booking";
+    id: string;
+    status: BookingStatus;
+    space: { __typename: "Space"; id: string; title: string } | null;
+  } | null;
+  participants: Array<{
+    __typename: "ConversationParticipant";
+    lastReadAt: string | null;
+    user: {
+      __typename: "User";
+      id: string;
+      name: string;
+      avatar: string | null;
+    };
+  }>;
+  messages: {
+    __typename: "MessagesConnection";
+    nodes: Array<{
+      __typename: "Message";
+      id: string;
+      content: string;
+      type: MessageType;
+      createdAt: string;
+      senderUser: { __typename: "User"; id: string };
+    }> | null;
+  } | null;
+} & { " $fragmentName"?: "ConversationItem_ConversationFragmentFragment" };
 
-export type MessagesDataQueryVariables = Exact<{ [key: string]: never; }>;
+export type NavigationSection_UserFragmentFragment = {
+  __typename: "User";
+  role: UserRole;
+  activeProfileType: ProfileType;
+} & { " $fragmentName"?: "NavigationSection_UserFragmentFragment" };
 
+export type OnNotificationSubscriptionVariables = Exact<{
+  userId: Scalars["ID"]["input"];
+}>;
 
-export type MessagesDataQuery = { unreadConversationsCount: number, me: { __typename: 'User', id: string } | null, myConversations: { __typename: 'MyConversationsConnection', nodes: Array<{ __typename: 'Conversation', id: string, updatedAt: string, booking: { __typename: 'Booking', id: string, status: BookingStatus, space: { __typename: 'Space', id: string, title: string } | null } | null, participants: Array<{ __typename: 'ConversationParticipant', lastReadAt: string | null, user: { __typename: 'User', id: string, name: string, avatar: string | null } }>, messages: { __typename: 'MessagesConnection', nodes: Array<{ __typename: 'Message', id: string, content: string, type: MessageType, createdAt: string, senderUser: { __typename: 'User', id: string } }> | null } | null }> | null } | null };
+export type OnNotificationSubscription = {
+  onNotification: {
+    __typename: "Notification";
+    id: string;
+    title: string;
+    body: string;
+    type: NotificationType;
+    isRead: boolean;
+    createdAt: string;
+    entityId: string | null;
+    entityType: string | null;
+  };
+};
 
-export type NavigationSection_UserFragmentFragment = { __typename: 'User', role: UserRole, activeProfileType: ProfileType } & { ' $fragmentName'?: 'NavigationSection_UserFragmentFragment' };
+export type MarkNotificationReadMutationVariables = Exact<{
+  input: MarkNotificationReadInput;
+}>;
 
-export type About_UserFragmentFragment = { __typename: 'User', name: string, activeProfileType: ProfileType, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', businessName: string | null, businessType: string | null, onboardingComplete: boolean, spaces: { __typename: 'SpacesConnection', nodes: Array<{ __typename: 'Space', id: string }> | null } | null } | null, advertiserProfile: { __typename: 'AdvertiserProfile', companyName: string | null, industry: string | null, website: string | null, onboardingComplete: boolean, campaigns: { __typename: 'CampaignsConnection', nodes: Array<{ __typename: 'Campaign', status: CampaignStatus }> | null } | null } | null } & { ' $fragmentName'?: 'About_UserFragmentFragment' };
+export type MarkNotificationReadMutation = {
+  markNotificationRead: {
+    __typename: "MarkNotificationReadPayload";
+    notification: {
+      __typename: "Notification";
+      id: string;
+      isRead: boolean;
+      readAt: string | null;
+    } | null;
+    errors: Array<{ __typename: "NotFoundError"; message: string }> | null;
+  };
+};
 
-export type Activity_UserFragmentFragment = { __typename: 'User', name: string, activeProfileType: ProfileType, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', reviews: { __typename: 'ReviewsConnection', nodes: Array<{ __typename: 'Review', id: string, rating: number, comment: string | null, createdAt: string, reviewer: { __typename: 'ReviewerInfo', name: string, avatar: string | null, companyName: string | null } | null }> | null } | null } | null, advertiserProfile: { __typename: 'AdvertiserProfile', campaigns: { __typename: 'CampaignsConnection', nodes: Array<{ __typename: 'Campaign', id: string, name: string, status: CampaignStatus, startDate: string | null, endDate: string | null, totalSpend: number, spacesCount: number }> | null } | null } | null } & { ' $fragmentName'?: 'Activity_UserFragmentFragment' };
+export type MarkAllNotificationsReadMutationVariables = Exact<{
+  [key: string]: never;
+}>;
 
-export type Info_UserFragmentFragment = { __typename: 'User', name: string, avatar: string | null, activeProfileType: ProfileType, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', createdAt: string, spaces: { __typename: 'SpacesConnection', nodes: Array<{ __typename: 'Space', averageRating: number | null }> | null } | null, reviews: { __typename: 'ReviewsConnection', nodes: Array<{ __typename: 'Review', id: string }> | null } | null } | null, advertiserProfile: { __typename: 'AdvertiserProfile', createdAt: string, totalSpend: number, campaigns: { __typename: 'CampaignsConnection', nodes: Array<{ __typename: 'Campaign', id: string }> | null } | null } | null } & { ' $fragmentName'?: 'Info_UserFragmentFragment' };
+export type MarkAllNotificationsReadMutation = {
+  markAllNotificationsRead: {
+    __typename: "MarkAllNotificationsReadPayload";
+    count: number;
+  };
+};
 
-export type ProfileQueryVariables = Exact<{ [key: string]: never; }>;
+export type DeleteNotificationMutationVariables = Exact<{
+  input: DeleteNotificationInput;
+}>;
 
+export type DeleteNotificationMutation = {
+  deleteNotification: {
+    __typename: "DeleteNotificationPayload";
+    success: boolean;
+  };
+};
 
-export type ProfileQuery = { me: (
-    { __typename: 'User', id: string, name: string }
-    & { ' $fragmentRefs'?: { 'ProfileLayout_UserFragmentFragment': ProfileLayout_UserFragmentFragment;'Info_UserFragmentFragment': Info_UserFragmentFragment;'About_UserFragmentFragment': About_UserFragmentFragment;'Activity_UserFragmentFragment': Activity_UserFragmentFragment } }
-  ) | null };
+export type LoadMoreNotificationsQueryVariables = Exact<{
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  isRead?: InputMaybe<Scalars["Boolean"]["input"]>;
+  type?: InputMaybe<NotificationType>;
+}>;
 
-export type ProfileLayout_UserFragmentFragment = { __typename: 'User', role: UserRole } & { ' $fragmentName'?: 'ProfileLayout_UserFragmentFragment' };
+export type LoadMoreNotificationsQuery = {
+  myNotifications: {
+    __typename: "MyNotificationsConnection";
+    nodes: Array<{
+      __typename: "Notification";
+      id: string;
+      title: string;
+      body: string;
+      type: NotificationType;
+      isRead: boolean;
+      readAt: string | null;
+      createdAt: string;
+      entityId: string | null;
+      entityType: string | null;
+    }> | null;
+    pageInfo: {
+      __typename: "PageInfo";
+      hasNextPage: boolean;
+      endCursor: string | null;
+    };
+  } | null;
+};
 
-export type RoleBasedView_UserFragmentFragment = { __typename: 'User', role: UserRole, activeProfileType: ProfileType } & { ' $fragmentName'?: 'RoleBasedView_UserFragmentFragment' };
+export type NotificationsPageQueryVariables = Exact<{ [key: string]: never }>;
 
-export type AccountSettings_UserFragmentFragment = { __typename: 'User', createdAt: string, lastLoginAt: string | null, activeProfileType: ProfileType } & { ' $fragmentName'?: 'AccountSettings_UserFragmentFragment' };
+export type NotificationsPageQuery = {
+  unreadNotificationsCount: number;
+  me: { __typename: "User"; id: string } | null;
+  myNotifications: {
+    __typename: "MyNotificationsConnection";
+    nodes: Array<{
+      __typename: "Notification";
+      id: string;
+      title: string;
+      body: string;
+      type: NotificationType;
+      isRead: boolean;
+      createdAt: string;
+      readAt: string | null;
+      entityId: string | null;
+      entityType: string | null;
+    }> | null;
+    pageInfo: {
+      __typename: "PageInfo";
+      hasNextPage: boolean;
+      endCursor: string | null;
+    };
+  } | null;
+};
 
-export type BusinessSettings_UserFragmentFragment = { __typename: 'User', activeProfileType: ProfileType, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', businessName: string | null, businessType: string | null, payoutSchedule: PayoutSchedule } | null, advertiserProfile: { __typename: 'AdvertiserProfile', companyName: string | null, industry: string | null, website: string | null } | null } & { ' $fragmentName'?: 'BusinessSettings_UserFragmentFragment' };
+export type About_UserFragmentFragment = {
+  __typename: "User";
+  name: string;
+  activeProfileType: ProfileType;
+  spaceOwnerProfile: {
+    __typename: "SpaceOwnerProfile";
+    businessName: string | null;
+    businessType: string | null;
+    onboardingComplete: boolean;
+    spaces: {
+      __typename: "SpacesConnection";
+      nodes: Array<{ __typename: "Space"; id: string }> | null;
+    } | null;
+  } | null;
+  advertiserProfile: {
+    __typename: "AdvertiserProfile";
+    companyName: string | null;
+    industry: string | null;
+    website: string | null;
+    onboardingComplete: boolean;
+    campaigns: {
+      __typename: "CampaignsConnection";
+      nodes: Array<{ __typename: "Campaign"; status: CampaignStatus }> | null;
+    } | null;
+  } | null;
+} & { " $fragmentName"?: "About_UserFragmentFragment" };
 
-export type NotificationSettings_UserFragmentFragment = { __typename: 'User', activeProfileType: ProfileType } & { ' $fragmentName'?: 'NotificationSettings_UserFragmentFragment' };
+export type Activity_UserFragmentFragment = {
+  __typename: "User";
+  name: string;
+  activeProfileType: ProfileType;
+  spaceOwnerProfile: {
+    __typename: "SpaceOwnerProfile";
+    reviews: {
+      __typename: "ReviewsConnection";
+      nodes: Array<{
+        __typename: "Review";
+        id: string;
+        rating: number;
+        comment: string | null;
+        createdAt: string;
+        reviewer: {
+          __typename: "ReviewerInfo";
+          name: string;
+          avatar: string | null;
+          companyName: string | null;
+        } | null;
+      }> | null;
+    } | null;
+  } | null;
+  advertiserProfile: {
+    __typename: "AdvertiserProfile";
+    campaigns: {
+      __typename: "CampaignsConnection";
+      nodes: Array<{
+        __typename: "Campaign";
+        id: string;
+        name: string;
+        status: CampaignStatus;
+        startDate: string | null;
+        endDate: string | null;
+        totalSpend: number;
+        spacesCount: number;
+      }> | null;
+    } | null;
+  } | null;
+} & { " $fragmentName"?: "Activity_UserFragmentFragment" };
 
-export type PayoutSettings_UserFragmentFragment = { __typename: 'User', activeProfileType: ProfileType, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', stripeAccountId: string | null, stripeAccountStatus: string | null } | null } & { ' $fragmentName'?: 'PayoutSettings_UserFragmentFragment' };
+export type Info_UserFragmentFragment = {
+  __typename: "User";
+  name: string;
+  avatar: string | null;
+  activeProfileType: ProfileType;
+  spaceOwnerProfile: {
+    __typename: "SpaceOwnerProfile";
+    createdAt: string;
+    spaces: {
+      __typename: "SpacesConnection";
+      nodes: Array<{
+        __typename: "Space";
+        averageRating: number | null;
+      }> | null;
+    } | null;
+    reviews: {
+      __typename: "ReviewsConnection";
+      nodes: Array<{ __typename: "Review"; id: string }> | null;
+    } | null;
+  } | null;
+  advertiserProfile: {
+    __typename: "AdvertiserProfile";
+    createdAt: string;
+    totalSpend: number;
+    campaigns: {
+      __typename: "CampaignsConnection";
+      nodes: Array<{ __typename: "Campaign"; id: string }> | null;
+    } | null;
+  } | null;
+} & { " $fragmentName"?: "Info_UserFragmentFragment" };
 
-export type ProfileSettings_UserFragmentFragment = { __typename: 'User', name: string, email: string, phone: string | null, avatar: string | null, activeProfileType: ProfileType } & { ' $fragmentName'?: 'ProfileSettings_UserFragmentFragment' };
+export type ProfileQueryVariables = Exact<{ [key: string]: never }>;
 
-export type SettingsQueryVariables = Exact<{ [key: string]: never; }>;
+export type ProfileQuery = {
+  me:
+    | ({ __typename: "User"; id: string; name: string } & {
+        " $fragmentRefs"?: {
+          ProfileLayout_UserFragmentFragment: ProfileLayout_UserFragmentFragment;
+          Info_UserFragmentFragment: Info_UserFragmentFragment;
+          About_UserFragmentFragment: About_UserFragmentFragment;
+          Activity_UserFragmentFragment: Activity_UserFragmentFragment;
+        };
+      })
+    | null;
+};
 
+export type ProfileLayout_UserFragmentFragment = {
+  __typename: "User";
+  role: UserRole;
+} & { " $fragmentName"?: "ProfileLayout_UserFragmentFragment" };
 
-export type SettingsQuery = { me: (
-    { __typename: 'User', id: string, email: string, name: string, avatar: string | null, phone: string | null, createdAt: string, lastLoginAt: string | null, activeProfileType: ProfileType }
-    & { ' $fragmentRefs'?: { 'SettingsLayout_UserFragmentFragment': SettingsLayout_UserFragmentFragment;'ProfileSettings_UserFragmentFragment': ProfileSettings_UserFragmentFragment;'BusinessSettings_UserFragmentFragment': BusinessSettings_UserFragmentFragment;'PayoutSettings_UserFragmentFragment': PayoutSettings_UserFragmentFragment;'AccountSettings_UserFragmentFragment': AccountSettings_UserFragmentFragment } }
-  ) | null, myNotificationPreferences: Array<{ __typename: 'NotificationPreference', id: string, notificationType: NotificationType, inAppEnabled: boolean, emailEnabled: boolean, pushEnabled: boolean }> };
+export type RoleBasedView_UserFragmentFragment = {
+  __typename: "User";
+  role: UserRole;
+  activeProfileType: ProfileType;
+} & { " $fragmentName"?: "RoleBasedView_UserFragmentFragment" };
 
-export type SettingsLayout_UserFragmentFragment = { __typename: 'User', role: UserRole } & { ' $fragmentName'?: 'SettingsLayout_UserFragmentFragment' };
+export type AccountSettings_UserFragmentFragment = {
+  __typename: "User";
+  createdAt: string;
+  lastLoginAt: string | null;
+  activeProfileType: ProfileType;
+} & { " $fragmentName"?: "AccountSettings_UserFragmentFragment" };
 
-export type GetCurrentUserForSettingsQueryVariables = Exact<{ [key: string]: never; }>;
+export type BusinessSettings_UserFragmentFragment = {
+  __typename: "User";
+  activeProfileType: ProfileType;
+  spaceOwnerProfile: {
+    __typename: "SpaceOwnerProfile";
+    businessName: string | null;
+    businessType: string | null;
+    payoutSchedule: PayoutSchedule;
+  } | null;
+  advertiserProfile: {
+    __typename: "AdvertiserProfile";
+    companyName: string | null;
+    industry: string | null;
+    website: string | null;
+  } | null;
+} & { " $fragmentName"?: "BusinessSettings_UserFragmentFragment" };
 
+export type NotificationSettings_UserFragmentFragment = {
+  __typename: "User";
+  activeProfileType: ProfileType;
+} & { " $fragmentName"?: "NotificationSettings_UserFragmentFragment" };
 
-export type GetCurrentUserForSettingsQuery = { me: { __typename: 'User', id: string, avatar: string | null, spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', id: string } | null, advertiserProfile: { __typename: 'AdvertiserProfile', id: string } | null } | null };
+export type PayoutSettings_UserFragmentFragment = {
+  __typename: "User";
+  activeProfileType: ProfileType;
+  spaceOwnerProfile: {
+    __typename: "SpaceOwnerProfile";
+    stripeAccountId: string | null;
+    stripeAccountStatus: string | null;
+  } | null;
+} & { " $fragmentName"?: "PayoutSettings_UserFragmentFragment" };
+
+export type ProfileSettings_UserFragmentFragment = {
+  __typename: "User";
+  name: string;
+  email: string;
+  phone: string | null;
+  avatar: string | null;
+  activeProfileType: ProfileType;
+} & { " $fragmentName"?: "ProfileSettings_UserFragmentFragment" };
+
+export type SettingsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type SettingsQuery = {
+  me:
+    | ({
+        __typename: "User";
+        id: string;
+        email: string;
+        name: string;
+        avatar: string | null;
+        phone: string | null;
+        createdAt: string;
+        lastLoginAt: string | null;
+        activeProfileType: ProfileType;
+      } & {
+        " $fragmentRefs"?: {
+          SettingsLayout_UserFragmentFragment: SettingsLayout_UserFragmentFragment;
+          ProfileSettings_UserFragmentFragment: ProfileSettings_UserFragmentFragment;
+          BusinessSettings_UserFragmentFragment: BusinessSettings_UserFragmentFragment;
+          PayoutSettings_UserFragmentFragment: PayoutSettings_UserFragmentFragment;
+          AccountSettings_UserFragmentFragment: AccountSettings_UserFragmentFragment;
+        };
+      })
+    | null;
+  myNotificationPreferences: Array<{
+    __typename: "NotificationPreference";
+    id: string;
+    notificationType: NotificationType;
+    inAppEnabled: boolean;
+    emailEnabled: boolean;
+    pushEnabled: boolean;
+  }>;
+};
+
+export type SettingsLayout_UserFragmentFragment = {
+  __typename: "User";
+  role: UserRole;
+} & { " $fragmentName"?: "SettingsLayout_UserFragmentFragment" };
+
+export type GetCurrentUserForSettingsQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetCurrentUserForSettingsQuery = {
+  me: {
+    __typename: "User";
+    id: string;
+    avatar: string | null;
+    spaceOwnerProfile: { __typename: "SpaceOwnerProfile"; id: string } | null;
+    advertiserProfile: { __typename: "AdvertiserProfile"; id: string } | null;
+  } | null;
+};
 
 export type UpdateUserProfileMutationVariables = Exact<{
   input: UpdateCurrentUserInput;
 }>;
 
-
-export type UpdateUserProfileMutation = { updateCurrentUser: { __typename: 'UpdateCurrentUserPayload', user: { __typename: 'User', id: string } | null } };
+export type UpdateUserProfileMutation = {
+  updateCurrentUser: {
+    __typename: "UpdateCurrentUserPayload";
+    user: { __typename: "User"; id: string } | null;
+  };
+};
 
 export type UpdateSpaceOwnerBusinessInfoMutationVariables = Exact<{
   input: UpdateSpaceOwnerProfileInput;
 }>;
 
-
-export type UpdateSpaceOwnerBusinessInfoMutation = { updateSpaceOwnerProfile: { __typename: 'UpdateSpaceOwnerProfilePayload', spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', id: string } | null } };
+export type UpdateSpaceOwnerBusinessInfoMutation = {
+  updateSpaceOwnerProfile: {
+    __typename: "UpdateSpaceOwnerProfilePayload";
+    spaceOwnerProfile: { __typename: "SpaceOwnerProfile"; id: string } | null;
+  };
+};
 
 export type UpdateAdvertiserBusinessInfoMutationVariables = Exact<{
   input: UpdateAdvertiserProfileInput;
 }>;
 
-
-export type UpdateAdvertiserBusinessInfoMutation = { updateAdvertiserProfile: { __typename: 'UpdateAdvertiserProfilePayload', advertiserProfile: { __typename: 'AdvertiserProfile', id: string } | null } };
+export type UpdateAdvertiserBusinessInfoMutation = {
+  updateAdvertiserProfile: {
+    __typename: "UpdateAdvertiserProfilePayload";
+    advertiserProfile: { __typename: "AdvertiserProfile"; id: string } | null;
+  };
+};
 
 export type UpdateNotificationPreferenceMutationVariables = Exact<{
   input: UpdateNotificationPreferenceInput;
 }>;
 
+export type UpdateNotificationPreferenceMutation = {
+  updateNotificationPreference: {
+    __typename: "UpdateNotificationPreferencePayload";
+    preference: {
+      __typename: "NotificationPreference";
+      id: string;
+      notificationType: NotificationType;
+      inAppEnabled: boolean;
+      emailEnabled: boolean;
+      pushEnabled: boolean;
+    };
+  };
+};
 
-export type UpdateNotificationPreferenceMutation = { updateNotificationPreference: { __typename: 'UpdateNotificationPreferencePayload', preference: { __typename: 'NotificationPreference', id: string, notificationType: NotificationType, inAppEnabled: boolean, emailEnabled: boolean, pushEnabled: boolean } } };
+export type ConnectStripeAccountMutationVariables = Exact<{
+  [key: string]: never;
+}>;
 
-export type ConnectStripeAccountMutationVariables = Exact<{ [key: string]: never; }>;
+export type ConnectStripeAccountMutation = {
+  connectStripeAccount: {
+    __typename: "ConnectStripeAccountPayload";
+    accountId: string | null;
+    onboardingUrl: string | null;
+    errors: Array<
+      | { __typename: "NotFoundError"; message: string }
+      | { __typename: "PaymentError"; message: string }
+    > | null;
+  };
+};
 
+export type DisconnectStripeAccountMutationVariables = Exact<{
+  [key: string]: never;
+}>;
 
-export type ConnectStripeAccountMutation = { connectStripeAccount: { __typename: 'ConnectStripeAccountPayload', accountId: string | null, onboardingUrl: string | null, errors: Array<
-      | { __typename: 'NotFoundError', message: string }
-      | { __typename: 'PaymentError', message: string }
-    > | null } };
+export type DisconnectStripeAccountMutation = {
+  disconnectStripeAccount: {
+    __typename: "DisconnectStripeAccountPayload";
+    profile: {
+      __typename: "SpaceOwnerProfile";
+      id: string;
+      stripeAccountId: string | null;
+      stripeAccountStatus: string | null;
+    } | null;
+    errors: Array<
+      | { __typename: "NotFoundError"; message: string }
+      | { __typename: "PaymentError"; message: string }
+      | { __typename: "ValidationError"; message: string }
+    > | null;
+  };
+};
 
-export type DisconnectStripeAccountMutationVariables = Exact<{ [key: string]: never; }>;
+export type RefreshStripeAccountStatusMutationVariables = Exact<{
+  [key: string]: never;
+}>;
 
-
-export type DisconnectStripeAccountMutation = { disconnectStripeAccount: { __typename: 'DisconnectStripeAccountPayload', profile: { __typename: 'SpaceOwnerProfile', id: string, stripeAccountId: string | null, stripeAccountStatus: string | null } | null, errors: Array<
-      | { __typename: 'NotFoundError', message: string }
-      | { __typename: 'PaymentError', message: string }
-      | { __typename: 'ValidationError', message: string }
-    > | null } };
-
-export type RefreshStripeAccountStatusMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type RefreshStripeAccountStatusMutation = { refreshStripeAccountStatus: { __typename: 'RefreshStripeAccountStatusPayload', profile: { __typename: 'SpaceOwnerProfile', id: string, stripeAccountStatus: string | null } | null, errors: Array<
-      | { __typename: 'NotFoundError', message: string }
-      | { __typename: 'PaymentError', message: string }
-      | { __typename: 'ValidationError', message: string }
-    > | null } };
+export type RefreshStripeAccountStatusMutation = {
+  refreshStripeAccountStatus: {
+    __typename: "RefreshStripeAccountStatusPayload";
+    profile: {
+      __typename: "SpaceOwnerProfile";
+      id: string;
+      stripeAccountStatus: string | null;
+    } | null;
+    errors: Array<
+      | { __typename: "NotFoundError"; message: string }
+      | { __typename: "PaymentError"; message: string }
+      | { __typename: "ValidationError"; message: string }
+    > | null;
+  };
+};
 
 export type DeleteMyAccountMutationVariables = Exact<{
   input: DeleteMyAccountInput;
 }>;
 
-
-export type DeleteMyAccountMutation = { deleteMyAccount: { __typename: 'DeleteMyAccountPayload', success: boolean | null, errors: Array<
-      | { __typename: 'NotFoundError', message: string }
-      | { __typename: 'ValidationError', message: string }
-    > | null } };
+export type DeleteMyAccountMutation = {
+  deleteMyAccount: {
+    __typename: "DeleteMyAccountPayload";
+    success: boolean | null;
+    errors: Array<
+      | { __typename: "NotFoundError"; message: string }
+      | { __typename: "ValidationError"; message: string }
+    > | null;
+  };
+};
 
 export type UpdateUserAvatarMutationVariables = Exact<{
   input: UpdateCurrentUserInput;
 }>;
 
-
-export type UpdateUserAvatarMutation = { updateCurrentUser: { __typename: 'UpdateCurrentUserPayload', user: { __typename: 'User', id: string, avatar: string | null } | null } };
+export type UpdateUserAvatarMutation = {
+  updateCurrentUser: {
+    __typename: "UpdateCurrentUserPayload";
+    user: { __typename: "User"; id: string; avatar: string | null } | null;
+  };
+};
 
 export type ChangePasswordMutationVariables = Exact<{
   input: ChangePasswordInput;
 }>;
 
+export type ChangePasswordMutation = {
+  changePassword: {
+    __typename: "ChangePasswordPayload";
+    success: boolean | null;
+    errors: Array<
+      | { __typename: "NotFoundError"; message: string }
+      | { __typename: "ValidationError"; message: string }
+    > | null;
+  };
+};
 
-export type ChangePasswordMutation = { changePassword: { __typename: 'ChangePasswordPayload', success: boolean | null, errors: Array<
-      | { __typename: 'NotFoundError', message: string }
-      | { __typename: 'ValidationError', message: string }
-    > | null } };
+export type Gallery_SharedSpaceFragmentFragment = {
+  __typename: "Space";
+  title: string;
+  images: Array<string>;
+} & { " $fragmentName"?: "Gallery_SharedSpaceFragmentFragment" };
 
-export type Gallery_SharedSpaceFragmentFragment = { __typename: 'Space', title: string, images: Array<string> } & { ' $fragmentName'?: 'Gallery_SharedSpaceFragmentFragment' };
+export type Header_SharedSpaceFragmentFragment = {
+  __typename: "Space";
+  title: string;
+  status: SpaceStatus;
+  type: SpaceType;
+} & { " $fragmentName"?: "Header_SharedSpaceFragmentFragment" };
 
-export type Header_SharedSpaceFragmentFragment = { __typename: 'Space', title: string, status: SpaceStatus, type: SpaceType } & { ' $fragmentName'?: 'Header_SharedSpaceFragmentFragment' };
-
-export type OwnerCard_SpaceFragmentFragment = { __typename: 'Space', spaceOwnerProfile: { __typename: 'SpaceOwnerProfile', businessName: string | null, user: { __typename: 'User', name: string, avatar: string | null } } } & { ' $fragmentName'?: 'OwnerCard_SpaceFragmentFragment' };
+export type OwnerCard_SpaceFragmentFragment = {
+  __typename: "Space";
+  spaceOwnerProfile: {
+    __typename: "SpaceOwnerProfile";
+    businessName: string | null;
+    user: { __typename: "User"; name: string; avatar: string | null };
+  };
+} & { " $fragmentName"?: "OwnerCard_SpaceFragmentFragment" };
 
 export type SharedSpaceDetailQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: Scalars["ID"]["input"];
 }>;
 
+export type SharedSpaceDetailQuery = {
+  spaceById:
+    | ({ __typename: "Space"; id: string } & {
+        " $fragmentRefs"?: {
+          Header_SharedSpaceFragmentFragment: Header_SharedSpaceFragmentFragment;
+          Gallery_SharedSpaceFragmentFragment: Gallery_SharedSpaceFragmentFragment;
+          SpaceInfo_SpaceFragmentFragment: SpaceInfo_SpaceFragmentFragment;
+          PricingCard_SpaceFragmentFragment: PricingCard_SpaceFragmentFragment;
+          OwnerCard_SpaceFragmentFragment: OwnerCard_SpaceFragmentFragment;
+        };
+      })
+    | null;
+};
 
-export type SharedSpaceDetailQuery = { spaceById: (
-    { __typename: 'Space', id: string }
-    & { ' $fragmentRefs'?: { 'Header_SharedSpaceFragmentFragment': Header_SharedSpaceFragmentFragment;'Gallery_SharedSpaceFragmentFragment': Gallery_SharedSpaceFragmentFragment;'SpaceInfo_SpaceFragmentFragment': SpaceInfo_SpaceFragmentFragment;'PricingCard_SpaceFragmentFragment': PricingCard_SpaceFragmentFragment;'OwnerCard_SpaceFragmentFragment': OwnerCard_SpaceFragmentFragment } }
-  ) | null };
+export type PricingCard_SpaceFragmentFragment = {
+  __typename: "Space";
+  pricePerDay: number;
+  installationFee: number | null;
+  minDuration: number;
+  maxDuration: number | null;
+} & { " $fragmentName"?: "PricingCard_SpaceFragmentFragment" };
 
-export type PricingCard_SpaceFragmentFragment = { __typename: 'Space', pricePerDay: number, installationFee: number | null, minDuration: number, maxDuration: number | null } & { ' $fragmentName'?: 'PricingCard_SpaceFragmentFragment' };
+export type SpaceInfo_SpaceFragmentFragment = {
+  __typename: "Space";
+  description: string | null;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string | null;
+  width: number | null;
+  height: number | null;
+  dimensionsText: string | null;
+  traffic: string | null;
+  availableFrom: string | null;
+  availableTo: string | null;
+  averageRating: number | null;
+  totalBookings: number;
+} & { " $fragmentName"?: "SpaceInfo_SpaceFragmentFragment" };
 
-export type SpaceInfo_SpaceFragmentFragment = { __typename: 'Space', description: string | null, address: string, city: string, state: string, zipCode: string | null, width: number | null, height: number | null, dimensionsText: string | null, traffic: string | null, availableFrom: string | null, availableTo: string | null, averageRating: number | null, totalBookings: number } & { ' $fragmentName'?: 'SpaceInfo_SpaceFragmentFragment' };
-
-export type UserSection_UserFragmentFragment = { __typename: 'User', email: string, name: string, avatar: string | null, activeProfileType: ProfileType } & { ' $fragmentName'?: 'UserSection_UserFragmentFragment' };
+export type UserSection_UserFragmentFragment = {
+  __typename: "User";
+  email: string;
+  name: string;
+  avatar: string | null;
+  activeProfileType: ProfileType;
+} & { " $fragmentName"?: "UserSection_UserFragmentFragment" };
 
 export type SwitchProfileMutationVariables = Exact<{
   input: UpdateCurrentUserInput;
 }>;
 
+export type SwitchProfileMutation = {
+  updateCurrentUser: {
+    __typename: "UpdateCurrentUserPayload";
+    user: {
+      __typename: "User";
+      id: string;
+      activeProfileType: ProfileType;
+    } | null;
+    errors: Array<{ __typename: "NotFoundError"; message: string }> | null;
+  };
+};
 
-export type SwitchProfileMutation = { updateCurrentUser: { __typename: 'UpdateCurrentUserPayload', user: { __typename: 'User', id: string, activeProfileType: ProfileType } | null, errors: Array<{ __typename: 'NotFoundError', message: string }> | null } };
-
-export const BookingCard_AdvertiserBookingFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BookingCard_AdvertiserBookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<BookingCard_AdvertiserBookingFragmentFragment, unknown>;
-export const BookingsTable_AdvertiserBookingFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BookingsTable_AdvertiserBookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<BookingsTable_AdvertiserBookingFragmentFragment, unknown>;
-export const CampaignCard_CampaignFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CampaignCard_CampaignFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Campaign"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalBudget"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"bookings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<CampaignCard_CampaignFragmentFragment, unknown>;
-export const CampaignsTable_CampaignFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CampaignsTable_CampaignFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Campaign"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalBudget"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"bookings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<CampaignsTable_CampaignFragmentFragment, unknown>;
-export const DiscoverSpaceCard_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"DiscoverSpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}}]}}]} as unknown as DocumentNode<DiscoverSpaceCard_SpaceFragmentFragment, unknown>;
-export const DiscoverMap_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"DiscoverMap_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"zipCode"}},{"kind":"Field","name":{"kind":"Name","value":"latitude"}},{"kind":"Field","name":{"kind":"Name","value":"longitude"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}}]}}]} as unknown as DocumentNode<DiscoverMap_SpaceFragmentFragment, unknown>;
-export const DiscoverTable_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"DiscoverTable_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}}]}}]} as unknown as DocumentNode<DiscoverTable_SpaceFragmentFragment, unknown>;
-export const BookingCard_BookingFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BookingCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"ownerPayoutAmount"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyName"}}]}}]}}]}}]} as unknown as DocumentNode<BookingCard_BookingFragmentFragment, unknown>;
-export const BookingsTable_BookingFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BookingsTable_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"ownerPayoutAmount"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyName"}}]}}]}}]}}]} as unknown as DocumentNode<BookingsTable_BookingFragmentFragment, unknown>;
-export const BalanceCards_EarningsSummaryFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BalanceCards_EarningsSummaryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"EarningsSummary"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"availableBalance"}},{"kind":"Field","name":{"kind":"Name","value":"pendingPayouts"}},{"kind":"Field","name":{"kind":"Name","value":"thisMonthEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"lastMonthEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"totalEarnings"}}]}}]} as unknown as DocumentNode<BalanceCards_EarningsSummaryFragmentFragment, unknown>;
-export const PayoutsTable_PayoutFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PayoutsTable_PayoutFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Payout"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"stage"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"processedAt"}},{"kind":"Field","name":{"kind":"Name","value":"booking"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]} as unknown as DocumentNode<PayoutsTable_PayoutFragmentFragment, unknown>;
-export const SpaceCard_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]} as unknown as DocumentNode<SpaceCard_SpaceFragmentFragment, unknown>;
-export const ListingsTable_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ListingsTable_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]} as unknown as DocumentNode<ListingsTable_SpaceFragmentFragment, unknown>;
-export const Details_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Details_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"zipCode"}},{"kind":"Field","name":{"kind":"Name","value":"traffic"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"installationFee"}},{"kind":"Field","name":{"kind":"Name","value":"minDuration"}},{"kind":"Field","name":{"kind":"Name","value":"maxDuration"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"dimensionsText"}},{"kind":"Field","name":{"kind":"Name","value":"availableFrom"}},{"kind":"Field","name":{"kind":"Name","value":"availableTo"}}]}}]} as unknown as DocumentNode<Details_SpaceFragmentFragment, unknown>;
-export const Gallery_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Gallery_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}}]} as unknown as DocumentNode<Gallery_SpaceFragmentFragment, unknown>;
-export const Header_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Header_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]} as unknown as DocumentNode<Header_SpaceFragmentFragment, unknown>;
-export const Performance_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Performance_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"totalRevenue"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}}]}}]} as unknown as DocumentNode<Performance_SpaceFragmentFragment, unknown>;
-export const OverviewActiveBookingsBookingCard_BookingFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewActiveBookingsBookingCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}}]}}]} as unknown as DocumentNode<OverviewActiveBookingsBookingCard_BookingFragmentFragment, unknown>;
-export const OverviewActiveBookings_QueryFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewActiveBookings_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myBookingsAsOwner"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"in"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"PAID"},{"kind":"EnumValue","value":"FILE_DOWNLOADED"},{"kind":"EnumValue","value":"INSTALLED"}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewActiveBookingsBookingCard_BookingFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewActiveBookingsBookingCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}}]}}]} as unknown as DocumentNode<OverviewActiveBookings_QueryFragmentFragment, unknown>;
-export const OverviewPendingRequestsRequestCard_BookingFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewPendingRequestsRequestCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]} as unknown as DocumentNode<OverviewPendingRequestsRequestCard_BookingFragmentFragment, unknown>;
-export const OverviewPendingRequests_QueryFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewPendingRequests_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"incomingBookingRequests"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewPendingRequestsRequestCard_BookingFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewPendingRequestsRequestCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]} as unknown as DocumentNode<OverviewPendingRequests_QueryFragmentFragment, unknown>;
-export const OverviewStatCards_QueryFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewStatCards_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"earningsSummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"availableBalance"}},{"kind":"Field","name":{"kind":"Name","value":"pendingPayouts"}},{"kind":"Field","name":{"kind":"Name","value":"thisMonthEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"lastMonthEarnings"}}]}}]}}]} as unknown as DocumentNode<OverviewStatCards_QueryFragmentFragment, unknown>;
-export const OverviewTopSpacesSpaceCard_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewTopSpacesSpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"totalRevenue"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]} as unknown as DocumentNode<OverviewTopSpacesSpaceCard_SpaceFragmentFragment, unknown>;
-export const OverviewTopSpaces_QueryFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewTopSpaces_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"totalRevenue"},"value":{"kind":"EnumValue","value":"DESC"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewTopSpacesSpaceCard_SpaceFragment"}}]}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewTopSpacesSpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"totalRevenue"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]} as unknown as DocumentNode<OverviewTopSpaces_QueryFragmentFragment, unknown>;
-export const NavigationSection_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NavigationSection_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}}]} as unknown as DocumentNode<NavigationSection_UserFragmentFragment, unknown>;
-export const About_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"About_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}},{"kind":"Field","name":{"kind":"Name","value":"businessType"}},{"kind":"Field","name":{"kind":"Name","value":"onboardingComplete"}},{"kind":"Field","name":{"kind":"Name","value":"spaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyName"}},{"kind":"Field","name":{"kind":"Name","value":"industry"}},{"kind":"Field","name":{"kind":"Name","value":"website"}},{"kind":"Field","name":{"kind":"Name","value":"onboardingComplete"}},{"kind":"Field","name":{"kind":"Name","value":"campaigns"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]}}]} as unknown as DocumentNode<About_UserFragmentFragment, unknown>;
-export const Activity_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Activity_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reviews"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"rating"}},{"kind":"Field","name":{"kind":"Name","value":"comment"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"reviewer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"companyName"}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"campaigns"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalSpend"}},{"kind":"Field","name":{"kind":"Name","value":"spacesCount"}}]}}]}}]}}]}}]} as unknown as DocumentNode<Activity_UserFragmentFragment, unknown>;
-export const Info_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Info_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"spaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"averageRating"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"reviews"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"totalSpend"}},{"kind":"Field","name":{"kind":"Name","value":"campaigns"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]} as unknown as DocumentNode<Info_UserFragmentFragment, unknown>;
-export const ProfileLayout_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProfileLayout_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]} as unknown as DocumentNode<ProfileLayout_UserFragmentFragment, unknown>;
-export const RoleBasedView_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"RoleBasedView_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}}]} as unknown as DocumentNode<RoleBasedView_UserFragmentFragment, unknown>;
-export const AccountSettings_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AccountSettings_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastLoginAt"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}}]} as unknown as DocumentNode<AccountSettings_UserFragmentFragment, unknown>;
-export const BusinessSettings_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BusinessSettings_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}},{"kind":"Field","name":{"kind":"Name","value":"businessType"}},{"kind":"Field","name":{"kind":"Name","value":"payoutSchedule"}}]}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyName"}},{"kind":"Field","name":{"kind":"Name","value":"industry"}},{"kind":"Field","name":{"kind":"Name","value":"website"}}]}}]}}]} as unknown as DocumentNode<BusinessSettings_UserFragmentFragment, unknown>;
-export const NotificationSettings_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NotificationSettings_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}}]} as unknown as DocumentNode<NotificationSettings_UserFragmentFragment, unknown>;
-export const PayoutSettings_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PayoutSettings_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stripeAccountId"}},{"kind":"Field","name":{"kind":"Name","value":"stripeAccountStatus"}}]}}]}}]} as unknown as DocumentNode<PayoutSettings_UserFragmentFragment, unknown>;
-export const ProfileSettings_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProfileSettings_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}}]} as unknown as DocumentNode<ProfileSettings_UserFragmentFragment, unknown>;
-export const SettingsLayout_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SettingsLayout_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]} as unknown as DocumentNode<SettingsLayout_UserFragmentFragment, unknown>;
-export const Gallery_SharedSpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Gallery_SharedSpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}}]} as unknown as DocumentNode<Gallery_SharedSpaceFragmentFragment, unknown>;
-export const Header_SharedSpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Header_SharedSpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]} as unknown as DocumentNode<Header_SharedSpaceFragmentFragment, unknown>;
-export const OwnerCard_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OwnerCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]} as unknown as DocumentNode<OwnerCard_SpaceFragmentFragment, unknown>;
-export const PricingCard_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PricingCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"installationFee"}},{"kind":"Field","name":{"kind":"Name","value":"minDuration"}},{"kind":"Field","name":{"kind":"Name","value":"maxDuration"}}]}}]} as unknown as DocumentNode<PricingCard_SpaceFragmentFragment, unknown>;
-export const SpaceInfo_SpaceFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SpaceInfo_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"zipCode"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"dimensionsText"}},{"kind":"Field","name":{"kind":"Name","value":"traffic"}},{"kind":"Field","name":{"kind":"Name","value":"availableFrom"}},{"kind":"Field","name":{"kind":"Name","value":"availableTo"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}}]}}]} as unknown as DocumentNode<SpaceInfo_SpaceFragmentFragment, unknown>;
-export const UserSection_UserFragmentFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserSection_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}}]} as unknown as DocumentNode<UserSection_UserFragmentFragment, unknown>;
-export const AdvertiserBookingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdvertiserBookings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myBookingsAsAdvertiser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"BookingCard_AdvertiserBookingFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"BookingsTable_AdvertiserBookingFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BookingCard_AdvertiserBookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BookingsTable_AdvertiserBookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<AdvertiserBookingsQuery, AdvertiserBookingsQueryVariables>;
-export const AdvertiserCampaignsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdvertiserCampaigns"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myCampaigns"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"CampaignCard_CampaignFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"CampaignsTable_CampaignFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CampaignCard_CampaignFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Campaign"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalBudget"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"bookings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CampaignsTable_CampaignFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Campaign"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalBudget"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}},{"kind":"Field","name":{"kind":"Name","value":"bookings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<AdvertiserCampaignsQuery, AdvertiserCampaignsQueryVariables>;
-export const DiscoverSpacesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DiscoverSpaces"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"32"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"EnumValue","value":"ACTIVE"}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"DiscoverSpaceCard_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"DiscoverTable_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"DiscoverMap_SpaceFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"DiscoverSpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"DiscoverTable_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"DiscoverMap_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"zipCode"}},{"kind":"Field","name":{"kind":"Name","value":"latitude"}},{"kind":"Field","name":{"kind":"Name","value":"longitude"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}}]}}]} as unknown as DocumentNode<DiscoverSpacesQuery, DiscoverSpacesQueryVariables>;
-export const SpaceOwnerBookingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SpaceOwnerBookings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myBookingsAsOwner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"BookingCard_BookingFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"BookingsTable_BookingFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BookingCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"ownerPayoutAmount"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyName"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BookingsTable_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"ownerPayoutAmount"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyName"}}]}}]}}]}}]} as unknown as DocumentNode<SpaceOwnerBookingsQuery, SpaceOwnerBookingsQueryVariables>;
-export const SpaceOwnerEarningsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SpaceOwnerEarnings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"earningsSummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"BalanceCards_EarningsSummaryFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"myPayouts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"processedAt"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PayoutsTable_PayoutFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BalanceCards_EarningsSummaryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"EarningsSummary"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"availableBalance"}},{"kind":"Field","name":{"kind":"Name","value":"pendingPayouts"}},{"kind":"Field","name":{"kind":"Name","value":"thisMonthEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"lastMonthEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"totalEarnings"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PayoutsTable_PayoutFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Payout"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"stage"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"processedAt"}},{"kind":"Field","name":{"kind":"Name","value":"booking"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]} as unknown as DocumentNode<SpaceOwnerEarningsQuery, SpaceOwnerEarningsQueryVariables>;
-export const SpaceDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SpaceDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Header_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Gallery_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Details_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Performance_SpaceFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Header_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Gallery_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Details_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"zipCode"}},{"kind":"Field","name":{"kind":"Name","value":"traffic"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"installationFee"}},{"kind":"Field","name":{"kind":"Name","value":"minDuration"}},{"kind":"Field","name":{"kind":"Name","value":"maxDuration"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"dimensionsText"}},{"kind":"Field","name":{"kind":"Name","value":"availableFrom"}},{"kind":"Field","name":{"kind":"Name","value":"availableTo"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Performance_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"totalRevenue"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}}]}}]} as unknown as DocumentNode<SpaceDetailQuery, SpaceDetailQueryVariables>;
-export const SpaceOwnerListingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SpaceOwnerListings"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"last"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"before"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SpaceSortInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"SpaceFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gridView"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tableView"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mySpaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"last"},"value":{"kind":"Variable","name":{"kind":"Name","value":"last"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}},{"kind":"Argument","name":{"kind":"Name","value":"before"},"value":{"kind":"Variable","name":{"kind":"Name","value":"before"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SpaceCard_SpaceFragment"},"directives":[{"kind":"Directive","name":{"kind":"Name","value":"include"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"if"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gridView"}}}]}]},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ListingsTable_SpaceFragment"},"directives":[{"kind":"Directive","name":{"kind":"Name","value":"include"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"if"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tableView"}}}]}]}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ListingsTable_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]} as unknown as DocumentNode<SpaceOwnerListingsQuery, SpaceOwnerListingsQueryVariables>;
-export const OverviewDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OverviewData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewStatCards_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewPendingRequests_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewActiveBookings_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewTopSpaces_QueryFragment"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewPendingRequestsRequestCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewActiveBookingsBookingCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewTopSpacesSpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"totalRevenue"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewStatCards_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"earningsSummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"availableBalance"}},{"kind":"Field","name":{"kind":"Name","value":"pendingPayouts"}},{"kind":"Field","name":{"kind":"Name","value":"thisMonthEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"lastMonthEarnings"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewPendingRequests_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"incomingBookingRequests"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewPendingRequestsRequestCard_BookingFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewActiveBookings_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myBookingsAsOwner"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"in"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"PAID"},{"kind":"EnumValue","value":"FILE_DOWNLOADED"},{"kind":"EnumValue","value":"INSTALLED"}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewActiveBookingsBookingCard_BookingFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewTopSpaces_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"totalRevenue"},"value":{"kind":"EnumValue","value":"DESC"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewTopSpacesSpaceCard_SpaceFragment"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<OverviewDataQuery, OverviewDataQueryVariables>;
-export const DashboardUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DashboardUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"NavigationSection_UserFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"UserSection_UserFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"RoleBasedView_UserFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"NavigationSection_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserSection_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"RoleBasedView_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}}]} as unknown as DocumentNode<DashboardUserQuery, DashboardUserQueryVariables>;
-export const SendMessageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SendMessage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SendMessageInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendMessage"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"attachments"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"senderUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ForbiddenError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SendMessageMutation, SendMessageMutationVariables>;
-export const MarkConversationReadDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"MarkConversationRead"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MarkConversationReadInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"markConversationRead"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"participant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"lastReadAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ForbiddenError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MarkConversationReadMutation, MarkConversationReadMutationVariables>;
-export const OnMessageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"subscription","name":{"kind":"Name","value":"OnMessage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"conversationId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"onMessage"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"conversationId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"conversationId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"attachments"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"senderUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]} as unknown as DocumentNode<OnMessageSubscription, OnMessageSubscriptionVariables>;
-export const ThreadDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ThreadData"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"conversationId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"myConversations"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"50"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"updatedAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"booking"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"participants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastReadAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"senderUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"messagesByConversation"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"conversationId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"conversationId"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"100"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"ASC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"attachments"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"senderUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}}]}}]} as unknown as DocumentNode<ThreadDataQuery, ThreadDataQueryVariables>;
-export const MessagesDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MessagesData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"myConversations"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"50"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"updatedAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"booking"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"participants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}},{"kind":"Field","name":{"kind":"Name","value":"lastReadAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"1"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"senderUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"unreadConversationsCount"}}]}}]} as unknown as DocumentNode<MessagesDataQuery, MessagesDataQueryVariables>;
-export const ProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Profile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProfileLayout_UserFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Info_UserFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"About_UserFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Activity_UserFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProfileLayout_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Info_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"spaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"averageRating"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"reviews"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"totalSpend"}},{"kind":"Field","name":{"kind":"Name","value":"campaigns"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"About_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}},{"kind":"Field","name":{"kind":"Name","value":"businessType"}},{"kind":"Field","name":{"kind":"Name","value":"onboardingComplete"}},{"kind":"Field","name":{"kind":"Name","value":"spaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyName"}},{"kind":"Field","name":{"kind":"Name","value":"industry"}},{"kind":"Field","name":{"kind":"Name","value":"website"}},{"kind":"Field","name":{"kind":"Name","value":"onboardingComplete"}},{"kind":"Field","name":{"kind":"Name","value":"campaigns"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Activity_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reviews"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"rating"}},{"kind":"Field","name":{"kind":"Name","value":"comment"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"reviewer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"companyName"}}]}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"campaigns"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalSpend"}},{"kind":"Field","name":{"kind":"Name","value":"spacesCount"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ProfileQuery, ProfileQueryVariables>;
-export const SettingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Settings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastLoginAt"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SettingsLayout_UserFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ProfileSettings_UserFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"BusinessSettings_UserFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PayoutSettings_UserFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"AccountSettings_UserFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"myNotificationPreferences"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"notificationType"}},{"kind":"Field","name":{"kind":"Name","value":"inAppEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"emailEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"pushEnabled"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SettingsLayout_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"role"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ProfileSettings_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"phone"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"BusinessSettings_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}},{"kind":"Field","name":{"kind":"Name","value":"businessType"}},{"kind":"Field","name":{"kind":"Name","value":"payoutSchedule"}}]}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyName"}},{"kind":"Field","name":{"kind":"Name","value":"industry"}},{"kind":"Field","name":{"kind":"Name","value":"website"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PayoutSettings_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stripeAccountId"}},{"kind":"Field","name":{"kind":"Name","value":"stripeAccountStatus"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AccountSettings_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastLoginAt"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}}]} as unknown as DocumentNode<SettingsQuery, SettingsQueryVariables>;
-export const GetCurrentUserForSettingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCurrentUserForSettings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<GetCurrentUserForSettingsQuery, GetCurrentUserForSettingsQueryVariables>;
-export const UpdateUserProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateUserProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCurrentUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCurrentUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateUserProfileMutation, UpdateUserProfileMutationVariables>;
-export const UpdateSpaceOwnerBusinessInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateSpaceOwnerBusinessInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateSpaceOwnerProfileInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateSpaceOwnerProfile"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateSpaceOwnerBusinessInfoMutation, UpdateSpaceOwnerBusinessInfoMutationVariables>;
-export const UpdateAdvertiserBusinessInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateAdvertiserBusinessInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateAdvertiserProfileInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateAdvertiserProfile"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateAdvertiserBusinessInfoMutation, UpdateAdvertiserBusinessInfoMutationVariables>;
-export const UpdateNotificationPreferenceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateNotificationPreference"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateNotificationPreferenceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateNotificationPreference"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"preference"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"notificationType"}},{"kind":"Field","name":{"kind":"Name","value":"inAppEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"emailEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"pushEnabled"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateNotificationPreferenceMutation, UpdateNotificationPreferenceMutationVariables>;
-export const ConnectStripeAccountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ConnectStripeAccount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"connectStripeAccount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accountId"}},{"kind":"Field","name":{"kind":"Name","value":"onboardingUrl"}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ConnectStripeAccountMutation, ConnectStripeAccountMutationVariables>;
-export const DisconnectStripeAccountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DisconnectStripeAccount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"disconnectStripeAccount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"profile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"stripeAccountId"}},{"kind":"Field","name":{"kind":"Name","value":"stripeAccountStatus"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<DisconnectStripeAccountMutation, DisconnectStripeAccountMutationVariables>;
-export const RefreshStripeAccountStatusDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RefreshStripeAccountStatus"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"refreshStripeAccountStatus"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"profile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"stripeAccountStatus"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RefreshStripeAccountStatusMutation, RefreshStripeAccountStatusMutationVariables>;
-export const DeleteMyAccountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMyAccount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteMyAccountInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMyAccount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<DeleteMyAccountMutation, DeleteMyAccountMutationVariables>;
-export const UpdateUserAvatarDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateUserAvatar"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCurrentUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCurrentUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateUserAvatarMutation, UpdateUserAvatarMutationVariables>;
-export const ChangePasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangePassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChangePasswordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"changePassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<ChangePasswordMutation, ChangePasswordMutationVariables>;
-export const SharedSpaceDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SharedSpaceDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Header_SharedSpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Gallery_SharedSpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SpaceInfo_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PricingCard_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OwnerCard_SpaceFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Header_SharedSpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Gallery_SharedSpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SpaceInfo_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"zipCode"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"dimensionsText"}},{"kind":"Field","name":{"kind":"Name","value":"traffic"}},{"kind":"Field","name":{"kind":"Name","value":"availableFrom"}},{"kind":"Field","name":{"kind":"Name","value":"availableTo"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PricingCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"installationFee"}},{"kind":"Field","name":{"kind":"Name","value":"minDuration"}},{"kind":"Field","name":{"kind":"Name","value":"maxDuration"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OwnerCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]} as unknown as DocumentNode<SharedSpaceDetailQuery, SharedSpaceDetailQueryVariables>;
-export const SwitchProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SwitchProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCurrentUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCurrentUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SwitchProfileMutation, SwitchProfileMutationVariables>;
+export const BookingCard_AdvertiserBookingFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BookingCard_AdvertiserBookingFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalAmount" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
+                { kind: "Field", name: { kind: "Name", value: "city" } },
+                { kind: "Field", name: { kind: "Name", value: "state" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "owner" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "businessName" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  BookingCard_AdvertiserBookingFragmentFragment,
+  unknown
+>;
+export const BookingsTable_AdvertiserBookingFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BookingsTable_AdvertiserBookingFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalAmount" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
+                { kind: "Field", name: { kind: "Name", value: "city" } },
+                { kind: "Field", name: { kind: "Name", value: "state" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "owner" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "businessName" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  BookingsTable_AdvertiserBookingFragmentFragment,
+  unknown
+>;
+export const CampaignCard_CampaignFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "CampaignCard_CampaignFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Campaign" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalBudget" } },
+          { kind: "Field", name: { kind: "Name", value: "imageUrl" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "bookings" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CampaignCard_CampaignFragmentFragment, unknown>;
+export const CampaignsTable_CampaignFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "CampaignsTable_CampaignFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Campaign" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalBudget" } },
+          { kind: "Field", name: { kind: "Name", value: "imageUrl" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "bookings" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CampaignsTable_CampaignFragmentFragment, unknown>;
+export const DiscoverSpaceCard_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "DiscoverSpaceCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DiscoverSpaceCard_SpaceFragmentFragment, unknown>;
+export const DiscoverMap_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "DiscoverMap_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "address" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "zipCode" } },
+          { kind: "Field", name: { kind: "Name", value: "latitude" } },
+          { kind: "Field", name: { kind: "Name", value: "longitude" } },
+          { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "width" } },
+          { kind: "Field", name: { kind: "Name", value: "height" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DiscoverMap_SpaceFragmentFragment, unknown>;
+export const DiscoverTable_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "DiscoverTable_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DiscoverTable_SpaceFragmentFragment, unknown>;
+export const BookingCard_BookingFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BookingCard_BookingFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "ownerPayoutAmount" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiserProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "companyName" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<BookingCard_BookingFragmentFragment, unknown>;
+export const BookingsTable_BookingFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BookingsTable_BookingFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "ownerPayoutAmount" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiserProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "companyName" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<BookingsTable_BookingFragmentFragment, unknown>;
+export const BalanceCards_EarningsSummaryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BalanceCards_EarningsSummaryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "EarningsSummary" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "availableBalance" } },
+          { kind: "Field", name: { kind: "Name", value: "pendingPayouts" } },
+          { kind: "Field", name: { kind: "Name", value: "thisMonthEarnings" } },
+          { kind: "Field", name: { kind: "Name", value: "lastMonthEarnings" } },
+          { kind: "Field", name: { kind: "Name", value: "totalEarnings" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  BalanceCards_EarningsSummaryFragmentFragment,
+  unknown
+>;
+export const PayoutsTable_PayoutFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PayoutsTable_PayoutFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Payout" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "amount" } },
+          { kind: "Field", name: { kind: "Name", value: "stage" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "processedAt" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "booking" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "space" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PayoutsTable_PayoutFragmentFragment, unknown>;
+export const SpaceCard_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "SpaceCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SpaceCard_SpaceFragmentFragment, unknown>;
+export const ListingsTable_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ListingsTable_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ListingsTable_SpaceFragmentFragment, unknown>;
+export const Details_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Details_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "address" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "zipCode" } },
+          { kind: "Field", name: { kind: "Name", value: "traffic" } },
+          { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+          { kind: "Field", name: { kind: "Name", value: "installationFee" } },
+          { kind: "Field", name: { kind: "Name", value: "minDuration" } },
+          { kind: "Field", name: { kind: "Name", value: "maxDuration" } },
+          { kind: "Field", name: { kind: "Name", value: "width" } },
+          { kind: "Field", name: { kind: "Name", value: "height" } },
+          { kind: "Field", name: { kind: "Name", value: "dimensionsText" } },
+          { kind: "Field", name: { kind: "Name", value: "availableFrom" } },
+          { kind: "Field", name: { kind: "Name", value: "availableTo" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<Details_SpaceFragmentFragment, unknown>;
+export const Gallery_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Gallery_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<Gallery_SpaceFragmentFragment, unknown>;
+export const Header_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Header_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<Header_SpaceFragmentFragment, unknown>;
+export const Performance_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Performance_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "totalBookings" } },
+          { kind: "Field", name: { kind: "Name", value: "totalRevenue" } },
+          { kind: "Field", name: { kind: "Name", value: "averageRating" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<Performance_SpaceFragmentFragment, unknown>;
+export const OverviewActiveBookingsBookingCard_BookingFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: {
+        kind: "Name",
+        value: "OverviewActiveBookingsBookingCard_BookingFragment",
+      },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiser" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "user" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "name" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+              ],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  OverviewActiveBookingsBookingCard_BookingFragmentFragment,
+  unknown
+>;
+export const OverviewActiveBookings_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewActiveBookings_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myBookingsAsOwner" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "5" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "where" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "status" },
+                      value: {
+                        kind: "ObjectValue",
+                        fields: [
+                          {
+                            kind: "ObjectField",
+                            name: { kind: "Name", value: "in" },
+                            value: {
+                              kind: "ListValue",
+                              values: [
+                                { kind: "EnumValue", value: "PAID" },
+                                { kind: "EnumValue", value: "FILE_DOWNLOADED" },
+                                { kind: "EnumValue", value: "INSTALLED" },
+                              ],
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value:
+                            "OverviewActiveBookingsBookingCard_BookingFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: {
+        kind: "Name",
+        value: "OverviewActiveBookingsBookingCard_BookingFragment",
+      },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiser" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "user" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "name" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+              ],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  OverviewActiveBookings_QueryFragmentFragment,
+  unknown
+>;
+export const OverviewPendingRequestsRequestCard_BookingFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: {
+        kind: "Name",
+        value: "OverviewPendingRequestsRequestCard_BookingFragment",
+      },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiser" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "user" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "name" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+              ],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalAmount" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  OverviewPendingRequestsRequestCard_BookingFragmentFragment,
+  unknown
+>;
+export const OverviewPendingRequests_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewPendingRequests_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "incomingBookingRequests" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "5" },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value:
+                            "OverviewPendingRequestsRequestCard_BookingFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: {
+        kind: "Name",
+        value: "OverviewPendingRequestsRequestCard_BookingFragment",
+      },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiser" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "user" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "name" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+              ],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalAmount" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  OverviewPendingRequests_QueryFragmentFragment,
+  unknown
+>;
+export const OverviewStatCards_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewStatCards_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "earningsSummary" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "availableBalance" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pendingPayouts" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "thisMonthEarnings" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "lastMonthEarnings" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<OverviewStatCards_QueryFragmentFragment, unknown>;
+export const OverviewTopSpacesSpaceCard_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewTopSpacesSpaceCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "totalBookings" } },
+          { kind: "Field", name: { kind: "Name", value: "totalRevenue" } },
+          { kind: "Field", name: { kind: "Name", value: "averageRating" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  OverviewTopSpacesSpaceCard_SpaceFragmentFragment,
+  unknown
+>;
+export const OverviewTopSpaces_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewTopSpaces_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spaceOwnerProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "spaces" },
+                        arguments: [
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "first" },
+                            value: { kind: "IntValue", value: "5" },
+                          },
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "order" },
+                            value: {
+                              kind: "ObjectValue",
+                              fields: [
+                                {
+                                  kind: "ObjectField",
+                                  name: { kind: "Name", value: "totalRevenue" },
+                                  value: { kind: "EnumValue", value: "DESC" },
+                                },
+                              ],
+                            },
+                          },
+                        ],
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "nodes" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  {
+                                    kind: "FragmentSpread",
+                                    name: {
+                                      kind: "Name",
+                                      value:
+                                        "OverviewTopSpacesSpaceCard_SpaceFragment",
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewTopSpacesSpaceCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "totalBookings" } },
+          { kind: "Field", name: { kind: "Name", value: "totalRevenue" } },
+          { kind: "Field", name: { kind: "Name", value: "averageRating" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<OverviewTopSpaces_QueryFragmentFragment, unknown>;
+export const MessageBubble_MessageFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "MessageBubble_MessageFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Message" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "content" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "attachments" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "senderUser" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "avatar" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<MessageBubble_MessageFragmentFragment, unknown>;
+export const ThreadHeader_ConversationFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ThreadHeader_ConversationFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Conversation" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "booking" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                { kind: "Field", name: { kind: "Name", value: "startDate" } },
+                { kind: "Field", name: { kind: "Name", value: "endDate" } },
+                { kind: "Field", name: { kind: "Name", value: "totalAmount" } },
+                { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+                { kind: "Field", name: { kind: "Name", value: "totalDays" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "installationFee" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "space" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "images" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "address" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "city" } },
+                      { kind: "Field", name: { kind: "Name", value: "state" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ThreadHeader_ConversationFragmentFragment,
+  unknown
+>;
+export const ConversationItem_ConversationFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ConversationItem_ConversationFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Conversation" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "booking" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "space" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participants" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avatar" },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "lastReadAt" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "messages" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "1" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "ListValue",
+                  values: [
+                    {
+                      kind: "ObjectValue",
+                      fields: [
+                        {
+                          kind: "ObjectField",
+                          name: { kind: "Name", value: "createdAt" },
+                          value: { kind: "EnumValue", value: "DESC" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "content" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "createdAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "senderUser" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ConversationItem_ConversationFragmentFragment,
+  unknown
+>;
+export const NavigationSection_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "NavigationSection_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "role" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<NavigationSection_UserFragmentFragment, unknown>;
+export const About_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "About_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "businessName" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "businessType" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "onboardingComplete" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spaces" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "advertiserProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "companyName" } },
+                { kind: "Field", name: { kind: "Name", value: "industry" } },
+                { kind: "Field", name: { kind: "Name", value: "website" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "onboardingComplete" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "campaigns" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "order" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "createdAt" },
+                                value: { kind: "EnumValue", value: "DESC" },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "status" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<About_UserFragmentFragment, unknown>;
+export const Activity_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Activity_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "reviews" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "order" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "createdAt" },
+                                value: { kind: "EnumValue", value: "DESC" },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "rating" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "comment" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "createdAt" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "reviewer" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "name" },
+                                  },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "avatar" },
+                                  },
+                                  {
+                                    kind: "Field",
+                                    name: {
+                                      kind: "Name",
+                                      value: "companyName",
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "advertiserProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "campaigns" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "order" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "createdAt" },
+                                value: { kind: "EnumValue", value: "DESC" },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "name" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "status" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "startDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "endDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "totalSpend" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "spacesCount" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<Activity_UserFragmentFragment, unknown>;
+export const Info_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Info_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "avatar" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spaces" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "averageRating" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "reviews" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "order" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "createdAt" },
+                                value: { kind: "EnumValue", value: "DESC" },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "advertiserProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                { kind: "Field", name: { kind: "Name", value: "totalSpend" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "campaigns" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "order" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "createdAt" },
+                                value: { kind: "EnumValue", value: "DESC" },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<Info_UserFragmentFragment, unknown>;
+export const ProfileLayout_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ProfileLayout_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [{ kind: "Field", name: { kind: "Name", value: "role" } }],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ProfileLayout_UserFragmentFragment, unknown>;
+export const RoleBasedView_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "RoleBasedView_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "role" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<RoleBasedView_UserFragmentFragment, unknown>;
+export const AccountSettings_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AccountSettings_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+          { kind: "Field", name: { kind: "Name", value: "lastLoginAt" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AccountSettings_UserFragmentFragment, unknown>;
+export const BusinessSettings_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BusinessSettings_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "businessName" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "businessType" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "payoutSchedule" },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "advertiserProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "companyName" } },
+                { kind: "Field", name: { kind: "Name", value: "industry" } },
+                { kind: "Field", name: { kind: "Name", value: "website" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<BusinessSettings_UserFragmentFragment, unknown>;
+export const NotificationSettings_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "NotificationSettings_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  NotificationSettings_UserFragmentFragment,
+  unknown
+>;
+export const PayoutSettings_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PayoutSettings_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "stripeAccountId" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "stripeAccountStatus" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PayoutSettings_UserFragmentFragment, unknown>;
+export const ProfileSettings_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ProfileSettings_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "email" } },
+          { kind: "Field", name: { kind: "Name", value: "phone" } },
+          { kind: "Field", name: { kind: "Name", value: "avatar" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ProfileSettings_UserFragmentFragment, unknown>;
+export const SettingsLayout_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "SettingsLayout_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [{ kind: "Field", name: { kind: "Name", value: "role" } }],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SettingsLayout_UserFragmentFragment, unknown>;
+export const Gallery_SharedSpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Gallery_SharedSpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<Gallery_SharedSpaceFragmentFragment, unknown>;
+export const Header_SharedSpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Header_SharedSpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<Header_SharedSpaceFragmentFragment, unknown>;
+export const OwnerCard_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OwnerCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "businessName" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avatar" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<OwnerCard_SpaceFragmentFragment, unknown>;
+export const PricingCard_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PricingCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+          { kind: "Field", name: { kind: "Name", value: "installationFee" } },
+          { kind: "Field", name: { kind: "Name", value: "minDuration" } },
+          { kind: "Field", name: { kind: "Name", value: "maxDuration" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PricingCard_SpaceFragmentFragment, unknown>;
+export const SpaceInfo_SpaceFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "SpaceInfo_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "address" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "zipCode" } },
+          { kind: "Field", name: { kind: "Name", value: "width" } },
+          { kind: "Field", name: { kind: "Name", value: "height" } },
+          { kind: "Field", name: { kind: "Name", value: "dimensionsText" } },
+          { kind: "Field", name: { kind: "Name", value: "traffic" } },
+          { kind: "Field", name: { kind: "Name", value: "availableFrom" } },
+          { kind: "Field", name: { kind: "Name", value: "availableTo" } },
+          { kind: "Field", name: { kind: "Name", value: "averageRating" } },
+          { kind: "Field", name: { kind: "Name", value: "totalBookings" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SpaceInfo_SpaceFragmentFragment, unknown>;
+export const UserSection_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "UserSection_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "email" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "avatar" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UserSection_UserFragmentFragment, unknown>;
+export const AdvertiserBookingsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "AdvertiserBookings" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myBookingsAsAdvertiser" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "BookingCard_AdvertiserBookingFragment",
+                        },
+                      },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "BookingsTable_AdvertiserBookingFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BookingCard_AdvertiserBookingFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalAmount" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
+                { kind: "Field", name: { kind: "Name", value: "city" } },
+                { kind: "Field", name: { kind: "Name", value: "state" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "owner" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "businessName" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BookingsTable_AdvertiserBookingFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalAmount" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
+                { kind: "Field", name: { kind: "Name", value: "city" } },
+                { kind: "Field", name: { kind: "Name", value: "state" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "owner" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "businessName" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AdvertiserBookingsQuery,
+  AdvertiserBookingsQueryVariables
+>;
+export const AdvertiserCampaignsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "AdvertiserCampaigns" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myCampaigns" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "CampaignCard_CampaignFragment",
+                        },
+                      },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "CampaignsTable_CampaignFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "CampaignCard_CampaignFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Campaign" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalBudget" } },
+          { kind: "Field", name: { kind: "Name", value: "imageUrl" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "bookings" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "CampaignsTable_CampaignFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Campaign" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalBudget" } },
+          { kind: "Field", name: { kind: "Name", value: "imageUrl" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "bookings" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AdvertiserCampaignsQuery,
+  AdvertiserCampaignsQueryVariables
+>;
+export const DiscoverSpacesDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "DiscoverSpaces" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaces" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "32" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "where" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "status" },
+                      value: {
+                        kind: "ObjectValue",
+                        fields: [
+                          {
+                            kind: "ObjectField",
+                            name: { kind: "Name", value: "eq" },
+                            value: { kind: "EnumValue", value: "ACTIVE" },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "DiscoverSpaceCard_SpaceFragment",
+                        },
+                      },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "DiscoverTable_SpaceFragment",
+                        },
+                      },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "DiscoverMap_SpaceFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "DiscoverSpaceCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "DiscoverTable_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "DiscoverMap_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "address" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "zipCode" } },
+          { kind: "Field", name: { kind: "Name", value: "latitude" } },
+          { kind: "Field", name: { kind: "Name", value: "longitude" } },
+          { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "width" } },
+          { kind: "Field", name: { kind: "Name", value: "height" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DiscoverSpacesQuery, DiscoverSpacesQueryVariables>;
+export const SpaceOwnerBookingsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "SpaceOwnerBookings" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myBookingsAsOwner" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "BookingCard_BookingFragment",
+                        },
+                      },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "BookingsTable_BookingFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BookingCard_BookingFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "ownerPayoutAmount" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiserProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "companyName" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BookingsTable_BookingFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "ownerPayoutAmount" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "images" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiserProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "companyName" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SpaceOwnerBookingsQuery,
+  SpaceOwnerBookingsQueryVariables
+>;
+export const SpaceOwnerEarningsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "SpaceOwnerEarnings" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "earningsSummary" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "FragmentSpread",
+                  name: {
+                    kind: "Name",
+                    value: "BalanceCards_EarningsSummaryFragment",
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myPayouts" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "amount" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "processedAt" },
+                      },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "PayoutsTable_PayoutFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BalanceCards_EarningsSummaryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "EarningsSummary" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "availableBalance" } },
+          { kind: "Field", name: { kind: "Name", value: "pendingPayouts" } },
+          { kind: "Field", name: { kind: "Name", value: "thisMonthEarnings" } },
+          { kind: "Field", name: { kind: "Name", value: "lastMonthEarnings" } },
+          { kind: "Field", name: { kind: "Name", value: "totalEarnings" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PayoutsTable_PayoutFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Payout" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "amount" } },
+          { kind: "Field", name: { kind: "Name", value: "stage" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "processedAt" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "booking" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "space" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SpaceOwnerEarningsQuery,
+  SpaceOwnerEarningsQueryVariables
+>;
+export const SpaceDetailDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "SpaceDetail" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceById" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "Header_SpaceFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "Gallery_SpaceFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "Details_SpaceFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "Performance_SpaceFragment" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Header_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Gallery_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Details_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "address" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "zipCode" } },
+          { kind: "Field", name: { kind: "Name", value: "traffic" } },
+          { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+          { kind: "Field", name: { kind: "Name", value: "installationFee" } },
+          { kind: "Field", name: { kind: "Name", value: "minDuration" } },
+          { kind: "Field", name: { kind: "Name", value: "maxDuration" } },
+          { kind: "Field", name: { kind: "Name", value: "width" } },
+          { kind: "Field", name: { kind: "Name", value: "height" } },
+          { kind: "Field", name: { kind: "Name", value: "dimensionsText" } },
+          { kind: "Field", name: { kind: "Name", value: "availableFrom" } },
+          { kind: "Field", name: { kind: "Name", value: "availableTo" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Performance_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "totalBookings" } },
+          { kind: "Field", name: { kind: "Name", value: "totalRevenue" } },
+          { kind: "Field", name: { kind: "Name", value: "averageRating" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SpaceDetailQuery, SpaceDetailQueryVariables>;
+export const SpaceOwnerListingsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "SpaceOwnerListings" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "first" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "last" } },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "after" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "before" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "order" },
+          },
+          type: {
+            kind: "ListType",
+            type: {
+              kind: "NonNullType",
+              type: {
+                kind: "NamedType",
+                name: { kind: "Name", value: "SpaceSortInput" },
+              },
+            },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "where" },
+          },
+          type: {
+            kind: "NamedType",
+            name: { kind: "Name", value: "SpaceFilterInput" },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "gridView" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "Boolean" },
+            },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "tableView" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "Boolean" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "mySpaces" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "first" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "last" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "last" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "after" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "after" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "before" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "before" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "order" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "where" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "where" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "SpaceCard_SpaceFragment",
+                        },
+                        directives: [
+                          {
+                            kind: "Directive",
+                            name: { kind: "Name", value: "include" },
+                            arguments: [
+                              {
+                                kind: "Argument",
+                                name: { kind: "Name", value: "if" },
+                                value: {
+                                  kind: "Variable",
+                                  name: { kind: "Name", value: "gridView" },
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "ListingsTable_SpaceFragment",
+                        },
+                        directives: [
+                          {
+                            kind: "Directive",
+                            name: { kind: "Name", value: "include" },
+                            arguments: [
+                              {
+                                kind: "Argument",
+                                name: { kind: "Name", value: "if" },
+                                value: {
+                                  kind: "Variable",
+                                  name: { kind: "Name", value: "tableView" },
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "hasNextPage" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "hasPreviousPage" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "startCursor" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "endCursor" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "SpaceCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ListingsTable_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SpaceOwnerListingsQuery,
+  SpaceOwnerListingsQueryVariables
+>;
+export const OverviewDataDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "OverviewData" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "FragmentSpread",
+            name: { kind: "Name", value: "OverviewStatCards_QueryFragment" },
+          },
+          {
+            kind: "FragmentSpread",
+            name: {
+              kind: "Name",
+              value: "OverviewPendingRequests_QueryFragment",
+            },
+          },
+          {
+            kind: "FragmentSpread",
+            name: {
+              kind: "Name",
+              value: "OverviewActiveBookings_QueryFragment",
+            },
+          },
+          {
+            kind: "FragmentSpread",
+            name: { kind: "Name", value: "OverviewTopSpaces_QueryFragment" },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: {
+        kind: "Name",
+        value: "OverviewPendingRequestsRequestCard_BookingFragment",
+      },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiser" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "user" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "name" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+              ],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+          { kind: "Field", name: { kind: "Name", value: "totalAmount" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: {
+        kind: "Name",
+        value: "OverviewActiveBookingsBookingCard_BookingFragment",
+      },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Booking" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "campaign" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiser" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "user" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "name" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "space" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+              ],
+            },
+          },
+          { kind: "Field", name: { kind: "Name", value: "startDate" } },
+          { kind: "Field", name: { kind: "Name", value: "endDate" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewTopSpacesSpaceCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+          { kind: "Field", name: { kind: "Name", value: "totalBookings" } },
+          { kind: "Field", name: { kind: "Name", value: "totalRevenue" } },
+          { kind: "Field", name: { kind: "Name", value: "averageRating" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewStatCards_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "earningsSummary" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "availableBalance" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pendingPayouts" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "thisMonthEarnings" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "lastMonthEarnings" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewPendingRequests_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "incomingBookingRequests" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "5" },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value:
+                            "OverviewPendingRequestsRequestCard_BookingFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewActiveBookings_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myBookingsAsOwner" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "5" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "where" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "status" },
+                      value: {
+                        kind: "ObjectValue",
+                        fields: [
+                          {
+                            kind: "ObjectField",
+                            name: { kind: "Name", value: "in" },
+                            value: {
+                              kind: "ListValue",
+                              values: [
+                                { kind: "EnumValue", value: "PAID" },
+                                { kind: "EnumValue", value: "FILE_DOWNLOADED" },
+                                { kind: "EnumValue", value: "INSTALLED" },
+                              ],
+                            },
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value:
+                            "OverviewActiveBookingsBookingCard_BookingFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OverviewTopSpaces_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spaceOwnerProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "spaces" },
+                        arguments: [
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "first" },
+                            value: { kind: "IntValue", value: "5" },
+                          },
+                          {
+                            kind: "Argument",
+                            name: { kind: "Name", value: "order" },
+                            value: {
+                              kind: "ObjectValue",
+                              fields: [
+                                {
+                                  kind: "ObjectField",
+                                  name: { kind: "Name", value: "totalRevenue" },
+                                  value: { kind: "EnumValue", value: "DESC" },
+                                },
+                              ],
+                            },
+                          },
+                        ],
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "nodes" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  {
+                                    kind: "FragmentSpread",
+                                    name: {
+                                      kind: "Name",
+                                      value:
+                                        "OverviewTopSpacesSpaceCard_SpaceFragment",
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<OverviewDataQuery, OverviewDataQueryVariables>;
+export const DashboardUserDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "DashboardUser" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "FragmentSpread",
+                  name: {
+                    kind: "Name",
+                    value: "NavigationSection_UserFragment",
+                  },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "UserSection_UserFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "RoleBasedView_UserFragment" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "NavigationSection_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "role" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "UserSection_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "email" } },
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "avatar" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "RoleBasedView_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "role" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DashboardUserQuery, DashboardUserQueryVariables>;
+export const SendMessageDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "SendMessage" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "SendMessageInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "sendMessage" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "message" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "content" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "attachments" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "createdAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "senderUser" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "name" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "ForbiddenError" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SendMessageMutation, SendMessageMutationVariables>;
+export const MarkConversationReadDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "MarkConversationRead" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "MarkConversationReadInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "markConversationRead" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "participant" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "lastReadAt" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "ForbiddenError" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkConversationReadMutation,
+  MarkConversationReadMutationVariables
+>;
+export const LoadEarlierMessagesDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "LoadEarlierMessages" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "conversationId" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "before" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "messagesByConversation" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "conversationId" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "conversationId" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "last" },
+                value: { kind: "IntValue", value: "50" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "before" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "before" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "ListValue",
+                  values: [
+                    {
+                      kind: "ObjectValue",
+                      fields: [
+                        {
+                          kind: "ObjectField",
+                          name: { kind: "Name", value: "createdAt" },
+                          value: { kind: "EnumValue", value: "ASC" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "content" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "attachments" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "createdAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "senderUser" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "name" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avatar" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "hasPreviousPage" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "startCursor" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  LoadEarlierMessagesQuery,
+  LoadEarlierMessagesQueryVariables
+>;
+export const OnMessageDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "subscription",
+      name: { kind: "Name", value: "OnMessage" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "conversationId" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "onMessage" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "conversationId" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "conversationId" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "content" } },
+                { kind: "Field", name: { kind: "Name", value: "type" } },
+                { kind: "Field", name: { kind: "Name", value: "attachments" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "senderUser" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avatar" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  OnMessageSubscription,
+  OnMessageSubscriptionVariables
+>;
+export const MessagesDataDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "MessagesData" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myConversations" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "50" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "ListValue",
+                  values: [
+                    {
+                      kind: "ObjectValue",
+                      fields: [
+                        {
+                          kind: "ObjectField",
+                          name: { kind: "Name", value: "updatedAt" },
+                          value: { kind: "EnumValue", value: "DESC" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "ConversationItem_ConversationFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "unreadConversationsCount" },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ConversationItem_ConversationFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Conversation" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "booking" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "space" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participants" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avatar" },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "lastReadAt" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "messages" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "1" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "ListValue",
+                  values: [
+                    {
+                      kind: "ObjectValue",
+                      fields: [
+                        {
+                          kind: "ObjectField",
+                          name: { kind: "Name", value: "createdAt" },
+                          value: { kind: "EnumValue", value: "DESC" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "content" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "createdAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "senderUser" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<MessagesDataQuery, MessagesDataQueryVariables>;
+export const ThreadDataDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "ThreadData" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "conversationId" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myConversations" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "50" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "ListValue",
+                  values: [
+                    {
+                      kind: "ObjectValue",
+                      fields: [
+                        {
+                          kind: "ObjectField",
+                          name: { kind: "Name", value: "updatedAt" },
+                          value: { kind: "EnumValue", value: "DESC" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "ConversationItem_ConversationFragment",
+                        },
+                      },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "ThreadHeader_ConversationFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "unreadConversationsCount" },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "messagesByConversation" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "conversationId" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "conversationId" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "50" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "ListValue",
+                  values: [
+                    {
+                      kind: "ObjectValue",
+                      fields: [
+                        {
+                          kind: "ObjectField",
+                          name: { kind: "Name", value: "createdAt" },
+                          value: { kind: "EnumValue", value: "ASC" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "MessageBubble_MessageFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "hasPreviousPage" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "startCursor" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ConversationItem_ConversationFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Conversation" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "updatedAt" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "booking" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "space" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "participants" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avatar" },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "lastReadAt" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "messages" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "1" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "ListValue",
+                  values: [
+                    {
+                      kind: "ObjectValue",
+                      fields: [
+                        {
+                          kind: "ObjectField",
+                          name: { kind: "Name", value: "createdAt" },
+                          value: { kind: "EnumValue", value: "DESC" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "content" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "createdAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "senderUser" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ThreadHeader_ConversationFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Conversation" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "booking" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                { kind: "Field", name: { kind: "Name", value: "startDate" } },
+                { kind: "Field", name: { kind: "Name", value: "endDate" } },
+                { kind: "Field", name: { kind: "Name", value: "totalAmount" } },
+                { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+                { kind: "Field", name: { kind: "Name", value: "totalDays" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "installationFee" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "space" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "images" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "address" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "city" } },
+                      { kind: "Field", name: { kind: "Name", value: "state" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "MessageBubble_MessageFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Message" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "content" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+          { kind: "Field", name: { kind: "Name", value: "attachments" } },
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "senderUser" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "avatar" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ThreadDataQuery, ThreadDataQueryVariables>;
+export const OnNotificationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "subscription",
+      name: { kind: "Name", value: "OnNotification" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "userId" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "onNotification" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "userId" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "userId" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "title" } },
+                { kind: "Field", name: { kind: "Name", value: "body" } },
+                { kind: "Field", name: { kind: "Name", value: "type" } },
+                { kind: "Field", name: { kind: "Name", value: "isRead" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                { kind: "Field", name: { kind: "Name", value: "entityId" } },
+                { kind: "Field", name: { kind: "Name", value: "entityType" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  OnNotificationSubscription,
+  OnNotificationSubscriptionVariables
+>;
+export const MarkNotificationReadDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "MarkNotificationRead" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "MarkNotificationReadInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "markNotificationRead" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "notification" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "isRead" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "readAt" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkNotificationReadMutation,
+  MarkNotificationReadMutationVariables
+>;
+export const MarkAllNotificationsReadDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "MarkAllNotificationsRead" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "markAllNotificationsRead" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "count" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkAllNotificationsReadMutation,
+  MarkAllNotificationsReadMutationVariables
+>;
+export const DeleteNotificationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "DeleteNotification" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "DeleteNotificationInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "deleteNotification" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "success" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteNotificationMutation,
+  DeleteNotificationMutationVariables
+>;
+export const LoadMoreNotificationsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "LoadMoreNotifications" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "after" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "isRead" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Boolean" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "type" } },
+          type: {
+            kind: "NamedType",
+            name: { kind: "Name", value: "NotificationType" },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myNotifications" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "20" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "after" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "after" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "where" },
+                value: {
+                  kind: "ObjectValue",
+                  fields: [
+                    {
+                      kind: "ObjectField",
+                      name: { kind: "Name", value: "and" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "isRead" },
+                                value: {
+                                  kind: "ObjectValue",
+                                  fields: [
+                                    {
+                                      kind: "ObjectField",
+                                      name: { kind: "Name", value: "eq" },
+                                      value: {
+                                        kind: "Variable",
+                                        name: { kind: "Name", value: "isRead" },
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
+                            ],
+                          },
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "type" },
+                                value: {
+                                  kind: "ObjectValue",
+                                  fields: [
+                                    {
+                                      kind: "ObjectField",
+                                      name: { kind: "Name", value: "eq" },
+                                      value: {
+                                        kind: "Variable",
+                                        name: { kind: "Name", value: "type" },
+                                      },
+                                    },
+                                  ],
+                                },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "ListValue",
+                  values: [
+                    {
+                      kind: "ObjectValue",
+                      fields: [
+                        {
+                          kind: "ObjectField",
+                          name: { kind: "Name", value: "createdAt" },
+                          value: { kind: "EnumValue", value: "DESC" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      { kind: "Field", name: { kind: "Name", value: "body" } },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "isRead" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "readAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "createdAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "entityId" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "entityType" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "hasNextPage" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "endCursor" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  LoadMoreNotificationsQuery,
+  LoadMoreNotificationsQueryVariables
+>;
+export const NotificationsPageDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "NotificationsPage" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myNotifications" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: { kind: "IntValue", value: "20" },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "ListValue",
+                  values: [
+                    {
+                      kind: "ObjectValue",
+                      fields: [
+                        {
+                          kind: "ObjectField",
+                          name: { kind: "Name", value: "createdAt" },
+                          value: { kind: "EnumValue", value: "DESC" },
+                        },
+                      ],
+                    },
+                  ],
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      { kind: "Field", name: { kind: "Name", value: "body" } },
+                      { kind: "Field", name: { kind: "Name", value: "type" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "isRead" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "createdAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "readAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "entityId" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "entityType" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "hasNextPage" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "endCursor" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "unreadNotificationsCount" },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  NotificationsPageQuery,
+  NotificationsPageQueryVariables
+>;
+export const ProfileDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "Profile" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "ProfileLayout_UserFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "Info_UserFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "About_UserFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "Activity_UserFragment" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ProfileLayout_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [{ kind: "Field", name: { kind: "Name", value: "role" } }],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Info_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "avatar" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spaces" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "averageRating" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "reviews" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "order" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "createdAt" },
+                                value: { kind: "EnumValue", value: "DESC" },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "advertiserProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                { kind: "Field", name: { kind: "Name", value: "totalSpend" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "campaigns" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "order" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "createdAt" },
+                                value: { kind: "EnumValue", value: "DESC" },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "About_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "businessName" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "businessType" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "onboardingComplete" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spaces" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "advertiserProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "companyName" } },
+                { kind: "Field", name: { kind: "Name", value: "industry" } },
+                { kind: "Field", name: { kind: "Name", value: "website" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "onboardingComplete" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "campaigns" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "order" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "createdAt" },
+                                value: { kind: "EnumValue", value: "DESC" },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "status" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Activity_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "reviews" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "order" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "createdAt" },
+                                value: { kind: "EnumValue", value: "DESC" },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "rating" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "comment" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "createdAt" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "reviewer" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "name" },
+                                  },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "avatar" },
+                                  },
+                                  {
+                                    kind: "Field",
+                                    name: {
+                                      kind: "Name",
+                                      value: "companyName",
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "advertiserProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "campaigns" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "order" },
+                      value: {
+                        kind: "ListValue",
+                        values: [
+                          {
+                            kind: "ObjectValue",
+                            fields: [
+                              {
+                                kind: "ObjectField",
+                                name: { kind: "Name", value: "createdAt" },
+                                value: { kind: "EnumValue", value: "DESC" },
+                              },
+                            ],
+                          },
+                        ],
+                      },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "nodes" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "name" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "status" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "startDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "endDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "totalSpend" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "spacesCount" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<ProfileQuery, ProfileQueryVariables>;
+export const SettingsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "Settings" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "email" } },
+                { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "avatar" } },
+                { kind: "Field", name: { kind: "Name", value: "phone" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                { kind: "Field", name: { kind: "Name", value: "lastLoginAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "activeProfileType" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "SettingsLayout_UserFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "ProfileSettings_UserFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: {
+                    kind: "Name",
+                    value: "BusinessSettings_UserFragment",
+                  },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "PayoutSettings_UserFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "AccountSettings_UserFragment" },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myNotificationPreferences" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "notificationType" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "inAppEnabled" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "emailEnabled" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "pushEnabled" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "SettingsLayout_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [{ kind: "Field", name: { kind: "Name", value: "role" } }],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "ProfileSettings_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "name" } },
+          { kind: "Field", name: { kind: "Name", value: "email" } },
+          { kind: "Field", name: { kind: "Name", value: "phone" } },
+          { kind: "Field", name: { kind: "Name", value: "avatar" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "BusinessSettings_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "businessName" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "businessType" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "payoutSchedule" },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "advertiserProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "companyName" } },
+                { kind: "Field", name: { kind: "Name", value: "industry" } },
+                { kind: "Field", name: { kind: "Name", value: "website" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PayoutSettings_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "stripeAccountId" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "stripeAccountStatus" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AccountSettings_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+          { kind: "Field", name: { kind: "Name", value: "lastLoginAt" } },
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SettingsQuery, SettingsQueryVariables>;
+export const GetCurrentUserForSettingsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetCurrentUserForSettings" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "avatar" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spaceOwnerProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiserProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetCurrentUserForSettingsQuery,
+  GetCurrentUserForSettingsQueryVariables
+>;
+export const UpdateUserProfileDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateUserProfile" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "UpdateCurrentUserInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateCurrentUser" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateUserProfileMutation,
+  UpdateUserProfileMutationVariables
+>;
+export const UpdateSpaceOwnerBusinessInfoDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateSpaceOwnerBusinessInfo" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "UpdateSpaceOwnerProfileInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateSpaceOwnerProfile" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spaceOwnerProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateSpaceOwnerBusinessInfoMutation,
+  UpdateSpaceOwnerBusinessInfoMutationVariables
+>;
+export const UpdateAdvertiserBusinessInfoDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateAdvertiserBusinessInfo" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "UpdateAdvertiserProfileInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateAdvertiserProfile" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiserProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateAdvertiserBusinessInfoMutation,
+  UpdateAdvertiserBusinessInfoMutationVariables
+>;
+export const UpdateNotificationPreferenceDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateNotificationPreference" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: {
+                kind: "Name",
+                value: "UpdateNotificationPreferenceInput",
+              },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateNotificationPreference" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "preference" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "notificationType" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "inAppEnabled" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "emailEnabled" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "pushEnabled" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateNotificationPreferenceMutation,
+  UpdateNotificationPreferenceMutationVariables
+>;
+export const ConnectStripeAccountDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ConnectStripeAccount" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "connectStripeAccount" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "accountId" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "onboardingUrl" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ConnectStripeAccountMutation,
+  ConnectStripeAccountMutationVariables
+>;
+export const DisconnectStripeAccountDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "DisconnectStripeAccount" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "disconnectStripeAccount" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "profile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "stripeAccountId" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "stripeAccountStatus" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DisconnectStripeAccountMutation,
+  DisconnectStripeAccountMutationVariables
+>;
+export const RefreshStripeAccountStatusDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "RefreshStripeAccountStatus" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "refreshStripeAccountStatus" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "profile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "stripeAccountStatus" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  RefreshStripeAccountStatusMutation,
+  RefreshStripeAccountStatusMutationVariables
+>;
+export const DeleteMyAccountDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "DeleteMyAccount" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "DeleteMyAccountInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "deleteMyAccount" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "success" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteMyAccountMutation,
+  DeleteMyAccountMutationVariables
+>;
+export const UpdateUserAvatarDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "UpdateUserAvatar" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "UpdateCurrentUserInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateCurrentUser" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avatar" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateUserAvatarMutation,
+  UpdateUserAvatarMutationVariables
+>;
+export const ChangePasswordDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ChangePassword" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "ChangePasswordInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "changePassword" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "success" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ChangePasswordMutation,
+  ChangePasswordMutationVariables
+>;
+export const SharedSpaceDetailDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "SharedSpaceDetail" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceById" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "Header_SharedSpaceFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "Gallery_SharedSpaceFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "SpaceInfo_SpaceFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "PricingCard_SpaceFragment" },
+                },
+                {
+                  kind: "FragmentSpread",
+                  name: { kind: "Name", value: "OwnerCard_SpaceFragment" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Header_SharedSpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "type" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "Gallery_SharedSpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "title" } },
+          { kind: "Field", name: { kind: "Name", value: "images" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "SpaceInfo_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "description" } },
+          { kind: "Field", name: { kind: "Name", value: "address" } },
+          { kind: "Field", name: { kind: "Name", value: "city" } },
+          { kind: "Field", name: { kind: "Name", value: "state" } },
+          { kind: "Field", name: { kind: "Name", value: "zipCode" } },
+          { kind: "Field", name: { kind: "Name", value: "width" } },
+          { kind: "Field", name: { kind: "Name", value: "height" } },
+          { kind: "Field", name: { kind: "Name", value: "dimensionsText" } },
+          { kind: "Field", name: { kind: "Name", value: "traffic" } },
+          { kind: "Field", name: { kind: "Name", value: "availableFrom" } },
+          { kind: "Field", name: { kind: "Name", value: "availableTo" } },
+          { kind: "Field", name: { kind: "Name", value: "averageRating" } },
+          { kind: "Field", name: { kind: "Name", value: "totalBookings" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PricingCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+          { kind: "Field", name: { kind: "Name", value: "installationFee" } },
+          { kind: "Field", name: { kind: "Name", value: "minDuration" } },
+          { kind: "Field", name: { kind: "Name", value: "maxDuration" } },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "OwnerCard_SpaceFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Space" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerProfile" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "businessName" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avatar" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SharedSpaceDetailQuery,
+  SharedSpaceDetailQueryVariables
+>;
+export const SwitchProfileDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "SwitchProfile" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "UpdateCurrentUserInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "updateCurrentUser" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "user" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "activeProfileType" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SwitchProfileMutation,
+  SwitchProfileMutationVariables
+>;

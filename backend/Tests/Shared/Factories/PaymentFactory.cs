@@ -123,3 +123,35 @@ public static class TransactionFactory {
         return transaction;
     }
 }
+
+public static class SavedPaymentMethodFactory {
+    private static readonly Faker Faker = new();
+    private static readonly string[] CardBrands = ["visa", "mastercard", "amex", "discover"];
+
+    public static SavedPaymentMethod Create(Guid advertiserProfileId,
+        Action<SavedPaymentMethod>? customize = null) {
+        var paymentMethod = new SavedPaymentMethod {
+            Id = Guid.NewGuid(),
+            AdvertiserProfileId = advertiserProfileId,
+            StripePaymentMethodId = $"pm_{Faker.Random.AlphaNumeric(24)}",
+            Brand = Faker.PickRandom(CardBrands),
+            Last4 = Faker.Random.Number(1000, 9999).ToString(),
+            ExpMonth = Faker.Random.Number(1, 12),
+            ExpYear = DateTime.UtcNow.Year + Faker.Random.Number(1, 5),
+            IsDefault = false,
+            CreatedAt = DateTime.UtcNow
+        };
+        customize?.Invoke(paymentMethod);
+        return paymentMethod;
+    }
+
+    public static SavedPaymentMethod CreateDefault(Guid advertiserProfileId) {
+        return Create(advertiserProfileId, pm => pm.IsDefault = true);
+    }
+
+    public static List<SavedPaymentMethod> CreateMany(Guid advertiserProfileId, int count) {
+        return Enumerable.Range(0, count).Select(i => Create(advertiserProfileId, pm => {
+            if (i == 0) pm.IsDefault = true;
+        })).ToList();
+    }
+}

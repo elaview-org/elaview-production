@@ -22,6 +22,22 @@ public static class SpaceOwnerProfileExtensions {
         [Parent] SpaceOwnerProfile owner,
         IReviewService reviewService)
         => reviewService.GetByOwnerProfileId(owner.Id);
+
+    public static async Task<float> GetResponseRate(
+        [Parent] SpaceOwnerProfile owner,
+        IResponseMetricsBySpaceOwnerProfileIdDataLoader loader,
+        CancellationToken ct) {
+        var metrics = await loader.LoadAsync(owner.Id, ct);
+        return metrics?.ResponseRate ?? 0f;
+    }
+
+    public static async Task<int> GetAverageResponseTime(
+        [Parent] SpaceOwnerProfile owner,
+        IResponseMetricsBySpaceOwnerProfileIdDataLoader loader,
+        CancellationToken ct) {
+        var metrics = await loader.LoadAsync(owner.Id, ct);
+        return metrics?.AverageResponseTimeHours ?? 0;
+    }
 }
 
 [ExtendObjectType<AdvertiserProfile>]

@@ -1,24 +1,67 @@
 import Link from "next/link";
 import { cn, formatTime, truncateText, getInitials } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/primitives/avatar";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/primitives/avatar";
 import { Badge } from "@/components/primitives/badge";
-import { MessageType, type MessagesDataQuery } from "@/types/gql";
+import {
+  graphql,
+  getFragmentData,
+  MessageType,
+  type FragmentType,
+} from "@/types/gql";
 
-type Conversation = NonNullable<
-  NonNullable<MessagesDataQuery["myConversations"]>["nodes"]
->[number];
+export const ConversationItem_ConversationFragment = graphql(`
+  fragment ConversationItem_ConversationFragment on Conversation {
+    id
+    updatedAt
+    booking {
+      id
+      status
+      space {
+        id
+        title
+      }
+    }
+    participants {
+      user {
+        id
+        name
+        avatar
+      }
+      lastReadAt
+    }
+    messages(first: 1, order: [{ createdAt: DESC }]) {
+      nodes {
+        id
+        content
+        type
+        createdAt
+        senderUser {
+          id
+        }
+      }
+    }
+  }
+`);
 
 type Props = {
-  conversation: Conversation;
+  data: FragmentType<typeof ConversationItem_ConversationFragment>;
   isSelected: boolean;
   currentUserId: string;
 };
 
 export default function ConversationItem({
-  conversation,
+  data,
   isSelected,
   currentUserId,
 }: Props) {
+  const conversation = getFragmentData(
+    ConversationItem_ConversationFragment,
+    data
+  );
   const spaceName = conversation.booking?.space?.title ?? "Unknown Space";
   const bookingId = conversation.booking?.id;
   const lastMessage = conversation.messages?.nodes?.[0];

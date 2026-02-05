@@ -50,7 +50,10 @@ export function MessageComposer({
     if (disabled || isUploading) return;
 
     const attachmentUrls = attachments.map((a) => a.url);
-    onSend(content.trim(), attachmentUrls.length > 0 ? attachmentUrls : undefined);
+    onSend(
+      content.trim(),
+      attachmentUrls.length > 0 ? attachmentUrls : undefined
+    );
     setContent("");
     setAttachments([]);
 
@@ -134,7 +137,9 @@ export function MessageComposer({
                 key={attachment.id}
                 className="group bg-background relative flex items-center gap-2 rounded-lg border px-2 py-1.5 text-xs"
               >
-                <span className="max-w-37.5 truncate">{attachment.fileName}</span>
+                <span className="max-w-37.5 truncate">
+                  {attachment.fileName}
+                </span>
                 <button
                   type="button"
                   onClick={() => handleRemoveAttachment(attachment.id)}

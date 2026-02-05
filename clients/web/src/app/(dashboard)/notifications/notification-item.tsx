@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTransition } from "react";
 import { Button } from "@/components/primitives/button";
 import { Badge } from "@/components/primitives/badge";
 import {
@@ -7,7 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/primitives/dropdown-menu";
-import { NotificationType } from "@/types/gql/graphql";
+import { NotificationType, type NotificationsPageQuery } from "@/types/gql";
 import {
   CheckCircle2,
   XCircle,
@@ -19,76 +22,49 @@ import {
   MoreVertical,
   Check,
   Trash2,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { type TNotification } from "./mock-notification";
+import {
+  markNotificationReadAction,
+  deleteNotificationAction,
+} from "./notifications.actions";
+import { toast } from "sonner";
 
-interface NotificationItemProps {
-  notification: TNotification;
-  onMarkAsRead?: (id: string) => void;
-  onDelete?: (id: string) => void;
-}
+type Notification = NonNullable<
+  NonNullable<NotificationsPageQuery["myNotifications"]>["nodes"]
+>[number];
 
-export function NotificationItem({
+type Props = {
+  notification: Notification;
+  onOptimisticMarkRead?: (id: string) => void;
+  onOptimisticDelete?: (id: string) => void;
+};
+
+export default function NotificationItem({
   notification,
-  onMarkAsRead,
-  onDelete,
-}: NotificationItemProps) {
-  const getNotificationIcon = (type: NotificationType) => {
-    switch (type) {
-      case NotificationType.BookingApproved:
-        return <CheckCircle2 className="h-5 w-5 text-green-600" />;
-      case NotificationType.BookingRejected:
-        return <XCircle className="h-5 w-5 text-red-600" />;
-      case NotificationType.BookingCancelled:
-        return <X className="h-5 w-5 text-gray-600" />;
-      case NotificationType.PaymentReceived:
-      case NotificationType.RefundProcessed:
-        return <DollarSign className="h-5 w-5 text-green-600" />;
-      case NotificationType.ProofUploaded:
-      case NotificationType.ProofApproved:
-        return <Camera className="h-5 w-5 text-blue-600" />;
-      case NotificationType.DisputeFiled:
-      case NotificationType.DisputeResolved:
-        return <AlertTriangle className="h-5 w-5 text-orange-600" />;
-      case NotificationType.MessageReceived:
-        return <MessageSquare className="h-5 w-5 text-blue-600" />;
-      default:
-        return <CheckCircle2 className="h-5 w-5 text-gray-600" />;
-    }
+  onOptimisticMarkRead,
+  onOptimisticDelete,
+}: Props) {
+  const [isPending, startTransition] = useTransition();
+
+  const handleMarkAsRead = () => {
+    onOptimisticMarkRead?.(notification.id);
+    startTransition(async () => {
+      const result = await markNotificationReadAction(notification.id);
+      if (!result.success) {
+        toast.error(result.error ?? "Failed to mark as read");
+      }
+    });
   };
 
-  const getNotificationLink = (notification: TNotification): string | null => {
-    if (!notification.entityId || !notification.entityType) {
-      return null;
-    }
-
-    switch (notification.entityType) {
-      case "Booking":
-        return `/bookings/${notification.entityId}`;
-      case "Conversation":
-      case "Message":
-        return `/messages/${notification.entityId}`;
-      default:
-        return null;
-    }
-  };
-
-  const formatTime = (dateString: string): string => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 1) return "Just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
+  const handleDelete = () => {
+    onOptimisticDelete?.(notification.id);
+    startTransition(async () => {
+      const result = await deleteNotificationAction(notification.id);
+      if (!result.success) {
+        toast.error(result.error ?? "Failed to delete notification");
+      }
     });
   };
 
@@ -100,15 +76,14 @@ export function NotificationItem({
       className={cn(
         "group hover:bg-muted/50 flex items-start gap-3 rounded-lg border p-4 transition-colors",
         isUnread &&
-          "border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20"
+          "border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-950/20",
+        isPending && "opacity-50"
       )}
     >
-      {/* Icon */}
       <div className="mt-0.5 flex-shrink-0">
         {getNotificationIcon(notification.type)}
       </div>
 
-      {/* Content */}
       <div className="min-w-0 flex-1 space-y-1">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
@@ -128,7 +103,7 @@ export function NotificationItem({
           )}
         </div>
         <div className="text-muted-foreground flex items-center gap-2 text-xs">
-          <span>{formatTime(notification.createdAt as string)}</span>
+          <span>{formatTime(notification.createdAt)}</span>
           {notification.entityType && (
             <>
               <span>•</span>
@@ -140,7 +115,6 @@ export function NotificationItem({
         </div>
       </div>
 
-      {/* Actions */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -148,34 +122,37 @@ export function NotificationItem({
             size="sm"
             className="opacity-0 transition-opacity group-hover:opacity-100"
             onClick={(e) => e.stopPropagation()}
+            disabled={isPending}
           >
-            <MoreVertical className="h-4 w-4" />
+            {isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <MoreVertical className="size-4" />
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          {isUnread && onMarkAsRead && (
+          {isUnread && (
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
-                onMarkAsRead(notification.id as string);
+                handleMarkAsRead();
               }}
             >
-              <Check className="mr-2 h-4 w-4" />
+              <Check className="mr-2 size-4" />
               Mark as read
             </DropdownMenuItem>
           )}
-          {onDelete && (
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                onDelete(notification.id as string);
-              }}
-              className="text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
-          )}
+          <DropdownMenuItem
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete();
+            }}
+            className="text-destructive"
+          >
+            <Trash2 className="mr-2 size-4" />
+            Delete
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -190,4 +167,63 @@ export function NotificationItem({
   }
 
   return content;
+}
+
+function getNotificationIcon(type: NotificationType) {
+  switch (type) {
+    case NotificationType.BookingApproved:
+      return <CheckCircle2 className="size-5 text-green-600" />;
+    case NotificationType.BookingRejected:
+      return <XCircle className="size-5 text-red-600" />;
+    case NotificationType.BookingCancelled:
+      return <X className="size-5 text-gray-600" />;
+    case NotificationType.PaymentReceived:
+    case NotificationType.RefundProcessed:
+    case NotificationType.PayoutProcessed:
+      return <DollarSign className="size-5 text-green-600" />;
+    case NotificationType.ProofUploaded:
+    case NotificationType.ProofApproved:
+      return <Camera className="size-5 text-blue-600" />;
+    case NotificationType.DisputeFiled:
+    case NotificationType.DisputeResolved:
+      return <AlertTriangle className="size-5 text-orange-600" />;
+    case NotificationType.MessageReceived:
+      return <MessageSquare className="size-5 text-blue-600" />;
+    default:
+      return <CheckCircle2 className="size-5 text-gray-600" />;
+  }
+}
+
+function getNotificationLink(notification: Notification): string | null {
+  if (!notification.entityId || !notification.entityType) {
+    return null;
+  }
+
+  switch (notification.entityType) {
+    case "Booking":
+      return `/bookings/${notification.entityId}`;
+    case "Conversation":
+    case "Message":
+      return `/messages/${notification.entityId}`;
+    default:
+      return null;
+  }
+}
+
+function formatTime(dateString: string): string {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }

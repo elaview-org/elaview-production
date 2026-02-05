@@ -110,23 +110,32 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 **Conversation List:**
 
-- [ ] List of all conversations
-- [ ] Unread indicators
-- [ ] Last message preview
-- [ ] Booking context link
-- [ ] Participant avatar and name
-- [ ] Search conversations
-- [ ] Sort by recent/unread
+- [x] List of all conversations (`myConversations` query)
+- [x] Unread indicators (comparing `lastReadAt` vs message timestamp)
+- [x] Last message preview (fetching `messages(first: 1)`)
+- [x] Booking context link (booking ID badge)
+- [x] Participant avatar and name
+- [x] Loading skeleton
+- [x] Empty state placeholder
+- [x] Search conversations
+- [x] Sort by recent/unread
 
 **Conversation Detail (`/messages/[id]`):**
 
-- [ ] Message thread display
-- [ ] Send message input
-- [ ] Image attachments
-- [ ] Booking reference card
-- [ ] Real-time updates (subscription)
-- [ ] Read receipts
-- [ ] Typing indicators
+- [x] Message thread display (`messagesByConversation` query)
+- [x] Send message input (`sendMessage` mutation)
+- [x] Image attachments (PDF, PNG, JPG supported)
+- [x] Real-time updates (`onMessage` subscription)
+- [x] Mark conversation as read (`markConversationRead` mutation)
+- [x] Date grouping for messages
+- [x] Auto-scroll to latest message
+- [x] Disabled messaging for completed/cancelled bookings
+- [x] Loading skeleton
+- [x] Error boundary
+- [x] Booking reference card in thread header
+- [x] Read receipts (conversation-level)
+- [x] Pagination (load more messages)
+- [ ] Typing indicators (blocked: requires backend schema changes)
 
 #### Backend Note
 
@@ -146,7 +155,7 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 - `onMessage(conversationId)` - Real-time message updates
 
-**Frontend Status:** Using mock data. Needs to wire up existing queries/mutations.
+**Frontend Status:** ✅ Fully functional (typing indicators blocked on backend)
 
 ---
 
@@ -158,13 +167,21 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 **Notification List:**
 
-- [ ] Paginated notifications list
-- [ ] Filter by read/unread
-- [ ] Filter by notification type
-- [ ] Mark as read
-- [ ] Mark all as read
-- [ ] Delete notification
-- [ ] Real-time updates
+- [x] Paginated notifications list (first 50)
+- [x] Filter by read/unread (tab filter)
+- [x] Filter by notification type (dropdown)
+- [x] Mark as read (individual)
+- [x] Mark all as read
+- [x] Delete notification
+- [x] Optimistic updates for all mutations
+- [x] Date grouping (Today, Yesterday, This Week, Older)
+- [x] Notification type icons
+- [x] Deep links to bookings/messages
+- [x] Loading skeleton
+- [x] Empty state placeholder
+- [x] Error boundary
+- [x] Real-time updates (`onNotification` subscription)
+- [x] Pagination (load more)
 
 **Notification Preferences:**
 
@@ -192,7 +209,7 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 - `onNotification(userId)` - Real-time notifications
 
-**Frontend Status:** Preferences working. List/mutations not wired.
+**Frontend Status:** ✅ Fully functional
 
 ---
 
@@ -1119,11 +1136,11 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 
 | Query                        | Purpose                   | Implemented |
 |------------------------------|---------------------------|-------------|
-| `myConversations`            | Message threads           | ⚠️          |
-| `messagesByConversation(id)` | Messages in thread        | ❌           |
-| `unreadConversationsCount`   | Unread message count      | ❌           |
-| `myNotifications`            | User notifications        | ❌           |
-| `unreadNotificationsCount`   | Unread notification count | ❌           |
+| `myConversations`            | Message threads           | ✅           |
+| `messagesByConversation(id)` | Messages in thread        | ✅           |
+| `unreadConversationsCount`   | Unread message count      | ✅           |
+| `myNotifications`            | User notifications        | ✅           |
+| `unreadNotificationsCount`   | Unread notification count | ✅           |
 | `myNotificationPreferences`  | Notification settings     | ✅           |
 | `reviewsBySpace(spaceId)`    | Reviews for a space       | ✅           |
 | `reviewByBooking(bookingId)` | Review for booking        | ❌           |
@@ -1180,17 +1197,17 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 
 | Mutation                    | Purpose             | Implemented |
 |-----------------------------|---------------------|-------------|
-| `sendMessage`               | Send message        | ❌           |
-| `markConversationRead`      | Mark thread as read | ❌           |
+| `sendMessage`               | Send message        | ✅           |
+| `markConversationRead`      | Mark thread as read | ✅           |
 | `createBookingConversation` | Start conversation  | ❌           |
 
 **Notification:**
 
 | Mutation                       | Purpose             | Implemented |
 |--------------------------------|---------------------|-------------|
-| `markNotificationRead`         | Mark as read        | ❌           |
-| `markAllNotificationsRead`     | Mark all as read    | ❌           |
-| `deleteNotification`           | Delete notification | ❌           |
+| `markNotificationRead`         | Mark as read        | ✅           |
+| `markAllNotificationsRead`     | Mark all as read    | ✅           |
+| `deleteNotification`           | Delete notification | ✅           |
 | `updateNotificationPreference` | Toggle notification | ✅           |
 
 **Review:**
@@ -1224,8 +1241,8 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 | Subscription                 | Purpose                     | Implemented |
 |------------------------------|-----------------------------|-------------|
 | `onBookingUpdate(bookingId)` | Real-time booking changes   | ❌           |
-| `onMessage(conversationId)`  | Real-time messages          | ❌           |
-| `onNotification(userId)`     | Real-time notifications     | ❌           |
+| `onMessage(conversationId)`  | Real-time messages          | ✅           |
+| `onNotification(userId)`     | Real-time notifications     | ✅           |
 | `onProofUpdate(bookingId)`   | Verification status changes | ❌           |
 
 ---
@@ -1443,9 +1460,9 @@ Everything else exists in the schema - frontend needs to wire up the mutations.
 
 ### Phase 3: Communication
 
-1. Messages (conversation list, thread view, send)
-2. Notifications (list, mark read, real-time)
-3. Real-time subscriptions
+1. ~~Messages (conversation list, thread view, send)~~ ✅ Done
+2. ~~Notifications (list, mark read, real-time)~~ ✅ Done (except real-time)
+3. Real-time subscriptions (messages done, notifications pending)
 
 ### Phase 4: Advanced Features
 

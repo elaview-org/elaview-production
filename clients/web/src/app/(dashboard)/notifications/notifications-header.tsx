@@ -2,23 +2,23 @@
 
 import { Button } from "@/components/primitives/button";
 import { Card, CardHeader, CardTitle } from "@/components/primitives/card";
-import { CheckCircle2, Trash2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 
-interface NotificationsHeaderProps {
+type Props = {
   unreadCount?: number;
   totalCount?: number;
   onMarkAllRead?: () => void;
-  onDeleteAll?: () => void;
   hasUnread?: boolean;
-}
+  isPending?: boolean;
+};
 
-export function NotificationsHeader({
+export default function NotificationsHeader({
   unreadCount = 0,
   totalCount = 0,
   onMarkAllRead,
-  onDeleteAll,
   hasUnread = false,
-}: NotificationsHeaderProps) {
+  isPending = false,
+}: Props) {
   return (
     <Card>
       <CardHeader className="flex-row items-center justify-between pb-4">
@@ -31,15 +31,18 @@ export function NotificationsHeader({
         </div>
         <div className="flex gap-2">
           {hasUnread && onMarkAllRead && (
-            <Button variant="outline" size="sm" onClick={onMarkAllRead}>
-              <CheckCircle2 className="mr-2 h-4 w-4" />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onMarkAllRead}
+              disabled={isPending}
+            >
+              {isPending ? (
+                <Loader2 className="mr-2 size-4 animate-spin" />
+              ) : (
+                <CheckCircle2 className="mr-2 size-4" />
+              )}
               Mark all read
-            </Button>
-          )}
-          {onDeleteAll && (
-            <Button variant="outline" size="sm" onClick={onDeleteAll}>
-              <Trash2 className="mr-2 h-4 w-4" />
-              Clear all
             </Button>
           )}
         </div>

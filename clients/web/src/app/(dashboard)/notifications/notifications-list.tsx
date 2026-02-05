@@ -1,53 +1,22 @@
-import { NotificationItem } from "./notification-item";
+import NotificationItem from "./notification-item";
 import { Separator } from "@/components/primitives/separator";
-import { type TNotification } from "./mock-notification";
+import type { NotificationsPageQuery } from "@/types/gql";
 
-interface NotificationsListProps {
-  notifications: TNotification[];
-  onMarkAsRead?: (id: string) => void;
-  onDelete?: (id: string) => void;
-}
+type Notification = NonNullable<
+  NonNullable<NotificationsPageQuery["myNotifications"]>["nodes"]
+>[number];
 
-function groupNotificationsByDate(notifications: TNotification[]) {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const thisWeek = new Date(today);
-  thisWeek.setDate(thisWeek.getDate() - 7);
+type Props = {
+  notifications: Notification[];
+  onOptimisticMarkRead?: (id: string) => void;
+  onOptimisticDelete?: (id: string) => void;
+};
 
-  const groups: {
-    label: string;
-    notifications: TNotification[];
-  }[] = [
-    { label: "Today", notifications: [] },
-    { label: "Yesterday", notifications: [] },
-    { label: "This Week", notifications: [] },
-    { label: "Older", notifications: [] },
-  ];
-
-  notifications.forEach((notification: TNotification) => {
-    const date = new Date(notification.createdAt as string);
-
-    if (date >= today) {
-      groups[0].notifications.push(notification);
-    } else if (date >= yesterday) {
-      groups[1].notifications.push(notification);
-    } else if (date >= thisWeek) {
-      groups[2].notifications.push(notification);
-    } else {
-      groups[3].notifications.push(notification);
-    }
-  });
-
-  return groups.filter((group) => group.notifications.length > 0);
-}
-
-export function NotificationsList({
+export default function NotificationsList({
   notifications,
-  onMarkAsRead,
-  onDelete,
-}: NotificationsListProps) {
+  onOptimisticMarkRead,
+  onOptimisticDelete,
+}: Props) {
   if (notifications.length === 0) {
     return null;
   }
@@ -70,10 +39,10 @@ export function NotificationsList({
           <div className="space-y-2">
             {group.notifications.map((notification) => (
               <NotificationItem
-                key={notification.id as string}
+                key={notification.id}
                 notification={notification}
-                onMarkAsRead={onMarkAsRead}
-                onDelete={onDelete}
+                onOptimisticMarkRead={onOptimisticMarkRead}
+                onOptimisticDelete={onOptimisticDelete}
               />
             ))}
           </div>
@@ -82,4 +51,39 @@ export function NotificationsList({
       ))}
     </div>
   );
+}
+
+function groupNotificationsByDate(notifications: Notification[]) {
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const thisWeek = new Date(today);
+  thisWeek.setDate(thisWeek.getDate() - 7);
+
+  const groups: {
+    label: string;
+    notifications: Notification[];
+  }[] = [
+    { label: "Today", notifications: [] },
+    { label: "Yesterday", notifications: [] },
+    { label: "This Week", notifications: [] },
+    { label: "Older", notifications: [] },
+  ];
+
+  notifications.forEach((notification) => {
+    const date = new Date(notification.createdAt);
+
+    if (date >= today) {
+      groups[0].notifications.push(notification);
+    } else if (date >= yesterday) {
+      groups[1].notifications.push(notification);
+    } else if (date >= thisWeek) {
+      groups[2].notifications.push(notification);
+    } else {
+      groups[3].notifications.push(notification);
+    }
+  });
+
+  return groups.filter((group) => group.notifications.length > 0);
 }

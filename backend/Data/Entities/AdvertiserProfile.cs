@@ -16,7 +16,12 @@ public sealed class AdvertiserProfile : UserProfileBase {
     [MaxLength(500)]
     public string? Website { get; init; }
 
+    [MaxLength(255)]
+    public string? StripeCustomerId { get; set; }
+
     public ICollection<Campaign> Campaigns { get; init; } = [];
+
+    public ICollection<SavedPaymentMethod> SavedPaymentMethods { get; init; } = [];
 }
 
 public sealed class AdvertiserProfileConfig :

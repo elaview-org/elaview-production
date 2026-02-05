@@ -9,16 +9,34 @@ import {
 import { Button } from "@/components/primitives/button";
 import { DownloadIcon, FileIcon } from "lucide-react";
 import Image from "next/image";
-import { MessageType, type ThreadDataQuery } from "@/types/gql";
+import {
+  graphql,
+  getFragmentData,
+  MessageType,
+  type FragmentType,
+} from "@/types/gql";
 
-type Message = NonNullable<
-  NonNullable<ThreadDataQuery["messagesByConversation"]>["nodes"]
->[number];
+export const MessageBubble_MessageFragment = graphql(`
+  fragment MessageBubble_MessageFragment on Message {
+    id
+    content
+    type
+    attachments
+    createdAt
+    senderUser {
+      id
+      name
+      avatar
+    }
+  }
+`);
 
 type Props = {
-  message: Message;
+  data: FragmentType<typeof MessageBubble_MessageFragment>;
   isCurrentUser: boolean;
   showAvatar?: boolean;
+  isRead?: boolean;
+  showReadReceipt?: boolean;
 };
 
 function formatTime(dateString: string): string {
@@ -95,10 +113,13 @@ function AttachmentPreview({ url }: { url: string }) {
 }
 
 export default function MessageBubble({
-  message,
+  data,
   isCurrentUser,
   showAvatar = true,
+  isRead = false,
+  showReadReceipt = false,
 }: Props) {
+  const message = getFragmentData(MessageBubble_MessageFragment, data);
   const isSystem = message.type === MessageType.System;
   const senderName = message.senderUser?.name ?? "Unknown";
   const senderAvatar = message.senderUser?.avatar;
@@ -166,6 +187,11 @@ export default function MessageBubble({
           >
             {formatTime(message.createdAt)}
           </time>
+          {isCurrentUser && showReadReceipt && (
+            <span className="text-muted-foreground text-xs">
+              {isRead ? "Seen" : "Sent"}
+            </span>
+          )}
         </div>
       </div>
     </div>

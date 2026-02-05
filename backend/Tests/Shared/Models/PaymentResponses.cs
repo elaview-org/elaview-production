@@ -110,3 +110,48 @@ public record TransactionsConnection(
 
 public record TransactionsByBookingResponse(
     TransactionsConnection TransactionsByBooking);
+
+public record SavedPaymentMethodNode(
+    Guid Id,
+    string Brand,
+    string Last4,
+    int ExpMonth,
+    int ExpYear,
+    bool IsDefault,
+    DateTime CreatedAt
+);
+
+public record MySavedPaymentMethodsResponse(List<SavedPaymentMethodNode> MySavedPaymentMethods);
+
+public record CreateSetupIntentPayloadResponse(
+    string? ClientSecret,
+    string? SetupIntentId,
+    List<MutationError>? Errors
+);
+
+public record CreateSetupIntentResponse(
+    CreateSetupIntentPayloadResponse CreateSetupIntent);
+
+public record ConfirmSetupIntentPayloadResponse(
+    SavedPaymentMethodNode? PaymentMethod,
+    List<MutationError>? Errors
+);
+
+public record ConfirmSetupIntentResponse(
+    ConfirmSetupIntentPayloadResponse ConfirmSetupIntent);
+
+public record SetDefaultPaymentMethodPayloadResponse(
+    SavedPaymentMethodNode? PaymentMethod,
+    List<MutationError>? Errors
+);
+
+public record SetDefaultPaymentMethodResponse(
+    SetDefaultPaymentMethodPayloadResponse SetDefaultPaymentMethod);
+
+public record DeletePaymentMethodPayloadResponse(
+    bool? Success,
+    List<MutationError>? Errors
+);
+
+public record DeletePaymentMethodResponse(
+    DeletePaymentMethodPayloadResponse DeletePaymentMethod);

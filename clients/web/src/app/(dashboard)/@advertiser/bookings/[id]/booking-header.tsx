@@ -1,11 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/primitives/button";
 import { Badge } from "@/components/primitives/badge";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@/components/primitives/card";
+import { Card, CardContent, CardHeader } from "@/components/primitives/card";
 import {
   DropdownMenu,
   DropdownMenuContent,

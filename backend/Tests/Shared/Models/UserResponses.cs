@@ -63,3 +63,17 @@ public record SwitchProfileData(Guid Id, string ActiveProfileType);
 public record DeleteUserPayloadResponse(DeleteUserPayload DeleteUser);
 
 public record DeleteUserPayload(bool Success);
+
+public record MeWithSpaceOwnerProfileResponse(MeWithSpaceOwnerProfileData? Me);
+
+public record MeWithSpaceOwnerProfileData(
+    Guid Id,
+    string Email,
+    SpaceOwnerProfileData? SpaceOwnerProfile
+);
+
+public record SpaceOwnerProfileData(
+    Guid Id,
+    float ResponseRate,
+    int AverageResponseTime
+);

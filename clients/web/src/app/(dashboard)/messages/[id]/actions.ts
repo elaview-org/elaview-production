@@ -1,7 +1,11 @@
 "use server";
 
 import api from "@/lib/gql/server";
-import { graphql, MessageType } from "@/types/gql";
+import {
+  graphql,
+  MessageType,
+  type LoadEarlierMessagesQuery,
+} from "@/types/gql";
 import { revalidatePath } from "next/cache";
 import type { ActionState } from "@/types/actions";
 
@@ -105,4 +109,71 @@ export async function markConversationRead(
   revalidatePath("/messages", "layout");
 
   return { success: true, message: "", data: null };
+}
+
+const LoadEarlierMessagesQuery = graphql(`
+  query LoadEarlierMessages($conversationId: ID!, $before: String) {
+    messagesByConversation(
+      conversationId: $conversationId
+      last: 50
+      before: $before
+      order: [{ createdAt: ASC }]
+    ) {
+      nodes {
+        id
+        content
+        type
+        attachments
+        createdAt
+        senderUser {
+          id
+          name
+          avatar
+        }
+      }
+      pageInfo {
+        hasPreviousPage
+        startCursor
+      }
+    }
+  }
+`);
+
+type LoadEarlierMessagesResult = {
+  messages: NonNullable<
+    NonNullable<LoadEarlierMessagesQuery["messagesByConversation"]>["nodes"]
+  >;
+  pageInfo: NonNullable<
+    LoadEarlierMessagesQuery["messagesByConversation"]
+  >["pageInfo"];
+};
+
+export async function loadEarlierMessages(
+  conversationId: string,
+  before?: string
+): Promise<ActionState<LoadEarlierMessagesResult | null>> {
+  const result = await api.query({
+    query: LoadEarlierMessagesQuery,
+    variables: {
+      conversationId,
+      before,
+    },
+  });
+
+  if (result.error || !result.data?.messagesByConversation) {
+    return {
+      success: false,
+      message: result.error?.message ?? "Failed to load messages",
+      data: null,
+    };
+  }
+
+  return {
+    success: true,
+    message: "",
+    data: {
+      messages: result.data.messagesByConversation.nodes ?? [],
+      pageInfo: result.data.messagesByConversation.pageInfo,
+    },
+  };
 }

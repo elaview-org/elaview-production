@@ -9,17 +9,17 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public",
+    "compile": "next build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public",
     "start": "bun .next/standalone/server.js ",
     "lint": "eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "gql:codegen": "graphql-codegen --config lib/gql/codegen.ts",
-    "test": "bun test",
-    "test:watch": "bun test --watch",
-    "test:coverage": "bun test --coverage",
-    "gql:codegen:watch": "graphql-codegen --config lib/gql/codegen.ts --watch"
+    "gql:codegen": "graphql-codegen --config src/lib/gql/codegen.ts",
+    "gql:codegen:watch": "graphql-codegen --config src/lib/gql/codegen.ts --watch",
+    "test": "bun src/tests",
+    "test:watch": "bun src/tests --watch",
+    "test:coverage": "bun src/tests --coverage"
   },
   "dependencies": {
     "@apollo/client": "^4.1.3",

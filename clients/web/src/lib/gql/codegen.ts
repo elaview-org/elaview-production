@@ -4,24 +4,22 @@ const config: CodegenConfig = {
   overwrite: true,
   schema: process.env.ELAVIEW_WEB_API_URL
     ? `${process.env.ELAVIEW_WEB_API_URL}/graphql`
-    : "./lib/gql/schema.graphql",
+    : "./src/lib/gql/schema.graphql",
   documents: [
-    "app/**/*.{ts,tsx}",
-    "components/**/*.{ts,tsx}",
-    "hooks/**/*.{ts,tsx}",
-    "lib/**/*.{ts,tsx}",
-    "api/**/*.{ts,tsx}",
-    "!types/gql/**/*",
+    "src/app/**/*.{ts,tsx}",
+    "src/components/**/*.{ts,tsx}",
+    "src/lib/**/*.{ts,tsx}",
+    "!src/types/gql/**/*",
   ],
   ignoreNoDocuments: true,
   generates: {
-    "./lib/gql/schema.graphql": {
+    "./src/lib/gql/schema.graphql": {
       plugins: ["schema-ast"],
       config: {
         includeDirectives: true,
       },
     },
-    "./types/gql/": {
+    "./src/types/gql/": {
       preset: "client",
       presetConfig: {
         fragmentMasking: {
@@ -49,7 +47,7 @@ const config: CodegenConfig = {
   },
   hooks: {
     afterAllFileWrite: [
-      `sh -c 'grep -q "export \\* from \\"./graphql\\"" ./types/gql/index.ts || echo "\nexport * from \\"./graphql\\";" >> ./types/gql/index.ts'`,
+      `sh -c 'grep -q "export \\* from \\"./graphql\\"" ./src/types/gql/index.ts || echo "\nexport * from \\"./graphql\\";" >> ./src/types/gql/index.ts'`,
     ],
   },
 };

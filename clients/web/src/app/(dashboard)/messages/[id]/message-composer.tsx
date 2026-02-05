@@ -4,16 +4,22 @@ import * as React from "react";
 import { KeyboardEvent, useRef, useState } from "react";
 import { Button } from "@/components/primitives/button";
 import { cn } from "@/lib/utils";
-import { PaperclipIcon, SendIcon } from "lucide-react";
-import type { MessageAttachment } from "@/types/messages";
+import { PaperclipIcon, SendIcon, XIcon } from "lucide-react";
 
-interface MessageComposerProps {
-  onSend: (content: string, attachments?: MessageAttachment[]) => void;
+type Props = {
+  onSend: (content: string, attachments?: string[]) => void;
   disabled?: boolean;
   placeholder?: string;
-}
+};
 
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
+type PendingAttachment = {
+  id: string;
+  fileName: string;
+  url: string;
+  isUploading: boolean;
+};
+
+const MAX_FILE_SIZE = 25 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = [
   "application/pdf",
   "image/png",
@@ -21,17 +27,13 @@ const ALLOWED_FILE_TYPES = [
   "image/jpg",
 ];
 
-// ============================================
-// Component
-// ============================================
-
 export function MessageComposer({
   onSend,
   disabled = false,
   placeholder = "Type a message...",
-}: MessageComposerProps) {
+}: Props) {
   const [content, setContent] = useState("");
-  const [attachments, setAttachments] = useState<MessageAttachment[]>([]);
+  const [attachments, setAttachments] = useState<PendingAttachment[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -47,11 +49,11 @@ export function MessageComposer({
     if (!content.trim() && attachments.length === 0) return;
     if (disabled || isUploading) return;
 
-    onSend(content.trim(), attachments.length > 0 ? attachments : undefined);
+    const attachmentUrls = attachments.map((a) => a.url);
+    onSend(content.trim(), attachmentUrls.length > 0 ? attachmentUrls : undefined);
     setContent("");
     setAttachments([]);
 
-    // Reset textarea height
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }
@@ -64,50 +66,29 @@ export function MessageComposer({
     setIsUploading(true);
 
     try {
-      const validFiles: MessageAttachment[] = [];
-
       for (const file of files) {
-        // Validate file type
         if (!ALLOWED_FILE_TYPES.includes(file.type)) {
-          alert(
-            `File "${file.name}" is not supported. Please upload PDF, PNG, or JPG files.`
-          );
           continue;
         }
 
-        // Validate file size
         if (file.size > MAX_FILE_SIZE) {
-          alert(
-            `File "${file.name}" is too large. Maximum size is ${MAX_FILE_SIZE / (1024 * 1024)}MB.`
-          );
           continue;
         }
 
-        // In a real implementation, this would upload to storage and return a URL
-        // For now, we'll create a mock attachment
-        const mockAttachment: MessageAttachment = {
-          id: `att-${Date.now()}-${Math.random()}`,
-          fileName: file.name,
-          fileUrl: URL.createObjectURL(file),
-          fileSize: file.size,
-          mimeType: file.type,
-          thumbnailUrl: file.type.startsWith("image/")
-            ? URL.createObjectURL(file)
-            : undefined,
-        };
+        const objectUrl = URL.createObjectURL(file);
 
-        validFiles.push(mockAttachment);
+        setAttachments((prev) => [
+          ...prev,
+          {
+            id: `${Date.now()}-${Math.random()}`,
+            fileName: file.name,
+            url: objectUrl,
+            isUploading: false,
+          },
+        ]);
       }
-
-      if (validFiles.length > 0) {
-        setAttachments((prev) => [...prev, ...validFiles]);
-      }
-    } catch (error) {
-      console.error("Error processing files:", error);
-      alert("Failed to process files. Please try again.");
     } finally {
       setIsUploading(false);
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -116,20 +97,14 @@ export function MessageComposer({
 
   const handleRemoveAttachment = (id: string) => {
     setAttachments((prev) => {
-      const updated = prev.filter((att) => att.id !== id);
-      // Revoke object URLs to prevent memory leaks
-      const removed = prev.find((att) => att.id === id);
+      const removed = prev.find((a) => a.id === id);
       if (removed) {
-        URL.revokeObjectURL(removed.fileUrl);
-        if (removed.thumbnailUrl) {
-          URL.revokeObjectURL(removed.thumbnailUrl);
-        }
+        URL.revokeObjectURL(removed.url);
       }
-      return updated;
+      return prev.filter((a) => a.id !== id);
     });
   };
 
-  // Auto-resize textarea
   React.useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -151,7 +126,6 @@ export function MessageComposer({
 
   return (
     <div className="bg-background sticky bottom-0 border-t">
-      {/* Attachment previews */}
       {attachments.length > 0 && (
         <div className="bg-muted/30 border-b px-4 py-2">
           <div className="flex flex-wrap gap-2">
@@ -160,28 +134,14 @@ export function MessageComposer({
                 key={attachment.id}
                 className="group bg-background relative flex items-center gap-2 rounded-lg border px-2 py-1.5 text-xs"
               >
-                <span className="max-w-37.5 truncate">
-                  {attachment.fileName}
-                </span>
+                <span className="max-w-37.5 truncate">{attachment.fileName}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveAttachment(attachment.id)}
                   className="text-muted-foreground hover:text-foreground"
                   aria-label={`Remove ${attachment.fileName}`}
                 >
-                  <svg
-                    className="size-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12"
-                    />
-                  </svg>
+                  <XIcon className="size-3" />
                 </button>
               </div>
             ))}
@@ -189,7 +149,6 @@ export function MessageComposer({
         </div>
       )}
 
-      {/* Input area */}
       <div className="flex items-center gap-2 px-4 py-3">
         <input
           ref={fileInputRef}
@@ -243,7 +202,6 @@ export function MessageComposer({
         </Button>
       </div>
 
-      {/* Helper text */}
       <div className="px-4 pb-2">
         <p className="text-muted-foreground text-xs">
           Press Enter to send, Shift+Enter for new line

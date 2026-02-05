@@ -14,7 +14,7 @@ Listed in `serverExternalPackages` in `next.config.ts` to prevent Next.js from b
 
 ## Logger Location
 
-Single pino instance at `lib/logger.ts`. Imported in Server Components, Server Actions, and Route Handlers only.
+Single pino instance at `src/lib/logger.ts`. Imported in Server Components, Server Actions, and Route Handlers only.
 
 ```ts
 import pino from "pino";
@@ -135,7 +135,7 @@ export async function POST(request: Request) {
 }
 ```
 
-## Instrumentation (`instrumentation.ts`)
+## Instrumentation (`src/instrumentation.ts`)
 
 ### Console Override
 
@@ -181,7 +181,7 @@ Logged fields:
 
 ## GraphQL Cache Context
 
-The Apollo logging link (`lib/gql/logging-link.ts`) includes cache-related context in each log entry when available:
+The Apollo logging link (`src/lib/gql/logging-link.ts`) includes cache-related context in each log entry when available:
 
 - `fetchPolicy` — the Apollo fetch policy for the operation (e.g., `cache-first`, `network-only`). Forwarded explicitly via operation context since Apollo consumes it before the link chain runs.
 - `cache` — Next.js Data Cache options (`revalidate`, `tags`) when configured via `api.query()`.
@@ -212,7 +212,7 @@ On the server side, every query hits the network because `registerApolloClient` 
 
 Next.js has its own route/fetch logger that writes directly via `process.stdout.write()` — not through `console.*`. There is no public API to redirect, format, or extend it.
 
-We intercept `process.stdout.write` in `instrumentation.ts` to capture this output and route it through pino. The patch strips ANSI escape codes, splits by newline, and logs each non-empty line at `debug` level under the `nextjs` module.
+We intercept `process.stdout.write` in `src/instrumentation.ts` to capture this output and route it through pino. The patch strips ANSI escape codes, splits by newline, and logs each non-empty line at `debug` level under the `nextjs` module.
 
 **Why this doesn't cause infinite loops:** Pino writes via SonicBoom (`fs.write(fd=1)`), which bypasses `process.stdout.write` entirely. The console is already overridden to use pino. The only remaining caller of `process.stdout.write` is Next.js itself.
 

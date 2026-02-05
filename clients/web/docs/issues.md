@@ -38,8 +38,8 @@ click. They should only reset the local pending state — the user must click "A
 
 **Affected files:**
 
-- `components/composed/toolbar/filters-panel.tsx`
-- `components/composed/toolbar/sort-panel.tsx`
+- `src/components/composed/toolbar/filters-panel.tsx`
+- `src/components/composed/toolbar/sort-panel.tsx`
 
 ---
 
@@ -53,7 +53,7 @@ both primary and secondary is nonsensical. The secondary selector should exclude
 
 **Affected file:**
 
-- `components/composed/toolbar/sort-panel.tsx`
+- `src/components/composed/toolbar/sort-panel.tsx`
 
 ---
 
@@ -66,14 +66,14 @@ When a user's auth token expires mid-session, server component GraphQL queries f
 boundaries, which showed a generic "Try again" error state. The dashboard layout only validates auth on initial load —
 layouts persist across client-side navigations, so the `me` query never re-runs.
 
-Fixed by wrapping `query()` and `mutate()` in try-catch in `api/gql/server.ts`. The `_query()` call throws
+Fixed by wrapping `query()` and `mutate()` in try-catch in `src/api/gql/server.ts`. The `_query()` call throws
 `CombinedGraphQLErrors` on GraphQL errors instead of returning them in `result.error`, so `throwIfAuthError` was never
 reached. The catch block now intercepts the thrown error and passes it to `throwIfAuthError`, which redirects to
 `/logout` on `AUTH_NOT_AUTHENTICATED`.
 
 **Affected files:**
 
-- `api/gql/server.ts`
+- `src/api/gql/server.ts`
 
 ---
 
@@ -102,8 +102,8 @@ cookie deletion, `notFound()` alone creates a redirect loop: the login page sees
 
 **Affected files:**
 
-- `proxy.ts`
-- `api/gql/server.ts`
+- `src/proxy.ts`
+- `src/api/gql/server.ts`
 
 ---
 
@@ -123,8 +123,8 @@ Two related problems with search params handling:
 
 **Affected files:**
 
-- `components/primitives/sidebar.tsx`
-- `components/composed/toolbar/` (all toolbar panels that read/write search params)
+- `src/components/primitives/sidebar.tsx`
+- `src/components/composed/toolbar/` (all toolbar panels that read/write search params)
 
 ---
 
@@ -143,8 +143,8 @@ children, so the directive has no architectural impact — `new Date()` runs on 
 
 **Affected files:**
 
-- `app/(dashboard)/@advertiser/profile/profile-card.tsx`
-- `app/(dashboard)/@spaceOwner/profile/profile-card.tsx`
+- `src/app/(dashboard)/@advertiser/profile/profile-card.tsx`
+- `src/app/(dashboard)/@spaceOwner/profile/profile-card.tsx`
 
 ---
 
@@ -165,11 +165,11 @@ segment labels (e.g., replacing a UUID with a space title). Applied to `@spaceOw
 
 **Affected files:**
 
-- `components/composed/breadcrumb-nav.tsx` (new)
-- `app/(dashboard)/content-header.tsx`
-- `app/(dashboard)/layout.tsx`
-- `app/(dashboard)/@spaceOwner/listings/[id]/header.tsx`
-- `app/(dashboard)/@advertiser/bookings/[id]/booking-details-wrapper.tsx`
+- `src/components/composed/breadcrumb-nav.tsx` (new)
+- `src/app/(dashboard)/content-header.tsx`
+- `src/app/(dashboard)/layout.tsx`
+- `src/app/(dashboard)/@spaceOwner/listings/[id]/header.tsx`
+- `src/app/(dashboard)/@advertiser/bookings/[id]/booking-details-wrapper.tsx`
 
 ---
 
@@ -191,7 +191,7 @@ Known upstream issue: [recharts#6716](https://github.com/recharts/recharts/issue
 
 **Affected file:**
 
-- `components/primitives/chart.tsx`
+- `src/components/primitives/chart.tsx`
 
 ---
 
@@ -204,7 +204,7 @@ Known upstream issue: [recharts#6716](https://github.com/recharts/recharts/issue
 caused four cascading failures:
 
 1. **Auth cookie deleted on dropdown open** — Next.js prefetched `/logout` when the dropdown opened, silently executing
-   the GET route handler (`app/(auth)/logout/route.ts`) which called the backend, deleted the auth cookie, and
+   the GET route handler (`src/app/(auth)/logout/route.ts`) which called the backend, deleted the auth cookie, and
    redirected to `/login`.
 2. **Dashboard routes 404 on hard navigation** — With the cookie already gone from prefetch, hard navigation (refresh,
    direct URL) to `/profile`, `/settings`, `/messages`, `/notifications` hit `proxy.ts` which rewrites cookieless
@@ -222,13 +222,13 @@ caused four cascading failures:
 - Inverted Radix nesting for remaining links: `<DropdownMenuItem asChild><Link>` instead of the reverse
 - Replaced outer `<button>` for switch profile with `onSelect` handler on `<DropdownMenuItem>`
 - Server action calls backend (best-effort), always deletes cookie, redirects to `/login`
-- Consolidated auth actions into `lib/auth.actions.ts` (`logout`, `switchProfile`)
-- Converted `app/(auth)/logout/route.ts` (GET handler) to `page.tsx` (client component calling `logout()` on mount) — eliminates CSRF/prefetch vulnerability
+- Consolidated auth actions into `src/lib/services/auth.actions.ts` (`logout`, `switchProfile`)
+- Converted `src/app/(auth)/logout/route.ts` (GET handler) to `page.tsx` (client component calling `logout()` on mount) — eliminates CSRF/prefetch vulnerability
 - Settings actions call `logout()` directly instead of `redirect("/logout")`
 
 **Affected files:**
 
-- `lib/auth.actions.ts`
-- `lib/auth.ts`
-- `app/(auth)/logout/page.tsx`
-- `app/(dashboard)/user-section.tsx`
+- `src/lib/services/auth.actions.ts`
+- `src/lib/services/auth.ts`
+- `src/app/(auth)/logout/page.tsx`
+- `src/app/(dashboard)/user-section.tsx`

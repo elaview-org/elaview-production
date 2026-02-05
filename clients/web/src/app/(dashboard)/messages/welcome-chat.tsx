@@ -1,6 +1,17 @@
-export function WelcomeChat() {
+import { cn } from "@/lib/utils";
+
+type Props = {
+  className?: string;
+};
+
+export function WelcomeChat({ className }: Props) {
   return (
-    <div className="bg-muted/30 hidden flex-1 flex-col items-center justify-center p-4 sm:flex sm:p-6 md:p-8">
+    <div
+      className={cn(
+        "bg-muted/30 flex-1 flex-col items-center justify-center p-4 sm:p-6 md:p-8",
+        className
+      )}
+    >
       <div className="flex w-full max-w-md flex-col items-center gap-4 text-center sm:gap-6">
         {/* Icon */}
         <div className="bg-primary/10 flex size-16 items-center justify-center rounded-full sm:size-20">

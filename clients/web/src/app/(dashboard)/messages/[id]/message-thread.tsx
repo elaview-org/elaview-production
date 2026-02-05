@@ -1,157 +1,134 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
-import { cn } from "@/lib/utils";
-import { Skeleton } from "@/components/primitives/skeleton";
-import { Button } from "@/components/primitives/button";
-import { MessageBubble } from "./message-bubble";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import MessageBubble from "./message-bubble";
 import { MessageComposer } from "./message-composer";
-import { ThreadHeader } from "./thread-header";
-import type {
-  Message,
-  MessageAttachment,
-  ThreadContext,
-} from "@/types/messages";
-import ConditionalRender from "@/components/composed/conditionally-render";
+import { markConversationRead, sendMessage } from "./actions";
+import { toast } from "sonner";
+import { BookingStatus, graphql, type ThreadDataQuery } from "@/types/gql";
+import api from "@/lib/gql/client";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/primitives/empty";
+import { MessageCircle } from "lucide-react";
 
-interface MessageThreadProps {
-  context: ThreadContext;
+type Conversation = NonNullable<
+  NonNullable<ThreadDataQuery["myConversations"]>["nodes"]
+>[number];
+
+type Message = NonNullable<
+  NonNullable<ThreadDataQuery["messagesByConversation"]>["nodes"]
+>[number];
+
+type Props = {
+  conversation: Conversation;
   messages: Message[];
   currentUserId: string;
-  isLoading?: boolean;
-  onSendMessage: (content: string, attachments?: MessageAttachment[]) => void;
-  onBack?: () => void;
-  showBackButton?: boolean;
-  disabled?: boolean;
-}
+  conversationId: string;
+};
 
-// ============================================
-// Loading Skeleton
-// ============================================
-
-function MessageThreadSkeleton() {
-  return (
-    <div className="flex h-full flex-col">
-      <div className="border-b p-4">
-        <Skeleton className="h-6 w-48" />
-        <Skeleton className="mt-2 h-4 w-32" />
-      </div>
-      <div className="flex-1 space-y-4 p-4">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div
-            key={i}
-            className={cn(
-              "flex gap-2",
-              i % 2 === 0 ? "flex-row-reverse" : "flex-row"
-            )}
-          >
-            <Skeleton className="size-8 rounded-full" />
-            <Skeleton className="h-16 w-48 rounded-2xl" />
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+const OnMessageSubscription = graphql(`
+  subscription OnMessage($conversationId: ID!) {
+    onMessage(conversationId: $conversationId) {
+      id
+      content
+      type
+      attachments
+      createdAt
+      senderUser {
+        id
+        name
+        avatar
+      }
+    }
+  }
+`);
 
 function EmptyState() {
   return (
-    <div className="flex h-full flex-col items-center justify-center p-8">
-      <div className="text-center">
-        <div className="bg-muted mx-auto mb-4 flex size-16 items-center justify-center rounded-full">
-          <svg
-            className="text-muted-foreground size-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-            />
-          </svg>
-        </div>
-        <h3 className="text-foreground text-sm font-semibold">
-          No messages yet
-        </h3>
-        <p className="text-muted-foreground mt-1 text-xs">
+    <Empty className="border-none">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <MessageCircle />
+        </EmptyMedia>
+        <EmptyTitle>No messages yet</EmptyTitle>
+        <EmptyDescription>
           Start the conversation by sending a message
-        </p>
-      </div>
-    </div>
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
   );
 }
 
-// ============================================
-// Error State
-// ============================================
-
-export function ErrorState({ onRetry }: { onRetry?: () => void }) {
-  return (
-    <div className="flex h-full flex-col items-center justify-center p-8">
-      <div className="text-center">
-        <div className="bg-destructive/10 mx-auto mb-4 flex size-16 items-center justify-center rounded-full">
-          <svg
-            className="text-destructive size-8"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-        </div>
-        <h3 className="text-foreground text-sm font-semibold">
-          Failed to load messages
-        </h3>
-        <p className="text-muted-foreground mt-1 text-xs">
-          There was an error loading the conversation
-        </p>
-        {onRetry && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={onRetry}
-            className="mt-4"
-          >
-            Try again
-          </Button>
-        )}
-      </div>
-    </div>
-  );
-}
-
-export function MessageThread({
-  context,
-  messages,
+export default function MessageThread({
+  conversation,
+  messages: initialMessages,
   currentUserId,
-  isLoading = false,
-  onSendMessage,
-  onBack,
-  showBackButton = false,
-  disabled = false,
-}: MessageThreadProps) {
+  conversationId,
+}: Props) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [isPending, startTransition] = useTransition();
+  const [liveMessages, setLiveMessages] = useState<{
+    conversationId: string;
+    messages: Message[];
+  }>({ conversationId, messages: [] });
 
-  // Auto-scroll to bottom when new messages arrive
+  const bookingStatus = conversation.booking?.status;
+  const isArchived =
+    bookingStatus === BookingStatus.Completed ||
+    bookingStatus === BookingStatus.Cancelled;
+
+  api.useSubscription(OnMessageSubscription, {
+    variables: { conversationId },
+    skip: isArchived,
+    onData: ({ data }) => {
+      const newMessage = data.data?.onMessage;
+      if (newMessage) {
+        setLiveMessages((prev) => {
+          if (prev.conversationId !== conversationId) {
+            return { conversationId, messages: [newMessage as Message] };
+          }
+          if (prev.messages.some((m) => m.id === newMessage.id)) return prev;
+          return {
+            conversationId,
+            messages: [...prev.messages, newMessage as Message],
+          };
+        });
+      }
+    },
+  });
+
+  const messages = useMemo(() => {
+    const currentLiveMessages =
+      liveMessages.conversationId === conversationId
+        ? liveMessages.messages
+        : [];
+    const allMessages = [...initialMessages, ...currentLiveMessages];
+    const seen = new Set<string>();
+    return allMessages.filter((m) => {
+      if (seen.has(m.id)) return false;
+      seen.add(m.id);
+      return true;
+    });
+  }, [initialMessages, liveMessages, conversationId]);
+
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages.length]);
-  console.log("currentUserId", currentUserId);
-  // Determine if booking is archived/closed
-  const isArchived = ["COMPLETED", "CANCELLED"].includes(context.bookingStatus);
 
-  // Group messages by date for better organization
+  useEffect(() => {
+    startTransition(async () => {
+      await markConversationRead(conversationId);
+    });
+  }, [conversationId]);
+
   const groupedMessages = useMemo(() => {
     const groups: { date: string; messages: Message[] }[] = [];
     let currentDate = "";
@@ -159,11 +136,7 @@ export function MessageThread({
     messages.forEach((message) => {
       const messageDate = new Date(message.createdAt).toLocaleDateString(
         "en-US",
-        {
-          month: "long",
-          day: "numeric",
-          year: "numeric",
-        }
+        { month: "long", day: "numeric", year: "numeric" }
       );
 
       if (messageDate !== currentDate) {
@@ -177,84 +150,88 @@ export function MessageThread({
     return groups;
   }, [messages]);
 
+  const handleSendMessage = async (content: string, attachments?: string[]) => {
+    startTransition(async () => {
+      const result = await sendMessage(conversationId, content, attachments);
+      if (!result.success) {
+        toast.error(result.message || "Failed to send message");
+      }
+    });
+  };
+
+  const shouldShowAvatar = (
+    message: Message,
+    prevMessage: Message | null
+  ): boolean => {
+    if (!prevMessage) return true;
+
+    if (prevMessage.senderUser?.id !== message.senderUser?.id) return true;
+
+    const timeDiff =
+      new Date(message.createdAt).getTime() -
+      new Date(prevMessage.createdAt).getTime();
+    return timeDiff > 5 * 60 * 1000;
+  };
+
   return (
-    <div className="flex h-full flex-col">
-      <ConditionalRender
-        condition={isLoading}
-        show={<MessageThreadSkeleton />}
-        elseShow={
-          <>
-            <ThreadHeader
-              context={context}
-              onBack={onBack}
-              showBackButton={showBackButton}
-            />
+    <>
+      <div
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto"
+        role="log"
+        aria-label="Message thread"
+      >
+        {messages.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="py-4">
+            {groupedMessages.map((group, groupIndex) => (
+              <div key={group.date}>
+                {groupIndex > 0 && (
+                  <div className="flex items-center gap-4 px-4 py-2">
+                    <div className="bg-border h-px flex-1" />
+                    <span className="text-muted-foreground text-xs font-medium">
+                      {group.date}
+                    </span>
+                    <div className="bg-border h-px flex-1" />
+                  </div>
+                )}
 
-            {/* Messages area */}
-            <div
-              ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto"
-              role="log"
-              aria-label="Message thread"
-            >
-              {messages.length === 0 ? (
-                <EmptyState />
-              ) : (
-                <div className="py-4">
-                  {groupedMessages.map((group, groupIndex) => (
-                    <div key={group.date}>
-                      {/* Date separator */}
-                      {groupIndex > 0 && (
-                        <div className="flex items-center gap-4 px-4 py-2">
-                          <div className="bg-border h-px flex-1" />
-                          <span className="text-muted-foreground text-xs font-medium">
-                            {group.date}
-                          </span>
-                          <div className="bg-border h-px flex-1" />
-                        </div>
-                      )}
+                {group.messages.map((message, index) => {
+                  const prevMessage =
+                    index > 0 ? group.messages[index - 1] : null;
+                  const showAvatar = shouldShowAvatar(
+                    message,
+                    prevMessage ?? null
+                  );
+                  const isCurrentUser =
+                    message.senderUser?.id === currentUserId;
 
-                      {/* Messages in this group */}
-                      {group.messages.map((message, index) => {
-                        const prevMessage =
-                          index > 0 ? group.messages[index - 1] : null;
-                        const showAvatar =
-                          prevMessage === null ||
-                          prevMessage.sender !== message.sender ||
-                          new Date(message.createdAt).getTime() -
-                            new Date(prevMessage.createdAt).getTime() >
-                            5 * 60 * 1000; // 5 minutes
+                  return (
+                    <MessageBubble
+                      key={message.id}
+                      message={message}
+                      isCurrentUser={isCurrentUser}
+                      showAvatar={showAvatar}
+                    />
+                  );
+                })}
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+        )}
+      </div>
 
-                        const isCurrentUser = message.sender === "ADVERTISER"; // In real app, check against current user
-
-                        return (
-                          <MessageBubble
-                            key={message.id}
-                            message={message}
-                            isCurrentUser={isCurrentUser}
-                            showAvatar={showAvatar}
-                          />
-                        );
-                      })}
-                    </div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
-              )}
-            </div>
-
-            <MessageComposer
-              onSend={onSendMessage}
-              disabled={disabled || isArchived}
-              placeholder={
-                isArchived
-                  ? "This booking is closed. Messaging is disabled."
-                  : "Type a message..."
-              }
-            />
-          </>
+      <MessageComposer
+        onSend={handleSendMessage}
+        disabled={isPending || isArchived}
+        placeholder={
+          isArchived
+            ? "This booking is closed. Messaging is disabled."
+            : "Type a message..."
         }
       />
-    </div>
+    </>
   );
 }

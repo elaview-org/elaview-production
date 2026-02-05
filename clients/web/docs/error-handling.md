@@ -22,7 +22,7 @@ Component: `<Toaster>` from `@/components/primitives/sonner` (shadcn/ui wrapper 
 
 API: `toast.error()`, `toast.success()`, `toast.warning()` from `sonner`
 
-**Prerequisite:** `<Toaster>` must be mounted in the root layout (`app/layout.tsx`). It is not yet mounted — add it when implementing toast-based error handling.
+**Prerequisite:** `<Toaster>` must be mounted in the root layout (`src/app/layout.tsx`). It is not yet mounted — add it when implementing toast-based error handling.
 
 ### Server Actions
 
@@ -155,16 +155,16 @@ export default function GlobalError({ reset }: Props) {
 ### Boundary Hierarchy
 
 ```
-global-error.tsx ─────────────── Root layout failures (last resort)
+src/app/global-error.tsx ─────────────── Root layout failures (last resort)
     │
-app/error.tsx ────────────────── (auth), (home), (public) pages
+src/app/error.tsx ────────────────────── (auth), (home), (public) pages
     │
-(dashboard)/error.tsx ────────── Dashboard layout failures
+src/app/(dashboard)/error.tsx ────────── Dashboard layout failures
     │
-├── @admin/error.tsx ─────────── Admin slot isolation
-├── @advertiser/error.tsx ────── Advertiser slot isolation
-├── @marketing/error.tsx ─────── Marketing slot isolation
-└── @spaceOwner/error.tsx ────── SpaceOwner slot isolation
+├── @admin/error.tsx ─────────────────── Admin slot isolation
+├── @advertiser/error.tsx ────────────── Advertiser slot isolation
+├── @marketing/error.tsx ─────────────── Marketing slot isolation
+└── @spaceOwner/error.tsx ────────────── SpaceOwner slot isolation
 ```
 
 ### Behavior

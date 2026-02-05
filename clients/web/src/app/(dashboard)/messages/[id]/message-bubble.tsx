@@ -1,24 +1,25 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback } from "@/components/primitives/avatar";
+import { cn, getInitials } from "@/lib/utils";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/primitives/avatar";
 import { Button } from "@/components/primitives/button";
-import type { Message, MessageAttachment } from "../../../../types/messages";
 import { DownloadIcon, FileIcon } from "lucide-react";
 import Image from "next/image";
-// ============================================
-// Types
-// ============================================
+import { MessageType, type ThreadDataQuery } from "@/types/gql";
 
-interface MessageBubbleProps {
+type Message = NonNullable<
+  NonNullable<ThreadDataQuery["messagesByConversation"]>["nodes"]
+>[number];
+
+type Props = {
   message: Message;
   isCurrentUser: boolean;
   showAvatar?: boolean;
-}
-
-// ============================================
-// Helpers
-// ============================================
+};
 
 function formatTime(dateString: string): string {
   const date = new Date(dateString);
@@ -36,27 +37,33 @@ function formatTime(dateString: string): string {
   return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+function getFileNameFromUrl(url: string): string {
+  try {
+    const pathname = new URL(url).pathname;
+    const fileName = pathname.split("/").pop() || "file";
+    return decodeURIComponent(fileName);
+  } catch {
+    return url.split("/").pop() || "file";
+  }
 }
 
-// ============================================
-// Attachment Component
-// ============================================
+function isImageUrl(url: string): boolean {
+  const imageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"];
+  const lowerUrl = url.toLowerCase();
+  return imageExtensions.some((ext) => lowerUrl.includes(ext));
+}
 
-function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
-  // const FileIcon = getFileIcon(attachment.mimeType);
-  const isImage = attachment.mimeType.startsWith("image/");
+function AttachmentPreview({ url }: { url: string }) {
+  const fileName = getFileNameFromUrl(url);
+  const isImage = isImageUrl(url);
 
   return (
     <div className="group bg-muted/50 relative mt-2 overflow-hidden rounded-lg border">
-      {isImage && attachment.thumbnailUrl ? (
-        <div className="relative aspect-video w-full">
+      {isImage ? (
+        <div className="relative aspect-video w-full max-w-xs">
           <Image
-            src={attachment.thumbnailUrl}
-            alt={attachment.fileName}
+            src={url}
+            alt={fileName}
             fill
             className="h-full w-full object-cover"
           />
@@ -68,12 +75,7 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
             <FileIcon className="text-muted-foreground size-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">
-              {attachment.fileName}
-            </p>
-            <p className="text-muted-foreground text-xs">
-              {formatFileSize(attachment.fileSize)}
-            </p>
+            <p className="truncate text-sm font-medium">{fileName}</p>
           </div>
         </div>
       )}
@@ -82,11 +84,8 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
           size="icon-sm"
           variant="secondary"
           className="h-7 w-7"
-          onClick={() => {
-            // In real implementation, this would download the file
-            window.open(attachment.fileUrl, "_blank");
-          }}
-          aria-label={`Download ${attachment.fileName}`}
+          onClick={() => window.open(url, "_blank")}
+          aria-label={`Download ${fileName}`}
         >
           <DownloadIcon className="size-3.5" />
         </Button>
@@ -95,22 +94,14 @@ function AttachmentPreview({ attachment }: { attachment: MessageAttachment }) {
   );
 }
 
-// ============================================
-// Component
-// ============================================
-
-export function MessageBubble({
+export default function MessageBubble({
   message,
   isCurrentUser,
   showAvatar = true,
-}: MessageBubbleProps) {
-  const isSystem = message.sender === "SYSTEM";
-  const senderInitials =
-    message.sender === "ADVERTISER"
-      ? "AD"
-      : message.sender === "SPACE_OWNER"
-        ? "SO"
-        : "";
+}: Props) {
+  const isSystem = message.type === MessageType.System;
+  const senderName = message.senderUser?.name ?? "Unknown";
+  const senderAvatar = message.senderUser?.avatar;
 
   if (isSystem) {
     return (
@@ -132,7 +123,10 @@ export function MessageBubble({
     >
       {showAvatar && (
         <Avatar className="size-8 shrink-0">
-          <AvatarFallback className="text-xs">{senderInitials}</AvatarFallback>
+          {senderAvatar && <AvatarImage src={senderAvatar} alt={senderName} />}
+          <AvatarFallback className="text-xs">
+            {getInitials(senderName)}
+          </AvatarFallback>
         </Avatar>
       )}
       {!showAvatar && <div className="w-8 shrink-0" />}
@@ -157,11 +151,8 @@ export function MessageBubble({
 
           {message.attachments && message.attachments.length > 0 && (
             <div className="mt-2 space-y-2">
-              {message.attachments.map((attachment) => (
-                <AttachmentPreview
-                  key={attachment.id}
-                  attachment={attachment}
-                />
+              {message.attachments.map((url, index) => (
+                <AttachmentPreview key={index} url={url} />
               ))}
             </div>
           )}
@@ -175,11 +166,6 @@ export function MessageBubble({
           >
             {formatTime(message.createdAt)}
           </time>
-          {isCurrentUser && message.readAt && (
-            <span className="text-muted-foreground text-xs" title="Read">
-              ✓
-            </span>
-          )}
         </div>
       </div>
     </div>

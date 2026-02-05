@@ -17,7 +17,7 @@ Users switch profiles via the sidebar profile switcher, which calls `switchProfi
 ### Route Structure
 
 ```
-app/(dashboard)/
+src/app/(dashboard)/
 ├── @spaceOwner/
 │   ├── overview/           # Dashboard landing
 │   ├── listings/           # Space management
@@ -27,11 +27,7 @@ app/(dashboard)/
 │   ├── earnings/           # Financial dashboard
 │   │   └── payouts/        # Payout history
 │   ├── analytics/          # Performance insights
-│   ├── calendar/           # Availability calendar
-│   ├── messages/           # Conversations
-│   │   └── [id]/           # Thread detail
-│   ├── profile/            # Public profile
-│   └── settings/           # Account settings
+│   └── calendar/           # Availability calendar
 │
 ├── @advertiser/
 │   ├── overview/           # Dashboard landing
@@ -43,11 +39,13 @@ app/(dashboard)/
 │   ├── bookings/           # Booking management
 │   │   └── [id]/           # Booking detail
 │   ├── spending/           # Financial dashboard
-│   ├── analytics/          # Campaign insights
-│   ├── messages/           # Conversations
-│   │   └── [id]/           # Thread detail
-│   ├── profile/            # Public profile
-│   └── settings/           # Account settings
+│   └── analytics/          # Campaign insights
+│
+├── messages/           # Conversations
+│   └── [id]/           # Thread detail
+├── notifications/      # Notifications
+├── profile/            # Public profile
+└── settings/           # Account settings
 ```
 
 ### Navigation Configuration

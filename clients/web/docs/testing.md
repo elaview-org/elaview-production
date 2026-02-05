@@ -19,7 +19,7 @@ ev web:coverage
 
 ### Writing a first test
 
-Create `lib/utils.test.ts`:
+Create `src/lib/utils.test.ts`:
 
 ```ts
 import { cn } from "./utils";
@@ -38,7 +38,7 @@ describe("cn", () => {
 Run it:
 
 ```bash
-bun test lib/utils.test.ts
+bun test src/lib/utils.test.ts
 ```
 
 ---
@@ -57,12 +57,12 @@ bun test lib/utils.test.ts
 
 ```
 # Co-located unit tests (next to source)
-lib/utils.test.ts
-hooks/use-mobile.test.ts
-components/composed/toolbar/sort-panel.test.tsx
+src/lib/utils.test.ts
+src/lib/hooks/use-mobile.test.ts
+src/components/composed/toolbar/sort-panel.test.tsx
 
 # Centralized test infrastructure + non-unit tests
-test/
+src/tests/
 ├── utils/
 │   ├── index.tsx              # Custom render, re-exports (screen, userEvent, asMock)
 │   ├── setup.ts               # Preload: jest-dom matchers, happy-dom, browser mocks
@@ -79,9 +79,9 @@ test/
 
 **Where each test type lives:**
 - **Unit tests**: co-located with source (`*.test.ts` next to `*.ts`)
-- **Issue regression tests**: `test/issues/` — one file per bug/issue
-- **Integration tests**: `test/integration/` — multi-component or cross-module
-- **Snapshot tests**: `test/snapshots/` — UI snapshot comparisons
+- **Issue regression tests**: `src/tests/issues/` — one file per bug/issue
+- **Integration tests**: `src/tests/integration/` — multi-component or cross-module
+- **Snapshot tests**: `src/tests/snapshots/` — UI snapshot comparisons
 
 ### Configuration
 
@@ -89,7 +89,7 @@ test/
 
 ```toml
 [test]
-preload = ["./test/utils/setup.ts"]
+preload = ["./src/tests/utils/setup.ts"]
 
 [test.coverage]
 skipTestFiles = true
@@ -109,7 +109,7 @@ Bun test auto-discovers `*.test.{ts,tsx}` files. No include/exclude config neede
 
 ### Issue-Driven Development for Bugs
 
-1. Reproduce the bug with a failing test in `test/issues/`
+1. Reproduce the bug with a failing test in `src/tests/issues/`
 2. Fix the code to make the test pass
 3. Test stays as a permanent regression guard
 
@@ -147,7 +147,7 @@ it("persists value", () => {
 ### Component tests
 
 ```tsx
-import { render, screen, userEvent } from "@/test/utils";
+import { render, screen, userEvent } from "@/tests/utils";
 import MyComponent from "./my-component";
 
 it("handles click", async () => {
@@ -210,7 +210,7 @@ spy.mockReturnValue("mocked");
 For functions mocked via `mock.module()` in setup (e.g., `next/navigation`), use `asMock` to access mock methods:
 
 ```tsx
-import { asMock } from "@/test/utils";
+import { asMock } from "@/tests/utils";
 import { useRouter } from "next/navigation";
 
 it("navigates on submit", async () => {
@@ -224,10 +224,10 @@ it("navigates on submit", async () => {
 
 ### next/navigation
 
-Auto-mocked globally via `test/utils/setup.ts`. Override per-test with `asMock`:
+Auto-mocked globally via `src/tests/utils/setup.ts`. Override per-test with `asMock`:
 
 ```tsx
-import { asMock } from "@/test/utils";
+import { asMock } from "@/tests/utils";
 import { useSearchParams } from "next/navigation";
 
 asMock(useSearchParams).mockReturnValue(new URLSearchParams({ page: "2" }));
@@ -236,7 +236,7 @@ asMock(useSearchParams).mockReturnValue(new URLSearchParams({ page: "2" }));
 Or use the custom render's `navigation` option:
 
 ```tsx
-import { render } from "@/test/utils";
+import { render } from "@/tests/utils";
 
 render(<MyComponent />, {
   navigation: {
@@ -280,7 +280,7 @@ it("disables submit when empty", async () => {
 
 ### Custom render
 
-The `render` from `@/test/utils` wraps Testing Library's render with navigation mock support. Always import from `@/test/utils` instead of `@testing-library/react`.
+The `render` from `@/tests/utils` wraps Testing Library's render with navigation mock support. Always import from `@/tests/utils` instead of `@testing-library/react`.
 
 ### Testing toolbar components
 
@@ -308,20 +308,20 @@ it("applies sort", async () => {
 
 | Target | Type | Rationale |
 |--------|------|-----------|
-| `lib/utils.ts` | Unit | Pure functions, highest ROI |
-| `hooks/*` | Hook | Stateful logic, easy to test |
-| `components/composed/toolbar/*` | Component | Complex interactions, business logic |
-| `test/issues/*` | Regression | Documents known issues, prevents regressions |
+| `src/lib/utils.ts` | Unit | Pure functions, highest ROI |
+| `src/lib/hooks/*` | Hook | Stateful logic, easy to test |
+| `src/components/composed/toolbar/*` | Component | Complex interactions, business logic |
+| `src/tests/issues/*` | Regression | Documents known issues, prevents regressions |
 
 ### Skip
 
 | Target | Rationale |
 |--------|-----------|
-| `components/primitives/*` | Thin shadcn/ui wrappers, tested upstream |
-| `types/gql/*` | Generated code |
-| `lib/constants.ts`, `app/**/constants.ts` | Static data, no logic |
-| `app/**/page.tsx` | Server components require full Next.js runtime |
-| `app/**/loading.tsx`, `app/**/placeholder.tsx` | Skeleton UI, no logic |
+| `src/components/primitives/*` | Thin shadcn/ui wrappers, tested upstream |
+| `src/types/gql/*` | Generated code |
+| `src/lib/constants.ts`, `src/app/**/constants.ts` | Static data, no logic |
+| `src/app/**/page.tsx` | Server components require full Next.js runtime |
+| `src/app/**/loading.tsx`, `src/app/**/placeholder.tsx` | Skeleton UI, no logic |
 
 ---
 
@@ -358,11 +358,11 @@ All steps must pass for the PR to merge.
 
 ### `ReferenceError: ResizeObserver is not defined`
 
-Handled in `test/utils/setup.ts`. If a new Radix component triggers this, verify the stub is loaded.
+Handled in `src/tests/utils/setup.ts`. If a new Radix component triggers this, verify the stub is loaded.
 
 ### `window.matchMedia is not a function`
 
-Handled in `test/utils/setup.ts`. Ensure tests import from `@/test/utils` which loads the setup.
+Handled in `src/tests/utils/setup.ts`. Ensure tests import from `@/tests/utils` which loads the setup.
 
 ### Radix Select not opening in happy-dom
 
@@ -374,7 +374,7 @@ happy-dom doesn't fully implement pointer events. Radix Select may not open via 
 
 ### `Cannot find module 'next/navigation'`
 
-Ensure `test/utils/setup.ts` includes the `mock.module("next/navigation", ...)` call. This is handled globally via preload.
+Ensure `src/tests/utils/setup.ts` includes the `mock.module("next/navigation", ...)` call. This is handled globally via preload.
 
 ### Tests hang or timeout
 
@@ -382,4 +382,4 @@ Check for unresolved promises or missing mock implementations. Radix portals can
 
 ### TypeScript doesn't recognize jest-dom matchers
 
-Ensure `test/utils/jest-dom.d.ts` exists and is included in `tsconfig.json`. This file augments `bun:test`'s `Matchers` interface with jest-dom matchers.
+Ensure `src/tests/utils/jest-dom.d.ts` exists and is included in `tsconfig.json`. This file augments `bun:test`'s `Matchers` interface with jest-dom matchers.

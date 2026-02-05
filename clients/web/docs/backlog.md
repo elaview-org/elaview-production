@@ -4,7 +4,7 @@
 
 **Date:** 2026-01-27 | **Status:** In Progress
 
-Centralized storage keys in `lib/storage-keys.ts` for consistent localStorage and cookie naming.
+Centralized storage keys in `src/lib/storage-keys.ts` for consistent localStorage and cookie naming.
 
 **Pattern:**
 
@@ -20,7 +20,7 @@ useLocalStorage(storageKey.preferences.theme, defaultValue);
 
 **Tasks:**
 
-- [x] Create `lib/storage-keys.ts` with centralized key definitions
+- [x] Create `src/lib/storage-keys.ts` with centralized key definitions
 - [x] Migrate `listings.view` cookie to use `storageKey`
 - [x] Migrate sidebar open state to use `storageKey` (read + write)
 - [x] Migrate theme preference to use `storageKey`
@@ -56,7 +56,7 @@ Implement `proxy.ts` (Next.js 16) for cross-cutting concerns at the network boun
 
 Highlight active navigation item and disable redundant navigation (e.g., clicking /bookings while on /bookings).
 
-**Location:** `app/(dashboard)/navigation-section.tsx`, `app/(dashboard)/user-section.tsx`
+**Location:** `src/app/(dashboard)/navigation-section.tsx`, `src/app/(dashboard)/user-section.tsx`
 
 **Tasks:**
 
@@ -72,10 +72,10 @@ Highlight active navigation item and disable redundant navigation (e.g., clickin
 
 **Date:** 2026-01-27 | **Status:** In Progress
 
-Extract reusable components from `@spaceOwner` to `components/composed/` for consistent UIs between SpaceOwner and
+Extract reusable components from `@spaceOwner` to `src/components/composed/` for consistent UIs between SpaceOwner and
 Advertiser dashboards.
 
-### Utility Functions (→ `lib/utils.ts`)
+### Utility Functions (→ `src/lib/utils.ts`)
 
 - [x] `formatCurrency(amount, options?)` - Currency display ($1,234)
 - [x] `formatDateRange(start, end)` - Date ranges (Jan 15 - Jan 20)
@@ -85,7 +85,7 @@ Advertiser dashboards.
 - [x] `formatDate(date, options?)` - Full date display (January 15, 2026)
 - [x] `calculateTrend(current, previous)` - Percentage change calculation
 
-### Shared Constants (→ `lib/constants.ts`)
+### Shared Constants (→ `src/lib/constants.ts`)
 
 - [x] `BOOKING_STATUS` - labels, variants, indicators
 - [x] `SPACE_STATUS` - labels, variants, indicators
@@ -123,20 +123,20 @@ The following files now use shared utilities and constants:
 
 ### High Priority Components
 
-- [x] **ProgressSteps** - Numbered workflow steps (`components/composed/progress-steps.tsx`)
-- [x] **ActionCard** - Avatar + info + actions (`components/composed/action-card.tsx`)
-- [x] **PerformerCard** - Icon + title + value badge (`components/composed/performer-card.tsx`)
-- [x] **TimeRangeSelector** - Responsive 90d/30d/7d toggle (`components/composed/time-range-selector.tsx`)
-- [x] **ComparisonTable** - Previous/current/change rows (`components/composed/comparison-table.tsx`)
-- [x] **SettingsSection** - Accordion with icon + description (`components/composed/settings-section.tsx`)
-- [x] **SectionCard** - Card header with count badge + "View All" link (`components/composed/section-card.tsx`)
+- [x] **ProgressSteps** - Numbered workflow steps (`src/components/composed/progress-steps.tsx`)
+- [x] **ActionCard** - Avatar + info + actions (`src/components/composed/action-card.tsx`)
+- [x] **PerformerCard** - Icon + title + value badge (`src/components/composed/performer-card.tsx`)
+- [x] **TimeRangeSelector** - Responsive 90d/30d/7d toggle (`src/components/composed/time-range-selector.tsx`)
+- [x] **ComparisonTable** - Previous/current/change rows (`src/components/composed/comparison-table.tsx`)
+- [x] **SettingsSection** - Accordion with icon + description (`src/components/composed/settings-section.tsx`)
+- [x] **SectionCard** - Card header with count badge + "View All" link (`src/components/composed/section-card.tsx`)
 
 ### Medium Priority Components
 
-- [x] **RankedCard** - Card with rank badge overlay (`components/composed/ranked-card.tsx`)
-- [x] **ReviewCard** - Star rating + comment + author (`components/composed/review-card.tsx`)
-- [x] **StarRating** - Star rating display primitive (`components/primitives/star-rating.tsx`)
-- [x] **ProfileCard** - Avatar + name + stats grid (`components/composed/profile-card.tsx`)
+- [x] **RankedCard** - Card with rank badge overlay (`src/components/composed/ranked-card.tsx`)
+- [x] **ReviewCard** - Star rating + comment + author (`src/components/composed/review-card.tsx`)
+- [x] **StarRating** - Star rating display primitive (`src/components/primitives/star-rating.tsx`)
+- [x] **ProfileCard** - Avatar + name + stats grid (`src/components/composed/profile-card.tsx`)
 
 ### Refactored @spaceOwner Files (Components)
 
@@ -163,25 +163,25 @@ Multiple @advertiser pages use mock data. Backend queries/mutations required bef
 `AdvertiserProfile` needs a `bookings` field (similar to `SpaceOwnerProfile.spaces`) to calculate total campaigns and total spend.
 
 **Files:**
-- `app/(dashboard)/@advertiser/profile/page.tsx`
-- `app/(dashboard)/@advertiser/profile/profile-card.tsx`
-- `app/(dashboard)/@advertiser/profile/about-section.tsx`
+- `src/app/(dashboard)/@advertiser/profile/page.tsx`
+- `src/app/(dashboard)/@advertiser/profile/profile-card.tsx`
+- `src/app/(dashboard)/@advertiser/profile/about-section.tsx`
 
 ### Advertiser Spending
 
 Requires `spendingSummary` query and `myPaymentsAsAdvertiser` paginated query.
 
 **Files:**
-- `app/(dashboard)/@advertiser/spending/page.tsx`
-- `app/(dashboard)/@advertiser/spending/spending-cards.tsx`
-- `app/(dashboard)/@advertiser/spending/payments-table.tsx`
+- `src/app/(dashboard)/@advertiser/spending/page.tsx`
+- `src/app/(dashboard)/@advertiser/spending/spending-cards.tsx`
+- `src/app/(dashboard)/@advertiser/spending/payments-table.tsx`
 
 ### Discover Favorites
 
 Allow advertisers to favorite spaces. Requires `toggleFavoriteSpace` mutation, `myFavoriteSpaces` query, and `Space.isFavorite` field.
 
 **Files:**
-- `app/(dashboard)/@advertiser/discover/space-card.tsx` - Add heart button
+- `src/app/(dashboard)/@advertiser/discover/space-card.tsx` - Add heart button
 - New route or section for favorites list
 
 ### Discover Backend Filtering
@@ -189,8 +189,8 @@ Allow advertisers to favorite spaces. Requires `toggleFavoriteSpace` mutation, `
 Replace client-side filtering with server-side. Requires `SpaceFilterInput`, `SpaceOrderInput`, and `availableSpaces` query with pagination.
 
 **Files:**
-- `app/(dashboard)/@advertiser/discover/page.tsx`
-- `app/(dashboard)/@advertiser/discover/filter-sheet.tsx`
+- `src/app/(dashboard)/@advertiser/discover/page.tsx`
+- `src/app/(dashboard)/@advertiser/discover/filter-sheet.tsx`
 
 ### Tasks
 
@@ -234,8 +234,8 @@ Replace `ToolbarPagination` (cursor-based prev/next) with an infinite scroll com
 - Map view: may keep manual pagination or load all results
 
 **Affected files:**
-- `components/composed/toolbar/index.tsx` — replace `<ToolbarPagination>` with infinite scroll
-- `components/composed/toolbar/pagination.tsx` — replace or remove
+- `src/components/composed/toolbar/index.tsx` — replace `<ToolbarPagination>` with infinite scroll
+- `src/components/composed/toolbar/pagination.tsx` — replace or remove
 
 **Tasks:**
 
@@ -259,7 +259,7 @@ Shared routes (spaces, messages, notifications, settings) render as direct `chil
 
 **Infrastructure (Phase 0):**
 
-- [x] Create `hooks/use-is-shared-route.ts` hook
+- [x] Create `src/lib/hooks/use-is-shared-route.ts` hook
 - [x] Convert `role-based-view.tsx` to client component with `children` prop and `useIsSharedRoute`
 - [x] Create `@{admin,advertiser,marketing,spaceOwner}/default.tsx` — return `null` for shared routes, `notFound()` otherwise
 

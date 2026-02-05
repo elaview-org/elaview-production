@@ -87,3 +87,14 @@ export const ADVERTISER_NOTIFICATIONS = [
   NotificationType.DisputeResolved,
   NotificationType.MessageReceived,
 ] as const;
+
+export const CARD_BRAND_NAMES: Record<string, string> = {
+  visa: "Visa",
+  mastercard: "Mastercard",
+  amex: "American Express",
+  discover: "Discover",
+  diners: "Diners Club",
+  jcb: "JCB",
+  unionpay: "UnionPay",
+  unknown: "Card",
+};

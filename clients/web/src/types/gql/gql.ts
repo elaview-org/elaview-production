@@ -65,16 +65,18 @@ type Documents = {
   "\n        query NotificationsPage {\n          me {\n            id\n          }\n          myNotifications(first: 20, order: [{ createdAt: DESC }]) {\n            nodes {\n              id\n              title\n              body\n              type\n              isRead\n              createdAt\n              readAt\n              entityId\n              entityType\n            }\n            pageInfo {\n              hasNextPage\n              endCursor\n            }\n          }\n          unreadNotificationsCount\n        }\n      ": typeof types.NotificationsPageDocument;
   "\n  fragment About_UserFragment on User {\n    name\n    activeProfileType\n    spaceOwnerProfile {\n      businessName\n      businessType\n      onboardingComplete\n      spaces(first: 10) {\n        nodes {\n          id\n        }\n      }\n    }\n    advertiserProfile {\n      companyName\n      industry\n      website\n      onboardingComplete\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          status\n        }\n      }\n    }\n  }\n": typeof types.About_UserFragmentFragmentDoc;
   "\n  fragment Activity_UserFragment on User {\n    name\n    activeProfileType\n    spaceOwnerProfile {\n      reviews(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n          rating\n          comment\n          createdAt\n          reviewer {\n            name\n            avatar\n            companyName\n          }\n        }\n      }\n    }\n    advertiserProfile {\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n          name\n          status\n          startDate\n          endDate\n          totalSpend\n          spacesCount\n        }\n      }\n    }\n  }\n": typeof types.Activity_UserFragmentFragmentDoc;
-  "\n  fragment Info_UserFragment on User {\n    name\n    avatar\n    activeProfileType\n    spaceOwnerProfile {\n      createdAt\n      spaces(first: 10) {\n        nodes {\n          averageRating\n        }\n      }\n      reviews(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n    advertiserProfile {\n      createdAt\n      totalSpend\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n  }\n": typeof types.Info_UserFragmentFragmentDoc;
+  "\n  fragment Info_UserFragment on User {\n    name\n    avatar\n    activeProfileType\n    spaceOwnerProfile {\n      createdAt\n      responseRate\n      averageResponseTime\n      spaces(first: 10) {\n        nodes {\n          averageRating\n        }\n      }\n      reviews(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n    advertiserProfile {\n      createdAt\n      totalSpend\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n  }\n": typeof types.Info_UserFragmentFragmentDoc;
   "\n        query Profile {\n          me {\n            id\n            name\n            ...ProfileLayout_UserFragment\n            ...Info_UserFragment\n            ...About_UserFragment\n            ...Activity_UserFragment\n          }\n        }\n      ": typeof types.ProfileDocument;
   "\n  fragment ProfileLayout_UserFragment on User {\n    role\n  }\n": typeof types.ProfileLayout_UserFragmentFragmentDoc;
   "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n": typeof types.RoleBasedView_UserFragmentFragmentDoc;
   "\n  fragment AccountSettings_UserFragment on User {\n    createdAt\n    lastLoginAt\n    activeProfileType\n  }\n": typeof types.AccountSettings_UserFragmentFragmentDoc;
   "\n  fragment BusinessSettings_UserFragment on User {\n    activeProfileType\n    spaceOwnerProfile {\n      businessName\n      businessType\n      payoutSchedule\n    }\n    advertiserProfile {\n      companyName\n      industry\n      website\n    }\n  }\n": typeof types.BusinessSettings_UserFragmentFragmentDoc;
   "\n  fragment NotificationSettings_UserFragment on User {\n    activeProfileType\n  }\n": typeof types.NotificationSettings_UserFragmentFragmentDoc;
+  "\n  fragment PaymentSettings_UserFragment on User {\n    activeProfileType\n  }\n": typeof types.PaymentSettings_UserFragmentFragmentDoc;
   "\n  fragment PayoutSettings_UserFragment on User {\n    activeProfileType\n    spaceOwnerProfile {\n      stripeAccountId\n      stripeAccountStatus\n    }\n  }\n": typeof types.PayoutSettings_UserFragmentFragmentDoc;
   "\n  fragment ProfileSettings_UserFragment on User {\n    name\n    email\n    phone\n    avatar\n    activeProfileType\n  }\n": typeof types.ProfileSettings_UserFragmentFragmentDoc;
   "\n        query Settings {\n          me {\n            id\n            email\n            name\n            avatar\n            phone\n            createdAt\n            lastLoginAt\n            activeProfileType\n            ...SettingsLayout_UserFragment\n            ...ProfileSettings_UserFragment\n            ...BusinessSettings_UserFragment\n            ...PayoutSettings_UserFragment\n            ...AccountSettings_UserFragment\n          }\n          myNotificationPreferences {\n            id\n            notificationType\n            inAppEnabled\n            emailEnabled\n            pushEnabled\n          }\n        }\n      ": typeof types.SettingsDocument;
+  "\n      query GetSavedPaymentMethods {\n        mySavedPaymentMethods {\n          id\n          brand\n          last4\n          expMonth\n          expYear\n          isDefault\n          createdAt\n        }\n      }\n    ": typeof types.GetSavedPaymentMethodsDocument;
   "\n  fragment SettingsLayout_UserFragment on User {\n    role\n  }\n": typeof types.SettingsLayout_UserFragmentFragmentDoc;
   "\n      query GetCurrentUserForSettings {\n        me {\n          id\n          avatar\n          spaceOwnerProfile {\n            id\n          }\n          advertiserProfile {\n            id\n          }\n        }\n      }\n    ": typeof types.GetCurrentUserForSettingsDocument;
   "\n        mutation UpdateUserProfile($input: UpdateCurrentUserInput!) {\n          updateCurrentUser(input: $input) {\n            user {\n              id\n            }\n          }\n        }\n      ": typeof types.UpdateUserProfileDocument;
@@ -87,6 +89,10 @@ type Documents = {
   "\n        mutation DeleteMyAccount($input: DeleteMyAccountInput!) {\n          deleteMyAccount(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.DeleteMyAccountDocument;
   "\n        mutation UpdateUserAvatar($input: UpdateCurrentUserInput!) {\n          updateCurrentUser(input: $input) {\n            user {\n              id\n              avatar\n            }\n          }\n        }\n      ": typeof types.UpdateUserAvatarDocument;
   "\n        mutation ChangePassword($input: ChangePasswordInput!) {\n          changePassword(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.ChangePasswordDocument;
+  "\n        mutation CreateSetupIntent {\n          createSetupIntent {\n            clientSecret\n            setupIntentId\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.CreateSetupIntentDocument;
+  "\n        mutation ConfirmSetupIntent($input: ConfirmSetupIntentInput!) {\n          confirmSetupIntent(input: $input) {\n            paymentMethod {\n              id\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.ConfirmSetupIntentDocument;
+  "\n        mutation SetDefaultPaymentMethod(\n          $input: SetDefaultPaymentMethodInput!\n        ) {\n          setDefaultPaymentMethod(input: $input) {\n            paymentMethod {\n              id\n              isDefault\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.SetDefaultPaymentMethodDocument;
+  "\n        mutation DeletePaymentMethod($input: DeletePaymentMethodInput!) {\n          deletePaymentMethod(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.DeletePaymentMethodDocument;
   "\n  fragment Gallery_SharedSpaceFragment on Space {\n    title\n    images\n  }\n": typeof types.Gallery_SharedSpaceFragmentFragmentDoc;
   "\n  fragment Header_SharedSpaceFragment on Space {\n    title\n    status\n    type\n  }\n": typeof types.Header_SharedSpaceFragmentFragmentDoc;
   "\n  fragment OwnerCard_SpaceFragment on Space {\n    spaceOwnerProfile {\n      businessName\n      user {\n        name\n        avatar\n      }\n    }\n  }\n": typeof types.OwnerCard_SpaceFragmentFragmentDoc;
@@ -199,7 +205,7 @@ const documents: Documents = {
     types.About_UserFragmentFragmentDoc,
   "\n  fragment Activity_UserFragment on User {\n    name\n    activeProfileType\n    spaceOwnerProfile {\n      reviews(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n          rating\n          comment\n          createdAt\n          reviewer {\n            name\n            avatar\n            companyName\n          }\n        }\n      }\n    }\n    advertiserProfile {\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n          name\n          status\n          startDate\n          endDate\n          totalSpend\n          spacesCount\n        }\n      }\n    }\n  }\n":
     types.Activity_UserFragmentFragmentDoc,
-  "\n  fragment Info_UserFragment on User {\n    name\n    avatar\n    activeProfileType\n    spaceOwnerProfile {\n      createdAt\n      spaces(first: 10) {\n        nodes {\n          averageRating\n        }\n      }\n      reviews(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n    advertiserProfile {\n      createdAt\n      totalSpend\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n  }\n":
+  "\n  fragment Info_UserFragment on User {\n    name\n    avatar\n    activeProfileType\n    spaceOwnerProfile {\n      createdAt\n      responseRate\n      averageResponseTime\n      spaces(first: 10) {\n        nodes {\n          averageRating\n        }\n      }\n      reviews(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n    advertiserProfile {\n      createdAt\n      totalSpend\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n  }\n":
     types.Info_UserFragmentFragmentDoc,
   "\n        query Profile {\n          me {\n            id\n            name\n            ...ProfileLayout_UserFragment\n            ...Info_UserFragment\n            ...About_UserFragment\n            ...Activity_UserFragment\n          }\n        }\n      ":
     types.ProfileDocument,
@@ -213,12 +219,16 @@ const documents: Documents = {
     types.BusinessSettings_UserFragmentFragmentDoc,
   "\n  fragment NotificationSettings_UserFragment on User {\n    activeProfileType\n  }\n":
     types.NotificationSettings_UserFragmentFragmentDoc,
+  "\n  fragment PaymentSettings_UserFragment on User {\n    activeProfileType\n  }\n":
+    types.PaymentSettings_UserFragmentFragmentDoc,
   "\n  fragment PayoutSettings_UserFragment on User {\n    activeProfileType\n    spaceOwnerProfile {\n      stripeAccountId\n      stripeAccountStatus\n    }\n  }\n":
     types.PayoutSettings_UserFragmentFragmentDoc,
   "\n  fragment ProfileSettings_UserFragment on User {\n    name\n    email\n    phone\n    avatar\n    activeProfileType\n  }\n":
     types.ProfileSettings_UserFragmentFragmentDoc,
   "\n        query Settings {\n          me {\n            id\n            email\n            name\n            avatar\n            phone\n            createdAt\n            lastLoginAt\n            activeProfileType\n            ...SettingsLayout_UserFragment\n            ...ProfileSettings_UserFragment\n            ...BusinessSettings_UserFragment\n            ...PayoutSettings_UserFragment\n            ...AccountSettings_UserFragment\n          }\n          myNotificationPreferences {\n            id\n            notificationType\n            inAppEnabled\n            emailEnabled\n            pushEnabled\n          }\n        }\n      ":
     types.SettingsDocument,
+  "\n      query GetSavedPaymentMethods {\n        mySavedPaymentMethods {\n          id\n          brand\n          last4\n          expMonth\n          expYear\n          isDefault\n          createdAt\n        }\n      }\n    ":
+    types.GetSavedPaymentMethodsDocument,
   "\n  fragment SettingsLayout_UserFragment on User {\n    role\n  }\n":
     types.SettingsLayout_UserFragmentFragmentDoc,
   "\n      query GetCurrentUserForSettings {\n        me {\n          id\n          avatar\n          spaceOwnerProfile {\n            id\n          }\n          advertiserProfile {\n            id\n          }\n        }\n      }\n    ":
@@ -243,6 +253,14 @@ const documents: Documents = {
     types.UpdateUserAvatarDocument,
   "\n        mutation ChangePassword($input: ChangePasswordInput!) {\n          changePassword(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ":
     types.ChangePasswordDocument,
+  "\n        mutation CreateSetupIntent {\n          createSetupIntent {\n            clientSecret\n            setupIntentId\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ":
+    types.CreateSetupIntentDocument,
+  "\n        mutation ConfirmSetupIntent($input: ConfirmSetupIntentInput!) {\n          confirmSetupIntent(input: $input) {\n            paymentMethod {\n              id\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ":
+    types.ConfirmSetupIntentDocument,
+  "\n        mutation SetDefaultPaymentMethod(\n          $input: SetDefaultPaymentMethodInput!\n        ) {\n          setDefaultPaymentMethod(input: $input) {\n            paymentMethod {\n              id\n              isDefault\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ":
+    types.SetDefaultPaymentMethodDocument,
+  "\n        mutation DeletePaymentMethod($input: DeletePaymentMethodInput!) {\n          deletePaymentMethod(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ":
+    types.DeletePaymentMethodDocument,
   "\n  fragment Gallery_SharedSpaceFragment on Space {\n    title\n    images\n  }\n":
     types.Gallery_SharedSpaceFragmentFragmentDoc,
   "\n  fragment Header_SharedSpaceFragment on Space {\n    title\n    status\n    type\n  }\n":
@@ -585,8 +603,8 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
-  source: "\n  fragment Info_UserFragment on User {\n    name\n    avatar\n    activeProfileType\n    spaceOwnerProfile {\n      createdAt\n      spaces(first: 10) {\n        nodes {\n          averageRating\n        }\n      }\n      reviews(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n    advertiserProfile {\n      createdAt\n      totalSpend\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n  }\n"
-): (typeof documents)["\n  fragment Info_UserFragment on User {\n    name\n    avatar\n    activeProfileType\n    spaceOwnerProfile {\n      createdAt\n      spaces(first: 10) {\n        nodes {\n          averageRating\n        }\n      }\n      reviews(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n    advertiserProfile {\n      createdAt\n      totalSpend\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n  }\n"];
+  source: "\n  fragment Info_UserFragment on User {\n    name\n    avatar\n    activeProfileType\n    spaceOwnerProfile {\n      createdAt\n      responseRate\n      averageResponseTime\n      spaces(first: 10) {\n        nodes {\n          averageRating\n        }\n      }\n      reviews(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n    advertiserProfile {\n      createdAt\n      totalSpend\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n  }\n"
+): (typeof documents)["\n  fragment Info_UserFragment on User {\n    name\n    avatar\n    activeProfileType\n    spaceOwnerProfile {\n      createdAt\n      responseRate\n      averageResponseTime\n      spaces(first: 10) {\n        nodes {\n          averageRating\n        }\n      }\n      reviews(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n    advertiserProfile {\n      createdAt\n      totalSpend\n      campaigns(first: 10, order: [{ createdAt: DESC }]) {\n        nodes {\n          id\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -627,6 +645,12 @@ export function graphql(
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(
+  source: "\n  fragment PaymentSettings_UserFragment on User {\n    activeProfileType\n  }\n"
+): (typeof documents)["\n  fragment PaymentSettings_UserFragment on User {\n    activeProfileType\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
   source: "\n  fragment PayoutSettings_UserFragment on User {\n    activeProfileType\n    spaceOwnerProfile {\n      stripeAccountId\n      stripeAccountStatus\n    }\n  }\n"
 ): (typeof documents)["\n  fragment PayoutSettings_UserFragment on User {\n    activeProfileType\n    spaceOwnerProfile {\n      stripeAccountId\n      stripeAccountStatus\n    }\n  }\n"];
 /**
@@ -641,6 +665,12 @@ export function graphql(
 export function graphql(
   source: "\n        query Settings {\n          me {\n            id\n            email\n            name\n            avatar\n            phone\n            createdAt\n            lastLoginAt\n            activeProfileType\n            ...SettingsLayout_UserFragment\n            ...ProfileSettings_UserFragment\n            ...BusinessSettings_UserFragment\n            ...PayoutSettings_UserFragment\n            ...AccountSettings_UserFragment\n          }\n          myNotificationPreferences {\n            id\n            notificationType\n            inAppEnabled\n            emailEnabled\n            pushEnabled\n          }\n        }\n      "
 ): (typeof documents)["\n        query Settings {\n          me {\n            id\n            email\n            name\n            avatar\n            phone\n            createdAt\n            lastLoginAt\n            activeProfileType\n            ...SettingsLayout_UserFragment\n            ...ProfileSettings_UserFragment\n            ...BusinessSettings_UserFragment\n            ...PayoutSettings_UserFragment\n            ...AccountSettings_UserFragment\n          }\n          myNotificationPreferences {\n            id\n            notificationType\n            inAppEnabled\n            emailEnabled\n            pushEnabled\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n      query GetSavedPaymentMethods {\n        mySavedPaymentMethods {\n          id\n          brand\n          last4\n          expMonth\n          expYear\n          isDefault\n          createdAt\n        }\n      }\n    "
+): (typeof documents)["\n      query GetSavedPaymentMethods {\n        mySavedPaymentMethods {\n          id\n          brand\n          last4\n          expMonth\n          expYear\n          isDefault\n          createdAt\n        }\n      }\n    "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -713,6 +743,30 @@ export function graphql(
 export function graphql(
   source: "\n        mutation ChangePassword($input: ChangePasswordInput!) {\n          changePassword(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "
 ): (typeof documents)["\n        mutation ChangePassword($input: ChangePasswordInput!) {\n          changePassword(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n        mutation CreateSetupIntent {\n          createSetupIntent {\n            clientSecret\n            setupIntentId\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "
+): (typeof documents)["\n        mutation CreateSetupIntent {\n          createSetupIntent {\n            clientSecret\n            setupIntentId\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n        mutation ConfirmSetupIntent($input: ConfirmSetupIntentInput!) {\n          confirmSetupIntent(input: $input) {\n            paymentMethod {\n              id\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "
+): (typeof documents)["\n        mutation ConfirmSetupIntent($input: ConfirmSetupIntentInput!) {\n          confirmSetupIntent(input: $input) {\n            paymentMethod {\n              id\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n        mutation SetDefaultPaymentMethod(\n          $input: SetDefaultPaymentMethodInput!\n        ) {\n          setDefaultPaymentMethod(input: $input) {\n            paymentMethod {\n              id\n              isDefault\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "
+): (typeof documents)["\n        mutation SetDefaultPaymentMethod(\n          $input: SetDefaultPaymentMethodInput!\n        ) {\n          setDefaultPaymentMethod(input: $input) {\n            paymentMethod {\n              id\n              isDefault\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(
+  source: "\n        mutation DeletePaymentMethod($input: DeletePaymentMethodInput!) {\n          deletePaymentMethod(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "
+): (typeof documents)["\n        mutation DeletePaymentMethod($input: DeletePaymentMethodInput!) {\n          deletePaymentMethod(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

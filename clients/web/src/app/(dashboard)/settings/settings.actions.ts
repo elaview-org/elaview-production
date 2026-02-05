@@ -563,3 +563,176 @@ export async function changePasswordAction(
     };
   }
 }
+
+export async function createSetupIntentAction(): Promise<{
+  clientSecret: string | null;
+  setupIntentId: string | null;
+  error: string | null;
+}> {
+  try {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation CreateSetupIntent {
+          createSetupIntent {
+            clientSecret
+            setupIntentId
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+    });
+
+    const result = mutationData?.createSetupIntent;
+
+    if (result?.errors?.length) {
+      return {
+        clientSecret: null,
+        setupIntentId: null,
+        error: result.errors[0].message,
+      };
+    }
+
+    return {
+      clientSecret: result?.clientSecret ?? null,
+      setupIntentId: result?.setupIntentId ?? null,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      clientSecret: null,
+      setupIntentId: null,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}
+
+export async function confirmSetupIntentAction(
+  setupIntentId: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation ConfirmSetupIntent($input: ConfirmSetupIntentInput!) {
+          confirmSetupIntent(input: $input) {
+            paymentMethod {
+              id
+            }
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+      variables: { input: { setupIntentId } },
+    });
+
+    const result = mutationData?.confirmSetupIntent;
+
+    if (result?.errors?.length) {
+      return { success: false, error: result.errors[0].message };
+    }
+
+    if (!result?.paymentMethod) {
+      return { success: false, error: "Failed to save payment method" };
+    }
+
+    revalidatePath("/settings");
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}
+
+export async function setDefaultPaymentMethodAction(
+  paymentMethodId: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation SetDefaultPaymentMethod(
+          $input: SetDefaultPaymentMethodInput!
+        ) {
+          setDefaultPaymentMethod(input: $input) {
+            paymentMethod {
+              id
+              isDefault
+            }
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+      variables: { input: { paymentMethodId } },
+    });
+
+    const result = mutationData?.setDefaultPaymentMethod;
+
+    if (result?.errors?.length) {
+      return { success: false, error: result.errors[0].message };
+    }
+
+    if (!result?.paymentMethod) {
+      return { success: false, error: "Failed to set default payment method" };
+    }
+
+    revalidatePath("/settings");
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}
+
+export async function deletePaymentMethodAction(
+  paymentMethodId: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const { data: mutationData } = await api.mutate({
+      mutation: graphql(`
+        mutation DeletePaymentMethod($input: DeletePaymentMethodInput!) {
+          deletePaymentMethod(input: $input) {
+            success
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+      variables: { input: { paymentMethodId } },
+    });
+
+    const result = mutationData?.deletePaymentMethod;
+
+    if (result?.errors?.length) {
+      return { success: false, error: result.errors[0].message };
+    }
+
+    if (!result?.success) {
+      return { success: false, error: "Failed to remove payment method" };
+    }
+
+    revalidatePath("/settings");
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}

@@ -50,9 +50,33 @@ async function getNotificationPreferences() {
   return data.myNotificationPreferences;
 }
 
-Object.assign(api, { getSettingsUser, getNotificationPreferences });
+async function getPaymentMethods() {
+  const { data } = await api.query({
+    query: graphql(`
+      query GetSavedPaymentMethods {
+        mySavedPaymentMethods {
+          id
+          brand
+          last4
+          expMonth
+          expYear
+          isDefault
+          createdAt
+        }
+      }
+    `),
+  });
+  return data?.mySavedPaymentMethods ?? [];
+}
+
+Object.assign(api, {
+  getSettingsUser,
+  getNotificationPreferences,
+  getPaymentMethods,
+});
 
 export default api as typeof api & {
   getSettingsUser: typeof getSettingsUser;
   getNotificationPreferences: typeof getNotificationPreferences;
+  getPaymentMethods: typeof getPaymentMethods;
 };

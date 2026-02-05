@@ -11,6 +11,8 @@ const Info_UserFragment = graphql(`
     activeProfileType
     spaceOwnerProfile {
       createdAt
+      responseRate
+      averageResponseTime
       spaces(first: 10) {
         nodes {
           averageRating
@@ -59,6 +61,9 @@ export default async function Page() {
           ).toFixed(1)
         : null;
 
+    const responseRate = profile.responseRate;
+    const responseTime = profile.averageResponseTime;
+
     return (
       <ProfileCardBase
         name={user.name}
@@ -78,6 +83,15 @@ export default async function Page() {
               </>
             ),
             label: "Rating",
+          },
+          {
+            value:
+              responseRate != null ? `${Math.round(responseRate * 100)}%` : "—",
+            label: "Response",
+          },
+          {
+            value: formatResponseTime(responseTime),
+            label: "Avg Reply",
           },
           {
             value: yearsHosting,
@@ -116,4 +130,13 @@ export default async function Page() {
       ]}
     />
   );
+}
+
+function formatResponseTime(minutes: number | null | undefined): string {
+  if (minutes == null) return "—";
+  if (minutes < 60) return "< 1 hr";
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} hr${hours !== 1 ? "s" : ""}`;
+  const days = Math.round(hours / 24);
+  return `${days} day${days !== 1 ? "s" : ""}`;
 }

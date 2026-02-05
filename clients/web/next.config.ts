@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   // logging: false,
   env: {
     API_URL: process.env.ELAVIEW_WEB_API_URL,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
+      process.env.ELAVIEW_BACKEND_STRIPE_PUBLISHABLE_KEY,
   },
   reactStrictMode: true,
   poweredByHeader: false,

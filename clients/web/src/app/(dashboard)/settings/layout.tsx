@@ -26,6 +26,7 @@ export default async function Layout(props: LayoutProps<"/settings">) {
         {props.profile}
         {props.business}
         {props.payout}
+        {props.payment}
         {props.notifications}
         {props.account}
       </SettingsShell>

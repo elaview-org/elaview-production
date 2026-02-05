@@ -4034,6 +4034,8 @@ export type Info_UserFragmentFragment = {
   spaceOwnerProfile: {
     __typename: "SpaceOwnerProfile";
     createdAt: string;
+    responseRate: number;
+    averageResponseTime: number;
     spaces: {
       __typename: "SpacesConnection";
       nodes: Array<{
@@ -4112,6 +4114,11 @@ export type NotificationSettings_UserFragmentFragment = {
   activeProfileType: ProfileType;
 } & { " $fragmentName"?: "NotificationSettings_UserFragmentFragment" };
 
+export type PaymentSettings_UserFragmentFragment = {
+  __typename: "User";
+  activeProfileType: ProfileType;
+} & { " $fragmentName"?: "PaymentSettings_UserFragmentFragment" };
+
 export type PayoutSettings_UserFragmentFragment = {
   __typename: "User";
   activeProfileType: ProfileType;
@@ -4162,6 +4169,23 @@ export type SettingsQuery = {
     inAppEnabled: boolean;
     emailEnabled: boolean;
     pushEnabled: boolean;
+  }>;
+};
+
+export type GetSavedPaymentMethodsQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetSavedPaymentMethodsQuery = {
+  mySavedPaymentMethods: Array<{
+    __typename: "SavedPaymentMethod";
+    id: string;
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+    isDefault: boolean;
+    createdAt: string;
   }>;
 };
 
@@ -4329,6 +4353,71 @@ export type ChangePasswordMutation = {
     errors: Array<
       | { __typename: "NotFoundError"; message: string }
       | { __typename: "ValidationError"; message: string }
+    > | null;
+  };
+};
+
+export type CreateSetupIntentMutationVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type CreateSetupIntentMutation = {
+  createSetupIntent: {
+    __typename: "CreateSetupIntentPayload";
+    clientSecret: string | null;
+    setupIntentId: string | null;
+    errors: Array<
+      | { __typename: "NotFoundError"; message: string }
+      | { __typename: "PaymentError"; message: string }
+    > | null;
+  };
+};
+
+export type ConfirmSetupIntentMutationVariables = Exact<{
+  input: ConfirmSetupIntentInput;
+}>;
+
+export type ConfirmSetupIntentMutation = {
+  confirmSetupIntent: {
+    __typename: "ConfirmSetupIntentPayload";
+    paymentMethod: { __typename: "SavedPaymentMethod"; id: string } | null;
+    errors: Array<
+      | { __typename: "NotFoundError"; message: string }
+      | { __typename: "PaymentError"; message: string }
+    > | null;
+  };
+};
+
+export type SetDefaultPaymentMethodMutationVariables = Exact<{
+  input: SetDefaultPaymentMethodInput;
+}>;
+
+export type SetDefaultPaymentMethodMutation = {
+  setDefaultPaymentMethod: {
+    __typename: "SetDefaultPaymentMethodPayload";
+    paymentMethod: {
+      __typename: "SavedPaymentMethod";
+      id: string;
+      isDefault: boolean;
+    } | null;
+    errors: Array<
+      | { __typename: "ForbiddenError"; message: string }
+      | { __typename: "NotFoundError"; message: string }
+    > | null;
+  };
+};
+
+export type DeletePaymentMethodMutationVariables = Exact<{
+  input: DeletePaymentMethodInput;
+}>;
+
+export type DeletePaymentMethodMutation = {
+  deletePaymentMethod: {
+    __typename: "DeletePaymentMethodPayload";
+    success: boolean | null;
+    errors: Array<
+      | { __typename: "ForbiddenError"; message: string }
+      | { __typename: "NotFoundError"; message: string }
     > | null;
   };
 };
@@ -6245,6 +6334,14 @@ export const Info_UserFragmentFragmentDoc = {
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
                 {
                   kind: "Field",
+                  name: { kind: "Name", value: "responseRate" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "averageResponseTime" },
+                },
+                {
+                  kind: "Field",
                   name: { kind: "Name", value: "spaces" },
                   arguments: [
                     {
@@ -6519,6 +6616,25 @@ export const NotificationSettings_UserFragmentFragmentDoc = {
   NotificationSettings_UserFragmentFragment,
   unknown
 >;
+export const PaymentSettings_UserFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PaymentSettings_UserFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "User" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "activeProfileType" } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PaymentSettings_UserFragmentFragment, unknown>;
 export const PayoutSettings_UserFragmentFragmentDoc = {
   kind: "Document",
   definitions: [
@@ -10071,6 +10187,14 @@ export const ProfileDocument = {
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
                 {
                   kind: "Field",
+                  name: { kind: "Name", value: "responseRate" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "averageResponseTime" },
+                },
+                {
+                  kind: "Field",
                   name: { kind: "Name", value: "spaces" },
                   arguments: [
                     {
@@ -10736,6 +10860,40 @@ export const SettingsDocument = {
     },
   ],
 } as unknown as DocumentNode<SettingsQuery, SettingsQueryVariables>;
+export const GetSavedPaymentMethodsDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "GetSavedPaymentMethods" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "mySavedPaymentMethods" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "brand" } },
+                { kind: "Field", name: { kind: "Name", value: "last4" } },
+                { kind: "Field", name: { kind: "Name", value: "expMonth" } },
+                { kind: "Field", name: { kind: "Name", value: "expYear" } },
+                { kind: "Field", name: { kind: "Name", value: "isDefault" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetSavedPaymentMethodsQuery,
+  GetSavedPaymentMethodsQueryVariables
+>;
 export const GetCurrentUserForSettingsDocument = {
   kind: "Document",
   definitions: [
@@ -11473,6 +11631,325 @@ export const ChangePasswordDocument = {
 } as unknown as DocumentNode<
   ChangePasswordMutation,
   ChangePasswordMutationVariables
+>;
+export const CreateSetupIntentDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CreateSetupIntent" },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "createSetupIntent" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "clientSecret" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "setupIntentId" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateSetupIntentMutation,
+  CreateSetupIntentMutationVariables
+>;
+export const ConfirmSetupIntentDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ConfirmSetupIntent" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "ConfirmSetupIntentInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "confirmSetupIntent" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "paymentMethod" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ConfirmSetupIntentMutation,
+  ConfirmSetupIntentMutationVariables
+>;
+export const SetDefaultPaymentMethodDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "SetDefaultPaymentMethod" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "SetDefaultPaymentMethodInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "setDefaultPaymentMethod" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "paymentMethod" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "isDefault" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SetDefaultPaymentMethodMutation,
+  SetDefaultPaymentMethodMutationVariables
+>;
+export const DeletePaymentMethodDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "DeletePaymentMethod" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "DeletePaymentMethodInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "deletePaymentMethod" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "success" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeletePaymentMethodMutation,
+  DeletePaymentMethodMutationVariables
 >;
 export const SharedSpaceDetailDocument = {
   kind: "Document",

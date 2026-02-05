@@ -227,8 +227,8 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Real GraphQL query (`me`)
 - [x] Fragment colocation pattern
 - [x] Loading skeleton
-- [ ] Response rate metric (blocked: needs `responseRate` field)
-- [ ] Response time metric (blocked: needs `averageResponseTime` field)
+- [x] Response rate metric
+- [x] Response time metric
 
 **Advertiser Profile:**
 
@@ -237,7 +237,6 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Campaigns section with pagination
 - [x] Real GraphQL query (`me`)
 - [x] Loading skeleton
-- [ ] Response rate metric (blocked: needs `responseRate` field)
 
 #### Backend Note
 
@@ -272,8 +271,8 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Business type / Industry selector
 - [x] Payout schedule selector (Space Owner only)
 - [x] Website field (Advertiser only)
-- [ ] Save changes button
-- [ ] `updateSpaceOwnerProfile` / `updateAdvertiserProfile` mutation
+- [x] Save changes button
+- [x] `updateSpaceOwnerProfile` / `updateAdvertiserProfile` mutation
 
 **Payout Tab (Space Owner):**
 
@@ -282,14 +281,14 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Connect Stripe button
 - [x] View Stripe Dashboard link
 - [x] Refresh Status button
-- [ ] Disconnect Stripe (managed via Stripe dashboard)
+- [x] Disconnect Stripe
 
 **Payment Tab (Advertiser):**
 
-- [ ] Saved payment methods
-- [ ] Add card (Stripe Elements)
-- [ ] Set default card
-- [ ] Remove card
+- [x] Saved payment methods
+- [x] Add card (Stripe Elements)
+- [x] Set default card
+- [x] Remove card
 
 **Notifications Tab:**
 

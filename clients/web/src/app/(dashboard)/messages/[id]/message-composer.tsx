@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { KeyboardEvent, useRef, useState } from "react";
+import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/primitives/button";
 import { cn } from "@/lib/utils";
 import { PaperclipIcon, SendIcon, XIcon } from "lucide-react";
 
 type Props = {
   onSend: (content: string, attachments?: string[]) => void;
+  onTypingChange?: (isTyping: boolean) => void;
   disabled?: boolean;
   placeholder?: string;
 };
@@ -29,6 +30,7 @@ const ALLOWED_FILE_TYPES = [
 
 export function MessageComposer({
   onSend,
+  onTypingChange,
   disabled = false,
   placeholder = "Type a message...",
 }: Props) {
@@ -37,6 +39,57 @@ export function MessageComposer({
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const isTypingRef = useRef(false);
+  const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const inactivityTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const setTyping = useCallback(
+    (typing: boolean) => {
+      if (isTypingRef.current !== typing) {
+        isTypingRef.current = typing;
+        onTypingChange?.(typing);
+      }
+    },
+    [onTypingChange]
+  );
+
+  const clearTimers = useCallback(() => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+      debounceTimerRef.current = null;
+    }
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+      inactivityTimerRef.current = null;
+    }
+  }, []);
+
+  const handleTypingStart = useCallback(() => {
+    clearTimers();
+
+    debounceTimerRef.current = setTimeout(() => {
+      setTyping(true);
+    }, 300);
+
+    inactivityTimerRef.current = setTimeout(() => {
+      setTyping(false);
+    }, 3000);
+  }, [clearTimers, setTyping]);
+
+  const handleTypingStop = useCallback(() => {
+    clearTimers();
+    setTyping(false);
+  }, [clearTimers, setTyping]);
+
+  useEffect(() => {
+    return () => {
+      clearTimers();
+      if (isTypingRef.current) {
+        onTypingChange?.(false);
+      }
+    };
+  }, [clearTimers, onTypingChange]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -48,6 +101,8 @@ export function MessageComposer({
   const handleSend = () => {
     if (!content.trim() && attachments.length === 0) return;
     if (disabled || isUploading) return;
+
+    handleTypingStop();
 
     const attachmentUrls = attachments.map((a) => a.url);
     onSend(
@@ -180,8 +235,16 @@ export function MessageComposer({
           <textarea
             ref={textareaRef}
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              setContent(e.target.value);
+              if (e.target.value.trim()) {
+                handleTypingStart();
+              } else {
+                handleTypingStop();
+              }
+            }}
             onKeyDown={handleKeyDown}
+            onBlur={handleTypingStop}
             placeholder={placeholder}
             disabled={disabled || isUploading}
             rows={1}

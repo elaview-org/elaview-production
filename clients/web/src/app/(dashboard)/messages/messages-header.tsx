@@ -75,7 +75,7 @@ export default function MessagesHeader({
           className="h-9 pl-9"
         />
       </div>
-      <p className="text-muted-foreground text-xs">
+      <p className="text-muted-foreground text-right text-xs">
         {conversationCount} conversation{conversationCount !== 1 ? "s" : ""}
       </p>
     </div>

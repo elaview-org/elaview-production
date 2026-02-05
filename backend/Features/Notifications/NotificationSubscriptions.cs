@@ -46,4 +46,14 @@ public static partial class NotificationSubscriptions {
     ) {
         return proof;
     }
+
+    [Authorize]
+    [Subscribe]
+    [Topic("typing:{conversationId}")]
+    public static TypingIndicator OnTyping(
+        [ID] Guid conversationId,
+        [EventMessage] TypingIndicator indicator
+    ) {
+        return indicator;
+    }
 }

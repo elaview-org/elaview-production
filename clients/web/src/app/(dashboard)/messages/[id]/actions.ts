@@ -177,3 +177,23 @@ export async function loadEarlierMessages(
     },
   };
 }
+
+const NotifyTypingMutation = graphql(`
+  mutation NotifyTyping($input: NotifyTypingInput!) {
+    notifyTyping(input: $input) {
+      boolean
+    }
+  }
+`);
+
+export async function notifyTypingAction(
+  conversationId: string,
+  isTyping: boolean
+): Promise<void> {
+  await api.mutate({
+    mutation: NotifyTypingMutation,
+    variables: {
+      input: { conversationId, isTyping },
+    },
+  });
+}

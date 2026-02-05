@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { Loader2 } from "lucide-react";
 import MessageBubble, { MessageBubble_MessageFragment } from "./message-bubble";
 import { MessageComposer } from "./message-composer";
@@ -8,6 +15,7 @@ import {
   markConversationRead,
   sendMessage,
   loadEarlierMessages,
+  notifyTypingAction,
 } from "./actions";
 import { toast } from "sonner";
 import {
@@ -58,6 +66,26 @@ const OnMessageSubscription = graphql(`
   }
 `);
 
+const OnTypingSubscription = graphql(`
+  subscription OnTyping($conversationId: ID!) {
+    onTyping(conversationId: $conversationId) {
+      conversationId
+      userId
+      userName
+      userAvatar
+      isTyping
+      timestamp
+    }
+  }
+`);
+
+type TypingUser = {
+  id: string;
+  name: string;
+  avatar: string | null;
+  timestamp: number;
+};
+
 function EmptyState() {
   return (
     <Empty className="border-none">
@@ -71,6 +99,31 @@ function EmptyState() {
         </EmptyDescription>
       </EmptyHeader>
     </Empty>
+  );
+}
+
+function TypingIndicator({ users }: { users: TypingUser[] }) {
+  const text = useMemo(() => {
+    if (users.length === 1) {
+      return `${users[0].name} is typing`;
+    }
+    if (users.length === 2) {
+      return `${users[0].name} and ${users[1].name} are typing`;
+    }
+    return `${users.length} people are typing`;
+  }, [users]);
+
+  return (
+    <div className="bg-muted/30 border-t px-4 py-2">
+      <div className="text-muted-foreground flex items-center gap-2 text-sm">
+        <span>{text}</span>
+        <span className="flex gap-0.5">
+          <span className="bg-muted-foreground size-1 animate-bounce rounded-full [animation-delay:0ms]" />
+          <span className="bg-muted-foreground size-1 animate-bounce rounded-full [animation-delay:150ms]" />
+          <span className="bg-muted-foreground size-1 animate-bounce rounded-full [animation-delay:300ms]" />
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -95,6 +148,12 @@ export default function MessageThread({
     conversationId: string;
     messages: UnmaskedMessage[];
   }>({ conversationId, messages: [] });
+  const [typingUsers, setTypingUsers] = useState<Map<string, TypingUser>>(
+    new Map()
+  );
+  const typingTimeoutsRef = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map()
+  );
 
   const bookingStatus = conversation.booking?.status;
   const isArchived =
@@ -133,6 +192,59 @@ export default function MessageThread({
       }
     },
   });
+
+  api.useSubscription(OnTypingSubscription, {
+    variables: { conversationId },
+    skip: isArchived,
+    onData: ({ data }) => {
+      const typing = data.data?.onTyping;
+      if (!typing || typing.userId === currentUserId) return;
+
+      const userId = typing.userId;
+
+      if (typingTimeoutsRef.current.has(userId)) {
+        clearTimeout(typingTimeoutsRef.current.get(userId)!);
+        typingTimeoutsRef.current.delete(userId);
+      }
+
+      if (typing.isTyping) {
+        setTypingUsers((prev) => {
+          const next = new Map(prev);
+          next.set(userId, {
+            id: userId,
+            name: typing.userName,
+            avatar: typing.userAvatar ?? null,
+            timestamp: Date.now(),
+          });
+          return next;
+        });
+
+        const timeout = setTimeout(() => {
+          setTypingUsers((prev) => {
+            const next = new Map(prev);
+            next.delete(userId);
+            return next;
+          });
+          typingTimeoutsRef.current.delete(userId);
+        }, 5000);
+        typingTimeoutsRef.current.set(userId, timeout);
+      } else {
+        setTypingUsers((prev) => {
+          const next = new Map(prev);
+          next.delete(userId);
+          return next;
+        });
+      }
+    },
+  });
+
+  useEffect(() => {
+    const timeouts = typingTimeoutsRef.current;
+    return () => {
+      timeouts.forEach((timeout) => clearTimeout(timeout));
+      timeouts.clear();
+    };
+  }, []);
 
   const messages = useMemo((): UnmaskedMessage[] => {
     const unmaskedInitial = initialMessages.map((m) =>
@@ -217,6 +329,13 @@ export default function MessageThread({
     });
   };
 
+  const handleTypingChange = useCallback(
+    (isTyping: boolean) => {
+      notifyTypingAction(conversationId, isTyping);
+    },
+    [conversationId]
+  );
+
   const shouldShowAvatar = (
     message: UnmaskedMessage,
     prevMessage: UnmaskedMessage | null
@@ -239,6 +358,8 @@ export default function MessageThread({
     lastOutgoingMessage && otherParticipantLastReadAt
       ? new Date(lastOutgoingMessage.createdAt) <= otherParticipantLastReadAt
       : false;
+
+  const typingUsersList = Array.from(typingUsers.values());
 
   return (
     <>
@@ -314,8 +435,13 @@ export default function MessageThread({
         )}
       </div>
 
+      {typingUsersList.length > 0 && (
+        <TypingIndicator users={typingUsersList} />
+      )}
+
       <MessageComposer
         onSend={handleSendMessage}
+        onTypingChange={handleTypingChange}
         disabled={isPending || isArchived}
         placeholder={
           isArchived

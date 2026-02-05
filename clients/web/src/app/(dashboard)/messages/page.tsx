@@ -7,14 +7,14 @@ export default async function Page() {
 
   return (
     <div className="flex h-full overflow-hidden">
-      <div className="bg-background flex w-full flex-col border-r md:max-w-sm">
+      <WelcomeChat className="hidden border-r md:flex" />
+      <div className="bg-background flex w-full flex-col md:max-w-sm">
         <MessagesContent
           conversations={conversations}
           currentUserId={currentUserId}
           unreadCount={unreadCount}
         />
       </div>
-      <WelcomeChat className="hidden md:flex" />
     </div>
   );
 }

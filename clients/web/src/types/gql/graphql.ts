@@ -1283,6 +1283,7 @@ export type Mutation = {
   markFileDownloaded: MarkFileDownloadedPayload;
   markInstalled: MarkInstalledPayload;
   markNotificationRead: MarkNotificationReadPayload;
+  notifyTyping: NotifyTypingPayload;
   processPayout: ProcessPayoutPayload;
   reactivateSpace: ReactivateSpacePayload;
   refreshStripeAccountStatus: RefreshStripeAccountStatusPayload;
@@ -1397,6 +1398,10 @@ export type MutationMarkInstalledArgs = {
 
 export type MutationMarkNotificationReadArgs = {
   input: MarkNotificationReadInput;
+};
+
+export type MutationNotifyTypingArgs = {
+  input: NotifyTypingInput;
 };
 
 export type MutationProcessPayoutArgs = {
@@ -1723,6 +1728,19 @@ export type NotificationTypeOperationFilterInput = {
   in?: InputMaybe<Array<NotificationType>>;
   neq?: InputMaybe<NotificationType>;
   nin?: InputMaybe<Array<NotificationType>>;
+};
+
+export type NotifyTypingError = ForbiddenError;
+
+export type NotifyTypingInput = {
+  conversationId: Scalars["UUID"]["input"];
+  isTyping: Scalars["Boolean"]["input"];
+};
+
+export type NotifyTypingPayload = {
+  __typename: "NotifyTypingPayload";
+  boolean: Maybe<Scalars["Boolean"]["output"]>;
+  errors: Maybe<Array<NotifyTypingError>>;
 };
 
 /** Information about pagination in a connection. */
@@ -2799,6 +2817,7 @@ export type Subscription = {
   onMessage: Message;
   onNotification: Notification;
   onProofUpdate: BookingProof;
+  onTyping: TypingIndicator;
 };
 
 export type SubscriptionOnBookingUpdateArgs = {
@@ -2815,6 +2834,10 @@ export type SubscriptionOnNotificationArgs = {
 
 export type SubscriptionOnProofUpdateArgs = {
   bookingId: Scalars["ID"]["input"];
+};
+
+export type SubscriptionOnTypingArgs = {
+  conversationId: Scalars["ID"]["input"];
 };
 
 export type Transaction = {
@@ -2897,6 +2920,16 @@ export type TransactionsByBookingEdge = {
   cursor: Scalars["String"]["output"];
   /** The item at the end of the edge. */
   node: Transaction;
+};
+
+export type TypingIndicator = {
+  __typename: "TypingIndicator";
+  conversationId: Scalars["UUID"]["output"];
+  isTyping: Scalars["Boolean"]["output"];
+  timestamp: Scalars["DateTime"]["output"];
+  userAvatar: Maybe<Scalars["String"]["output"]>;
+  userId: Scalars["UUID"]["output"];
+  userName: Scalars["String"]["output"];
 };
 
 export type UpdateAdvertiserProfileError = NotFoundError;
@@ -3693,6 +3726,14 @@ export type LoadEarlierMessagesQuery = {
   } | null;
 };
 
+export type NotifyTypingMutationVariables = Exact<{
+  input: NotifyTypingInput;
+}>;
+
+export type NotifyTypingMutation = {
+  notifyTyping: { __typename: "NotifyTypingPayload"; boolean: boolean | null };
+};
+
 export type MessageBubble_MessageFragmentFragment = {
   __typename: "Message";
   id: string;
@@ -3726,6 +3767,22 @@ export type OnMessageSubscription = {
       name: string;
       avatar: string | null;
     };
+  };
+};
+
+export type OnTypingSubscriptionVariables = Exact<{
+  conversationId: Scalars["ID"]["input"];
+}>;
+
+export type OnTypingSubscription = {
+  onTyping: {
+    __typename: "TypingIndicator";
+    conversationId: string;
+    userId: string;
+    userName: string;
+    userAvatar: string | null;
+    isTyping: boolean;
+    timestamp: string;
   };
 };
 
@@ -3967,6 +4024,8 @@ export type About_UserFragmentFragment = {
     businessName: string | null;
     businessType: string | null;
     onboardingComplete: boolean;
+    responseRate: number;
+    averageResponseTime: number;
     spaces: {
       __typename: "SpacesConnection";
       nodes: Array<{ __typename: "Space"; id: string }> | null;
@@ -4034,8 +4093,6 @@ export type Info_UserFragmentFragment = {
   spaceOwnerProfile: {
     __typename: "SpaceOwnerProfile";
     createdAt: string;
-    responseRate: number;
-    averageResponseTime: number;
     spaces: {
       __typename: "SpacesConnection";
       nodes: Array<{
@@ -6016,6 +6073,14 @@ export const About_UserFragmentFragmentDoc = {
                 },
                 {
                   kind: "Field",
+                  name: { kind: "Name", value: "responseRate" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "averageResponseTime" },
+                },
+                {
+                  kind: "Field",
                   name: { kind: "Name", value: "spaces" },
                   arguments: [
                     {
@@ -6332,14 +6397,6 @@ export const Info_UserFragmentFragmentDoc = {
               kind: "SelectionSet",
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "responseRate" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "averageResponseTime" },
-                },
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "spaces" },
@@ -8892,6 +8949,60 @@ export const LoadEarlierMessagesDocument = {
   LoadEarlierMessagesQuery,
   LoadEarlierMessagesQueryVariables
 >;
+export const NotifyTypingDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "NotifyTyping" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "NotifyTypingInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "notifyTyping" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "boolean" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  NotifyTypingMutation,
+  NotifyTypingMutationVariables
+>;
 export const OnMessageDocument = {
   kind: "Document",
   definitions: [
@@ -8961,6 +9072,65 @@ export const OnMessageDocument = {
 } as unknown as DocumentNode<
   OnMessageSubscription,
   OnMessageSubscriptionVariables
+>;
+export const OnTypingDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "subscription",
+      name: { kind: "Name", value: "OnTyping" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "conversationId" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "onTyping" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "conversationId" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "conversationId" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "conversationId" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "userId" } },
+                { kind: "Field", name: { kind: "Name", value: "userName" } },
+                { kind: "Field", name: { kind: "Name", value: "userAvatar" } },
+                { kind: "Field", name: { kind: "Name", value: "isTyping" } },
+                { kind: "Field", name: { kind: "Name", value: "timestamp" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  OnTypingSubscription,
+  OnTypingSubscriptionVariables
 >;
 export const MessagesDataDocument = {
   kind: "Document",
@@ -10187,14 +10357,6 @@ export const ProfileDocument = {
                 { kind: "Field", name: { kind: "Name", value: "createdAt" } },
                 {
                   kind: "Field",
-                  name: { kind: "Name", value: "responseRate" },
-                },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "averageResponseTime" },
-                },
-                {
-                  kind: "Field",
                   name: { kind: "Name", value: "spaces" },
                   arguments: [
                     {
@@ -10364,6 +10526,14 @@ export const ProfileDocument = {
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "onboardingComplete" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "responseRate" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "averageResponseTime" },
                 },
                 {
                   kind: "Field",

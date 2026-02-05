@@ -1362,6 +1362,7 @@ type Mutation {
   markNotificationRead(
     input: MarkNotificationReadInput!
   ): MarkNotificationReadPayload!
+  notifyTyping(input: NotifyTypingInput!): NotifyTypingPayload!
   processPayout(input: ProcessPayoutInput!): ProcessPayoutPayload!
   reactivateSpace(input: ReactivateSpaceInput!): ReactivateSpacePayload!
   refreshStripeAccountStatus: RefreshStripeAccountStatusPayload!
@@ -1748,6 +1749,18 @@ input NotificationTypeOperationFilterInput {
   in: [NotificationType!]
   neq: NotificationType
   nin: [NotificationType!]
+}
+
+union NotifyTypingError = ForbiddenError
+
+input NotifyTypingInput {
+  conversationId: UUID!
+  isTyping: Boolean!
+}
+
+type NotifyTypingPayload {
+  boolean: Boolean
+  errors: [NotifyTypingError!]
 }
 
 """
@@ -3048,6 +3061,7 @@ type Subscription {
   onMessage(conversationId: ID!): Message!
   onNotification(userId: ID!): Notification!
   onProofUpdate(bookingId: ID!): BookingProof!
+  onTyping(conversationId: ID!): TypingIndicator!
 }
 
 type Transaction {
@@ -3141,6 +3155,15 @@ type TransactionsByBookingEdge {
   The item at the end of the edge.
   """
   node: Transaction!
+}
+
+type TypingIndicator {
+  conversationId: UUID!
+  isTyping: Boolean!
+  timestamp: DateTime!
+  userAvatar: String
+  userId: UUID!
+  userName: String!
 }
 
 scalar UUID

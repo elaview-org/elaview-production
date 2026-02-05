@@ -2,7 +2,9 @@ import { graphql, ProfileType, CampaignStatus } from "@/types/gql";
 import {
   IconBriefcase,
   IconBuilding,
+  IconClock,
   IconMapPin,
+  IconMessageReply,
   IconShieldCheck,
   IconWorld,
 } from "@tabler/icons-react";
@@ -16,6 +18,8 @@ const About_UserFragment = graphql(`
       businessName
       businessType
       onboardingComplete
+      responseRate
+      averageResponseTime
       spaces(first: 10) {
         nodes {
           id
@@ -42,6 +46,8 @@ export default async function Page() {
   if (user.activeProfileType === ProfileType.SpaceOwner) {
     const profile = user.spaceOwnerProfile!;
     const spaces = profile.spaces?.nodes ?? [];
+    const responseRate = profile.responseRate;
+    const responseTime = profile.averageResponseTime;
 
     return (
       <div className="flex flex-1 flex-col gap-6">
@@ -70,6 +76,20 @@ export default async function Page() {
                 : "Identity not verified"}
             </span>
           </div>
+
+          {responseRate != null && (
+            <div className="flex items-center gap-3">
+              <IconMessageReply className="text-muted-foreground size-5" />
+              <span>Response rate: {Math.round(responseRate * 100)}%</span>
+            </div>
+          )}
+
+          {responseTime != null && (
+            <div className="flex items-center gap-3">
+              <IconClock className="text-muted-foreground size-5" />
+              <span>Avg reply: {formatResponseTime(responseTime)}</span>
+            </div>
+          )}
         </div>
 
         {spaces.length > 0 && (
@@ -138,4 +158,12 @@ export default async function Page() {
       )}
     </div>
   );
+}
+
+function formatResponseTime(minutes: number): string {
+  if (minutes < 60) return "< 1 hr";
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} hr${hours !== 1 ? "s" : ""}`;
+  const days = Math.round(hours / 24);
+  return `${days} day${days !== 1 ? "s" : ""}`;
 }

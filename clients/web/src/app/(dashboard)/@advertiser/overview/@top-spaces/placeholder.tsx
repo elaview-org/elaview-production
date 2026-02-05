@@ -7,19 +7,20 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/primitives/empty";
-import { IconChartBar } from "@tabler/icons-react";
+import { IconBuildingStore } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function Placeholder() {
   return (
-    <Empty className="border py-16">
+    <Empty className="py-16">
       <EmptyHeader>
         <EmptyMedia variant="icon">
-          <IconChartBar />
+          <IconBuildingStore />
         </EmptyMedia>
-        <EmptyTitle>No activity yet</EmptyTitle>
+        <EmptyTitle>No spaces yet</EmptyTitle>
         <EmptyDescription>
-          Your dashboard will populate once you start booking advertising spaces
+          Your top performing ad spaces will appear here after you complete
+          bookings
         </EmptyDescription>
       </EmptyHeader>
       <EmptyContent>

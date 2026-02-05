@@ -1,39 +1,4 @@
-import {
-  IconCircleCheckFilled,
-  IconClock,
-  IconLoader,
-  IconDownload,
-  IconTool,
-  IconCamera,
-} from "@tabler/icons-react";
-
-export const ACTIVITY_TYPES = {
-  booking: "Booking",
-  payout: "Payout",
-  review: "Review",
-} as const;
-
-export type ActivityType = keyof typeof ACTIVITY_TYPES;
-
-export const ACTIVITY_STATUS = {
-  completed: {
-    label: "Completed",
-    icon: IconCircleCheckFilled,
-    className: "fill-green-500 dark:fill-green-400",
-  },
-  pending: {
-    label: "Pending",
-    icon: IconClock,
-    className: "text-yellow-500",
-  },
-  processing: {
-    label: "Processing",
-    icon: IconLoader,
-    className: "text-blue-500",
-  },
-} as const;
-
-export type ActivityStatus = keyof typeof ACTIVITY_STATUS;
+import { IconDownload, IconTool, IconCamera } from "@tabler/icons-react";
 
 export const BOOKING_STATUS_CONFIG = {
   PAID: {

@@ -4,39 +4,72 @@ import SummaryCard, {
 import { calculateTrend, formatCurrency } from "@/lib/utils";
 import { graphql } from "@/types/gql";
 import api from "../api";
-import mock from "./mock.json";
 
 const OverviewStatCards_QueryFragment = graphql(`
   fragment OverviewStatCards_QueryFragment on Query {
+    me {
+      spaceOwnerProfile {
+        stripeAccountStatus
+      }
+    }
     earningsSummary {
       availableBalance
       pendingPayouts
       thisMonthEarnings
       lastMonthEarnings
     }
+    activeBookings: myBookingsAsOwner(
+      where: { status: { in: [PAID, FILE_DOWNLOADED, INSTALLED, VERIFIED] } }
+    ) {
+      totalCount
+    }
+    mySpaces {
+      totalCount
+    }
   }
 `);
 
 export default async function Page() {
-  const earnings = await api
-    .getMyOverview(OverviewStatCards_QueryFragment)
-    .then((res) => res.earningsSummary ?? null);
+  const data = await api.getMyOverview(OverviewStatCards_QueryFragment);
 
+  const stripeStatus = data.me?.spaceOwnerProfile?.stripeAccountStatus;
+  const earnings = data.earningsSummary ?? null;
   const availableBalance = earnings?.availableBalance ?? 0;
   const pendingPayouts = earnings?.pendingPayouts ?? 0;
   const thisMonth = earnings?.thisMonthEarnings ?? 0;
   const lastMonth = earnings?.lastMonthEarnings ?? 0;
   const earningsTrend = calculateTrend(thisMonth, lastMonth);
-  const bookingsTrend = calculateTrend(
-    mock.activeBookings,
-    mock.previousActiveBookings
-  );
+  const activeBookingsCount = data.activeBookings?.totalCount ?? 0;
+  const totalSpacesCount = data.mySpaces?.totalCount ?? 0;
+
+  const getStripeBadge = () => {
+    if (stripeStatus === "complete") {
+      return {
+        type: "text" as const,
+        text: "Connected",
+        className: "text-emerald-600 dark:text-emerald-400",
+      };
+    }
+    if (stripeStatus === "pending") {
+      return {
+        type: "text" as const,
+        text: "Pending",
+        className: "text-amber-600 dark:text-amber-400",
+      };
+    }
+    return {
+      type: "text" as const,
+      text: "Action Required",
+      className: "text-destructive",
+    };
+  };
 
   return (
     <SummaryCardGrid>
       <SummaryCard
         label="Available Balance"
         value={formatCurrency(availableBalance)}
+        badge={getStripeBadge()}
         footer="Ready to withdraw"
         description="From completed bookings"
         showFooterIcon={false}
@@ -61,14 +94,10 @@ export default async function Page() {
       />
       <SummaryCard
         label="Active Bookings"
-        value={mock.activeBookings.toString()}
-        badge={
-          bookingsTrend !== 0
-            ? { type: "trend", value: bookingsTrend }
-            : undefined
-        }
-        footer={`${mock.totalSpaces} total spaces`}
+        value={activeBookingsCount.toString()}
+        footer={`${totalSpacesCount} total spaces`}
         description="Currently in progress"
+        showFooterIcon={false}
       />
     </SummaryCardGrid>
   );

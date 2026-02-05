@@ -40,6 +40,52 @@ directive @listSize(
   slicingArguments: [String!]
 ) on FIELD_DEFINITION
 
+interface ActivityEvent {
+  id: UUID!
+  timestamp: DateTime!
+  type: String!
+}
+
+type AdvertiserAnalytics {
+  endDate: DateTime!
+  monthlyStats(months: Int!): [AdvertiserMonthlyStats!]!
+  periodComparison: AdvertiserPeriodComparison!
+  spacePerformance(first: Int!): [AdvertiserSpacePerformance!]!
+  startDate: DateTime!
+  statusDistribution: [StatusCount!]!
+  summary: AdvertiserSummary!
+  topPerformers: AdvertiserTopPerformers!
+  userId: UUID!
+}
+
+type AdvertiserAttentionItem {
+  id: UUID!
+  impressions: Long!
+  roi: Decimal
+  title: String!
+}
+
+type AdvertiserMonthlyStats {
+  impressions: Long!
+  month: String!
+  spending: Decimal
+}
+
+type AdvertiserPeriodComparison {
+  current: AdvertiserPeriodData!
+  previous: AdvertiserPeriodData!
+}
+
+type AdvertiserPeriodData {
+  bookings: Int!
+  endDate: DateTime!
+  impressions: Long!
+  period: String!
+  roi: Decimal
+  spending: Decimal
+  startDate: DateTime!
+}
+
 type AdvertiserProfile {
   campaigns(
     """
@@ -117,6 +163,41 @@ input AdvertiserProfileSortInput {
   website: SortEnumType
 }
 
+type AdvertiserSpacePerformance {
+  id: UUID!
+  image: String
+  impressions: Long!
+  roi: Decimal
+  title: String!
+  totalBookings: Int!
+  totalSpend: Decimal
+}
+
+type AdvertiserSummary {
+  avgCostPerImpression: Decimal
+  completionRate: Decimal
+  previousAvgCostPerImpression: Decimal
+  previousCompletionRate: Decimal
+  previousReach: Int!
+  previousRoi: Decimal
+  previousTotalBookings: Int!
+  previousTotalImpressions: Long!
+  previousTotalSpend: Decimal
+  reach: Int!
+  roi: Decimal
+  totalBookings: Int!
+  totalImpressions: Long!
+  totalSpend: Decimal
+}
+
+type AdvertiserTopPerformers {
+  bestRoi: PerformerItem
+  bestValue: PerformerItem
+  mostBookings: PerformerItem
+  mostImpressions: PerformerItem
+  needsReview: AdvertiserAttentionItem
+}
+
 """
 Defines when a policy shall be executed.
 """
@@ -148,6 +229,13 @@ input ApproveBookingInput {
 type ApproveBookingPayload {
   booking: Booking
   errors: [ApproveBookingError!]
+}
+
+type AttentionItem {
+  bookings: Int!
+  id: UUID!
+  occupancy: Decimal
+  title: String!
 }
 
 type Booking {
@@ -183,6 +271,13 @@ type Booking {
   totalAmount: Decimal!
   totalDays: Int!
   updatedAt: DateTime!
+}
+
+type BookingActivity implements ActivityEvent {
+  booking: Booking!
+  id: UUID!
+  timestamp: DateTime!
+  type: String!
 }
 
 type BookingDispute {
@@ -824,6 +919,13 @@ type CreateSpacePayload {
   space: Space
 }
 
+type DailyStats {
+  bookings: Int!
+  date: DateTime!
+  earnings: Decimal!
+  spending: Decimal!
+}
+
 """
 The `DateTime` scalar represents an ISO-8601 compliant date time type.
 """
@@ -1141,6 +1243,11 @@ input ListStringOperationFilterInput {
   some: StringOperationFilterInput
 }
 
+"""
+The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1.
+"""
+scalar Long
+
 type MarkAllNotificationsReadPayload {
   count: Int!
 }
@@ -1312,6 +1419,12 @@ type MessagesEdge {
   The item at the end of the edge.
   """
   node: Message!
+}
+
+type MonthlyStats {
+  bookings: Int!
+  month: String!
+  revenue: Decimal
 }
 
 type Mutation {
@@ -1820,6 +1933,13 @@ type Payment {
   type: PaymentType!
 }
 
+type PaymentActivity implements ActivityEvent {
+  id: UUID!
+  payment: Payment!
+  timestamp: DateTime!
+  type: String!
+}
+
 type PaymentError implements Error {
   code: String!
   message: String!
@@ -2013,6 +2133,28 @@ input PayoutStatusOperationFilterInput {
   nin: [PayoutStatus!]
 }
 
+type PerformerItem {
+  change: Decimal
+  id: UUID!
+  title: String!
+  value: Decimal
+}
+
+type PeriodComparison {
+  current: PeriodData!
+  previous: PeriodData!
+}
+
+type PeriodData {
+  avgRating: Float
+  bookings: Int!
+  completionRate: Decimal
+  endDate: DateTime!
+  period: String!
+  revenue: Decimal
+  startDate: DateTime!
+}
+
 union ProcessPayoutError = ConflictError | NotFoundError | PaymentError
 
 input ProcessPayoutInput {
@@ -2037,6 +2179,13 @@ input ProfileTypeOperationFilterInput {
   nin: [ProfileType!]
 }
 
+type ProofActivity implements ActivityEvent {
+  id: UUID!
+  proof: BookingProof!
+  timestamp: DateTime!
+  type: String!
+}
+
 enum ProofStatus {
   APPROVED
   CORRECTION_REQUESTED
@@ -2054,6 +2203,11 @@ input ProofStatusOperationFilterInput {
 }
 
 type Query {
+  advertiserAnalytics(
+    endDate: DateTime!
+    startDate: DateTime!
+  ): AdvertiserAnalytics!
+  advertiserDailyStats(endDate: DateTime!, startDate: DateTime!): [DailyStats!]!
   bookingById(id: ID!): Booking
   bookingsRequiringAction(
     """
@@ -2116,6 +2270,7 @@ type Query {
     order: [MessageSortInput!]
     where: MessageFilterInput
   ): MessagesByConversationConnection
+  myActivityFeed(first: Int!): [ActivityEvent!]!
   myBookingsAsAdvertiser(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -2325,6 +2480,11 @@ type Query {
     spaceId: ID!
   ): ReviewsBySpaceConnection
   spaceById(id: ID!): Space
+  spaceOwnerAnalytics(
+    endDate: DateTime!
+    startDate: DateTime!
+  ): SpaceOwnerAnalytics!
+  spaceOwnerDailyStats(endDate: DateTime!, startDate: DateTime!): [DailyStats!]!
   spaces(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -2368,6 +2528,19 @@ type Query {
   ): TransactionsByBookingConnection
   unreadConversationsCount: Int!
   unreadNotificationsCount: Int!
+}
+
+type RatingPerformerItem {
+  id: UUID!
+  reviews: Int!
+  title: String!
+  value: Float!
+}
+
+type RatingTrendPoint {
+  month: String!
+  rating: Float!
+  reviews: Int!
 }
 
 union ReactivateSpaceError = ForbiddenError | NotFoundError
@@ -2832,6 +3005,20 @@ input SpaceFilterInput {
   zipCode: StringOperationFilterInput
 }
 
+type SpaceOwnerAnalytics {
+  bookingHeatmap: [[Int!]!]!
+  endDate: DateTime!
+  monthlyStats(months: Int!): [MonthlyStats!]!
+  periodComparison: PeriodComparison!
+  ratingTrends(months: Int!): [RatingTrendPoint!]!
+  spacePerformance(first: Int!): [SpacePerformanceItem!]!
+  startDate: DateTime!
+  statusDistribution: [StatusCount!]!
+  summary: SpaceOwnerSummary!
+  topPerformers: SpaceOwnerTopPerformers!
+  userId: UUID!
+}
+
 type SpaceOwnerProfile {
   averageResponseTime: Int!
   businessName: String
@@ -2925,6 +3112,40 @@ input SpaceOwnerProfileSortInput {
   stripeLastAccountHealthCheck: SortEnumType
   user: UserSortInput
   userId: SortEnumType
+}
+
+type SpaceOwnerSummary {
+  averageRating: Float
+  avgBookingDuration: Decimal
+  completionRate: Decimal
+  forecastedRevenue: Decimal
+  occupancyRate: Decimal
+  previousAvgBookingDuration: Decimal
+  previousOccupancyRate: Decimal
+  previousRepeatAdvertiserRate: Decimal
+  previousTotalBookings: Int!
+  previousTotalRevenue: Decimal
+  repeatAdvertiserRate: Decimal
+  totalBookings: Int!
+  totalRevenue: Decimal
+}
+
+type SpaceOwnerTopPerformers {
+  bestOccupancy: PerformerItem
+  bestRating: RatingPerformerItem
+  bestRevenue: PerformerItem
+  mostBookings: PerformerItem
+  needsAttention: AttentionItem
+}
+
+type SpacePerformanceItem {
+  averageRating: Float
+  id: UUID!
+  image: String
+  occupancyRate: Decimal
+  title: String!
+  totalBookings: Int!
+  totalRevenue: Decimal
 }
 
 input SpaceSortInput {
@@ -3025,6 +3246,11 @@ type SpacesEdge {
   The item at the end of the edge.
   """
   node: Space!
+}
+
+type StatusCount {
+  count: Int!
+  status: BookingStatus!
 }
 
 input StringOperationFilterInput {

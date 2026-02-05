@@ -6,9 +6,13 @@ const getMyOverview = api.createFragmentReader(() =>
     query: graphql(`
       query OverviewData {
         ...OverviewStatCards_QueryFragment
+        ...OverviewDeadlineWarnings_QueryFragment
         ...OverviewPendingRequests_QueryFragment
         ...OverviewActiveBookings_QueryFragment
         ...OverviewTopSpaces_QueryFragment
+        ...OverviewUpcomingPayouts_QueryFragment
+        ...OverviewActivityChart_QueryFragment
+        ...OverviewRecentActivity_QueryFragment
       }
     `),
   })

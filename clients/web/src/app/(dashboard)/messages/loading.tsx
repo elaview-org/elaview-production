@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/primitives/skeleton";
 
+// todo: correct loading skeleton
 export default function Loading() {
   return (
     <>

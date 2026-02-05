@@ -2,8 +2,8 @@ import { graphql } from "@/types/gql";
 import api from "../api";
 import RecentActivity from "./recent-activity";
 
-const OverviewRecentActivity_QueryFragment = graphql(`
-  fragment OverviewRecentActivity_QueryFragment on Query {
+const AdvertiserOverviewRecentActivity_QueryFragment = graphql(`
+  fragment AdvertiserOverviewRecentActivity_QueryFragment on Query {
     myNotifications(first: 10, order: [{ createdAt: DESC }]) {
       nodes {
         id
@@ -19,7 +19,7 @@ const OverviewRecentActivity_QueryFragment = graphql(`
 
 export default async function Page() {
   const notifications = await api
-    .getMyOverview(OverviewRecentActivity_QueryFragment)
+    .getAdvertiserOverview(AdvertiserOverviewRecentActivity_QueryFragment)
     .then((res) => res.myNotifications?.nodes ?? []);
 
   return <RecentActivity data={notifications} />;

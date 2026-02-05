@@ -74,7 +74,7 @@ Each profile has its own `navigation-bar.data.ts`:
 
 | Route     | Status       | Data Source    | Notes                                   |
 |-----------|--------------|----------------|-----------------------------------------|
-| Overview  | ✅ Functional | GraphQL        | Stats integrated, charts use mock       |
+| Overview  | ✅ Functional | GraphQL        | Fully integrated                        |
 | Listings  | ⚠️ Partial   | GraphQL + Mock | Detail page needs mutations             |
 | Bookings  | ⚠️ Partial   | GraphQL + Mock | Filtering disabled, mutations not wired |
 | Earnings  | ✅ Functional | GraphQL        | Fully integrated                        |
@@ -87,7 +87,7 @@ Each profile has its own `navigation-bar.data.ts`:
 
 | Route     | Status       | Data Source | Notes                            |
 |-----------|--------------|-------------|----------------------------------|
-| Overview  | ⚠️ Partial   | Mock        | Under construction               |
+| Overview  | ✅ Functional | GraphQL     | Parallel routes, all sections live |
 | Discover  | ✅ Functional | GraphQL     | Grid/Table/Map views working     |
 | Campaigns | ⚠️ Partial   | GraphQL     | Query works, mutations not wired |
 | Bookings  | ⚠️ Partial   | GraphQL     | Query works, mutations needed    |
@@ -135,7 +135,7 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Booking reference card in thread header
 - [x] Read receipts (conversation-level)
 - [x] Pagination (load more messages)
-- [ ] Typing indicators (blocked: requires backend schema changes)
+- [x] Typing indicators
 
 #### Backend Note
 
@@ -350,16 +350,17 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] `incomingBookingRequests` for pending requests
 - [x] `myBookingsAsOwner` (status filter) for active bookings
 - [x] `mySpaces` (sorted by revenue) for top spaces
-- [ ] Replace mock chart data with aggregated query
-- [ ] Replace mock activity with real activity feed
+- [x] `myBookingsAsOwner.totalCount` for active bookings count
+- [x] `mySpaces.totalCount` for total spaces count
+- [x] `myPayouts` aggregated by date for activity chart
+- [x] `myNotifications` for recent activity feed
 
 **Additional Features:**
 
-- [ ] Quick action buttons (Create Space, Withdraw Funds)
-- [ ] Installation deadline warnings
-- [ ] Stripe Connect status indicator
-- [ ] Upcoming payouts preview
-- [ ] Performance comparison vs previous period
+- [x] Stripe Connect status indicator (badge on Available Balance card)
+- [x] Installation deadline warnings (dedicated slot with urgency badges)
+- [x] Upcoming payouts preview (dedicated slot showing pending/processing payouts)
+- [x] Performance comparison vs previous period (trend badge on This Month card)
 
 #### Backend Note
 
@@ -368,20 +369,14 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - `earningsSummary` → `availableBalance`, `pendingPayouts`, `thisMonthEarnings`, `lastMonthEarnings`
 - `incomingBookingRequests(first: 5)` - Pending approval bookings
 - `myBookingsAsOwner(where: {status: {in: [PAID, FILE_DOWNLOADED, INSTALLED]}})` - Active bookings
-- `me.spaceOwnerProfile.spaces(first: 5, order: {totalRevenue: DESC})` - Top spaces
+- `mySpaces(first: 5, order: {totalRevenue: DESC})` - Top spaces
 
-**Missing:**
+**Implementation Notes:**
 
-- `activeBookingsCount` - Use `totalCount` from connection
-- `totalSpacesCount` - Use `totalCount` from connection
-- Activity chart time-series - Options:
-    1. Add `bookingsByDateRange(start, end)` query with daily aggregation
-    2. Client-side aggregate from `myPayouts` (current workaround)
-- Recent activity feed - Options:
-    - Add `myActivityFeed` query returning union of events
-    - Client combines `myNotifications` with entity lookups
+- Activity chart: Client-side aggregation from `myPayouts` (grouped by processedAt date)
+- Recent activity: Uses `myNotifications` directly as activity feed
 
-**Frontend Status:** Stats cards work. Charts/activity mocked.
+**Frontend Status:** ✅ Fully functional (parallel routes, all sections live)
 
 ---
 
@@ -444,7 +439,9 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 - `createSpace(input: {...})` - All fields supported
 -
+
 `updateSpace(id, input: {title, description, pricePerDay, installationFee, minDuration, maxDuration, images, traffic, availableFrom, availableTo})`
+
 - `deactivateSpace(input: {id})`
 - `reactivateSpace(input: {id})`
 - `deleteSpace(input: {id})`
@@ -737,36 +734,50 @@ blockedDates: [BlockedDate!]!  # Space availability blocks
 
 **Core Components:**
 
-- [ ] Stats cards (Active Campaigns, Pending Bookings, This Month Spending, Total Reach)
-- [ ] Active campaigns section with status cards
-- [ ] Pending verifications section (installations awaiting approval)
-- [ ] Recent bookings table
-- [ ] Spending chart with time range selector
-- [ ] Quick actions (Create Campaign, Discover Spaces)
+- [x] Stats cards (Total Spend, Active Campaigns, Active Bookings, Pending Approvals)
+- [x] Pending approvals section with verification cards
+- [x] Active campaigns section with status cards
+- [x] Top spaces section with performance ranking
+- [x] Spending chart with time range selector
+- [x] Recent activity table (via notifications)
+
+**Additional Features:**
+
+- [x] Payment method status indicator (badge on Total Spend card)
+- [x] Approval deadline warnings (dedicated slot for VERIFIED bookings with 48hr countdown)
+- [x] Pending payments preview (dedicated slot showing APPROVED bookings awaiting payment)
+- [x] Performance comparison vs previous period (This Month card with spending trend)
 
 **GraphQL Migration:**
 
-- [ ] Replace mock stats with aggregated campaign/booking data
-- [ ] `myCampaigns` query for active campaigns
-- [ ] `myBookingsAsAdvertiser` for pending verifications
-- [ ] Aggregate payment data for spending chart
+- [x] `me.advertiserProfile.totalSpend` for total spend stat
+- [x] `myCampaigns` (count nodes) for active campaigns count
+- [x] `myBookingsAsAdvertiser.totalCount` for active/pending bookings
+- [x] `myBookingsAsAdvertiser` for pending approvals list
+- [x] `myCampaigns` for active campaigns list
+- [x] `myBookingsAsAdvertiser` aggregated by space for top spaces
+- [x] `myBookingsAsAdvertiser.payments` aggregated for spending chart
+- [x] `myNotifications` for recent activity feed
 
 #### Backend Note
 
-**Queries (exist in schema):**
+**Queries (used):**
 
-- `myCampaigns(where: {status: {eq: ACTIVE}})` - Active campaigns
-- `myBookingsAsAdvertiser(where: {status: {in: [INSTALLED, VERIFIED]}})` - Pending verifications
-- `me.advertiserProfile.totalSpend` - Total spending
+- `me.advertiserProfile.totalSpend` - Total lifetime spending
+- `myCampaigns(where: {status: {in: [ACTIVE, SUBMITTED]}})` - Active campaigns
+- `myBookingsAsAdvertiser(where: {status: {eq: VERIFIED}})` - Pending approvals
+- `myBookingsAsAdvertiser(where: {status: {in: [...]}})` - For top spaces and stats
+- `myBookingsAsAdvertiser.payments` - For spending chart (client-side aggregation)
+- `myNotifications` - For recent activity feed
 
-**Missing:**
+**Patterns Used:**
 
-- `activeCampaignsCount` - Use `totalCount` from connection
-- `pendingBookingsCount` - Need count of PENDING_APPROVAL bookings
-- Spending chart time-series - Aggregate from `myBookingsAsAdvertiser.payments`
-- Consider `advertiserDashboardSummary` query for efficiency
+- Parallel routes for independent streaming of each section
+- Fragment reader pattern with `createFragmentReader`
+- Client-side aggregation for top spaces (group by space, sum amounts)
+- Client-side aggregation for spending chart (group by date)
 
-**Frontend Status:** ❌ Entirely mocked
+**Frontend Status:** ✅ Fully functional (parallel routes, all sections live)
 
 ---
 
@@ -1432,11 +1443,12 @@ For payment flows:
 
 ### Missing Queries (would improve UX)
 
-1. `spaceOwnerAnalytics` - Aggregated analytics
-2. `advertiserAnalytics` - Aggregated analytics
-3. `advertiserSpendingSummary` - Spending totals
+1. `spaceOwnerAnalytics` - Aggregated analytics for analytics page
+2. `advertiserAnalytics` - Aggregated analytics for analytics page
+3. `advertiserSpendingSummary` - Spending totals for spending page
 4. `calendarEvents` - Optimized calendar query
-5. `myActivityFeed` - Unified activity stream
+
+Note: Activity feeds on overview pages use `myNotifications`, charts use client-side aggregation from `myPayouts`/`myBookingsAsAdvertiser.payments`.
 
 Everything else exists in the schema - frontend needs to wire up the mutations.
 
@@ -1453,7 +1465,7 @@ Everything else exists in the schema - frontend needs to wire up the mutations.
 
 ### Phase 2: GraphQL Migration
 
-1. Overview pages → Replace mock data with real queries
+1. ~~Overview pages → Replace mock data with real queries~~ ✅ Done (Space Owner stats + Advertiser full)
 2. Analytics → Request backend aggregation queries
 3. Bookings → Enable filtering, remove mock fallback
 

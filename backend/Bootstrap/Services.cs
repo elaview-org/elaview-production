@@ -6,6 +6,7 @@ using ElaviewBackend.Features.Auth;
 using ElaviewBackend.Features.Marketplace;
 using ElaviewBackend.Features.Notifications;
 using ElaviewBackend.Features.Payments;
+using ElaviewBackend.Features.Analytics;
 using ElaviewBackend.Features.Shared.Errors;
 using ElaviewBackend.Features.Users;
 using ElaviewBackend.Settings;
@@ -62,6 +63,8 @@ public static class Services {
             .AddScoped<IConversationRepository, ConversationRepository>()
             .AddScoped<IMessageService, MessageService>()
             .AddScoped<IMessageRepository, MessageRepository>()
+            .AddScoped<IAnalyticsRepository, AnalyticsRepository>()
+            .AddScoped<IAnalyticsService, AnalyticsService>()
             .AddScoped<DatabaseSeeder>()
             .AddScoped<ISeeder, AdminSeeder>()
             .AddScoped<ISeeder, LegacyDevAccountsSeeder>()

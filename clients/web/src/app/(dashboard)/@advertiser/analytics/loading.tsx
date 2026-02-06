@@ -5,8 +5,8 @@ import {
 import { PerformanceTableSkeleton } from "./performance-table";
 import { TopPerformersSkeleton } from "./top-performers";
 import { ComparisonCardSkeleton } from "./comparison-card";
-import { ChartCardSkeleton } from "./spending-chart";
 import { StatusChartSkeleton } from "./status-chart";
+import { ChartCardSkeleton } from "@/components/composed/chart-card-skeleton";
 
 export default function Loading() {
   return (

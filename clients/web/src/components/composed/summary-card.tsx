@@ -34,6 +34,8 @@ type Props = {
   showFooterIcon?: boolean;
 };
 
+//this summary card they should perform also skeleton
+
 export default function SummaryCard({
   label,
   value,

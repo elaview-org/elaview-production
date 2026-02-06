@@ -18,7 +18,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
-import mock from "./mock.json";
+import mock from "../mock.json";
 
 type SpacePerformance = {
   id: string;

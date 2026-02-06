@@ -30,6 +30,9 @@ jobs:
       - name: Install
         run: ev web:install
 
+      - name: Format
+        run: ev web:format:check
+
       - name: Lint
         run: ev web:lint
 

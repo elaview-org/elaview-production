@@ -61,10 +61,10 @@ ev_web_test() {
     return $ev_web_exit
 }
 
-ev_web_coverage() {
+ev_web_test_coverage() {
     ev_core_require_cmd "bun" || return 1
     ev_core_log_info "Running web tests with coverage..."
-    ev_core_in_web bun run test:coverage
+    ev_core_in_web bun test:coverage
     ev_web_exit=$?
     [ $ev_web_exit -eq 0 ] && ev_core_log_success "Coverage report generated."
     return $ev_web_exit
@@ -75,7 +75,16 @@ ev_web_format() {
     ev_core_log_info "Formatting web client..."
     ev_core_in_web bun format
     ev_web_exit=$?
-    [ $ev_web_exit -eq 0 ] && ev_core_log_success "Formatting complete."
+    [ $ev_web_exit -eq 0 ] && ev_core_log_success "Formatting completed."
+    return $ev_web_exit
+}
+
+ev_web_format_check() {
+    ev_core_require_cmd "bun" || return 1
+    ev_core_log_info "Checking code format in web client..."
+    ev_core_in_web bun format:check
+    ev_web_exit=$?
+    [ $ev_web_exit -eq 0 ] && ev_core_log_success "Formatting check completed."
     return $ev_web_exit
 }
 
@@ -84,17 +93,18 @@ ev_web_dispatch() {
     shift
 
     case "$cmd" in
-        install)  ev_web_install ;;
-        lint)     ev_web_lint ;;
-        typecheck) ev_web_typecheck ;;
-        build)    ev_web_build ;;
-        test)     ev_web_test ;;
-        coverage) ev_web_coverage ;;
-        format)   ev_web_format ;;
-        reset)    ev_web_reset ;;
+        install)            ev_web_install ;;
+        lint)               ev_web_lint ;;
+        typecheck)          ev_web_typecheck ;;
+        build)              ev_web_build ;;
+        test)               ev_web_test ;;
+        test:coverage)      ev_web_test_coverage ;;
+        format)             ev_web_format ;;
+        format:check)       ev_web_format_check ;;
+        reset)              ev_web_reset ;;
         *)
             ev_core_log_error "Unknown web command: $cmd"
-            echo "Available: install, lint, typecheck, build, test, coverage, format, reset"
+            echo "Available: install, lint, typecheck, build, test, test:coverage, format, format:check, reset"
             return 1
             ;;
     esac

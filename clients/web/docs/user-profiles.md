@@ -72,29 +72,29 @@ Each profile has its own `navigation-bar.data.ts`:
 
 ### Space Owner Routes
 
-| Route     | Status       | Data Source    | Notes                                   |
-|-----------|--------------|----------------|-----------------------------------------|
-| Overview  | ✅ Functional | GraphQL        | Fully integrated                        |
-| Listings  | ✅ Functional | GraphQL        | Fully integrated with mutations         |
-| Bookings  | ⚠️ Partial   | GraphQL + Mock | Filtering disabled, mutations not wired |
-| Earnings  | ✅ Functional | GraphQL        | Fully integrated                        |
-| Analytics | ⚠️ Partial   | Mock JSON      | UI complete, needs backend query        |
-| Calendar  | ⚠️ Partial   | Mock JSON      | Views implemented, needs GraphQL        |
-| Profile   | ✅ Functional | GraphQL        | Real reviews from API                   |
-| Settings  | ✅ Functional | GraphQL        | Stripe Connect, notifications working   |
+| Route     | Status       | Data Source | Notes                                 |
+|-----------|--------------|-------------|---------------------------------------|
+| Overview  | ✅ Functional | GraphQL     | Fully integrated                      |
+| Listings  | ✅ Functional | GraphQL     | Fully integrated with mutations       |
+| Bookings  | ✅ Functional | GraphQL     | Filtering, actions, detail page wired |
+| Earnings  | ✅ Functional | GraphQL     | Fully integrated                      |
+| Analytics | ⚠️ Partial   | Mock JSON   | UI complete, needs backend query      |
+| Calendar  | ⚠️ Partial   | Mock JSON   | Views implemented, needs GraphQL      |
+| Profile   | ✅ Functional | GraphQL     | Real reviews from API                 |
+| Settings  | ✅ Functional | GraphQL     | Stripe Connect, notifications working |
 
 ### Advertiser Routes
 
-| Route     | Status       | Data Source | Notes                            |
-|-----------|--------------|-------------|----------------------------------|
+| Route     | Status       | Data Source | Notes                              |
+|-----------|--------------|-------------|------------------------------------|
 | Overview  | ✅ Functional | GraphQL     | Parallel routes, all sections live |
-| Discover  | ✅ Functional | GraphQL     | Grid/Table/Map views working     |
-| Campaigns | ⚠️ Partial   | GraphQL     | Query works, mutations not wired |
-| Bookings  | ⚠️ Partial   | GraphQL     | Query works, mutations needed    |
-| Spending  | ❌ Mock Only  | Mock        | No GraphQL integration           |
-| Analytics | ❌ Mock Only  | Mock        | No GraphQL integration           |
-| Profile   | ✅ Functional | GraphQL     | Real campaign data               |
-| Settings  | ✅ Functional | GraphQL     | Notifications, delete working    |
+| Discover  | ✅ Functional | GraphQL     | Grid/Table/Map views working       |
+| Campaigns | ⚠️ Partial   | GraphQL     | Query works, mutations not wired   |
+| Bookings  | ⚠️ Partial   | GraphQL     | Query works, mutations needed      |
+| Spending  | ❌ Mock Only  | Mock        | No GraphQL integration             |
+| Analytics | ❌ Mock Only  | Mock        | No GraphQL integration             |
+| Profile   | ✅ Functional | GraphQL     | Real campaign data                 |
+| Settings  | ✅ Functional | GraphQL     | Notifications, delete working      |
 
 ---
 
@@ -464,35 +464,38 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Real GraphQL query (`myBookingsAsOwner`)
 - [x] Fragment masking
 - [x] Status badges with colors
-- [x] Action dropdowns
+- [x] Action dropdowns (wired to mutations)
 - [x] Empty state placeholder
 - [x] Loading skeleton
-- [ ] Tab filters (Incoming, Active, Completed, All) - currently disabled
-- [ ] Search by advertiser or space name
-- [ ] Date range filter
-- [ ] Bulk actions (Accept, Reject selected)
-- [ ] Export to CSV
+- [x] Tab filters (Incoming, Active, Completed, All)
+- [x] Search by advertiser or space name (`searchText` param)
+- [x] Sorting (startDate, endDate, createdAt, ownerPayoutAmount)
+- [x] Pagination
+- [x] Bulk actions (Accept, Reject selected with reason dialog)
+- [x] Date range filter
+- [x] Export to CSV
 
 **Filter Tabs:**
 
-| Tab       | Status Filter                                      |
-|-----------|----------------------------------------------------|
-| Incoming  | `PENDING_APPROVAL`                                 |
-| Active    | `PAID`, `FILE_DOWNLOADED`, `INSTALLED`, `VERIFIED` |
-| Completed | `COMPLETED`                                        |
-| All       | No filter                                          |
+| Tab       | Status Filter                                                  |
+|-----------|----------------------------------------------------------------|
+| Incoming  | `PENDING_APPROVAL`                                             |
+| Active    | `APPROVED`, `PAID`, `FILE_DOWNLOADED`, `INSTALLED`, `VERIFIED` |
+| Completed | `COMPLETED`                                                    |
+| All       | No filter                                                      |
 
 **Detail Page (`/bookings/[id]`):**
 
-- [ ] Header with status and dates
-- [ ] Status timeline visualization
-- [ ] Campaign info (advertiser, creative preview)
-- [ ] Space info card
-- [ ] Financial summary (price breakdown, payouts)
-- [ ] Context-appropriate action buttons
-- [ ] Verification photos display/upload
-- [ ] Message thread link
-- [ ] Dispute handling UI
+- [x] Header with status and dates
+- [x] Status timeline visualization (7-step progress or terminal state)
+- [x] Campaign info (advertiser, creative preview)
+- [x] Space info card
+- [x] Financial summary (price breakdown, payouts by stage)
+- [x] Context-appropriate action buttons (sticky bottom bar)
+- [x] Verification photos display
+- [x] Message thread link (creates conversation on demand)
+- [x] Dispute handling UI
+- [x] Verification photos upload
 
 **Status-Based Actions:**
 
@@ -522,16 +525,17 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - `cancelBooking(input: {id, reason})`
 - `markFileDownloaded(input: {id})` - Owner downloaded creative
 - `markInstalled(input: {id})` - Owner completed installation
+- `submitProof(input: {bookingId, photoUrls})` - Upload verification photos
+- `createBookingConversation(input: {bookingId})` - Start/get conversation with advertiser
 
 **Subscriptions (exist in schema):**
 
 - `onBookingUpdate(bookingId)` - Real-time status changes
 - `onProofUpdate(bookingId)` - Verification status changes
 
-**Note:** All mutations exist but frontend hasn't wired action buttons. Status filtering exists but frontend disabled
-it (see bookings/page.tsx).
+**Note:** All mutations wired. Status filtering enabled with URL param sync.
 
-**Frontend Status:** Query works. Mutations not wired.
+**Frontend Status:** ✅ Fully functional (queries + mutations wired, detail page complete)
 
 ---
 
@@ -544,24 +548,24 @@ it (see bookings/page.tsx).
 **Main Page:**
 
 - [x] Balance cards (Available, Pending, This Month, Total)
-- [x] Real GraphQL query (`earningsSummary`, `myPayouts`)
+- [x] Real GraphQL query (`earningsSummary`, `myPayouts`, `me.spaceOwnerProfile.stripeAccountStatus`)
 - [x] Fragment masking
 - [x] Earnings chart with daily aggregation
 - [x] Payouts table with stage badges
 - [x] Loading skeleton
-- [ ] Stripe Connect status indicator
-- [ ] "Withdraw" button integration
-- [ ] Date range filter for chart
-- [ ] Export payouts to CSV
+- [x] Stripe Connect status indicator (badge on Available Balance card)
+- [x] "Withdraw" button integration (`requestManualPayout` mutation)
+- [x] Date range filter for chart
+- [x] Export payouts to CSV
 
 **Payout History (`/earnings/payouts`):**
 
-- [ ] Full payout history with pagination
-- [ ] Filter by stage (Stage 1, Stage 2)
-- [ ] Filter by status (Pending, Processing, Completed, Failed)
-- [ ] Filter by date range
-- [ ] Retry failed payout button
-- [ ] Export to CSV/PDF
+- [x] Full payout history with pagination
+- [x] Filter by stage (Stage 1, Stage 2)
+- [x] Filter by status (Pending, Processing, Completed, Failed)
+- [x] Filter by date range
+- [x] Retry failed payout button (`retryPayout` mutation)
+- [x] Export to CSV/PDF (dropdown with both options)
 
 **Payout Types:**
 
@@ -714,7 +718,8 @@ query spaceOwnerAnalytics(dateRange: DateRangeInput): SpaceOwnerAnalytics
 - `blockDates(input: {spaceId, dates, reason})` - Block dates ✅
 - `unblockDates(input: {spaceId, dates})` - Unblock dates ✅
 
-**Note:** Space-specific calendar with block/unblock is implemented in `/listings/[id]`. Global calendar route still uses mock data.
+**Note:** Space-specific calendar with block/unblock is implemented in `/listings/[id]`. Global calendar route still
+uses mock data.
 
 **Frontend Status:** ⚠️ Global calendar uses mock. Space-specific calendar in /listings/[id] is functional.
 
@@ -1120,7 +1125,7 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 | `mySpaces`                | Owner's spaces             | ✅           |
 | `spaceById(id)`           | Single space details       | ✅           |
 | `myBookingsAsOwner`       | Bookings on owner's spaces | ✅           |
-| `bookingById(id)`         | Single booking details     | ❌           |
+| `bookingById(id)`         | Single booking details     | ✅           |
 | `incomingBookingRequests` | Pending approval queue     | ❌           |
 | `bookingsRequiringAction` | Bookings needing action    | ❌           |
 | `earningsSummary`         | Financial summary          | ✅           |
@@ -1168,11 +1173,12 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 
 | Mutation             | Purpose                    | Implemented |
 |----------------------|----------------------------|-------------|
-| `approveBooking`     | Accept booking request     | ❌           |
-| `rejectBooking`      | Decline booking request    | ❌           |
-| `cancelBooking`      | Cancel booking             | ❌           |
-| `markFileDownloaded` | Record creative download   | ❌           |
-| `markInstalled`      | Mark installation complete | ❌           |
+| `approveBooking`     | Accept booking request     | ✅           |
+| `rejectBooking`      | Decline booking request    | ✅           |
+| `cancelBooking`      | Cancel booking             | ✅           |
+| `markFileDownloaded` | Record creative download   | ✅           |
+| `markInstalled`      | Mark installation complete | ✅           |
+| `submitProof`        | Upload verification photos | ✅           |
 
 **Campaign:**
 
@@ -1197,7 +1203,7 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 | Mutation        | Purpose             | Implemented |
 |-----------------|---------------------|-------------|
 | `processPayout` | Process payout      | ❌           |
-| `retryPayout`   | Retry failed payout | ❌           |
+| `retryPayout`   | Retry failed payout | ✅           |
 
 **Message:**
 
@@ -1205,7 +1211,7 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 |-----------------------------|---------------------|-------------|
 | `sendMessage`               | Send message        | ✅           |
 | `markConversationRead`      | Mark thread as read | ✅           |
-| `createBookingConversation` | Start conversation  | ❌           |
+| `createBookingConversation` | Start conversation  | ✅           |
 
 **Notification:**
 
@@ -1443,41 +1449,7 @@ For payment flows:
 3. `advertiserSpendingSummary` - Spending totals for spending page
 4. `calendarEvents` - Optimized calendar query
 
-Note: Activity feeds on overview pages use `myNotifications`, charts use client-side aggregation from `myPayouts`/`myBookingsAsAdvertiser.payments`.
+Note: Activity feeds on overview pages use `myNotifications`, charts use client-side aggregation from `myPayouts`/
+`myBookingsAsAdvertiser.payments`.
 
 Everything else exists in the schema - frontend needs to wire up the mutations.
-
----
-
-## Implementation Priority
-
-### Phase 1: Core Mutations (Critical Path)
-
-1. ~~Space mutations (create, update, delete)~~ ✅ Done
-2. Booking actions (approve, reject, mark downloaded/installed)
-3. Campaign mutations (create, update, submit, cancel)
-4. Payment flow (createPaymentIntent, confirmPayment)
-
-### Phase 2: GraphQL Migration
-
-1. ~~Overview pages → Replace mock data with real queries~~ ✅ Done (Space Owner stats + Advertiser full)
-2. Analytics → Request backend aggregation queries
-3. Bookings → Enable filtering, remove mock fallback
-
-### Phase 3: Communication
-
-1. ~~Messages (conversation list, thread view, send)~~ ✅ Done
-2. ~~Notifications (list, mark read, real-time)~~ ✅ Done (except real-time)
-3. Real-time subscriptions (messages done, notifications pending)
-
-### Phase 4: Advanced Features
-
-1. ~~Calendar view with date blocking~~ ✅ Done (in /listings/[id])
-2. Export functionality
-3. Stripe payment methods management
-
-### Phase 5: Polish
-
-1. Empty states refinement
-2. Error handling improvements
-3. Performance optimization

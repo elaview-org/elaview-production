@@ -10,18 +10,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/primitives/dialog";
-import { Input } from "@/components/primitives/input";
-import {
-  IconLoader2,
-  IconToggleLeft,
-  IconTrash,
-  IconX,
-} from "@tabler/icons-react";
+import { Textarea } from "@/components/primitives/textarea";
+import { IconCheck, IconLoader2, IconX } from "@tabler/icons-react";
 import { toast } from "sonner";
 import {
-  bulkDeactivateSpacesAction,
-  bulkDeleteSpacesAction,
-} from "./listings.actions";
+  bulkApproveBookingsAction,
+  bulkRejectBookingsAction,
+} from "../bookings.actions";
 
 type Props = {
   selectedIds: string[];
@@ -29,46 +24,52 @@ type Props = {
 };
 
 export default function BulkActions({ selectedIds, onClearSelection }: Props) {
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [confirmText, setConfirmText] = useState("");
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
   const [isPending, startTransition] = useTransition();
 
   const count = selectedIds.length;
-  const confirmValue = count.toString();
-  const isConfirmValid = confirmText === confirmValue;
 
-  const handleDeactivate = () => {
+  const handleApprove = () => {
     startTransition(async () => {
-      const result = await bulkDeactivateSpacesAction(selectedIds);
+      const result = await bulkApproveBookingsAction(selectedIds);
       if (result.success) {
-        toast.success(`Deactivated ${result.successCount} spaces`);
+        toast.success(`Approved ${result.successCount} bookings`);
         onClearSelection();
       } else if (result.successCount > 0) {
         toast.success(
-          `Deactivated ${result.successCount} spaces, ${result.failedCount} failed`
+          `Approved ${result.successCount} bookings, ${result.failedCount} failed`
         );
         onClearSelection();
       } else {
-        toast.error("Failed to deactivate spaces");
+        toast.error("Failed to approve bookings");
       }
     });
   };
 
-  const handleDelete = () => {
+  const handleReject = () => {
+    if (!rejectReason.trim()) {
+      toast.error("Please provide a reason for rejection");
+      return;
+    }
+
     startTransition(async () => {
-      const result = await bulkDeleteSpacesAction(selectedIds);
-      setDeleteDialogOpen(false);
-      setConfirmText("");
+      const result = await bulkRejectBookingsAction(
+        selectedIds,
+        rejectReason.trim()
+      );
+      setRejectDialogOpen(false);
+      setRejectReason("");
       if (result.success) {
-        toast.success(`Deleted ${result.successCount} spaces`);
+        toast.success(`Rejected ${result.successCount} bookings`);
         onClearSelection();
       } else if (result.successCount > 0) {
         toast.success(
-          `Deleted ${result.successCount} spaces, ${result.failedCount} failed`
+          `Rejected ${result.successCount} bookings, ${result.failedCount} failed`
         );
         onClearSelection();
       } else {
-        toast.error("Failed to delete spaces");
+        toast.error("Failed to reject bookings");
       }
     });
   };
@@ -79,31 +80,31 @@ export default function BulkActions({ selectedIds, onClearSelection }: Props) {
     <>
       <div className="bg-muted/50 flex items-center gap-3 rounded-lg border px-4 py-2">
         <span className="text-sm font-medium">
-          {count} {count === 1 ? "space" : "spaces"} selected
+          {count} {count === 1 ? "booking" : "bookings"} selected
         </span>
         <div className="bg-border h-4 w-px" />
         <Button
           variant="outline"
           size="sm"
-          onClick={handleDeactivate}
+          onClick={handleApprove}
           disabled={isPending}
         >
           {isPending ? (
             <IconLoader2 className="size-4 animate-spin" />
           ) : (
-            <IconToggleLeft className="size-4" />
+            <IconCheck className="size-4" />
           )}
-          Deactivate
+          Accept
         </Button>
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setDeleteDialogOpen(true)}
+          onClick={() => setRejectDialogOpen(true)}
           disabled={isPending}
           className="text-destructive hover:text-destructive"
         >
-          <IconTrash className="size-4" />
-          Delete
+          <IconX className="size-4" />
+          Reject
         </Button>
         <div className="flex-1" />
         <Button
@@ -117,44 +118,40 @@ export default function BulkActions({ selectedIds, onClearSelection }: Props) {
         </Button>
       </div>
 
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      <Dialog open={rejectDialogOpen} onOpenChange={setRejectDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete {count} spaces?</DialogTitle>
+            <DialogTitle>Reject {count} bookings?</DialogTitle>
             <DialogDescription>
-              This action cannot be undone. All selected spaces will be
-              permanently deleted along with their bookings and reviews.
+              The advertisers will be notified of the rejection. Please provide
+              a reason for rejecting these booking requests.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-2 py-4">
-            <p className="text-sm">
-              Type <span className="font-mono font-bold">{confirmValue}</span>{" "}
-              to confirm deletion:
-            </p>
-            <Input
-              value={confirmText}
-              onChange={(e) => setConfirmText(e.target.value)}
-              placeholder={confirmValue}
-              autoComplete="off"
+            <Textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="Reason for rejection..."
+              rows={3}
             />
           </div>
           <DialogFooter>
             <Button
               variant="outline"
               onClick={() => {
-                setDeleteDialogOpen(false);
-                setConfirmText("");
+                setRejectDialogOpen(false);
+                setRejectReason("");
               }}
             >
               Cancel
             </Button>
             <Button
               variant="destructive"
-              onClick={handleDelete}
-              disabled={!isConfirmValid || isPending}
+              onClick={handleReject}
+              disabled={!rejectReason.trim() || isPending}
             >
               {isPending && <IconLoader2 className="size-4 animate-spin" />}
-              Delete {count} spaces
+              Reject {count} bookings
             </Button>
           </DialogFooter>
         </DialogContent>

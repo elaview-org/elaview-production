@@ -93,4 +93,18 @@ public static partial class BookingMutations {
         var booking = await bookingService.MarkInstalledAsync(userService.GetPrincipalId(), id, ct);
         return new MarkInstalledPayload(booking);
     }
+
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
+    [Error<InvalidStatusTransitionException>]
+    public static async Task<SubmitProofPayload> SubmitProof(
+        SubmitProofInput input,
+        IUserService userService,
+        IBookingService bookingService,
+        CancellationToken ct
+    ) {
+        var booking = await bookingService.SubmitProofAsync(userService.GetPrincipalId(), input, ct);
+        return new SubmitProofPayload(booking);
+    }
 }

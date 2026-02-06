@@ -259,3 +259,15 @@ public enum PartnerStatus {
     Inactive,
     Churned
 }
+
+public enum ManualPayoutStatus {
+    Pending,
+    Completed,
+    Failed
+}
+
+public enum Granularity {
+    Day,
+    Week,
+    Month
+}

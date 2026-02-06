@@ -19,6 +19,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
 
     public DbSet<Payment> Payments { get; set; } = null!;
     public DbSet<Payout> Payouts { get; set; } = null!;
+    public DbSet<ManualPayout> ManualPayouts { get; set; } = null!;
     public DbSet<Refund> Refunds { get; set; } = null!;
     public DbSet<Transaction> Transactions { get; set; } = null!;
     public DbSet<StripeWebhookEvent> StripeWebhookEvents { get; set; } = null!;
@@ -56,6 +57,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
 
         new PaymentConfig().Configure(modelBuilder.Entity<Payment>());
         new PayoutConfig().Configure(modelBuilder.Entity<Payout>());
+        new ManualPayoutConfig().Configure(modelBuilder.Entity<ManualPayout>());
         new RefundConfig().Configure(modelBuilder.Entity<Refund>());
         new TransactionConfig().Configure(modelBuilder.Entity<Transaction>());
         new StripeWebhookEventConfig().Configure(modelBuilder

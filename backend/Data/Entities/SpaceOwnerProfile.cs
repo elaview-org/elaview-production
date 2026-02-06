@@ -18,6 +18,8 @@ public sealed class SpaceOwnerProfile : UserProfileBase {
     public ICollection<Space> Spaces { get; init; } = [];
 
     public ICollection<Payout> Payouts { get; init; } = [];
+
+    public ICollection<ManualPayout> ManualPayouts { get; init; } = [];
 }
 
 public sealed class SpaceOwnerProfileConfig :

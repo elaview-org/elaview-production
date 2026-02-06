@@ -29,4 +29,15 @@ public static partial class PayoutQueries {
         IPayoutService payoutService,
         CancellationToken ct
     ) => await payoutService.GetEarningsSummaryAsync(userService.GetPrincipalId(), ct);
+
+    [Authorize]
+    public static async Task<List<EarningsDataPoint>> GetEarningsByDateRange(
+        DateTime start,
+        DateTime end,
+        Granularity granularity,
+        IUserService userService,
+        IPayoutService payoutService,
+        CancellationToken ct
+    ) => await payoutService.GetEarningsByDateRangeAsync(
+        userService.GetPrincipalId(), start, end, granularity, ct);
 }

@@ -1,5 +1,8 @@
+using System.Text;
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Notifications;
 using ElaviewBackend.Features.Shared.Errors;
+using Microsoft.EntityFrameworkCore;
 
 namespace ElaviewBackend.Features.Marketplace;
 
@@ -7,6 +10,7 @@ public interface IBookingService {
     IQueryable<Booking> GetById(Guid id);
     IQueryable<Booking> GetByAdvertiserUserId(Guid userId);
     IQueryable<Booking> GetByOwnerUserId(Guid userId);
+    IQueryable<Booking> GetByOwnerUserId(Guid userId, string? searchText);
     IQueryable<Booking> GetPendingByOwnerUserId(Guid userId);
     IQueryable<Booking> GetRequiringActionByUserId(Guid userId);
     IQueryable<Review> GetReviewsByBookingId(Guid bookingId);
@@ -20,9 +24,14 @@ public interface IBookingService {
     Task<Booking> CancelAsync(Guid userId, Guid id, string reason, CancellationToken ct);
     Task<Booking> MarkFileDownloadedAsync(Guid userId, Guid id, CancellationToken ct);
     Task<Booking> MarkInstalledAsync(Guid userId, Guid id, CancellationToken ct);
+    Task<Booking> SubmitProofAsync(Guid userId, SubmitProofInput input, CancellationToken ct);
+    Task<ExportBookingsPayload> ExportBookingsAsCsvAsync(Guid userId, ExportBookingsInput? input, CancellationToken ct);
 }
 
-public sealed class BookingService(IBookingRepository repository) : IBookingService {
+public sealed class BookingService(
+    IBookingRepository repository,
+    INotificationService notificationService
+) : IBookingService {
     private const decimal PlatformFeePercent = 0.10m;
 
     public IQueryable<Booking> GetById(Guid id)
@@ -33,6 +42,13 @@ public sealed class BookingService(IBookingRepository repository) : IBookingServ
 
     public IQueryable<Booking> GetByOwnerUserId(Guid userId)
         => repository.GetByOwnerUserId(userId);
+
+    public IQueryable<Booking> GetByOwnerUserId(Guid userId, string? searchText) {
+        if (string.IsNullOrWhiteSpace(searchText))
+            return repository.GetByOwnerUserId(userId);
+
+        return repository.GetByOwnerUserIdWithSearch(userId, searchText);
+    }
 
     public IQueryable<Booking> GetPendingByOwnerUserId(Guid userId)
         => repository.GetPendingByOwnerUserId(userId);
@@ -186,5 +202,100 @@ public sealed class BookingService(IBookingRepository repository) : IBookingServ
             throw new InvalidStatusTransitionException(booking.Status.ToString(), BookingStatus.Installed.ToString());
 
         return await repository.UpdateStatusAsync(booking, BookingStatus.Installed, ct);
+    }
+
+    public async Task<Booking> SubmitProofAsync(Guid userId, SubmitProofInput input, CancellationToken ct) {
+        var booking = await repository.GetByIdWithRelationsAsync(input.BookingId, ct)
+            ?? throw new NotFoundException("Booking", input.BookingId);
+
+        if (booking.Space.SpaceOwnerProfile.UserId != userId)
+            throw new ForbiddenException("submit proof for this booking");
+
+        if (booking.Status != BookingStatus.Installed)
+            throw new InvalidStatusTransitionException(booking.Status.ToString(), BookingStatus.Verified.ToString());
+
+        var now = DateTime.UtcNow;
+        var proof = new BookingProof {
+            BookingId = input.BookingId,
+            Photos = input.PhotoUrls,
+            Status = ProofStatus.Pending,
+            SubmittedAt = now,
+            AutoApproveAt = now.AddHours(48),
+            CreatedAt = now
+        };
+
+        await repository.AddProofAsync(proof, ct);
+        var updatedBooking = await repository.UpdateStatusAsync(booking, BookingStatus.Verified, ct);
+
+        await notificationService.SendBookingNotificationAsync(
+            input.BookingId,
+            NotificationType.ProofUploaded,
+            "Verification Photos Submitted",
+            $"The space owner has submitted verification photos for your booking at {booking.Space.Title}.",
+            ct);
+
+        return updatedBooking;
+    }
+
+    public async Task<ExportBookingsPayload> ExportBookingsAsCsvAsync(Guid userId, ExportBookingsInput? input, CancellationToken ct) {
+        var query = repository.GetByOwnerUserId(userId);
+
+        if (input is not null) {
+            if (!string.IsNullOrWhiteSpace(input.SearchText))
+                query = repository.GetByOwnerUserIdWithSearch(userId, input.SearchText);
+
+            if (input.Statuses is { Count: > 0 })
+                query = query.Where(b => input.Statuses.Contains(b.Status));
+
+            if (input.StartDateFrom.HasValue)
+                query = query.Where(b => b.StartDate >= input.StartDateFrom.Value);
+
+            if (input.StartDateTo.HasValue)
+                query = query.Where(b => b.StartDate <= input.StartDateTo.Value);
+        }
+
+        var bookings = await query
+            .Include(b => b.Space)
+            .Include(b => b.Campaign).ThenInclude(c => c.AdvertiserProfile).ThenInclude(p => p.User)
+            .OrderByDescending(b => b.CreatedAt)
+            .ToListAsync(ct);
+
+        var csv = new StringBuilder();
+        csv.AppendLine("Booking ID,Status,Start Date,End Date,Total Days,Space Title,Space Address,Space City,Advertiser Company,Advertiser Contact,Total Amount,Owner Payout Amount,Created At,File Downloaded At");
+
+        foreach (var booking in bookings) {
+            var advertiserName = booking.Campaign.AdvertiserProfile.User.Name;
+            var row = string.Join(",",
+                EscapeCsvField(booking.Id.ToString()),
+                EscapeCsvField(booking.Status.ToString()),
+                EscapeCsvField(booking.StartDate.ToString("yyyy-MM-dd")),
+                EscapeCsvField(booking.EndDate.ToString("yyyy-MM-dd")),
+                booking.TotalDays,
+                EscapeCsvField(booking.Space.Title),
+                EscapeCsvField(booking.Space.Address ?? ""),
+                EscapeCsvField(booking.Space.City ?? ""),
+                EscapeCsvField(booking.Campaign.AdvertiserProfile.CompanyName ?? ""),
+                EscapeCsvField(advertiserName),
+                booking.TotalAmount,
+                booking.OwnerPayoutAmount,
+                EscapeCsvField(booking.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")),
+                EscapeCsvField(booking.FileDownloadedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? ""));
+            csv.AppendLine(row);
+        }
+
+        var fileName = $"bookings-export-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv";
+        var contentBase64 = Convert.ToBase64String(Encoding.UTF8.GetBytes(csv.ToString()));
+
+        return new ExportBookingsPayload(fileName, contentBase64, "text/csv");
+    }
+
+    private static string EscapeCsvField(string field) {
+        if (string.IsNullOrEmpty(field))
+            return "";
+
+        if (field.Contains(',') || field.Contains('"') || field.Contains('\n'))
+            return $"\"{field.Replace("\"", "\"\"")}\"";
+
+        return field;
     }
 }

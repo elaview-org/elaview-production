@@ -6,7 +6,7 @@ import TableView from "@/components/composed/table-view";
 import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import { columns, type SpaceRow } from "./columns";
 import TablePlaceholder from "./placeholder";
-import BulkActions from "../bulk-actions";
+import BulkActions from "./bulk-actions";
 
 export const ListingsTable_SpaceFragment = graphql(`
   fragment ListingsTable_SpaceFragment on Space {

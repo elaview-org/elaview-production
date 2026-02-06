@@ -24,7 +24,9 @@ public interface IBookingRepository {
     Task<bool> HasOverlappingBookingsAsync(Guid spaceId, DateTime startDate, DateTime endDate, CancellationToken ct);
     Task<bool> HasBlockedDatesInRangeAsync(Guid spaceId, DateOnly startDate, DateOnly endDate, CancellationToken ct);
     Task<Booking> AddAsync(Booking booking, CancellationToken ct);
+    Task<BookingProof> AddProofAsync(BookingProof proof, CancellationToken ct);
     Task<Booking> UpdateStatusAsync(Booking booking, BookingStatus status, CancellationToken ct);
+    IQueryable<Booking> GetByOwnerUserIdWithSearch(Guid userId, string searchText);
     Task SaveChangesAsync(CancellationToken ct);
 }
 
@@ -129,6 +131,22 @@ public sealed class BookingRepository(
         context.Entry(booking).Property(b => b.UpdatedAt).CurrentValue = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
         return booking;
+    }
+
+    public async Task<BookingProof> AddProofAsync(BookingProof proof, CancellationToken ct) {
+        context.BookingProofs.Add(proof);
+        await context.SaveChangesAsync(ct);
+        return proof;
+    }
+
+    public IQueryable<Booking> GetByOwnerUserIdWithSearch(Guid userId, string searchText) {
+        var term = searchText.ToLower();
+        return context.Bookings
+            .Where(b => b.Space.SpaceOwnerProfile.UserId == userId)
+            .Where(b =>
+                b.Space.Title.ToLower().Contains(term) ||
+                b.Campaign.AdvertiserProfile.CompanyName!.ToLower().Contains(term) ||
+                b.Campaign.AdvertiserProfile.User.Name.ToLower().Contains(term));
     }
 
     public async Task SaveChangesAsync(CancellationToken ct)

@@ -51,6 +51,7 @@ public static class Services {
             .AddScoped<IPaymentRepository, PaymentRepository>()
             .AddScoped<IPayoutService, PayoutService>()
             .AddScoped<IPayoutRepository, PayoutRepository>()
+            .AddScoped<IManualPayoutRepository, ManualPayoutRepository>()
             .AddScoped<IRefundService, RefundService>()
             .AddScoped<IRefundRepository, RefundRepository>()
             .AddScoped<ITransactionService, TransactionService>()

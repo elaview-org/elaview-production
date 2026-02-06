@@ -1132,6 +1132,12 @@ export type DisputeIssueTypeOperationFilterInput = {
   nin?: InputMaybe<Array<DisputeIssueType>>;
 };
 
+export type EarningsDataPoint = {
+  __typename: "EarningsDataPoint";
+  amount: Scalars["Decimal"]["output"];
+  date: Scalars["DateTime"]["output"];
+};
+
 export type EarningsSummary = {
   __typename: "EarningsSummary";
   availableBalance: Maybe<Scalars["Decimal"]["output"]>;
@@ -1143,6 +1149,20 @@ export type EarningsSummary = {
 
 export type Error = {
   message: Scalars["String"]["output"];
+};
+
+export type ExportBookingsInput = {
+  searchText?: InputMaybe<Scalars["String"]["input"]>;
+  startDateFrom?: InputMaybe<Scalars["DateTime"]["input"]>;
+  startDateTo?: InputMaybe<Scalars["DateTime"]["input"]>;
+  statuses?: InputMaybe<Array<BookingStatus>>;
+};
+
+export type ExportBookingsPayload = {
+  __typename: "ExportBookingsPayload";
+  contentBase64: Scalars["String"]["output"];
+  contentType: Scalars["String"]["output"];
+  fileName: Scalars["String"]["output"];
 };
 
 export type FloatOperationFilterInput = {
@@ -1174,6 +1194,12 @@ export type GeocodingError = Error & {
   details: Maybe<Scalars["String"]["output"]>;
   message: Scalars["String"]["output"];
 };
+
+export enum Granularity {
+  Day = "DAY",
+  Month = "MONTH",
+  Week = "WEEK",
+}
 
 /** A connection to a list of items. */
 export type IncomingBookingRequestsConnection = {
@@ -1252,6 +1278,13 @@ export type ListFilterInputTypeOfConversationParticipantFilterInput = {
   some?: InputMaybe<ConversationParticipantFilterInput>;
 };
 
+export type ListFilterInputTypeOfManualPayoutFilterInput = {
+  all?: InputMaybe<ManualPayoutFilterInput>;
+  any?: InputMaybe<Scalars["Boolean"]["input"]>;
+  none?: InputMaybe<ManualPayoutFilterInput>;
+  some?: InputMaybe<ManualPayoutFilterInput>;
+};
+
 export type ListFilterInputTypeOfMessageFilterInput = {
   all?: InputMaybe<MessageFilterInput>;
   any?: InputMaybe<Scalars["Boolean"]["input"]>;
@@ -1321,6 +1354,46 @@ export type LocalDateOperationFilterInput = {
   nin?: InputMaybe<Array<InputMaybe<Scalars["LocalDate"]["input"]>>>;
   nlt?: InputMaybe<Scalars["LocalDate"]["input"]>;
   nlte?: InputMaybe<Scalars["LocalDate"]["input"]>;
+};
+
+export type ManualPayout = {
+  __typename: "ManualPayout";
+  amount: Scalars["Decimal"]["output"];
+  createdAt: Scalars["DateTime"]["output"];
+  failureReason: Maybe<Scalars["String"]["output"]>;
+  id: Scalars["UUID"]["output"];
+  processedAt: Maybe<Scalars["DateTime"]["output"]>;
+  spaceOwnerProfile: SpaceOwnerProfile;
+  spaceOwnerProfileId: Scalars["UUID"]["output"];
+  status: ManualPayoutStatus;
+  stripePayoutId: Maybe<Scalars["String"]["output"]>;
+};
+
+export type ManualPayoutFilterInput = {
+  amount?: InputMaybe<DecimalOperationFilterInput>;
+  and?: InputMaybe<Array<ManualPayoutFilterInput>>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  failureReason?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<ManualPayoutFilterInput>>;
+  processedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileFilterInput>;
+  spaceOwnerProfileId?: InputMaybe<UuidOperationFilterInput>;
+  status?: InputMaybe<ManualPayoutStatusOperationFilterInput>;
+  stripePayoutId?: InputMaybe<StringOperationFilterInput>;
+};
+
+export enum ManualPayoutStatus {
+  Completed = "COMPLETED",
+  Failed = "FAILED",
+  Pending = "PENDING",
+}
+
+export type ManualPayoutStatusOperationFilterInput = {
+  eq?: InputMaybe<ManualPayoutStatus>;
+  in?: InputMaybe<Array<ManualPayoutStatus>>;
+  neq?: InputMaybe<ManualPayoutStatus>;
+  nin?: InputMaybe<Array<ManualPayoutStatus>>;
 };
 
 export type MarkAllNotificationsReadPayload = {
@@ -1521,11 +1594,13 @@ export type Mutation = {
   reactivateSpace: ReactivateSpacePayload;
   refreshStripeAccountStatus: RefreshStripeAccountStatusPayload;
   rejectBooking: RejectBookingPayload;
+  requestManualPayout: RequestManualPayoutPayload;
   requestRefund: RequestRefundPayload;
   retryPayout: RetryPayoutPayload;
   sendMessage: SendMessagePayload;
   setDefaultPaymentMethod: SetDefaultPaymentMethodPayload;
   submitCampaign: SubmitCampaignPayload;
+  submitProof: SubmitProofPayload;
   unblockDates: UnblockDatesPayload;
   updateAdvertiserProfile: UpdateAdvertiserProfilePayload;
   updateCampaign: UpdateCampaignPayload;
@@ -1654,6 +1729,10 @@ export type MutationRejectBookingArgs = {
   input: RejectBookingInput;
 };
 
+export type MutationRequestManualPayoutArgs = {
+  input: RequestManualPayoutInput;
+};
+
 export type MutationRequestRefundArgs = {
   input: RequestRefundInput;
 };
@@ -1672,6 +1751,10 @@ export type MutationSetDefaultPaymentMethodArgs = {
 
 export type MutationSubmitCampaignArgs = {
   input: SubmitCampaignInput;
+};
+
+export type MutationSubmitProofArgs = {
+  input: SubmitProofInput;
 };
 
 export type MutationUnblockDatesArgs = {
@@ -2297,7 +2380,9 @@ export type Query = {
   bookingById: Maybe<Booking>;
   bookingsRequiringAction: Maybe<BookingsRequiringActionConnection>;
   campaignById: Maybe<Campaign>;
+  earningsByDateRange: Array<EarningsDataPoint>;
   earningsSummary: EarningsSummary;
+  exportBookingsAsCsv: ExportBookingsPayload;
   incomingBookingRequests: Maybe<IncomingBookingRequestsConnection>;
   me: Maybe<User>;
   messagesByConversation: Maybe<MessagesByConversationConnection>;
@@ -2363,6 +2448,16 @@ export type QueryCampaignByIdArgs = {
   id: Scalars["ID"]["input"];
 };
 
+export type QueryEarningsByDateRangeArgs = {
+  end: Scalars["DateTime"]["input"];
+  granularity: Granularity;
+  start: Scalars["DateTime"]["input"];
+};
+
+export type QueryExportBookingsAsCsvArgs = {
+  input?: InputMaybe<ExportBookingsInput>;
+};
+
 export type QueryIncomingBookingRequestsArgs = {
   after?: InputMaybe<Scalars["String"]["input"]>;
   before?: InputMaybe<Scalars["String"]["input"]>;
@@ -2400,6 +2495,7 @@ export type QueryMyBookingsAsOwnerArgs = {
   first?: InputMaybe<Scalars["Int"]["input"]>;
   last?: InputMaybe<Scalars["Int"]["input"]>;
   order?: InputMaybe<Array<BookingSortInput>>;
+  searchText?: InputMaybe<Scalars["String"]["input"]>;
   where?: InputMaybe<BookingFilterInput>;
 };
 
@@ -2656,6 +2752,21 @@ export type RejectBookingPayload = {
   __typename: "RejectBookingPayload";
   booking: Maybe<Booking>;
   errors: Maybe<Array<RejectBookingError>>;
+};
+
+export type RequestManualPayoutError =
+  | NotFoundError
+  | PaymentError
+  | ValidationError;
+
+export type RequestManualPayoutInput = {
+  amount?: InputMaybe<Scalars["Decimal"]["input"]>;
+};
+
+export type RequestManualPayoutPayload = {
+  __typename: "RequestManualPayoutPayload";
+  errors: Maybe<Array<RequestManualPayoutError>>;
+  manualPayout: Maybe<ManualPayout>;
 };
 
 export type RequestRefundError =
@@ -2995,6 +3106,7 @@ export type SpaceOwnerProfile = {
   businessType: Maybe<Scalars["String"]["output"]>;
   createdAt: Scalars["DateTime"]["output"];
   id: Scalars["UUID"]["output"];
+  manualPayouts: Array<ManualPayout>;
   onboardingComplete: Scalars["Boolean"]["output"];
   payoutSchedule: PayoutSchedule;
   payouts: Array<Payout>;
@@ -3034,6 +3146,7 @@ export type SpaceOwnerProfileFilterInput = {
   businessType?: InputMaybe<StringOperationFilterInput>;
   createdAt?: InputMaybe<DateTimeOperationFilterInput>;
   id?: InputMaybe<UuidOperationFilterInput>;
+  manualPayouts?: InputMaybe<ListFilterInputTypeOfManualPayoutFilterInput>;
   onboardingComplete?: InputMaybe<BooleanOperationFilterInput>;
   or?: InputMaybe<Array<SpaceOwnerProfileFilterInput>>;
   payoutSchedule?: InputMaybe<PayoutScheduleOperationFilterInput>;
@@ -3221,6 +3334,22 @@ export type SubmitCampaignPayload = {
   __typename: "SubmitCampaignPayload";
   campaign: Maybe<Campaign>;
   errors: Maybe<Array<SubmitCampaignError>>;
+};
+
+export type SubmitProofError =
+  | ForbiddenError
+  | InvalidStatusTransitionError
+  | NotFoundError;
+
+export type SubmitProofInput = {
+  bookingId: Scalars["ID"]["input"];
+  photoUrls: Array<Scalars["String"]["input"]>;
+};
+
+export type SubmitProofPayload = {
+  __typename: "SubmitProofPayload";
+  booking: Maybe<Booking>;
+  errors: Maybe<Array<SubmitProofError>>;
 };
 
 export type Subscription = {
@@ -4017,6 +4146,7 @@ export type BookingsTable_BookingFragmentFragment = {
   campaign: {
     __typename: "Campaign";
     name: string;
+    imageUrl: string;
     advertiserProfile: {
       __typename: "AdvertiserProfile";
       companyName: string | null;
@@ -4024,11 +4154,230 @@ export type BookingsTable_BookingFragmentFragment = {
   } | null;
 } & { " $fragmentName"?: "BookingsTable_BookingFragmentFragment" };
 
-export type SpaceOwnerBookingsQueryVariables = Exact<{ [key: string]: never }>;
+export type BookingDetailQueryVariables = Exact<{
+  id: Scalars["ID"]["input"];
+}>;
+
+export type BookingDetailQuery = {
+  bookingById: {
+    __typename: "Booking";
+    id: string;
+    status: BookingStatus;
+    startDate: string;
+    endDate: string;
+    createdAt: string;
+    totalDays: number;
+    pricePerDay: number;
+    subtotalAmount: number;
+    installationFee: number;
+    platformFeeAmount: number;
+    platformFeePercent: number;
+    totalAmount: number;
+    ownerPayoutAmount: number;
+    ownerNotes: string | null;
+    advertiserNotes: string | null;
+    rejectionReason: string | null;
+    rejectedAt: string | null;
+    cancellationReason: string | null;
+    cancelledAt: string | null;
+    fileDownloadedAt: string | null;
+    space: {
+      __typename: "Space";
+      id: string;
+      title: string;
+      images: Array<string>;
+      address: string;
+      city: string;
+      state: string;
+      zipCode: string | null;
+    } | null;
+    campaign: {
+      __typename: "Campaign";
+      id: string;
+      name: string;
+      imageUrl: string;
+      advertiserProfile: {
+        __typename: "AdvertiserProfile";
+        companyName: string | null;
+        user: { __typename: "User"; name: string; avatar: string | null };
+      };
+    } | null;
+    proof: {
+      __typename: "BookingProof";
+      id: string;
+      status: ProofStatus;
+      photos: Array<string>;
+      submittedAt: string;
+      autoApproveAt: string;
+      rejectionReason: string | null;
+    } | null;
+    dispute: {
+      __typename: "BookingDispute";
+      id: string;
+      issueType: DisputeIssueType;
+      reason: string;
+      photos: Array<string>;
+      disputedAt: string;
+      resolutionAction: string | null;
+      resolutionNotes: string | null;
+      resolvedAt: string | null;
+    } | null;
+    payouts: Array<{
+      __typename: "Payout";
+      id: string;
+      amount: number;
+      stage: PayoutStage;
+      status: PayoutStatus;
+      processedAt: string | null;
+    }>;
+  } | null;
+};
+
+export type ApproveBookingMutationVariables = Exact<{
+  input: ApproveBookingInput;
+}>;
+
+export type ApproveBookingMutation = {
+  approveBooking: {
+    __typename: "ApproveBookingPayload";
+    booking: {
+      __typename: "Booking";
+      id: string;
+      status: BookingStatus;
+    } | null;
+    errors: Array<
+      | { __typename: "ForbiddenError"; message: string }
+      | { __typename: "InvalidStatusTransitionError"; message: string }
+      | { __typename: "NotFoundError"; message: string }
+    > | null;
+  };
+};
+
+export type RejectBookingMutationVariables = Exact<{
+  input: RejectBookingInput;
+}>;
+
+export type RejectBookingMutation = {
+  rejectBooking: {
+    __typename: "RejectBookingPayload";
+    booking: {
+      __typename: "Booking";
+      id: string;
+      status: BookingStatus;
+    } | null;
+    errors: Array<
+      | { __typename: "ForbiddenError"; message: string }
+      | { __typename: "InvalidStatusTransitionError"; message: string }
+      | { __typename: "NotFoundError"; message: string }
+    > | null;
+  };
+};
+
+export type CancelBookingMutationVariables = Exact<{
+  input: CancelBookingInput;
+}>;
+
+export type CancelBookingMutation = {
+  cancelBooking: {
+    __typename: "CancelBookingPayload";
+    booking: {
+      __typename: "Booking";
+      id: string;
+      status: BookingStatus;
+    } | null;
+    errors: Array<
+      | { __typename: "ForbiddenError"; message: string }
+      | { __typename: "InvalidStatusTransitionError"; message: string }
+      | { __typename: "NotFoundError"; message: string }
+    > | null;
+  };
+};
+
+export type MarkFileDownloadedMutationVariables = Exact<{
+  input: MarkFileDownloadedInput;
+}>;
+
+export type MarkFileDownloadedMutation = {
+  markFileDownloaded: {
+    __typename: "MarkFileDownloadedPayload";
+    booking: {
+      __typename: "Booking";
+      id: string;
+      status: BookingStatus;
+      fileDownloadedAt: string | null;
+    } | null;
+    errors: Array<
+      | { __typename: "ForbiddenError"; message: string }
+      | { __typename: "InvalidStatusTransitionError"; message: string }
+      | { __typename: "NotFoundError"; message: string }
+    > | null;
+  };
+};
+
+export type MarkInstalledMutationVariables = Exact<{
+  input: MarkInstalledInput;
+}>;
+
+export type MarkInstalledMutation = {
+  markInstalled: {
+    __typename: "MarkInstalledPayload";
+    booking: {
+      __typename: "Booking";
+      id: string;
+      status: BookingStatus;
+    } | null;
+    errors: Array<
+      | { __typename: "ForbiddenError"; message: string }
+      | { __typename: "InvalidStatusTransitionError"; message: string }
+      | { __typename: "NotFoundError"; message: string }
+    > | null;
+  };
+};
+
+export type SubmitProofMutationVariables = Exact<{
+  input: SubmitProofInput;
+}>;
+
+export type SubmitProofMutation = {
+  submitProof: {
+    __typename: "SubmitProofPayload";
+    booking: {
+      __typename: "Booking";
+      id: string;
+      status: BookingStatus;
+    } | null;
+    errors: Array<
+      | { __typename: "ForbiddenError"; message: string }
+      | { __typename: "InvalidStatusTransitionError"; message: string }
+      | { __typename: "NotFoundError"; message: string }
+    > | null;
+  };
+};
+
+export type CreateBookingConversationMutationVariables = Exact<{
+  input: CreateBookingConversationInput;
+}>;
+
+export type CreateBookingConversationMutation = {
+  createBookingConversation: {
+    __typename: "CreateBookingConversationPayload";
+    conversation: { __typename: "Conversation"; id: string } | null;
+    errors: Array<{ __typename: "NotFoundError"; message: string }> | null;
+  };
+};
+
+export type SpaceOwnerBookingsQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  where?: InputMaybe<BookingFilterInput>;
+  order?: InputMaybe<Array<BookingSortInput> | BookingSortInput>;
+  searchText?: InputMaybe<Scalars["String"]["input"]>;
+}>;
 
 export type SpaceOwnerBookingsQuery = {
   myBookingsAsOwner: {
     __typename: "MyBookingsAsOwnerConnection";
+    totalCount: number;
     nodes: Array<
       { __typename: "Booking"; id: string } & {
         " $fragmentRefs"?: {
@@ -4037,6 +4386,13 @@ export type SpaceOwnerBookingsQuery = {
         };
       }
     > | null;
+    pageInfo: {
+      __typename: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor: string | null;
+      endCursor: string | null;
+    };
   } | null;
 };
 
@@ -4049,9 +4405,37 @@ export type BalanceCards_EarningsSummaryFragmentFragment = {
   totalEarnings: number | null;
 } & { " $fragmentName"?: "BalanceCards_EarningsSummaryFragmentFragment" };
 
+export type RequestManualPayoutMutationVariables = Exact<{
+  input: RequestManualPayoutInput;
+}>;
+
+export type RequestManualPayoutMutation = {
+  requestManualPayout: {
+    __typename: "RequestManualPayoutPayload";
+    manualPayout: {
+      __typename: "ManualPayout";
+      id: string;
+      amount: number;
+      status: ManualPayoutStatus;
+    } | null;
+    errors: Array<
+      | { __typename: "NotFoundError"; message: string }
+      | { __typename: "PaymentError"; message: string }
+      | { __typename: "ValidationError"; message: string }
+    > | null;
+  };
+};
+
 export type SpaceOwnerEarningsQueryVariables = Exact<{ [key: string]: never }>;
 
 export type SpaceOwnerEarningsQuery = {
+  me: {
+    __typename: "User";
+    spaceOwnerProfile: {
+      __typename: "SpaceOwnerProfile";
+      stripeAccountStatus: string | null;
+    } | null;
+  } | null;
   earningsSummary: { __typename: "EarningsSummary" } & {
     " $fragmentRefs"?: {
       BalanceCards_EarningsSummaryFragmentFragment: BalanceCards_EarningsSummaryFragmentFragment;
@@ -4087,6 +4471,65 @@ export type PayoutsTable_PayoutFragmentFragment = {
     space: { __typename: "Space"; title: string } | null;
   };
 } & { " $fragmentName"?: "PayoutsTable_PayoutFragmentFragment" };
+
+export type SpaceOwnerPayoutsHistoryQueryVariables = Exact<{
+  first?: InputMaybe<Scalars["Int"]["input"]>;
+  after?: InputMaybe<Scalars["String"]["input"]>;
+  where?: InputMaybe<PayoutFilterInput>;
+  order?: InputMaybe<Array<PayoutSortInput> | PayoutSortInput>;
+}>;
+
+export type SpaceOwnerPayoutsHistoryQuery = {
+  myPayouts: {
+    __typename: "MyPayoutsConnection";
+    nodes: Array<
+      { __typename: "Payout"; id: string } & {
+        " $fragmentRefs"?: {
+          PayoutsHistoryTable_PayoutFragmentFragment: PayoutsHistoryTable_PayoutFragmentFragment;
+        };
+      }
+    > | null;
+    pageInfo: {
+      __typename: "PageInfo";
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor: string | null;
+      endCursor: string | null;
+    };
+  } | null;
+};
+
+export type PayoutsHistoryTable_PayoutFragmentFragment = {
+  __typename: "Payout";
+  id: string;
+  amount: number;
+  stage: PayoutStage;
+  status: PayoutStatus;
+  processedAt: string | null;
+  failureReason: string | null;
+  attemptCount: number;
+  booking: {
+    __typename: "Booking";
+    id: string;
+    space: { __typename: "Space"; title: string } | null;
+  };
+} & { " $fragmentName"?: "PayoutsHistoryTable_PayoutFragmentFragment" };
+
+export type RetryPayoutMutationVariables = Exact<{
+  input: RetryPayoutInput;
+}>;
+
+export type RetryPayoutMutation = {
+  retryPayout: {
+    __typename: "RetryPayoutPayload";
+    payout: { __typename: "Payout"; id: string; status: PayoutStatus } | null;
+    errors: Array<
+      | { __typename: "InvalidStatusTransitionError"; message: string }
+      | { __typename: "NotFoundError"; message: string }
+      | { __typename: "PaymentError"; message: string }
+    > | null;
+  };
+};
 
 export type SpaceCard_SpaceFragmentFragment = {
   __typename: "Space";
@@ -7503,6 +7946,7 @@ export const BookingsTable_BookingFragmentFragmentDoc = {
               kind: "SelectionSet",
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "imageUrl" } },
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "advertiserProfile" },
@@ -7593,6 +8037,54 @@ export const PayoutsTable_PayoutFragmentFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<PayoutsTable_PayoutFragmentFragment, unknown>;
+export const PayoutsHistoryTable_PayoutFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PayoutsHistoryTable_PayoutFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Payout" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "amount" } },
+          { kind: "Field", name: { kind: "Name", value: "stage" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "processedAt" } },
+          { kind: "Field", name: { kind: "Name", value: "failureReason" } },
+          { kind: "Field", name: { kind: "Name", value: "attemptCount" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "booking" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "space" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  PayoutsHistoryTable_PayoutFragmentFragment,
+  unknown
+>;
 export const SpaceCard_SpaceFragmentFragmentDoc = {
   kind: "Document",
   definitions: [
@@ -11862,6 +12354,899 @@ export const AdvertiserOverviewDataDocument = {
   AdvertiserOverviewDataQuery,
   AdvertiserOverviewDataQueryVariables
 >;
+export const BookingDetailDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "BookingDetail" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: { kind: "Variable", name: { kind: "Name", value: "id" } },
+          type: {
+            kind: "NonNullType",
+            type: { kind: "NamedType", name: { kind: "Name", value: "ID" } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "bookingById" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "id" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "id" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                { kind: "Field", name: { kind: "Name", value: "status" } },
+                { kind: "Field", name: { kind: "Name", value: "startDate" } },
+                { kind: "Field", name: { kind: "Name", value: "endDate" } },
+                { kind: "Field", name: { kind: "Name", value: "createdAt" } },
+                { kind: "Field", name: { kind: "Name", value: "totalDays" } },
+                { kind: "Field", name: { kind: "Name", value: "pricePerDay" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "subtotalAmount" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "installationFee" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "platformFeeAmount" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "platformFeePercent" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "totalAmount" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "ownerPayoutAmount" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "ownerNotes" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "advertiserNotes" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "rejectionReason" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "rejectedAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "cancellationReason" },
+                },
+                { kind: "Field", name: { kind: "Name", value: "cancelledAt" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "fileDownloadedAt" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "space" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "images" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "address" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "city" } },
+                      { kind: "Field", name: { kind: "Name", value: "state" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "zipCode" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "campaign" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "name" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "imageUrl" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "advertiserProfile" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "companyName" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "user" },
+                              selectionSet: {
+                                kind: "SelectionSet",
+                                selections: [
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "name" },
+                                  },
+                                  {
+                                    kind: "Field",
+                                    name: { kind: "Name", value: "avatar" },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "proof" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "photos" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "submittedAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "autoApproveAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "rejectionReason" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "dispute" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "issueType" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "reason" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "photos" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "disputedAt" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "resolutionAction" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "resolutionNotes" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "resolvedAt" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "payouts" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "amount" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "stage" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "processedAt" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<BookingDetailQuery, BookingDetailQueryVariables>;
+export const ApproveBookingDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "ApproveBooking" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "ApproveBookingInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "approveBooking" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "booking" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ApproveBookingMutation,
+  ApproveBookingMutationVariables
+>;
+export const RejectBookingDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "RejectBooking" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "RejectBookingInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "rejectBooking" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "booking" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  RejectBookingMutation,
+  RejectBookingMutationVariables
+>;
+export const CancelBookingDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CancelBooking" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "CancelBookingInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "cancelBooking" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "booking" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CancelBookingMutation,
+  CancelBookingMutationVariables
+>;
+export const MarkFileDownloadedDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "MarkFileDownloaded" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "MarkFileDownloadedInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "markFileDownloaded" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "booking" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "fileDownloadedAt" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkFileDownloadedMutation,
+  MarkFileDownloadedMutationVariables
+>;
+export const MarkInstalledDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "MarkInstalled" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "MarkInstalledInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "markInstalled" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "booking" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkInstalledMutation,
+  MarkInstalledMutationVariables
+>;
+export const SubmitProofDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "SubmitProof" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "SubmitProofInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "submitProof" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "booking" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SubmitProofMutation, SubmitProofMutationVariables>;
+export const CreateBookingConversationDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "CreateBookingConversation" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "CreateBookingConversationInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "createBookingConversation" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "conversation" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateBookingConversationMutation,
+  CreateBookingConversationMutationVariables
+>;
 export const SpaceOwnerBookingsDocument = {
   kind: "Document",
   definitions: [
@@ -11869,12 +13254,108 @@ export const SpaceOwnerBookingsDocument = {
       kind: "OperationDefinition",
       operation: "query",
       name: { kind: "Name", value: "SpaceOwnerBookings" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "first" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "after" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "where" },
+          },
+          type: {
+            kind: "NamedType",
+            name: { kind: "Name", value: "BookingFilterInput" },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "order" },
+          },
+          type: {
+            kind: "ListType",
+            type: {
+              kind: "NonNullType",
+              type: {
+                kind: "NamedType",
+                name: { kind: "Name", value: "BookingSortInput" },
+              },
+            },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "searchText" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+      ],
       selectionSet: {
         kind: "SelectionSet",
         selections: [
           {
             kind: "Field",
             name: { kind: "Name", value: "myBookingsAsOwner" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "first" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "after" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "after" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "where" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "where" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "order" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "searchText" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "searchText" },
+                },
+              },
+            ],
             selectionSet: {
               kind: "SelectionSet",
               selections: [
@@ -11902,6 +13383,32 @@ export const SpaceOwnerBookingsDocument = {
                     ],
                   },
                 },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "hasNextPage" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "hasPreviousPage" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "startCursor" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "endCursor" },
+                      },
+                    ],
+                  },
+                },
+                { kind: "Field", name: { kind: "Name", value: "totalCount" } },
               ],
             },
           },
@@ -11993,6 +13500,7 @@ export const SpaceOwnerBookingsDocument = {
               kind: "SelectionSet",
               selections: [
                 { kind: "Field", name: { kind: "Name", value: "name" } },
+                { kind: "Field", name: { kind: "Name", value: "imageUrl" } },
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "advertiserProfile" },
@@ -12017,6 +13525,102 @@ export const SpaceOwnerBookingsDocument = {
   SpaceOwnerBookingsQuery,
   SpaceOwnerBookingsQueryVariables
 >;
+export const RequestManualPayoutDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "RequestManualPayout" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "RequestManualPayoutInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "requestManualPayout" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "manualPayout" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "amount" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  RequestManualPayoutMutation,
+  RequestManualPayoutMutationVariables
+>;
 export const SpaceOwnerEarningsDocument = {
   kind: "Document",
   definitions: [
@@ -12027,6 +13631,28 @@ export const SpaceOwnerEarningsDocument = {
       selectionSet: {
         kind: "SelectionSet",
         selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "me" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spaceOwnerProfile" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "stripeAccountStatus" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
           {
             kind: "Field",
             name: { kind: "Name", value: "earningsSummary" },
@@ -12141,6 +13767,284 @@ export const SpaceOwnerEarningsDocument = {
   SpaceOwnerEarningsQuery,
   SpaceOwnerEarningsQueryVariables
 >;
+export const SpaceOwnerPayoutsHistoryDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "SpaceOwnerPayoutsHistory" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "first" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "Int" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "after" },
+          },
+          type: { kind: "NamedType", name: { kind: "Name", value: "String" } },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "where" },
+          },
+          type: {
+            kind: "NamedType",
+            name: { kind: "Name", value: "PayoutFilterInput" },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "order" },
+          },
+          type: {
+            kind: "ListType",
+            type: {
+              kind: "NonNullType",
+              type: {
+                kind: "NamedType",
+                name: { kind: "Name", value: "PayoutSortInput" },
+              },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "myPayouts" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "first" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "first" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "after" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "after" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "where" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "where" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "order" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "order" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "nodes" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "FragmentSpread",
+                        name: {
+                          kind: "Name",
+                          value: "PayoutsHistoryTable_PayoutFragment",
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "pageInfo" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "hasNextPage" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "hasPreviousPage" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "startCursor" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "endCursor" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "PayoutsHistoryTable_PayoutFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Payout" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          { kind: "Field", name: { kind: "Name", value: "id" } },
+          { kind: "Field", name: { kind: "Name", value: "amount" } },
+          { kind: "Field", name: { kind: "Name", value: "stage" } },
+          { kind: "Field", name: { kind: "Name", value: "status" } },
+          { kind: "Field", name: { kind: "Name", value: "processedAt" } },
+          { kind: "Field", name: { kind: "Name", value: "failureReason" } },
+          { kind: "Field", name: { kind: "Name", value: "attemptCount" } },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "booking" },
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "id" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "space" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SpaceOwnerPayoutsHistoryQuery,
+  SpaceOwnerPayoutsHistoryQueryVariables
+>;
+export const RetryPayoutDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "mutation",
+      name: { kind: "Name", value: "RetryPayout" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "input" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "RetryPayoutInput" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "retryPayout" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "input" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "input" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "payout" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "errors" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "InlineFragment",
+                        typeCondition: {
+                          kind: "NamedType",
+                          name: { kind: "Name", value: "Error" },
+                        },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "message" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<RetryPayoutMutation, RetryPayoutMutationVariables>;
 export const SpaceBookingsDocument = {
   kind: "Document",
   definitions: [

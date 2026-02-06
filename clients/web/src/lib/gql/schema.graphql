@@ -1156,6 +1156,11 @@ input DisputeIssueTypeOperationFilterInput {
   nin: [DisputeIssueType!]
 }
 
+type EarningsDataPoint {
+  amount: Decimal!
+  date: DateTime!
+}
+
 type EarningsSummary {
   availableBalance: Decimal
   lastMonthEarnings: Decimal
@@ -1166,6 +1171,19 @@ type EarningsSummary {
 
 interface Error {
   message: String!
+}
+
+input ExportBookingsInput {
+  searchText: String
+  startDateFrom: DateTime
+  startDateTo: DateTime
+  statuses: [BookingStatus!]
+}
+
+type ExportBookingsPayload {
+  contentBase64: String!
+  contentType: String!
+  fileName: String!
 }
 
 input FloatOperationFilterInput {
@@ -1194,6 +1212,12 @@ type GeocodingError implements Error {
   code: String!
   details: String
   message: String!
+}
+
+enum Granularity {
+  DAY
+  MONTH
+  WEEK
 }
 
 """
@@ -1283,6 +1307,13 @@ input ListFilterInputTypeOfConversationParticipantFilterInput {
   some: ConversationParticipantFilterInput
 }
 
+input ListFilterInputTypeOfManualPayoutFilterInput {
+  all: ManualPayoutFilterInput
+  any: Boolean
+  none: ManualPayoutFilterInput
+  some: ManualPayoutFilterInput
+}
+
 input ListFilterInputTypeOfMessageFilterInput {
   all: MessageFilterInput
   any: Boolean
@@ -1363,6 +1394,45 @@ input LocalDateOperationFilterInput {
 The `Long` scalar type represents non-fractional signed whole 64-bit numeric values. Long can represent values between -(2^63) and 2^63 - 1.
 """
 scalar Long
+
+type ManualPayout {
+  amount: Decimal!
+  createdAt: DateTime!
+  failureReason: String
+  id: UUID!
+  processedAt: DateTime
+  spaceOwnerProfile: SpaceOwnerProfile!
+  spaceOwnerProfileId: UUID!
+  status: ManualPayoutStatus!
+  stripePayoutId: String
+}
+
+input ManualPayoutFilterInput {
+  amount: DecimalOperationFilterInput
+  and: [ManualPayoutFilterInput!]
+  createdAt: DateTimeOperationFilterInput
+  failureReason: StringOperationFilterInput
+  id: UuidOperationFilterInput
+  or: [ManualPayoutFilterInput!]
+  processedAt: DateTimeOperationFilterInput
+  spaceOwnerProfile: SpaceOwnerProfileFilterInput
+  spaceOwnerProfileId: UuidOperationFilterInput
+  status: ManualPayoutStatusOperationFilterInput
+  stripePayoutId: StringOperationFilterInput
+}
+
+enum ManualPayoutStatus {
+  COMPLETED
+  FAILED
+  PENDING
+}
+
+input ManualPayoutStatusOperationFilterInput {
+  eq: ManualPayoutStatus
+  in: [ManualPayoutStatus!]
+  neq: ManualPayoutStatus
+  nin: [ManualPayoutStatus!]
+}
 
 type MarkAllNotificationsReadPayload {
   count: Int!
@@ -1597,6 +1667,9 @@ type Mutation {
   reactivateSpace(input: ReactivateSpaceInput!): ReactivateSpacePayload!
   refreshStripeAccountStatus: RefreshStripeAccountStatusPayload!
   rejectBooking(input: RejectBookingInput!): RejectBookingPayload!
+  requestManualPayout(
+    input: RequestManualPayoutInput!
+  ): RequestManualPayoutPayload!
   requestRefund(input: RequestRefundInput!): RequestRefundPayload!
   retryPayout(input: RetryPayoutInput!): RetryPayoutPayload!
   sendMessage(input: SendMessageInput!): SendMessagePayload!
@@ -1604,6 +1677,7 @@ type Mutation {
     input: SetDefaultPaymentMethodInput!
   ): SetDefaultPaymentMethodPayload!
   submitCampaign(input: SubmitCampaignInput!): SubmitCampaignPayload!
+  submitProof(input: SubmitProofInput!): SubmitProofPayload!
   unblockDates(input: UnblockDatesInput!): UnblockDatesPayload!
   updateAdvertiserProfile(
     input: UpdateAdvertiserProfileInput!
@@ -2369,7 +2443,13 @@ type Query {
     last: Int
   ): BookingsRequiringActionConnection
   campaignById(id: ID!): Campaign
+  earningsByDateRange(
+    end: DateTime!
+    granularity: Granularity!
+    start: DateTime!
+  ): [EarningsDataPoint!]!
   earningsSummary: EarningsSummary!
+  exportBookingsAsCsv(input: ExportBookingsInput): ExportBookingsPayload!
   incomingBookingRequests(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -2450,6 +2530,7 @@ type Query {
     """
     last: Int
     order: [BookingSortInput!]
+    searchText: String
     where: BookingFilterInput
   ): MyBookingsAsOwnerConnection
   myCampaigns(
@@ -2807,6 +2888,17 @@ input RejectBookingInput {
 type RejectBookingPayload {
   booking: Booking
   errors: [RejectBookingError!]
+}
+
+union RequestManualPayoutError = NotFoundError | PaymentError | ValidationError
+
+input RequestManualPayoutInput {
+  amount: Decimal
+}
+
+type RequestManualPayoutPayload {
+  errors: [RequestManualPayoutError!]
+  manualPayout: ManualPayout
 }
 
 union RequestRefundError =
@@ -3168,6 +3260,7 @@ type SpaceOwnerProfile {
   businessType: String
   createdAt: DateTime!
   id: UUID!
+  manualPayouts: [ManualPayout!]!
   onboardingComplete: Boolean!
   payoutSchedule: PayoutSchedule!
   payouts: [Payout!]!
@@ -3227,6 +3320,7 @@ input SpaceOwnerProfileFilterInput {
   businessType: StringOperationFilterInput
   createdAt: DateTimeOperationFilterInput
   id: UuidOperationFilterInput
+  manualPayouts: ListFilterInputTypeOfManualPayoutFilterInput
   onboardingComplete: BooleanOperationFilterInput
   or: [SpaceOwnerProfileFilterInput!]
   payoutSchedule: PayoutScheduleOperationFilterInput
@@ -3423,6 +3517,21 @@ input SubmitCampaignInput {
 type SubmitCampaignPayload {
   campaign: Campaign
   errors: [SubmitCampaignError!]
+}
+
+union SubmitProofError =
+  | ForbiddenError
+  | InvalidStatusTransitionError
+  | NotFoundError
+
+input SubmitProofInput {
+  bookingId: ID!
+  photoUrls: [String!]!
+}
+
+type SubmitProofPayload {
+  booking: Booking
+  errors: [SubmitProofError!]
 }
 
 type Subscription {

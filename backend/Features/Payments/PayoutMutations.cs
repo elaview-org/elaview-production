@@ -1,5 +1,6 @@
 using ElaviewBackend.Data.Entities;
 using ElaviewBackend.Features.Shared.Errors;
+using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Payments;
@@ -28,4 +29,17 @@ public static partial class PayoutMutations {
         CancellationToken ct
     ) => new RetryPayoutPayload(
         await payoutService.RetryPayoutAsync(payoutId, ct));
+
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ValidationException>]
+    [Error<PaymentException>]
+    public static async Task<RequestManualPayoutPayload> RequestManualPayout(
+        RequestManualPayoutInput input,
+        IUserService userService,
+        IPayoutService payoutService,
+        CancellationToken ct
+    ) => new RequestManualPayoutPayload(
+        await payoutService.RequestManualPayoutAsync(
+            userService.GetPrincipalId(), input.Amount, ct));
 }

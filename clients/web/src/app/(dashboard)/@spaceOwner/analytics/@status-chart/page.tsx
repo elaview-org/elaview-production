@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
-import { Skeleton } from "@/components/primitives/skeleton";
 import {
   ChartContainer,
   ChartLegend,
@@ -19,20 +18,8 @@ import {
 } from "@/components/primitives/chart";
 import { BOOKING_STATUS } from "@/lib/constants";
 import { BookingStatus } from "@/types/gql/graphql";
-import { STATUS_CHART_CONFIG } from "./constants";
-import mock from "./mock.json";
-
-export function StatusChartSkeleton() {
-  return (
-    <div className="flex flex-col gap-4 rounded-xl border p-6">
-      <div className="flex flex-col items-center gap-1">
-        <Skeleton className="h-5 w-48" />
-        <Skeleton className="h-4 w-40" />
-      </div>
-      <Skeleton className="mx-auto size-[250px] rounded-full" />
-    </div>
-  );
-}
+import { STATUS_CHART_CONFIG } from "../constants";
+import mock from "../mock.json";
 
 export default function StatusChart() {
   const chartData = React.useMemo(() => {
@@ -56,7 +43,7 @@ export default function StatusChart() {
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={STATUS_CHART_CONFIG}
-          className="mx-auto aspect-square max-h-[300px]"
+          className="mx-auto aspect-square max-h-75"
         >
           <PieChart>
             <ChartTooltip

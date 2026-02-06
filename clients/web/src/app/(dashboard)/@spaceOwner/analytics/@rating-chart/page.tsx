@@ -33,8 +33,8 @@ import {
   MONTH_RANGES,
   RATING_CHART_CONFIG,
   type MonthRange,
-} from "./constants";
-import mock from "./mock.json";
+} from "../constants";
+import mock from "../mock.json";
 
 export default function RatingChart() {
   const [monthRange, setMonthRange] = React.useState<MonthRange>("12m");
@@ -82,7 +82,7 @@ export default function RatingChart() {
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={RATING_CHART_CONFIG}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-62.5 w-full"
         >
           <ComposedChart data={filteredData}>
             <defs>

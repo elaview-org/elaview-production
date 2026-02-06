@@ -2,9 +2,9 @@ import SummaryCard, {
   SummaryCardGrid,
 } from "@/components/composed/summary-card";
 import { calculateTrend, formatCurrency } from "@/lib/utils";
-import mock from "./mock.json";
+import mock from "../mock.json";
 
-export default function SummaryCards() {
+export default async function SummaryCards() {
   const { summary } = mock;
 
   const bookingsChange = calculateTrend(

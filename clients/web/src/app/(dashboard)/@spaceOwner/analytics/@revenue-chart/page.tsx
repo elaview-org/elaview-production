@@ -13,8 +13,8 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/primitives/chart";
-import { SPACE_REVENUE_CHART_CONFIG } from "./constants";
-import mock from "./mock.json";
+import { SPACE_REVENUE_CHART_CONFIG } from "../constants";
+import mock from "../mock.json";
 
 export default function RevenueChart() {
   const chartData = mock.spacePerformance.map((space) => ({
@@ -35,7 +35,7 @@ export default function RevenueChart() {
       <CardContent>
         <ChartContainer
           config={SPACE_REVENUE_CHART_CONFIG}
-          className="h-[300px] w-full"
+          className="h-75 w-full"
         >
           <BarChart
             data={chartData}

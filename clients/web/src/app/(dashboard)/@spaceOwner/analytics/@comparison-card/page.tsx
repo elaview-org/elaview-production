@@ -5,25 +5,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
-import ComparisonTable, {
-  ComparisonTableSkeleton,
-} from "@/components/composed/comparison-table";
-import { Skeleton } from "@/components/primitives/skeleton";
-import mock from "./mock.json";
-
-export function ComparisonCardSkeleton() {
-  return (
-    <Card>
-      <CardHeader>
-        <Skeleton className="h-5 w-36" />
-        <Skeleton className="h-4 w-48" />
-      </CardHeader>
-      <CardContent>
-        <ComparisonTableSkeleton rowCount={4} />
-      </CardContent>
-    </Card>
-  );
-}
+import ComparisonTable from "@/components/composed/comparison-table";
+import mock from "../mock.json";
 
 export default function ComparisonCard() {
   const { comparison } = mock;

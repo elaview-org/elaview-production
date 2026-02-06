@@ -5,26 +5,10 @@ import {
   IconCurrencyDollar,
   IconAlertTriangle,
 } from "@tabler/icons-react";
-import PerformerCard, {
-  PerformerCardSkeleton,
-} from "@/components/composed/performer-card";
-import SectionCard, {
-  SectionCardSkeleton,
-} from "@/components/composed/section-card";
+import PerformerCard from "@/components/composed/performer-card";
+import SectionCard from "@/components/composed/section-card";
 import { formatCurrency } from "@/lib/utils";
-import mock from "./mock.json";
-
-export function TopPerformersSkeleton() {
-  return (
-    <SectionCardSkeleton>
-      <div className="grid grid-cols-1 gap-4 @lg/main:grid-cols-2 @3xl/main:grid-cols-3">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <PerformerCardSkeleton key={i} />
-        ))}
-      </div>
-    </SectionCardSkeleton>
-  );
-}
+import mock from "../mock.json";
 
 export default function TopPerformers() {
   const { topPerformers } = mock;

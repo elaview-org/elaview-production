@@ -26,8 +26,8 @@ import {
   MONTH_RANGES,
   MONTHLY_CHART_CONFIG,
   type MonthRange,
-} from "./constants";
-import mock from "./mock.json";
+} from "../constants";
+import mock from "../mock.json";
 
 export default function MonthlyChart() {
   const [monthRange, setMonthRange] = React.useState<MonthRange>("12m");
@@ -74,7 +74,7 @@ export default function MonthlyChart() {
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={MONTHLY_CHART_CONFIG}
-          className="aspect-auto h-[300px] w-full"
+          className="aspect-auto h-75 w-full"
         >
           <BarChart data={filteredData}>
             <CartesianGrid vertical={false} />

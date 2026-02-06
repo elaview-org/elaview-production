@@ -232,3 +232,29 @@ caused four cascading failures:
 - `src/lib/services/auth.ts`
 - `src/app/(auth)/logout/page.tsx`
 - `src/app/(dashboard)/user-section.tsx`
+
+---
+
+## Popover Components Rendered Behind Leaflet Map
+
+**Date:** 2026-02-06
+**Status:** Fixed
+
+Dropdown menus, select dropdowns, tooltips, and other popover-style components appeared behind the Leaflet map on pages
+like `/discover`. The map's geolocation button used `z-[1000]` to sit above Leaflet's internal controls (tiles ~200,
+markers ~400-600, popups ~700, controls ~800-1000). Since both Leaflet elements and Radix portals render at the `<body>`
+level, they share the same stacking context — and the default `z-50` on Radix primitives lost to `z-[1000]`.
+
+Fixed by updating all non-overlay popover primitives from `z-50` to `z-[1001]`. Dialog, sheet, drawer, and alert-dialog
+were left unchanged because their full-screen overlays (`bg-black/50`) already cover the map.
+
+**Affected files:**
+
+- `src/components/primitives/dropdown-menu.tsx`
+- `src/components/primitives/select.tsx`
+- `src/components/primitives/tooltip.tsx`
+- `src/components/primitives/popover.tsx`
+- `src/components/primitives/hover-card.tsx`
+- `src/components/primitives/navigation-menu.tsx`
+- `src/components/primitives/context-menu.tsx`
+- `src/components/primitives/menubar.tsx`

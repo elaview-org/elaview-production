@@ -1,0 +1,16 @@
+{
+  "reachTrend": [
+    { "date": "2025-11-01", "reach": 8200, "impressions": 16400 },
+    { "date": "2025-11-08", "reach": 12500, "impressions": 25000 },
+    { "date": "2025-11-15", "reach": 6800, "impressions": 13600 },
+    { "date": "2025-11-22", "reach": 15200, "impressions": 30400 },
+    { "date": "2025-11-29", "reach": 9800, "impressions": 19600 },
+    { "date": "2025-12-06", "reach": 13500, "impressions": 27000 },
+    { "date": "2025-12-13", "reach": 18200, "impressions": 36400 },
+    { "date": "2025-12-20", "reach": 7500, "impressions": 15000 },
+    { "date": "2025-12-27", "reach": 10800, "impressions": 21600 },
+    { "date": "2026-01-03", "reach": 19500, "impressions": 39000 },
+    { "date": "2026-01-10", "reach": 9200, "impressions": 18400 },
+    { "date": "2026-01-17", "reach": 13200, "impressions": 26400 }
+  ]
+}

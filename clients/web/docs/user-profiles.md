@@ -92,7 +92,7 @@ Each profile has its own `navigation-bar.data.ts`:
 | Campaigns | ⚠️ Partial   | GraphQL     | Query works, mutations not wired   |
 | Bookings  | ⚠️ Partial   | GraphQL     | Query works, mutations needed      |
 | Spending  | ❌ Mock Only  | Mock        | No GraphQL integration             |
-| Analytics | ❌ Mock Only  | Mock        | No GraphQL integration             |
+| Analytics | ✅ Functional | GraphQL     | Parallel routes, reach chart mocked|
 | Profile   | ✅ Functional | GraphQL     | Real campaign data                 |
 | Settings  | ✅ Functional | GraphQL     | Notifications, delete working      |
 
@@ -1038,26 +1038,25 @@ uses mock data.
 
 **Summary Cards:**
 
-- [ ] Total bookings with trend
-- [ ] Total spent with trend
-- [ ] Active campaigns count
-- [ ] Average booking duration
-- [ ] Spaces booked count
-- [ ] Completion rate
+- [x] Total bookings with trend
+- [x] Total spent with trend
+- [x] Active campaigns count (mapped to totalBookings)
+- [x] Average cost per impression (avgCostPerImpression)
+- [x] Spaces booked count (reach)
+- [x] Completion rate
 
 **Charts:**
 
-- [ ] Bookings over time (area chart with time range)
-- [ ] Status distribution (pie chart)
-- [ ] Spending by campaign (bar chart)
-- [ ] Monthly spending (bar chart with range selector)
-- [ ] Booking heatmap (day × hour activity)
+- [x] Spending over time (area chart with time range)
+- [x] Status distribution (pie chart)
+- [x] Monthly performance (bar chart with range selector)
+- [x] Reach & impressions (area chart - mock data, no backend)
 
 **Tables:**
 
-- [ ] Campaign performance table
-- [ ] Space performance table (which spaces performed best)
-- [ ] Top performing locations
+- [x] Space performance table (which spaces performed best)
+- [x] Top performing locations
+- [x] Period comparison
 
 #### Backend Note
 
@@ -1087,7 +1086,7 @@ type AdvertiserAnalytics {
 query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 ```
 
-**Frontend Status:** ❌ Entirely mocked
+**Frontend Status:** ✅ Functional (reach chart uses mock data pending backend support)
 
 ---
 

@@ -2,81 +2,86 @@ import SummaryCard, {
   SummaryCardGrid,
 } from "@/components/composed/summary-card";
 import { calculateTrend, formatCurrency, formatNumber } from "@/lib/utils";
-import mock from "./mock.json";
+import type { AdvertiserSummary } from "@/types/gql";
 
-export default function SummaryCards() {
-  const { summary } = mock;
+type Props = {
+  data: AdvertiserSummary;
+};
 
+export default function SummaryCards({ data }: Props) {
   const spendChange = calculateTrend(
-    summary.totalSpend,
-    summary.previousTotalSpend
+    Number(data.totalSpend ?? 0),
+    Number(data.previousTotalSpend ?? 0)
   );
   const bookingsChange = calculateTrend(
-    summary.totalBookings,
-    summary.previousTotalBookings
+    data.totalBookings,
+    data.previousTotalBookings
   );
   const impressionsChange = calculateTrend(
-    summary.totalImpressions,
-    summary.previousTotalImpressions
+    Number(data.totalImpressions),
+    Number(data.previousTotalImpressions)
   );
-  const reachChange = calculateTrend(summary.reach, summary.previousReach);
+  const reachChange = calculateTrend(data.reach, data.previousReach);
   const cpiChange = calculateTrend(
-    summary.avgCostPerImpression,
-    summary.previousAvgCostPerImpression
+    Number(data.avgCostPerImpression ?? 0),
+    Number(data.previousAvgCostPerImpression ?? 0)
   );
-  const roiChange = calculateTrend(summary.roi, summary.previousRoi);
+  const roiChange = calculateTrend(
+    Number(data.roi ?? 0),
+    Number(data.previousRoi ?? 0)
+  );
 
   return (
     <div className="flex flex-col gap-4">
       <SummaryCardGrid>
         <SummaryCard
           label="Total Spend"
-          value={formatCurrency(summary.totalSpend)}
+          value={formatCurrency(Number(data.totalSpend ?? 0))}
           badge={{ type: "trend", value: spendChange }}
           footer={spendChange >= 0 ? "Increased spend" : "Reduced spend"}
-          description={`${formatCurrency(summary.previousTotalSpend)} last period`}
+          description={`${formatCurrency(Number(data.previousTotalSpend ?? 0))} last period`}
         />
         <SummaryCard
           label="Total Bookings"
-          value={summary.totalBookings.toString()}
+          value={data.totalBookings.toString()}
           badge={{ type: "trend", value: bookingsChange }}
           footer={bookingsChange >= 0 ? "Trending up" : "Trending down"}
-          description={`${summary.previousTotalBookings} bookings last period`}
+          description={`${data.previousTotalBookings} bookings last period`}
         />
         <SummaryCard
           label="Total Impressions"
-          value={formatNumber(summary.totalImpressions)}
+          value={formatNumber(Number(data.totalImpressions))}
           badge={{ type: "trend", value: impressionsChange }}
           footer={impressionsChange >= 0 ? "Growing reach" : "Declining reach"}
-          description={`${formatNumber(summary.previousTotalImpressions)} last period`}
+          description={`${formatNumber(Number(data.previousTotalImpressions))} last period`}
         />
         <SummaryCard
           label="Total Reach"
-          value={formatNumber(summary.reach)}
+          value={formatNumber(data.reach)}
           badge={{ type: "trend", value: reachChange }}
           footer="Unique viewers"
-          description={`${formatNumber(summary.previousReach)} last period`}
+          description={`${formatNumber(data.previousReach)} last period`}
         />
       </SummaryCardGrid>
 
       <SummaryCardGrid>
         <SummaryCard
           label="Avg. Cost/Impression"
-          value={`$${summary.avgCostPerImpression.toFixed(3)}`}
+          value={`$${Number(data.avgCostPerImpression ?? 0).toFixed(3)}`}
           badge={{ type: "trend", value: -cpiChange }}
           footer={cpiChange <= 0 ? "Better efficiency" : "Increasing cost"}
           description="Cost per impression"
         />
         <SummaryCard
           label="Return on Investment"
-          value={`${summary.roi.toFixed(1)}x`}
+          value={`${Number(data.roi ?? 0).toFixed(1)}x`}
           badge={{ type: "trend", value: roiChange }}
           footer={roiChange >= 0 ? "Improving" : "Declining"}
           description="Revenue generated per dollar spent"
         />
         <SummaryCard
           label="Completion Rate"
-          value={`${summary.completionRate.toFixed(0)}%`}
+          value={`${Number(data.completionRate ?? 0).toFixed(0)}%`}
           badge={{ type: "text", text: "Good" }}
           footer="High completion"
           description="Campaigns successfully completed"
@@ -84,7 +89,7 @@ export default function SummaryCards() {
         />
         <SummaryCard
           label="Active Campaigns"
-          value={summary.totalBookings.toString()}
+          value={data.totalBookings.toString()}
           badge={{ type: "text", text: "Active" }}
           footer="Across all spaces"
           description="Currently running campaigns"

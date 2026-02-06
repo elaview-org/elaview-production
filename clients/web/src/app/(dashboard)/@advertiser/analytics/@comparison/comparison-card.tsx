@@ -9,7 +9,7 @@ import ComparisonTable, {
   ComparisonTableSkeleton,
 } from "@/components/composed/comparison-table";
 import { Skeleton } from "@/components/primitives/skeleton";
-import mock from "./mock.json";
+import type { AdvertiserPeriodComparison } from "@/types/gql";
 
 export function ComparisonCardSkeleton() {
   return (
@@ -25,9 +25,12 @@ export function ComparisonCardSkeleton() {
   );
 }
 
-export default function ComparisonCard() {
-  const { comparison } = mock;
-  const { current, previous } = comparison;
+type Props = {
+  data: AdvertiserPeriodComparison;
+};
+
+export default function ComparisonCard({ data }: Props) {
+  const { current, previous } = data;
 
   return (
     <Card>
@@ -47,17 +50,21 @@ export default function ComparisonCard() {
             },
             {
               label: "Spending",
-              current: current.spending,
-              previous: previous.spending,
+              current: Number(current.spending ?? 0),
+              previous: Number(previous.spending ?? 0),
               format: "currency",
             },
             {
               label: "Impressions",
-              current: current.impressions,
-              previous: previous.impressions,
+              current: Number(current.impressions),
+              previous: Number(previous.impressions),
               format: "number",
             },
-            { label: "ROI", current: current.roi, previous: previous.roi },
+            {
+              label: "ROI",
+              current: Number(current.roi ?? 0),
+              previous: Number(previous.roi ?? 0),
+            },
           ]}
         />
       </CardContent>

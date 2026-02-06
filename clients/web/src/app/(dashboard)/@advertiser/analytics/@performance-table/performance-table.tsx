@@ -11,17 +11,7 @@ import TableView, {
   imageTextColumn,
   numberColumn,
 } from "@/components/composed/table-view";
-import mock from "./mock.json";
-
-type SpacePerformance = {
-  id: string;
-  title: string;
-  totalBookings: number;
-  totalSpend: number;
-  impressions: number;
-  roi: number;
-  image: string;
-};
+import type { AdvertiserSpacePerformance } from "@/types/gql";
 
 function getRoiVariant(roi: number): "default" | "secondary" | "destructive" {
   if (roi >= 3) return "default";
@@ -29,72 +19,56 @@ function getRoiVariant(roi: number): "default" | "secondary" | "destructive" {
   return "destructive";
 }
 
-const roiColumn: ColumnDef<SpacePerformance> = {
+const roiColumn: ColumnDef<AdvertiserSpacePerformance> = {
   id: "roi",
   header: () => <div className="text-right">ROI</div>,
   cell: ({ row }) => (
     <div className="flex items-center justify-end gap-1">
-      <Badge variant={getRoiVariant(row.original.roi)} className="tabular-nums">
+      <Badge
+        variant={getRoiVariant(Number(row.original.roi ?? 0))}
+        className="tabular-nums"
+      >
         <IconTrendingUp className="mr-1 size-3" />
-        {row.original.roi.toFixed(1)}x
+        {Number(row.original.roi ?? 0).toFixed(1)}x
       </Badge>
     </div>
   ),
   meta: { skeleton: "badge", headerAlign: "right" },
 };
 
-const impressionsColumn: ColumnDef<SpacePerformance> = {
+const impressionsColumn: ColumnDef<AdvertiserSpacePerformance> = {
   id: "impressions",
   header: () => <div className="text-right">Impressions</div>,
   cell: ({ row }) => (
     <div className="text-right tabular-nums">
-      {row.original.impressions.toLocaleString()}
+      {Number(row.original.impressions).toLocaleString()}
     </div>
   ),
   meta: { skeleton: "number", headerAlign: "right" },
 };
 
-const columns = [
-  createSelectColumn<SpacePerformance>(),
-  imageTextColumn<SpacePerformance>({
+const columns: ColumnDef<AdvertiserSpacePerformance>[] = [
+  createSelectColumn<AdvertiserSpacePerformance>(),
+  imageTextColumn<AdvertiserSpacePerformance>({
     key: "space",
     header: "Space",
-    image: (row) => row.image,
+    image: (row) => row.image ?? "",
     text: (row) => row.title,
     href: (row) => `/discover/${row.id}`,
   }),
-  numberColumn<SpacePerformance>({
+  numberColumn<AdvertiserSpacePerformance>({
     key: "bookings",
     header: "Bookings",
     value: (row) => row.totalBookings,
   }),
-  currencyColumn<SpacePerformance>({
+  currencyColumn<AdvertiserSpacePerformance>({
     key: "spend",
     header: "Spend",
-    value: (row) => row.totalSpend,
+    value: (row) => Number(row.totalSpend ?? 0),
   }),
   impressionsColumn,
   roiColumn,
 ];
-
-export default function PerformanceTable() {
-  return (
-    <div className="flex flex-col gap-4">
-      <div>
-        <h3 className="text-lg font-semibold">Space Performance</h3>
-        <p className="text-muted-foreground text-sm">
-          Performance metrics for each space you&apos;ve advertised on
-        </p>
-      </div>
-      <TableView
-        data={mock.spacePerformance as SpacePerformance[]}
-        columns={columns}
-        getRowId={(row) => row.id}
-        emptyMessage="No spaces found."
-      />
-    </div>
-  );
-}
 
 export function PerformanceTableSkeleton() {
   return (
@@ -104,6 +78,29 @@ export function PerformanceTableSkeleton() {
         <Skeleton className="mt-1 h-4 w-64" />
       </div>
       <TableViewSkeleton columns={columns} rows={5} />
+    </div>
+  );
+}
+
+type Props = {
+  data: AdvertiserSpacePerformance[];
+};
+
+export default function PerformanceTable({ data }: Props) {
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <h3 className="text-lg font-semibold">Space Performance</h3>
+        <p className="text-muted-foreground text-sm">
+          Performance metrics for each space you&apos;ve advertised on
+        </p>
+      </div>
+      <TableView
+        data={data}
+        columns={columns}
+        getRowId={(row) => row.id}
+        emptyMessage="No spaces found."
+      />
     </div>
   );
 }

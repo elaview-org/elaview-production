@@ -34,21 +34,25 @@ import {
   RATING_CHART_CONFIG,
   type MonthRange,
 } from "./constants";
-import mock from "./mock.json";
+import type { RatingTrendPoint } from "@/types/gql";
 
-export default function RatingChart() {
+type Props = {
+  data: RatingTrendPoint[];
+};
+
+export default function RatingChart({ data }: Props) {
   const [monthRange, setMonthRange] = React.useState<MonthRange>("12m");
 
   const filteredData = React.useMemo(() => {
     const range = MONTH_RANGES.find((r) => r.value === monthRange);
     const monthsToShow = range?.months ?? 12;
-    return mock.ratingTrend.slice(-monthsToShow).map((item) => ({
+    return data.slice(-monthsToShow).map((item) => ({
       ...item,
       monthLabel: new Date(item.month + "-01").toLocaleDateString("en-US", {
         month: "short",
       }),
     }));
-  }, [monthRange]);
+  }, [data, monthRange]);
 
   return (
     <Card className="@container/card">

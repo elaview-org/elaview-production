@@ -27,22 +27,27 @@ import {
   MONTHLY_CHART_CONFIG,
   type MonthRange,
 } from "./constants";
-import mock from "./mock.json";
+import type { MonthlyStats } from "@/types/gql";
 
-export default function MonthlyChart() {
+type Props = {
+  data: MonthlyStats[];
+};
+
+export default function MonthlyChart({ data }: Props) {
   const [monthRange, setMonthRange] = React.useState<MonthRange>("12m");
 
   const filteredData = React.useMemo(() => {
     const range = MONTH_RANGES.find((r) => r.value === monthRange);
     const monthsToShow = range?.months ?? 12;
-    return mock.monthlyRevenue.slice(-monthsToShow).map((item) => ({
+    return data.slice(-monthsToShow).map((item) => ({
       ...item,
+      revenue: Number(item.revenue ?? 0),
       monthLabel: new Date(item.month + "-01").toLocaleDateString("en-US", {
         month: "short",
         year: "2-digit",
       }),
     }));
-  }, [monthRange]);
+  }, [data, monthRange]);
 
   return (
     <Card className="@container/card">

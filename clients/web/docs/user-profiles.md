@@ -78,7 +78,7 @@ Each profile has its own `navigation-bar.data.ts`:
 | Listings  | ✅ Functional | GraphQL     | Fully integrated with mutations       |
 | Bookings  | ✅ Functional | GraphQL     | Filtering, actions, detail page wired |
 | Earnings  | ✅ Functional | GraphQL     | Fully integrated                      |
-| Analytics | ⚠️ Partial   | Mock JSON   | UI complete, needs backend query      |
+| Analytics | ✅ Functional | GraphQL     | Fully integrated                      |
 | Calendar  | ⚠️ Partial   | Mock JSON   | Views implemented, needs GraphQL      |
 | Profile   | ✅ Functional | GraphQL     | Real reviews from API                 |
 | Settings  | ✅ Functional | GraphQL     | Stripe Connect, notifications working |
@@ -618,7 +618,7 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Occupancy rate
 - [x] Repeat advertisers rate
 - [x] Revenue forecast
-- [ ] Replace mock data with real queries
+- [x] Real GraphQL query integration
 
 **Charts:**
 
@@ -629,47 +629,30 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Rating trends (composed chart with review volume)
 - [x] Booking heatmap (day × hour activity)
 - [x] Period comparison card
-- [ ] Replace mock data with real queries
+- [x] Real GraphQL query integration
 
 **Tables:**
 
 - [x] Space performance table with occupancy
 - [x] Top performers section
-- [ ] Replace mock data with real queries
+- [x] Real GraphQL query integration
 
 #### Backend Note
 
-**Queries - MISSING:**
+**Queries (exist in schema):**
 
-Frontend needs aggregated analytics data. Current mock includes:
+- `spaceOwnerAnalytics(startDate, endDate)` - Aggregated analytics data
+  - `summary` - All 8 metrics with previous period values
+  - `statusDistribution` - Counts by booking status
+  - `spacePerformance(first)` - Top spaces by revenue
+  - `monthlyStats(months)` - Monthly revenue trends
+  - `ratingTrends(months)` - Rating trends with review volume
+  - `bookingHeatmap` - 7×24 matrix for activity heatmap
+  - `periodComparison` - This period vs previous period
+  - `topPerformers` - Top space, best rated, most booked
+- `spaceOwnerDailyStats(startDate, endDate)` - Daily stats for bookings trend chart
 
-- `totalBookings`, `totalRevenue`, `averageRating`, `completionRate`
-- Booking trends (weekly time series)
-- Status distribution (counts by status)
-- Revenue by space (top performers)
-- Monthly revenue trends
-- Rating trends with review counts
-- Booking heatmap (day × hour matrix)
-- Period comparison (this month vs last)
-
-**Recommended new query:**
-
-```graphql
-type SpaceOwnerAnalytics {
-    summary: AnalyticsSummary!
-    bookingTrends(range: DateRange!): [TimeSeriesPoint!]!
-    statusDistribution: [StatusCount!]!
-    spacePerformance(first: Int): [SpacePerformance!]!
-    monthlyRevenue(months: Int): [MonthlyRevenue!]!
-    ratingTrends(months: Int): [RatingTrend!]!
-    bookingHeatmap: [[Int!]!]!  # 7x24 matrix
-    periodComparison: PeriodComparison!
-}
-
-query spaceOwnerAnalytics(dateRange: DateRangeInput): SpaceOwnerAnalytics
-```
-
-**Frontend Status:** ❌ Entirely mocked
+**Frontend Status:** ✅ Fully functional
 
 ---
 
@@ -1444,10 +1427,9 @@ For payment flows:
 
 ### Missing Queries (would improve UX)
 
-1. `spaceOwnerAnalytics` - Aggregated analytics for analytics page
-2. `advertiserAnalytics` - Aggregated analytics for analytics page
-3. `advertiserSpendingSummary` - Spending totals for spending page
-4. `calendarEvents` - Optimized calendar query
+1. `advertiserAnalytics` - Aggregated analytics for advertiser analytics page
+2. `advertiserSpendingSummary` - Spending totals for spending page
+3. `calendarEvents` - Optimized calendar query
 
 Note: Activity feeds on overview pages use `myNotifications`, charts use client-side aggregation from `myPayouts`/
 `myBookingsAsAdvertiser.payments`.

@@ -16,7 +16,6 @@ import {
 } from "@/components/primitives/tooltip";
 import { cn } from "@/lib/utils";
 import { DAYS_OF_WEEK, HOURS_OF_DAY } from "./constants";
-import mock from "./mock.json";
 
 type HeatmapCell = {
   day: number;
@@ -57,12 +56,15 @@ export function HeatmapChartSkeleton() {
   );
 }
 
-export default function HeatmapChart() {
-  const heatmapData = mock.bookingHeatmap as HeatmapCell[];
-  const maxCount = Math.max(...heatmapData.map((d) => d.count), 1);
+type Props = {
+  data: HeatmapCell[];
+};
+
+export default function HeatmapChart({ data }: Props) {
+  const maxCount = Math.max(...data.map((d) => d.count), 1);
 
   const getCellValue = (day: number, hour: number): number => {
-    const cell = heatmapData.find((d) => d.day === day && d.hour === hour);
+    const cell = data.find((d) => d.day === day && d.hour === hour);
     return cell?.count ?? 0;
   };
 

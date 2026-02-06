@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { IconChartPie } from "@tabler/icons-react";
 import { Label, Pie, PieChart } from "recharts";
 import {
   Card,
@@ -17,10 +18,17 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/primitives/chart";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/primitives/empty";
+import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import { BOOKING_STATUS } from "@/lib/constants";
-import { BookingStatus } from "@/types/gql/graphql";
+import type { StatusCount, BookingStatus } from "@/types/gql";
 import { STATUS_CHART_CONFIG } from "./constants";
-import mock from "./mock.json";
 
 export function StatusChartSkeleton() {
   return (
@@ -34,14 +42,36 @@ export function StatusChartSkeleton() {
   );
 }
 
-export default function StatusChart() {
+type Props = {
+  data: StatusCount[];
+};
+
+function Placeholder() {
+  return (
+    <Empty className="mx-auto aspect-square max-h-[300px]">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <IconChartPie />
+        </EmptyMedia>
+        <EmptyTitle>No bookings yet</EmptyTitle>
+        <EmptyDescription>
+          Status distribution will appear here once you have bookings.
+        </EmptyDescription>
+      </EmptyHeader>
+    </Empty>
+  );
+}
+
+export default function StatusChart({ data }: Props) {
   const chartData = React.useMemo(() => {
-    return mock.statusDistribution.map((item) => ({
-      status: item.status,
-      count: item.count,
-      fill: item.fill,
-    }));
-  }, []);
+    return data
+      .filter((item) => item.count > 0)
+      .map((item) => ({
+        status: item.status,
+        count: item.count,
+        fill: STATUS_CHART_CONFIG[item.status]?.color ?? "var(--muted)",
+      }));
+  }, [data]);
 
   const totalBookings = React.useMemo(() => {
     return chartData.reduce((acc, curr) => acc + curr.count, 0);
@@ -54,74 +84,76 @@ export default function StatusChart() {
         <CardDescription>Current status of all bookings</CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={STATUS_CHART_CONFIG}
-          className="mx-auto aspect-square max-h-[300px]"
-        >
-          <PieChart>
-            <ChartTooltip
-              cursor={false}
-              content={
-                <ChartTooltipContent
-                  hideLabel
-                  formatter={(value, name) => {
-                    const statusKey = name as BookingStatus;
-                    const label = BOOKING_STATUS.labels[statusKey] ?? name;
-                    return (
-                      <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground">{label}</span>
-                        <span className="font-medium tabular-nums">
-                          {value}
-                        </span>
-                      </div>
-                    );
-                  }}
-                />
-              }
-            />
-            <Pie
-              data={chartData}
-              dataKey="count"
-              nameKey="status"
-              innerRadius={60}
-              strokeWidth={5}
-            >
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
+        <MaybePlaceholder data={chartData} placeholder={<Placeholder />}>
+          <ChartContainer
+            config={STATUS_CHART_CONFIG}
+            className="mx-auto aspect-square max-h-[300px]"
+          >
+            <PieChart>
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    hideLabel
+                    formatter={(value, name) => {
+                      const statusKey = name as BookingStatus;
+                      const label = BOOKING_STATUS.labels[statusKey] ?? name;
+                      return (
+                        <div className="flex items-center gap-2">
+                          <span className="text-muted-foreground">{label}</span>
+                          <span className="font-medium tabular-nums">
+                            {value}
+                          </span>
+                        </div>
+                      );
+                    }}
+                  />
+                }
+              />
+              <Pie
+                data={chartData}
+                dataKey="count"
+                nameKey="status"
+                innerRadius={60}
+                strokeWidth={5}
+              >
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-3xl font-bold"
+                          textAnchor="middle"
+                          dominantBaseline="middle"
                         >
-                          {totalBookings.toLocaleString()}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy ?? 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Bookings
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-3xl font-bold"
+                          >
+                            {totalBookings.toLocaleString()}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy ?? 0) + 24}
+                            className="fill-muted-foreground"
+                          >
+                            Bookings
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </Pie>
+              <ChartLegend
+                content={<ChartLegendContent nameKey="status" />}
+                className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
               />
-            </Pie>
-            <ChartLegend
-              content={<ChartLegendContent nameKey="status" />}
-              className="-translate-y-2 flex-wrap gap-2 *:basis-1/4 *:justify-center"
-            />
-          </PieChart>
-        </ChartContainer>
+            </PieChart>
+          </ChartContainer>
+        </MaybePlaceholder>
       </CardContent>
     </Card>
   );

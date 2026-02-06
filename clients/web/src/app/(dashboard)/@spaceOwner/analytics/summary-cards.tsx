@@ -2,30 +2,32 @@ import SummaryCard, {
   SummaryCardGrid,
 } from "@/components/composed/summary-card";
 import { calculateTrend, formatCurrency } from "@/lib/utils";
-import mock from "./mock.json";
+import type { SpaceOwnerSummary } from "@/types/gql";
 
-export default function SummaryCards() {
-  const { summary } = mock;
+type Props = {
+  data: SpaceOwnerSummary;
+};
 
+export default function SummaryCards({ data }: Props) {
   const bookingsChange = calculateTrend(
-    summary.totalBookings,
-    summary.previousTotalBookings
+    data.totalBookings,
+    data.previousTotalBookings
   );
   const revenueChange = calculateTrend(
-    summary.totalRevenue,
-    summary.previousTotalRevenue
+    data.totalRevenue ?? 0,
+    data.previousTotalRevenue ?? 0
   );
   const durationChange = calculateTrend(
-    summary.averageBookingDuration,
-    summary.previousAverageBookingDuration
+    data.avgBookingDuration ?? 0,
+    data.previousAvgBookingDuration ?? 0
   );
   const occupancyChange = calculateTrend(
-    summary.occupancyRate,
-    summary.previousOccupancyRate
+    data.occupancyRate ?? 0,
+    data.previousOccupancyRate ?? 0
   );
   const repeatChange = calculateTrend(
-    summary.repeatAdvertiserRate,
-    summary.previousRepeatAdvertiserRate
+    data.repeatAdvertiserRate ?? 0,
+    data.previousRepeatAdvertiserRate ?? 0
   );
 
   return (
@@ -33,21 +35,21 @@ export default function SummaryCards() {
       <SummaryCardGrid>
         <SummaryCard
           label="Total Bookings"
-          value={summary.totalBookings.toString()}
+          value={data.totalBookings.toString()}
           badge={{ type: "trend", value: bookingsChange }}
           footer={bookingsChange >= 0 ? "Trending up" : "Trending down"}
-          description={`${summary.previousTotalBookings} bookings last period`}
+          description={`${data.previousTotalBookings} bookings last period`}
         />
         <SummaryCard
           label="Total Revenue"
-          value={formatCurrency(summary.totalRevenue)}
+          value={formatCurrency(data.totalRevenue ?? 0)}
           badge={{ type: "trend", value: revenueChange }}
           footer={revenueChange >= 0 ? "Trending up" : "Trending down"}
-          description={`${formatCurrency(summary.previousTotalRevenue)} last period`}
+          description={`${formatCurrency(data.previousTotalRevenue ?? 0)} last period`}
         />
         <SummaryCard
           label="Average Rating"
-          value={summary.averageRating.toFixed(1)}
+          value={data.averageRating?.toFixed(1) ?? "—"}
           badge={{ type: "text", text: "★", className: "text-yellow-500" }}
           footer="Excellent rating"
           description="Based on all reviews"
@@ -55,7 +57,11 @@ export default function SummaryCards() {
         />
         <SummaryCard
           label="Completion Rate"
-          value={`${summary.completionRate.toFixed(0)}%`}
+          value={
+            data.completionRate != null
+              ? `${Number(data.completionRate).toFixed(0)}%`
+              : "—"
+          }
           badge={{ type: "text", text: "Good" }}
           footer="High completion"
           description="Bookings successfully completed"
@@ -66,31 +72,47 @@ export default function SummaryCards() {
       <SummaryCardGrid>
         <SummaryCard
           label="Avg. Booking Duration"
-          value={`${summary.averageBookingDuration.toFixed(1)} days`}
+          value={
+            data.avgBookingDuration != null
+              ? `${Number(data.avgBookingDuration).toFixed(1)} days`
+              : "—"
+          }
           badge={{ type: "trend", value: durationChange }}
           footer={durationChange >= 0 ? "Longer bookings" : "Shorter bookings"}
-          description={`${summary.previousAverageBookingDuration.toFixed(1)} days last period`}
+          description={
+            data.previousAvgBookingDuration != null
+              ? `${Number(data.previousAvgBookingDuration).toFixed(1)} days last period`
+              : "No previous data"
+          }
         />
         <SummaryCard
           label="Occupancy Rate"
-          value={`${summary.occupancyRate.toFixed(0)}%`}
+          value={
+            data.occupancyRate != null
+              ? `${Number(data.occupancyRate).toFixed(0)}%`
+              : "—"
+          }
           badge={{ type: "trend", value: occupancyChange }}
           footer={occupancyChange >= 0 ? "Improving" : "Declining"}
           description="Percentage of days booked"
         />
         <SummaryCard
           label="Repeat Advertisers"
-          value={`${summary.repeatAdvertiserRate.toFixed(0)}%`}
+          value={
+            data.repeatAdvertiserRate != null
+              ? `${Number(data.repeatAdvertiserRate).toFixed(0)}%`
+              : "—"
+          }
           badge={{ type: "trend", value: repeatChange }}
           footer={repeatChange >= 0 ? "Growing loyalty" : "Needs attention"}
           description="Advertisers who book again"
         />
         <SummaryCard
           label="Revenue Forecast"
-          value={formatCurrency(summary.forecastedRevenue)}
+          value={formatCurrency(data.forecastedRevenue ?? 0)}
           badge={{ type: "text", text: "Projected" }}
-          footer={`${formatCurrency(summary.pendingBookingsValue)} pending`}
-          description={`${formatCurrency(summary.confirmedUpcomingValue)} confirmed upcoming`}
+          footer="Based on current trends"
+          description="Expected revenue this period"
           showFooterIcon={false}
         />
       </SummaryCardGrid>

@@ -14,14 +14,18 @@ import {
   ChartTooltipContent,
 } from "@/components/primitives/chart";
 import { SPACE_REVENUE_CHART_CONFIG } from "./constants";
-import mock from "./mock.json";
+import type { SpacePerformanceItem } from "@/types/gql";
 
-export default function RevenueChart() {
-  const chartData = mock.spacePerformance.map((space) => ({
+type Props = {
+  data: SpacePerformanceItem[];
+};
+
+export default function RevenueChart({ data }: Props) {
+  const chartData = data.map((space) => ({
     name:
       space.title.length > 15 ? space.title.slice(0, 15) + "..." : space.title,
     fullName: space.title,
-    revenue: space.totalRevenue,
+    revenue: Number(space.totalRevenue ?? 0),
   }));
 
   return (

@@ -18,16 +18,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
-import mock from "./mock.json";
+import type { SpacePerformanceItem } from "@/types/gql";
 
-type SpacePerformance = {
+type TableRow = {
   id: string;
   title: string;
   totalBookings: number;
   totalRevenue: number;
   averageRating: number | null;
   occupancyRate: number;
-  image: string;
+  image: string | null;
 };
 
 function getOccupancyVariant(
@@ -38,7 +38,7 @@ function getOccupancyVariant(
   return "destructive";
 }
 
-const occupancyColumn: ColumnDef<SpacePerformance> = {
+const occupancyColumn: ColumnDef<TableRow> = {
   id: "occupancy",
   header: () => <div className="text-right">Occupancy</div>,
   cell: ({ row }) => (
@@ -54,7 +54,7 @@ const occupancyColumn: ColumnDef<SpacePerformance> = {
   meta: { skeleton: "badge", headerAlign: "right" },
 };
 
-const ratingColumn: ColumnDef<SpacePerformance> = {
+const ratingColumn: ColumnDef<TableRow> = {
   id: "rating",
   header: () => <div className="text-right">Rating</div>,
   cell: ({ row }) => (
@@ -73,20 +73,20 @@ const ratingColumn: ColumnDef<SpacePerformance> = {
 };
 
 const columns = [
-  createSelectColumn<SpacePerformance>(),
-  imageTextColumn<SpacePerformance>({
+  createSelectColumn<TableRow>(),
+  imageTextColumn<TableRow>({
     key: "space",
     header: "Space",
-    image: (row) => row.image,
+    image: (row) => row.image ?? undefined,
     text: (row) => row.title,
     href: (row) => `/listings/${row.id}`,
   }),
-  numberColumn<SpacePerformance>({
+  numberColumn<TableRow>({
     key: "bookings",
     header: "Bookings",
     value: (row) => row.totalBookings,
   }),
-  currencyColumn<SpacePerformance>({
+  currencyColumn<TableRow>({
     key: "revenue",
     header: "Revenue",
     value: (row) => row.totalRevenue,
@@ -95,7 +95,21 @@ const columns = [
   ratingColumn,
 ];
 
-export default function PerformanceTable() {
+type Props = {
+  data: SpacePerformanceItem[];
+};
+
+export default function PerformanceTable({ data }: Props) {
+  const tableData: TableRow[] = data.map((item) => ({
+    id: item.id,
+    title: item.title,
+    totalBookings: item.totalBookings,
+    totalRevenue: Number(item.totalRevenue ?? 0),
+    averageRating: item.averageRating ?? null,
+    occupancyRate: Number(item.occupancyRate ?? 0),
+    image: item.image ?? null,
+  }));
+
   return (
     <Card>
       <CardHeader>
@@ -106,7 +120,7 @@ export default function PerformanceTable() {
       </CardHeader>
       <CardContent>
         <TableView
-          data={mock.spacePerformance as SpacePerformance[]}
+          data={tableData}
           columns={columns}
           getRowId={(row) => row.id}
           emptyMessage="No spaces found."

@@ -12,7 +12,7 @@ import SectionCard, {
   SectionCardSkeleton,
 } from "@/components/composed/section-card";
 import { formatCurrency } from "@/lib/utils";
-import mock from "./mock.json";
+import type { SpaceOwnerTopPerformers } from "@/types/gql";
 
 export function TopPerformersSkeleton() {
   return (
@@ -26,8 +26,18 @@ export function TopPerformersSkeleton() {
   );
 }
 
-export default function TopPerformers() {
-  const { topPerformers } = mock;
+type Props = {
+  data: SpaceOwnerTopPerformers;
+};
+
+export default function TopPerformers({ data }: Props) {
+  const {
+    bestRevenue,
+    bestRating,
+    bestOccupancy,
+    mostBookings,
+    needsAttention,
+  } = data;
 
   return (
     <SectionCard
@@ -35,47 +45,69 @@ export default function TopPerformers() {
       description="Your best performing spaces and areas that need attention"
     >
       <div className="grid grid-cols-1 gap-4 @lg/main:grid-cols-2 @3xl/main:grid-cols-3">
-        <PerformerCard
-          icon={<IconCurrencyDollar className="size-5" />}
-          title="Highest Revenue"
-          name={topPerformers.bestRevenue.title}
-          href={`/listings/${topPerformers.bestRevenue.id}`}
-          value={formatCurrency(topPerformers.bestRevenue.value)}
-          subtitle={`+${topPerformers.bestRevenue.change}%`}
-        />
-        <PerformerCard
-          icon={<IconStar className="size-5" />}
-          title="Best Rated"
-          name={topPerformers.bestRating.title}
-          href={`/listings/${topPerformers.bestRating.id}`}
-          value={`★ ${topPerformers.bestRating.value}`}
-          subtitle={`${topPerformers.bestRating.reviews} reviews`}
-        />
-        <PerformerCard
-          icon={<IconCalendar className="size-5" />}
-          title="Highest Occupancy"
-          name={topPerformers.bestOccupancy.title}
-          href={`/listings/${topPerformers.bestOccupancy.id}`}
-          value={`${topPerformers.bestOccupancy.value}%`}
-          subtitle={`+${topPerformers.bestOccupancy.change}%`}
-        />
-        <PerformerCard
-          icon={<IconTrendingUp className="size-5" />}
-          title="Most Bookings"
-          name={topPerformers.mostBookings.title}
-          href={`/listings/${topPerformers.mostBookings.id}`}
-          value={topPerformers.mostBookings.value.toString()}
-          subtitle={`+${topPerformers.mostBookings.change}%`}
-        />
-        <PerformerCard
-          icon={<IconAlertTriangle className="size-5" />}
-          title="Needs Attention"
-          name={topPerformers.needsAttention.title}
-          href={`/listings/${topPerformers.needsAttention.id}`}
-          value={`${topPerformers.needsAttention.occupancy}%`}
-          subtitle={`${topPerformers.needsAttention.bookings} bookings`}
-          variant="warning"
-        />
+        {bestRevenue && (
+          <PerformerCard
+            icon={<IconCurrencyDollar className="size-5" />}
+            title="Highest Revenue"
+            name={bestRevenue.title}
+            href={`/listings/${bestRevenue.id}`}
+            value={formatCurrency(Number(bestRevenue.value ?? 0))}
+            subtitle={
+              bestRevenue.change != null
+                ? `${Number(bestRevenue.change) >= 0 ? "+" : ""}${Number(bestRevenue.change).toFixed(1)}%`
+                : undefined
+            }
+          />
+        )}
+        {bestRating && (
+          <PerformerCard
+            icon={<IconStar className="size-5" />}
+            title="Best Rated"
+            name={bestRating.title}
+            href={`/listings/${bestRating.id}`}
+            value={`★ ${bestRating.value.toFixed(1)}`}
+            subtitle={`${bestRating.reviews} reviews`}
+          />
+        )}
+        {bestOccupancy && (
+          <PerformerCard
+            icon={<IconCalendar className="size-5" />}
+            title="Highest Occupancy"
+            name={bestOccupancy.title}
+            href={`/listings/${bestOccupancy.id}`}
+            value={`${Number(bestOccupancy.value ?? 0).toFixed(0)}%`}
+            subtitle={
+              bestOccupancy.change != null
+                ? `${Number(bestOccupancy.change) >= 0 ? "+" : ""}${Number(bestOccupancy.change).toFixed(1)}%`
+                : undefined
+            }
+          />
+        )}
+        {mostBookings && (
+          <PerformerCard
+            icon={<IconTrendingUp className="size-5" />}
+            title="Most Bookings"
+            name={mostBookings.title}
+            href={`/listings/${mostBookings.id}`}
+            value={Number(mostBookings.value ?? 0).toString()}
+            subtitle={
+              mostBookings.change != null
+                ? `${Number(mostBookings.change) >= 0 ? "+" : ""}${Number(mostBookings.change).toFixed(1)}%`
+                : undefined
+            }
+          />
+        )}
+        {needsAttention && (
+          <PerformerCard
+            icon={<IconAlertTriangle className="size-5" />}
+            title="Needs Attention"
+            name={needsAttention.title}
+            href={`/listings/${needsAttention.id}`}
+            value={`${Number(needsAttention.occupancy ?? 0).toFixed(0)}%`}
+            subtitle={`${needsAttention.bookings} bookings`}
+            variant="warning"
+          />
+        )}
       </div>
     </SectionCard>
   );

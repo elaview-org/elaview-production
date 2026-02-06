@@ -4117,6 +4117,127 @@ export type AdvertiserOverviewDataQuery = {
   };
 };
 
+export type SpaceOwnerAnalyticsPageQueryVariables = Exact<{
+  startDate: Scalars["DateTime"]["input"];
+  endDate: Scalars["DateTime"]["input"];
+}>;
+
+export type SpaceOwnerAnalyticsPageQuery = {
+  spaceOwnerAnalytics: {
+    __typename: "SpaceOwnerAnalytics";
+    bookingHeatmap: Array<Array<number>>;
+    summary: {
+      __typename: "SpaceOwnerSummary";
+      totalBookings: number;
+      previousTotalBookings: number;
+      totalRevenue: number | null;
+      previousTotalRevenue: number | null;
+      averageRating: number | null;
+      completionRate: number | null;
+      avgBookingDuration: number | null;
+      previousAvgBookingDuration: number | null;
+      occupancyRate: number | null;
+      previousOccupancyRate: number | null;
+      repeatAdvertiserRate: number | null;
+      previousRepeatAdvertiserRate: number | null;
+      forecastedRevenue: number | null;
+    };
+    statusDistribution: Array<{
+      __typename: "StatusCount";
+      status: BookingStatus;
+      count: number;
+    }>;
+    spacePerformance: Array<{
+      __typename: "SpacePerformanceItem";
+      id: string;
+      title: string;
+      image: string | null;
+      totalBookings: number;
+      totalRevenue: number | null;
+      averageRating: number | null;
+      occupancyRate: number | null;
+    }>;
+    monthlyStats: Array<{
+      __typename: "MonthlyStats";
+      month: string;
+      revenue: number | null;
+      bookings: number;
+    }>;
+    ratingTrends: Array<{
+      __typename: "RatingTrendPoint";
+      month: string;
+      rating: number;
+      reviews: number;
+    }>;
+    periodComparison: {
+      __typename: "PeriodComparison";
+      current: {
+        __typename: "PeriodData";
+        period: string;
+        startDate: string;
+        endDate: string;
+        bookings: number;
+        revenue: number | null;
+        avgRating: number | null;
+        completionRate: number | null;
+      };
+      previous: {
+        __typename: "PeriodData";
+        period: string;
+        startDate: string;
+        endDate: string;
+        bookings: number;
+        revenue: number | null;
+        avgRating: number | null;
+        completionRate: number | null;
+      };
+    };
+    topPerformers: {
+      __typename: "SpaceOwnerTopPerformers";
+      bestRevenue: {
+        __typename: "PerformerItem";
+        id: string;
+        title: string;
+        value: number | null;
+        change: number | null;
+      } | null;
+      bestRating: {
+        __typename: "RatingPerformerItem";
+        id: string;
+        title: string;
+        value: number;
+        reviews: number;
+      } | null;
+      bestOccupancy: {
+        __typename: "PerformerItem";
+        id: string;
+        title: string;
+        value: number | null;
+        change: number | null;
+      } | null;
+      mostBookings: {
+        __typename: "PerformerItem";
+        id: string;
+        title: string;
+        value: number | null;
+        change: number | null;
+      } | null;
+      needsAttention: {
+        __typename: "AttentionItem";
+        id: string;
+        title: string;
+        occupancy: number | null;
+        bookings: number;
+      } | null;
+    };
+  };
+  spaceOwnerDailyStats: Array<{
+    __typename: "DailyStats";
+    date: string;
+    bookings: number;
+  }>;
+};
+
 export type BookingCard_BookingFragmentFragment = {
   __typename: "Booking";
   id: string;
@@ -12353,6 +12474,497 @@ export const AdvertiserOverviewDataDocument = {
 } as unknown as DocumentNode<
   AdvertiserOverviewDataQuery,
   AdvertiserOverviewDataQueryVariables
+>;
+export const SpaceOwnerAnalyticsPageDocument = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "OperationDefinition",
+      operation: "query",
+      name: { kind: "Name", value: "SpaceOwnerAnalyticsPage" },
+      variableDefinitions: [
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "startDate" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "DateTime" },
+            },
+          },
+        },
+        {
+          kind: "VariableDefinition",
+          variable: {
+            kind: "Variable",
+            name: { kind: "Name", value: "endDate" },
+          },
+          type: {
+            kind: "NonNullType",
+            type: {
+              kind: "NamedType",
+              name: { kind: "Name", value: "DateTime" },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "summary" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalBookings" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "previousTotalBookings" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalRevenue" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "previousTotalRevenue" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "averageRating" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "completionRate" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avgBookingDuration" },
+                      },
+                      {
+                        kind: "Field",
+                        name: {
+                          kind: "Name",
+                          value: "previousAvgBookingDuration",
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "occupancyRate" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "previousOccupancyRate" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "repeatAdvertiserRate" },
+                      },
+                      {
+                        kind: "Field",
+                        name: {
+                          kind: "Name",
+                          value: "previousRepeatAdvertiserRate",
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "forecastedRevenue" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "statusDistribution" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "count" } },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spacePerformance" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      { kind: "Field", name: { kind: "Name", value: "image" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalBookings" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalRevenue" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "averageRating" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "occupancyRate" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "monthlyStats" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "months" },
+                      value: { kind: "IntValue", value: "12" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "month" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "revenue" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "bookings" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "ratingTrends" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "months" },
+                      value: { kind: "IntValue", value: "12" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "month" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "rating" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "reviews" },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "bookingHeatmap" },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "periodComparison" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "current" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "period" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "startDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "endDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "bookings" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "revenue" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avgRating" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "completionRate" },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "previous" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "period" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "startDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "endDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "bookings" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "revenue" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avgRating" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "completionRate" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "topPerformers" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "bestRevenue" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "title" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "value" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "change" },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "bestRating" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "title" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "value" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "reviews" },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "bestOccupancy" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "title" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "value" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "change" },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "mostBookings" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "title" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "value" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "change" },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "needsAttention" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "title" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "occupancy" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "bookings" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerDailyStats" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "date" } },
+                { kind: "Field", name: { kind: "Name", value: "bookings" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SpaceOwnerAnalyticsPageQuery,
+  SpaceOwnerAnalyticsPageQueryVariables
 >;
 export const BookingDetailDocument = {
   kind: "Document",

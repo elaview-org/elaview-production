@@ -9,7 +9,7 @@ import ComparisonTable, {
   ComparisonTableSkeleton,
 } from "@/components/composed/comparison-table";
 import { Skeleton } from "@/components/primitives/skeleton";
-import mock from "./mock.json";
+import type { PeriodComparison } from "@/types/gql";
 
 export function ComparisonCardSkeleton() {
   return (
@@ -25,9 +25,12 @@ export function ComparisonCardSkeleton() {
   );
 }
 
-export default function ComparisonCard() {
-  const { comparison } = mock;
-  const { current, previous } = comparison;
+type Props = {
+  data: PeriodComparison;
+};
+
+export default function ComparisonCard({ data }: Props) {
+  const { current, previous } = data;
 
   return (
     <Card>
@@ -47,20 +50,20 @@ export default function ComparisonCard() {
             },
             {
               label: "Revenue",
-              current: current.revenue,
-              previous: previous.revenue,
+              current: Number(current.revenue ?? 0),
+              previous: Number(previous.revenue ?? 0),
               format: "currency",
             },
             {
               label: "Avg. Rating",
-              current: current.avgRating,
-              previous: previous.avgRating,
+              current: current.avgRating ?? 0,
+              previous: previous.avgRating ?? 0,
               format: "rating",
             },
             {
               label: "Completion Rate",
-              current: current.completionRate,
-              previous: previous.completionRate,
+              current: Number(current.completionRate ?? 0),
+              previous: Number(previous.completionRate ?? 0),
               format: "percent",
             },
           ]}

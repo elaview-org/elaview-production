@@ -29,6 +29,9 @@ const storage = {
   authentication: {
     token: createKey("authentication", "token"),
   },
+  drafts: {
+    createSpace: createKey("drafts", "create-space"),
+  },
 } as const;
 
 export default storage;

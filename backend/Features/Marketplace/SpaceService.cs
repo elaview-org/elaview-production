@@ -19,7 +19,7 @@ public interface ISpaceService {
     Task<Space> ReactivateAsync(Guid userId, Guid id, CancellationToken ct);
 }
 
-public sealed class SpaceService(ISpaceRepository repository) : ISpaceService {
+public sealed class SpaceService(ISpaceRepository repository, IGeocodingService geocodingService) : ISpaceService {
     public IQueryable<Space> GetAll()
         => repository.Query();
 
@@ -51,6 +51,9 @@ public sealed class SpaceService(ISpaceRepository repository) : ISpaceService {
         var profile = await repository.GetSpaceOwnerProfileByUserIdAsync(userId, ct)
             ?? throw new NotFoundException("SpaceOwnerProfile", userId);
 
+        var (latitude, longitude) = await ResolveCoordinatesAsync(
+            input.Latitude, input.Longitude, input.Address, input.City, input.State, input.ZipCode, ct);
+
         var space = new Space {
             SpaceOwnerProfileId = profile.Id,
             Title = input.Title,
@@ -61,8 +64,8 @@ public sealed class SpaceService(ISpaceRepository repository) : ISpaceService {
             City = input.City,
             State = input.State,
             ZipCode = input.ZipCode,
-            Latitude = input.Latitude,
-            Longitude = input.Longitude,
+            Latitude = latitude,
+            Longitude = longitude,
             Width = input.Width,
             Height = input.Height,
             Dimensions = input.Dimensions,
@@ -81,6 +84,17 @@ public sealed class SpaceService(ISpaceRepository repository) : ISpaceService {
         return await repository.AddAsync(space, ct);
     }
 
+    private async Task<(double Latitude, double Longitude)> ResolveCoordinatesAsync(
+        double? latitude, double? longitude,
+        string address, string city, string state, string? zipCode,
+        CancellationToken ct) {
+        if (latitude.HasValue && longitude.HasValue)
+            return (latitude.Value, longitude.Value);
+
+        var result = await geocodingService.GeocodeAddressAsync(address, city, state, zipCode, ct);
+        return (result.Latitude, result.Longitude);
+    }
+
     public async Task<Space> UpdateAsync(Guid userId, Guid id, UpdateSpaceInput input, CancellationToken ct) {
         if (input.PricePerDay is < 0)
             throw new ValidationException("PricePerDay", "Price cannot be negative");
@@ -91,7 +105,30 @@ public sealed class SpaceService(ISpaceRepository repository) : ISpaceService {
         if (space.SpaceOwnerProfile.UserId != userId)
             throw new ForbiddenException("update this space");
 
-        return await repository.UpdateAsync(space, input, ct);
+        var coordinates = await ResolveCoordinatesForUpdateAsync(space, input, ct);
+        return await repository.UpdateAsync(space, input, coordinates, ct);
+    }
+
+    private async Task<(double Latitude, double Longitude)?> ResolveCoordinatesForUpdateAsync(
+        Space space, UpdateSpaceInput input, CancellationToken ct) {
+        if (input.Latitude.HasValue && input.Longitude.HasValue)
+            return (input.Latitude.Value, input.Longitude.Value);
+
+        var addressChanged = input.Address is not null && input.Address != space.Address;
+        var cityChanged = input.City is not null && input.City != space.City;
+        var stateChanged = input.State is not null && input.State != space.State;
+        var zipCodeChanged = input.ZipCode is not null && input.ZipCode != space.ZipCode;
+
+        if (!addressChanged && !cityChanged && !stateChanged && !zipCodeChanged)
+            return null;
+
+        var address = input.Address ?? space.Address;
+        var city = input.City ?? space.City;
+        var state = input.State ?? space.State;
+        var zipCode = input.ZipCode ?? space.ZipCode;
+
+        var result = await geocodingService.GeocodeAddressAsync(address, city, state, zipCode, ct);
+        return (result.Latitude, result.Longitude);
     }
 
     public async Task<bool> DeleteAsync(Guid userId, Guid id, CancellationToken ct) {

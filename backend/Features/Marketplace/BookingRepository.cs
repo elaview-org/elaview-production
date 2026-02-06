@@ -22,6 +22,7 @@ public interface IBookingRepository {
     Task<Guid?> GetCampaignIdIfOwnedByUserAsync(Guid campaignId, Guid userId, CancellationToken ct);
     Task<SpaceInfo?> GetActiveSpaceInfoAsync(Guid spaceId, CancellationToken ct);
     Task<bool> HasOverlappingBookingsAsync(Guid spaceId, DateTime startDate, DateTime endDate, CancellationToken ct);
+    Task<bool> HasBlockedDatesInRangeAsync(Guid spaceId, DateOnly startDate, DateOnly endDate, CancellationToken ct);
     Task<Booking> AddAsync(Booking booking, CancellationToken ct);
     Task<Booking> UpdateStatusAsync(Booking booking, BookingStatus status, CancellationToken ct);
     Task SaveChangesAsync(CancellationToken ct);
@@ -109,6 +110,13 @@ public sealed class BookingRepository(
             b.Status != BookingStatus.Rejected &&
             b.StartDate < endDate &&
             b.EndDate > startDate, ct);
+
+    public async Task<bool> HasBlockedDatesInRangeAsync(
+        Guid spaceId, DateOnly startDate, DateOnly endDate, CancellationToken ct)
+        => await context.BlockedDates.AnyAsync(bd =>
+            bd.SpaceId == spaceId &&
+            bd.Date >= startDate &&
+            bd.Date <= endDate, ct);
 
     public async Task<Booking> AddAsync(Booking booking, CancellationToken ct) {
         context.Bookings.Add(booking);

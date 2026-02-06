@@ -1,9 +1,12 @@
 "use client";
 
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
-import { IconPhoto, IconPlus, IconX } from "@tabler/icons-react";
+import { IconLoader2, IconPhoto, IconPlus, IconX } from "@tabler/icons-react";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef, useState, useTransition } from "react";
+import { updateSpaceImagesAction } from "../listings.actions";
+import { toast } from "sonner";
+import env from "@/lib/env";
 
 export const Gallery_SpaceFragment = graphql(`
   fragment Gallery_SpaceFragment on Space {
@@ -21,23 +24,57 @@ export default function Gallery({ data }: Props) {
   const space = getFragmentData(Gallery_SpaceFragment, data);
   const [images, setImages] = useState(space.images);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [pending, startTransition] = useTransition();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    if (!files) return;
+    if (!files || files.length === 0) return;
 
-    Array.from(files).forEach((file) => {
-      const url = URL.createObjectURL(file);
-      setImages((prev) => [...prev, url]);
+    setUploading(true);
+    const newImages = [...images];
+
+    for (const file of Array.from(files)) {
+      if (newImages.length >= 10) break;
+
+      try {
+        const url = await uploadImage(file, `spaces/${space.id}`);
+        newImages.push(url);
+      } catch (error) {
+        toast.error(
+          error instanceof Error ? error.message : "Failed to upload image"
+        );
+      }
+    }
+
+    setImages(newImages);
+    setUploading(false);
+    if (inputRef.current) inputRef.current.value = "";
+
+    startTransition(async () => {
+      const result = await updateSpaceImagesAction(space.id, newImages);
+      if (!result.success) {
+        toast.error(result.error ?? "Failed to save images");
+        setImages(images);
+      } else {
+        toast.success("Photos updated");
+      }
     });
-
-    // TODO: upload files to server
-    e.target.value = "";
   };
 
   const handleRemove = (index: number) => {
-    setImages((prev) => prev.filter((_, i) => i !== index));
-    // TODO: delete from server
+    const newImages = images.filter((_, i) => i !== index);
+    setImages(newImages);
+
+    startTransition(async () => {
+      const result = await updateSpaceImagesAction(space.id, newImages);
+      if (!result.success) {
+        toast.error(result.error ?? "Failed to remove image");
+        setImages(images);
+      } else {
+        toast.success("Photo removed");
+      }
+    });
   };
 
   return (
@@ -45,7 +82,7 @@ export default function Gallery({ data }: Props) {
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/gif,image/webp"
         multiple
         onChange={handleFileChange}
         className="hidden"
@@ -54,11 +91,16 @@ export default function Gallery({ data }: Props) {
       {images.length === 0 ? (
         <button
           type="button"
+          disabled={uploading || pending}
           onClick={() => inputRef.current?.click()}
-          className="bg-muted hover:border-primary hover:text-primary flex h-48 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors"
+          className="bg-muted hover:border-primary hover:text-primary flex h-48 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed transition-colors disabled:opacity-50"
         >
-          <IconPhoto className="size-8" />
-          <span>Add Photos</span>
+          {uploading ? (
+            <IconLoader2 className="size-8 animate-spin" />
+          ) : (
+            <IconPhoto className="size-8" />
+          )}
+          <span>{uploading ? "Uploading..." : "Add Photos"}</span>
         </button>
       ) : (
         <div className="flex flex-col gap-4">
@@ -77,8 +119,9 @@ export default function Gallery({ data }: Props) {
                 />
                 <button
                   type="button"
+                  disabled={pending}
                   onClick={() => handleRemove(index)}
-                  className="absolute top-1 right-1 rounded-full bg-black/50 p-1 opacity-0 transition-opacity group-hover:opacity-100"
+                  className="absolute top-1 right-1 rounded-full bg-black/50 p-1 opacity-0 transition-opacity group-hover:opacity-100 disabled:opacity-50"
                 >
                   <IconX className="size-4 text-white" />
                 </button>
@@ -93,10 +136,15 @@ export default function Gallery({ data }: Props) {
             {images.length < 10 && (
               <button
                 type="button"
+                disabled={uploading || pending}
                 onClick={() => inputRef.current?.click()}
-                className="text-muted-foreground hover:border-primary hover:text-primary flex aspect-square items-center justify-center rounded-lg border-2 border-dashed transition-colors"
+                className="text-muted-foreground hover:border-primary hover:text-primary flex aspect-square items-center justify-center rounded-lg border-2 border-dashed transition-colors disabled:opacity-50"
               >
-                <IconPlus className="size-6" />
+                {uploading ? (
+                  <IconLoader2 className="size-6 animate-spin" />
+                ) : (
+                  <IconPlus className="size-6" />
+                )}
               </button>
             )}
           </div>
@@ -104,4 +152,41 @@ export default function Gallery({ data }: Props) {
       )}
     </div>
   );
+}
+
+async function uploadImage(file: File, folder: string): Promise<string> {
+  const sigResponse = await fetch(
+    `${env.client.apiUrl}/api/storage/upload-signature`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ folder }),
+    }
+  );
+
+  if (!sigResponse.ok) {
+    throw new Error("Failed to get upload signature");
+  }
+
+  const sig = await sigResponse.json();
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("signature", sig.signature);
+  formData.append("timestamp", String(sig.timestamp));
+  formData.append("api_key", sig.apiKey);
+  if (sig.folder) formData.append("folder", sig.folder);
+
+  const uploadResponse = await fetch(
+    `https://api.cloudinary.com/v1_1/${sig.cloudName}/image/upload`,
+    { method: "POST", body: formData }
+  );
+
+  if (!uploadResponse.ok) {
+    throw new Error("Failed to upload image");
+  }
+
+  const result = await uploadResponse.json();
+  return result.secure_url;
 }

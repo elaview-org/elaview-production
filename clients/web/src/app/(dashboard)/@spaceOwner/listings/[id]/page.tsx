@@ -1,11 +1,16 @@
 import api from "@/lib/gql/server";
 import { graphql } from "@/types/gql";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { z } from "zod";
 import Details from "./details";
 import Gallery from "./gallery";
 import Header from "./header";
 import Performance from "./performance";
+import Bookings, { BookingsSkeleton } from "./bookings";
+import Reviews, { ReviewsSkeleton } from "./reviews";
+import CalendarWrapper from "./calendar-wrapper";
+import { CalendarSkeleton } from "./calendar";
 
 export default async function Page({ params }: PageProps<"/listings/[id]">) {
   const space = await api
@@ -14,6 +19,7 @@ export default async function Page({ params }: PageProps<"/listings/[id]">) {
         query SpaceDetail($id: ID!) {
           spaceById(id: $id) {
             id
+            averageRating
             ...Header_SpaceFragment
             ...Gallery_SpaceFragment
             ...Details_SpaceFragment
@@ -41,6 +47,17 @@ export default async function Page({ params }: PageProps<"/listings/[id]">) {
         <Performance data={space} />
       </div>
       <Details data={space} />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <Suspense fallback={<BookingsSkeleton />}>
+          <Bookings spaceId={space.id} />
+        </Suspense>
+        <Suspense fallback={<ReviewsSkeleton />}>
+          <Reviews spaceId={space.id} averageRating={space.averageRating} />
+        </Suspense>
+      </div>
+      <Suspense fallback={<CalendarSkeleton />}>
+        <CalendarWrapper spaceId={space.id} />
+      </Suspense>
     </div>
   );
 }

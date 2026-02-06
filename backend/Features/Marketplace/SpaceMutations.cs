@@ -9,6 +9,7 @@ public static partial class SpaceMutations {
     [Authorize]
     [Error<NotFoundException>]
     [Error<ValidationException>]
+    [Error<GeocodingException>]
     public static async Task<CreateSpacePayload> CreateSpace(
         CreateSpaceInput input,
         IUserService userService,
@@ -23,6 +24,7 @@ public static partial class SpaceMutations {
     [Error<NotFoundException>]
     [Error<ForbiddenException>]
     [Error<ValidationException>]
+    [Error<GeocodingException>]
     public static async Task<UpdateSpacePayload> UpdateSpace(
         [ID] Guid id,
         UpdateSpaceInput input,

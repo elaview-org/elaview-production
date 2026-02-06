@@ -12,7 +12,7 @@ import ListingsTable from "./(table)/listings-table";
 import ListingsMap from "./(map)/listings-map";
 
 export default async function Page(props: PageProps<"/listings">) {
-  const { view, ...variables } = await Promise.all([
+  const { view, bounds, zoom, ...variables } = await Promise.all([
     cookies(),
     props.searchParams,
   ]).then(([cookieStore, searchParams]) => {
@@ -36,23 +36,77 @@ export default async function Page(props: PageProps<"/listings">) {
           .catch(undefined),
         after: z.string().optional().catch(undefined),
         before: z.string().optional().catch(undefined),
-        sort: z.string().optional().catch(undefined), // todo: :ASC | :DESC
-        filter: z.string().optional().catch(undefined), // todo: validate values & fields
+        sort: z.string().optional().catch(undefined),
+        filter: z.string().optional().catch(undefined),
+        q: z.string().optional().catch(undefined),
       })
       .parse(searchParams);
 
+    const mapKeys = new Set(["minLat", "maxLat", "minLng", "maxLng", "zoom"]);
+    const allEntries = params.filter
+      ? Object.fromEntries(
+          params.filter.split(",").map((entry) => {
+            const [key, ...rest] = entry.split(":");
+            return [key, rest.join(":")];
+          })
+        )
+      : {};
+
+    const mapEntries = {
+      minLat: allEntries.minLat ? Number(allEntries.minLat) : undefined,
+      maxLat: allEntries.maxLat ? Number(allEntries.maxLat) : undefined,
+      minLng: allEntries.minLng ? Number(allEntries.minLng) : undefined,
+      maxLng: allEntries.maxLng ? Number(allEntries.maxLng) : undefined,
+      zoom: allEntries.zoom ? Number(allEntries.zoom) : undefined,
+    };
+
+    const filterEntries = Object.fromEntries(
+      Object.entries(allEntries)
+        .filter(([key]) => !mapKeys.has(key))
+        .map(([key, value]) => [key, { eq: value }])
+    );
+
+    const hasBounds =
+      mapEntries.minLat !== undefined &&
+      mapEntries.maxLat !== undefined &&
+      mapEntries.minLng !== undefined &&
+      mapEntries.maxLng !== undefined;
+
+    const boundsFilter =
+      view === ViewOptions.Map && hasBounds
+        ? {
+            latitude: { gte: mapEntries.minLat, lte: mapEntries.maxLat },
+            longitude: { gte: mapEntries.minLng, lte: mapEntries.maxLng },
+          }
+        : {};
+
+    const where =
+      params.q || Object.keys(filterEntries).length > 0 || hasBounds
+        ? {
+            ...filterEntries,
+            ...boundsFilter,
+            ...(params.q && { title: { contains: params.q } }),
+          }
+        : undefined;
+
+    const bounds = hasBounds
+      ? {
+          minLat: mapEntries.minLat!,
+          maxLat: mapEntries.maxLat!,
+          minLng: mapEntries.minLng!,
+          maxLng: mapEntries.maxLng!,
+        }
+      : undefined;
+
+    const zoom = mapEntries.zoom;
+
     return {
-      ...(params satisfies Omit<typeof params, "filter" | "sort">),
+      ...(params satisfies Omit<typeof params, "filter" | "sort" | "q">),
       view,
+      bounds,
+      zoom,
       first: params.last || params.before ? undefined : (params.first ?? 32),
-      where: params.filter
-        ? Object.fromEntries(
-            params.filter.split(",").map((entry) => {
-              const [key, value] = entry.split(":");
-              return [key, { eq: value }];
-            })
-          )
-        : undefined,
+      where,
       order: params.sort?.split(",").map((entry) => {
         const [key, dir] = entry.split(":");
         return {
@@ -61,6 +115,7 @@ export default async function Page(props: PageProps<"/listings">) {
       }),
       gridView: view === ViewOptions.Grid,
       tableView: view === ViewOptions.Table,
+      mapView: view === ViewOptions.Map,
     };
   });
 
@@ -76,6 +131,7 @@ export default async function Page(props: PageProps<"/listings">) {
           $where: SpaceFilterInput
           $gridView: Boolean!
           $tableView: Boolean!
+          $mapView: Boolean!
         ) {
           mySpaces(
             first: $first
@@ -89,6 +145,7 @@ export default async function Page(props: PageProps<"/listings">) {
               id
               ...SpaceCard_SpaceFragment @include(if: $gridView)
               ...ListingsTable_SpaceFragment @include(if: $tableView)
+              ...ListingsMap_SpaceFragment @include(if: $mapView)
             }
             pageInfo {
               hasNextPage
@@ -123,7 +180,9 @@ export default async function Page(props: PageProps<"/listings">) {
         action={<CreateSpace />}
       />
       {view === ViewOptions.Table && <ListingsTable data={spaces} />}
-      {view === ViewOptions.Map && <ListingsMap data={spaces} />}
+      {view === ViewOptions.Map && (
+        <ListingsMap data={spaces} bounds={bounds} zoom={zoom} />
+      )}
       {view === ViewOptions.Grid && <ListingsGrid data={spaces} />}
     </div>
   );

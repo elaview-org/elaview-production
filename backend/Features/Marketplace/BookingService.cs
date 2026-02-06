@@ -75,6 +75,12 @@ public sealed class BookingService(IBookingRepository repository) : IBookingServ
         if (await repository.HasOverlappingBookingsAsync(input.SpaceId, input.StartDate, input.EndDate, ct))
             throw new ConflictException("Booking", "Space already has bookings for the requested dates");
 
+        var startDateOnly = DateOnly.FromDateTime(input.StartDate);
+        var endDateOnly = DateOnly.FromDateTime(input.EndDate);
+
+        if (await repository.HasBlockedDatesInRangeAsync(input.SpaceId, startDateOnly, endDateOnly, ct))
+            throw new ConflictException("Booking", "Space has blocked dates in the requested range");
+
         var subtotal = space.PricePerDay * totalDays;
         var installationFee = space.InstallationFee ?? 0;
         var platformFee = subtotal * PlatformFeePercent;

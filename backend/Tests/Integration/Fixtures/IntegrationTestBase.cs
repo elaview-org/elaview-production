@@ -347,4 +347,22 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture)
         await context.SaveChangesAsync();
         return payout;
     }
+
+    protected async Task<BlockedDate> SeedBlockedDateAsync(Guid spaceId, DateOnly date, string? reason = null) {
+        var blockedDate = BlockedDateFactory.CreateForDate(spaceId, date, reason);
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.BlockedDates.Add(blockedDate);
+        await context.SaveChangesAsync();
+        return blockedDate;
+    }
+
+    protected async Task<List<BlockedDate>> SeedBlockedDatesAsync(Guid spaceId, DateOnly startDate, int days, string? reason = null) {
+        var blockedDates = BlockedDateFactory.CreateRange(spaceId, startDate, days, reason);
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.BlockedDates.AddRange(blockedDates);
+        await context.SaveChangesAsync();
+        return blockedDates;
+    }
 }

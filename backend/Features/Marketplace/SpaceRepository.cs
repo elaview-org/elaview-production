@@ -17,7 +17,7 @@ public interface ISpaceRepository {
     IQueryable<Booking> GetBookingsBySpaceId(Guid spaceId);
     IQueryable<Review> GetReviewsBySpaceId(Guid spaceId);
     Task<Space> AddAsync(Space space, CancellationToken ct);
-    Task<Space> UpdateAsync(Space space, UpdateSpaceInput input, CancellationToken ct);
+    Task<Space> UpdateAsync(Space space, UpdateSpaceInput input, (double Latitude, double Longitude)? coordinates, CancellationToken ct);
     Task<Space> UpdateStatusAsync(Space space, SpaceStatus status, CancellationToken ct);
     Task<bool> DeleteAsync(Space space, CancellationToken ct);
 }
@@ -77,12 +77,25 @@ public sealed class SpaceRepository(
         return space;
     }
 
-    public async Task<Space> UpdateAsync(Space space, UpdateSpaceInput input, CancellationToken ct) {
+    public async Task<Space> UpdateAsync(
+        Space space, UpdateSpaceInput input, (double Latitude, double Longitude)? coordinates, CancellationToken ct) {
         var entry = context.Entry(space);
         if (input.Title is not null)
             entry.Property(s => s.Title).CurrentValue = input.Title;
         if (input.Description is not null)
             entry.Property(s => s.Description).CurrentValue = input.Description;
+        if (input.Address is not null)
+            entry.Property(s => s.Address).CurrentValue = input.Address;
+        if (input.City is not null)
+            entry.Property(s => s.City).CurrentValue = input.City;
+        if (input.State is not null)
+            entry.Property(s => s.State).CurrentValue = input.State;
+        if (input.ZipCode is not null)
+            entry.Property(s => s.ZipCode).CurrentValue = input.ZipCode;
+        if (coordinates is not null) {
+            entry.Property(s => s.Latitude).CurrentValue = coordinates.Value.Latitude;
+            entry.Property(s => s.Longitude).CurrentValue = coordinates.Value.Longitude;
+        }
         if (input.PricePerDay is not null)
             entry.Property(s => s.PricePerDay).CurrentValue = input.PricePerDay.Value;
         if (input.InstallationFee is not null)

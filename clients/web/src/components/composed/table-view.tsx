@@ -64,6 +64,7 @@ type TableViewProps<TData> = {
   emptyMessage?: string;
   enableSelection?: boolean;
   pageSize?: number;
+  onSelectionChange?: (selectedIds: string[]) => void;
 };
 
 export default function TableView<TData>({
@@ -73,8 +74,11 @@ export default function TableView<TData>({
   emptyMessage = "No results.",
   enableSelection = true,
   pageSize: initialPageSize = 10,
+  onSelectionChange,
 }: TableViewProps<TData>) {
-  const [rowSelection, setRowSelection] = React.useState({});
+  const [rowSelection, setRowSelection] = React.useState<
+    Record<string, boolean>
+  >({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -85,6 +89,25 @@ export default function TableView<TData>({
     pageIndex: 0,
     pageSize: initialPageSize,
   });
+
+  const onSelectionChangeRef = React.useRef(onSelectionChange);
+  onSelectionChangeRef.current = onSelectionChange;
+
+  const handleRowSelectionChange = React.useCallback(
+    (updater: React.SetStateAction<Record<string, boolean>>) => {
+      setRowSelection((prev) => {
+        const next = typeof updater === "function" ? updater(prev) : updater;
+        queueMicrotask(() => {
+          if (onSelectionChangeRef.current) {
+            const ids = Object.keys(next).filter((key) => next[key]);
+            onSelectionChangeRef.current(ids);
+          }
+        });
+        return next;
+      });
+    },
+    []
+  );
 
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table is incompatible with React Compiler; "use no memo" directive applied
   const table = useReactTable({
@@ -99,7 +122,7 @@ export default function TableView<TData>({
     },
     getRowId,
     enableRowSelection: enableSelection,
-    onRowSelectionChange: setRowSelection,
+    onRowSelectionChange: handleRowSelectionChange,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,

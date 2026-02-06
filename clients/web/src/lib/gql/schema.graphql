@@ -238,6 +238,88 @@ type AttentionItem {
   title: String!
 }
 
+union BlockDatesError =
+  | ConflictError
+  | ForbiddenError
+  | NotFoundError
+  | ValidationError
+
+input BlockDatesInput {
+  dates: [LocalDate!]!
+  reason: String
+  spaceId: ID!
+}
+
+type BlockDatesPayload {
+  blockedDates: [BlockedDate!]
+  errors: [BlockDatesError!]
+}
+
+type BlockedDate {
+  createdAt: DateTime!
+  date: LocalDate!
+  id: UUID!
+  reason: String
+  space: Space!
+  spaceId: UUID!
+}
+
+input BlockedDateFilterInput {
+  and: [BlockedDateFilterInput!]
+  createdAt: DateTimeOperationFilterInput
+  date: LocalDateOperationFilterInput
+  id: UuidOperationFilterInput
+  or: [BlockedDateFilterInput!]
+  reason: StringOperationFilterInput
+  space: SpaceFilterInput
+  spaceId: UuidOperationFilterInput
+}
+
+input BlockedDateSortInput {
+  createdAt: SortEnumType
+  date: SortEnumType
+  id: SortEnumType
+  reason: SortEnumType
+  space: SpaceSortInput
+  spaceId: SortEnumType
+}
+
+"""
+A connection to a list of items.
+"""
+type BlockedDatesBySpaceConnection {
+  """
+  A list of edges.
+  """
+  edges: [BlockedDatesBySpaceEdge!]
+  """
+  A flattened list of the nodes.
+  """
+  nodes: [BlockedDate!]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+
+"""
+An edge in a connection.
+"""
+type BlockedDatesBySpaceEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+  """
+  The item at the end of the edge.
+  """
+  node: BlockedDate!
+}
+
 type Booking {
   advertiserNotes: String
   campaign: Campaign
@@ -888,7 +970,7 @@ type CreateSetupIntentPayload {
   setupIntentId: String
 }
 
-union CreateSpaceError = NotFoundError | ValidationError
+union CreateSpaceError = GeocodingError | NotFoundError | ValidationError
 
 input CreateSpaceInput {
   address: String!
@@ -901,8 +983,8 @@ input CreateSpaceInput {
   height: Float
   images: [String!]
   installationFee: Decimal
-  latitude: Float!
-  longitude: Float!
+  latitude: Float
+  longitude: Float
   maxDuration: Int
   minDuration: Int!
   pricePerDay: Decimal!
@@ -1107,6 +1189,13 @@ type ForbiddenError implements Error {
   message: String!
 }
 
+type GeocodingError implements Error {
+  address: String!
+  code: String!
+  details: String
+  message: String!
+}
+
 """
 A connection to a list of items.
 """
@@ -1164,6 +1253,13 @@ type InvalidStatusTransitionError implements Error {
 type KeyValuePairOfStringAndString__ {
   key: String!
   value: [String!]!
+}
+
+input ListFilterInputTypeOfBlockedDateFilterInput {
+  all: BlockedDateFilterInput
+  any: Boolean
+  none: BlockedDateFilterInput
+  some: BlockedDateFilterInput
 }
 
 input ListFilterInputTypeOfBookingFilterInput {
@@ -1241,6 +1337,26 @@ input ListStringOperationFilterInput {
   any: Boolean
   none: StringOperationFilterInput
   some: StringOperationFilterInput
+}
+
+"""
+The `LocalDate` scalar type represents a ISO date string, represented as UTF-8 character sequences YYYY-MM-DD. The scalar follows the specification defined in RFC3339
+"""
+scalar LocalDate
+
+input LocalDateOperationFilterInput {
+  eq: LocalDate
+  gt: LocalDate
+  gte: LocalDate
+  in: [LocalDate]
+  lt: LocalDate
+  lte: LocalDate
+  neq: LocalDate
+  ngt: LocalDate
+  ngte: LocalDate
+  nin: [LocalDate]
+  nlt: LocalDate
+  nlte: LocalDate
 }
 
 """
@@ -1429,6 +1545,7 @@ type MonthlyStats {
 
 type Mutation {
   approveBooking(input: ApproveBookingInput!): ApproveBookingPayload!
+  blockDates(input: BlockDatesInput!): BlockDatesPayload!
   cancelBooking(input: CancelBookingInput!): CancelBookingPayload!
   cancelCampaign(input: CancelCampaignInput!): CancelCampaignPayload!
   changePassword(input: ChangePasswordInput!): ChangePasswordPayload!
@@ -1487,6 +1604,7 @@ type Mutation {
     input: SetDefaultPaymentMethodInput!
   ): SetDefaultPaymentMethodPayload!
   submitCampaign(input: SubmitCampaignInput!): SubmitCampaignPayload!
+  unblockDates(input: UnblockDatesInput!): UnblockDatesPayload!
   updateAdvertiserProfile(
     input: UpdateAdvertiserProfileInput!
   ): UpdateAdvertiserProfilePayload!
@@ -2208,6 +2326,29 @@ type Query {
     startDate: DateTime!
   ): AdvertiserAnalytics!
   advertiserDailyStats(endDate: DateTime!, startDate: DateTime!): [DailyStats!]!
+  blockedDatesBySpace(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    endDate: LocalDate
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+    order: [BlockedDateSortInput!]
+    spaceId: ID!
+    startDate: LocalDate
+    where: BlockedDateFilterInput
+  ): BlockedDatesBySpaceConnection
   bookingById(id: ID!): Booking
   bookingsRequiringAction(
     """
@@ -2899,6 +3040,7 @@ type Space {
   availableFrom: DateTime
   availableTo: DateTime
   averageRating: Float
+  blockedDates: [BlockedDate!]!
   bookings(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -2974,6 +3116,7 @@ input SpaceFilterInput {
   availableFrom: DateTimeOperationFilterInput
   availableTo: DateTimeOperationFilterInput
   averageRating: FloatOperationFilterInput
+  blockedDates: ListFilterInputTypeOfBlockedDateFilterInput
   bookings: ListFilterInputTypeOfBookingFilterInput
   city: StringOperationFilterInput
   createdAt: DateTimeOperationFilterInput
@@ -3394,6 +3537,18 @@ type TypingIndicator {
 
 scalar UUID
 
+union UnblockDatesError = ForbiddenError | NotFoundError | ValidationError
+
+input UnblockDatesInput {
+  dates: [LocalDate!]!
+  spaceId: ID!
+}
+
+type UnblockDatesPayload {
+  errors: [UnblockDatesError!]
+  unblockedCount: Int
+}
+
 union UpdateAdvertiserProfileError = NotFoundError
 
 input UpdateAdvertiserProfileInput {
@@ -3462,19 +3617,29 @@ type UpdateReviewPayload {
   review: Review
 }
 
-union UpdateSpaceError = ForbiddenError | NotFoundError | ValidationError
+union UpdateSpaceError =
+  | ForbiddenError
+  | GeocodingError
+  | NotFoundError
+  | ValidationError
 
 input UpdateSpaceInput {
+  address: String
   availableFrom: DateTime
   availableTo: DateTime
+  city: String
   description: String
   images: [String!]
   installationFee: Decimal
+  latitude: Float
+  longitude: Float
   maxDuration: Int
   minDuration: Int
   pricePerDay: Decimal
+  state: String
   title: String
   traffic: String
+  zipCode: String
 }
 
 union UpdateSpaceOwnerProfileError = NotFoundError

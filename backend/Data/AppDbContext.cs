@@ -9,6 +9,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<AdvertiserProfile> AdvertiserProfiles { get; set; } = null!;
     public DbSet<SpaceOwnerProfile> SpaceOwnerProfiles { get; set; } = null!;
     public DbSet<Space> Spaces { get; set; } = null!;
+    public DbSet<BlockedDate> BlockedDates { get; set; } = null!;
     public DbSet<Campaign> Campaigns { get; set; } = null!;
 
     public DbSet<Booking> Bookings { get; set; } = null!;
@@ -44,6 +45,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
         new SpaceOwnerProfileConfig().Configure(modelBuilder
             .Entity<SpaceOwnerProfile>());
         new SpaceConfig().Configure(modelBuilder.Entity<Space>());
+        new BlockedDateConfig().Configure(modelBuilder.Entity<BlockedDate>());
         new CampaignConfig().Configure(modelBuilder.Entity<Campaign>());
 
         new BookingConfig().Configure(modelBuilder.Entity<Booking>());

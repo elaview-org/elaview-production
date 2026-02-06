@@ -75,7 +75,7 @@ Each profile has its own `navigation-bar.data.ts`:
 | Route     | Status       | Data Source    | Notes                                   |
 |-----------|--------------|----------------|-----------------------------------------|
 | Overview  | ✅ Functional | GraphQL        | Fully integrated                        |
-| Listings  | ⚠️ Partial   | GraphQL + Mock | Detail page needs mutations             |
+| Listings  | ✅ Functional | GraphQL        | Fully integrated with mutations         |
 | Bookings  | ⚠️ Partial   | GraphQL + Mock | Filtering disabled, mutations not wired |
 | Earnings  | ✅ Functional | GraphQL        | Fully integrated                        |
 | Analytics | ⚠️ Partial   | Mock JSON      | UI complete, needs backend query        |
@@ -397,8 +397,8 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Status filter tabs (Active, Inactive, Pending, Rejected)
 - [x] Sort options (Revenue, Rating, Bookings, Created)
 - [x] Pagination
-- [ ] Search by title
-- [ ] Bulk actions (Deactivate, Delete)
+- [x] Search by title (debounced URL sync)
+- [x] Bulk actions - Deactivate/Delete selected (table view only)
 
 **Create Space Modal:**
 
@@ -407,10 +407,10 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Step 3: Location fields + map preview
 - [x] Step 4: Pricing and duration settings
 - [x] Step 5: Preview before publish
-- [ ] Photo upload to server (TODO in code)
-- [ ] `createSpace` mutation integration
-- [ ] Validation with error messages
-- [ ] Draft saving to localStorage
+- [x] Photo upload to Cloudinary (signed URLs)
+- [x] `createSpace` mutation integration
+- [x] Per-step Zod validation with error messages
+- [x] Draft saving to localStorage (auto-save, discard button)
 
 **Detail Page (`/listings/[id]`):**
 
@@ -419,14 +419,14 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Details form UI
 - [x] Performance stats section
 - [x] Real GraphQL query (`spaceById`)
-- [ ] Photo upload to server (TODO: gallery.tsx:34)
-- [ ] Photo delete from server (TODO: gallery.tsx:40)
-- [ ] `updateSpace` mutation (TODO: details.tsx:43)
-- [ ] Availability calendar integration
-- [ ] Booking history for this space
-- [ ] Reviews for this space
-- [ ] Deactivate/Reactivate toggle
-- [ ] Delete with confirmation
+- [x] Photo upload to Cloudinary
+- [x] Photo delete with `updateSpaceImages` mutation
+- [x] `updateSpace` mutation with toast notifications
+- [x] Availability calendar with block/unblock dates
+- [x] Booking history for this space
+- [x] Reviews for this space
+- [x] Deactivate/Reactivate toggle in dropdown
+- [x] Delete with confirmation dialog (requires title match)
 
 #### Backend Note
 
@@ -446,10 +446,9 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - `reactivateSpace(input: {id})`
 - `deleteSpace(input: {id})`
 
-**Note:** All mutations exist but frontend hasn't wired them yet. Image upload handled via Cloudinary (frontend), then
-URLs passed to mutations.
+**Note:** All mutations wired. Image upload handled via Cloudinary signed URLs.
 
-**Frontend Status:** Query works. Mutations not wired (TODO comments in code).
+**Frontend Status:** ✅ Fully functional (queries + mutations wired)
 
 ---
 
@@ -690,7 +689,7 @@ query spaceOwnerAnalytics(dateRange: DateRangeInput): SpaceOwnerAnalytics
 **Interactivity:**
 
 - [ ] Drag to block dates
-- [ ] Click to unblock dates
+- [x] Click to block/unblock dates (implemented in /listings/[id] calendar)
 - [x] Filter by space
 - [ ] Filter by booking status
 - [ ] Bulk block date ranges
@@ -705,22 +704,19 @@ query spaceOwnerAnalytics(dateRange: DateRangeInput): SpaceOwnerAnalytics
 
 #### Backend Note
 
-**Queries - PARTIAL:**
+**Queries:**
 
 - `mySpaces` with nested `bookings(where: {startDate: {lte: $end}, endDate: {gte: $start}})` - Works but expensive
+- `blockedDatesBySpace(spaceId, first)` - Blocked dates for a space ✅
 
-**Recommended optimization:**
+**Mutations:**
 
-```graphql
-query calendarEvents(start: DateTime!, end: DateTime!, spaceIds: [ID!]) {
-bookings: [CalendarBooking!]!  # Flattened booking data
-blockedDates: [BlockedDate!]!  # Space availability blocks
-}
-```
+- `blockDates(input: {spaceId, dates, reason})` - Block dates ✅
+- `unblockDates(input: {spaceId, dates})` - Unblock dates ✅
 
-**Note:** Currently no `BlockedDate` type exists - owner can't block dates for spaces.
+**Note:** Space-specific calendar with block/unblock is implemented in `/listings/[id]`. Global calendar route still uses mock data.
 
-**Frontend Status:** ⚠️ Mock data. Query possible via nested approach.
+**Frontend Status:** ⚠️ Global calendar uses mock. Space-specific calendar in /listings/[id] is functional.
 
 ---
 
@@ -1162,11 +1158,11 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 
 | Mutation          | Purpose            | Implemented |
 |-------------------|--------------------|-------------|
-| `createSpace`     | Create new space   | ❌           |
-| `updateSpace`     | Edit space details | ❌           |
-| `deactivateSpace` | Set space inactive | ❌           |
-| `reactivateSpace` | Reactivate space   | ❌           |
-| `deleteSpace`     | Remove space       | ❌           |
+| `createSpace`     | Create new space   | ✅           |
+| `updateSpace`     | Edit space details | ✅           |
+| `deactivateSpace` | Set space inactive | ✅           |
+| `reactivateSpace` | Reactivate space   | ✅           |
+| `deleteSpace`     | Remove space       | ✅           |
 
 **Booking:**
 
@@ -1439,7 +1435,6 @@ For payment flows:
 ### Missing Mutations (blocking features)
 
 1. `approveProof` / `disputeProof` - Advertiser verification approval
-2. Space blocked dates management
 
 ### Missing Queries (would improve UX)
 
@@ -1458,7 +1453,7 @@ Everything else exists in the schema - frontend needs to wire up the mutations.
 
 ### Phase 1: Core Mutations (Critical Path)
 
-1. Space mutations (create, update, delete)
+1. ~~Space mutations (create, update, delete)~~ ✅ Done
 2. Booking actions (approve, reject, mark downloaded/installed)
 3. Campaign mutations (create, update, submit, cancel)
 4. Payment flow (createPaymentIntent, confirmPayment)
@@ -1477,7 +1472,7 @@ Everything else exists in the schema - frontend needs to wire up the mutations.
 
 ### Phase 4: Advanced Features
 
-1. Calendar view with date blocking
+1. ~~Calendar view with date blocking~~ ✅ Done (in /listings/[id])
 2. Export functionality
 3. Stripe payment methods management
 

@@ -24,20 +24,20 @@ public sealed class Space : EntityBase {
     public SpaceStatus Status { get; init; } = SpaceStatus.Active;
 
     [MaxLength(500)]
-    public string Address { get; init; } = null!;
+    public string Address { get; set; } = null!;
 
     [MaxLength(100)]
-    public string City { get; init; } = null!;
+    public string City { get; set; } = null!;
 
     [MaxLength(100)]
-    public string State { get; init; } = null!;
+    public string State { get; set; } = null!;
 
     [MaxLength(20)]
-    public string? ZipCode { get; init; }
+    public string? ZipCode { get; set; }
 
-    public double Latitude { get; init; }
+    public double Latitude { get; set; }
 
-    public double Longitude { get; init; }
+    public double Longitude { get; set; }
 
     public double? Width { get; init; }
 
@@ -78,6 +78,8 @@ public sealed class Space : EntityBase {
     public ICollection<Booking> Bookings { get; init; } = [];
 
     public ICollection<Review> Reviews { get; init; } = [];
+
+    public ICollection<BlockedDate> BlockedDates { get; init; } = [];
 }
 
 public sealed class SpaceConfig :

@@ -40,7 +40,7 @@ jobs:
         run: ev web:typecheck
 
       - name: Test
-        run: ev web:coverage
+        run: ev web:test:coverage
 
       - name: Build
         run: ev web:build

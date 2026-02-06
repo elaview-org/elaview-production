@@ -1,0 +1,19 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ experimental/ci-cd ]
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  ELAVIEW_ENVIRONMENT: production
+  DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "TODO"

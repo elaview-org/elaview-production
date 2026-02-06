@@ -330,7 +330,8 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture)
         Payout payout;
         if (status == PayoutStatus.Completed) {
             payout = PayoutFactory.CreateCompleted(bookingId, spaceOwnerProfileId, stage);
-        } else {
+        }
+        else {
             payout = new Payout {
                 Id = Guid.NewGuid(),
                 BookingId = bookingId,

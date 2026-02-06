@@ -46,7 +46,7 @@ ev_web_typecheck() {
 ev_web_build() {
     ev_core_require_cmd "bun" || return 1
     ev_core_log_info "Building web client..."
-    ev_core_in_web bun run build
+    ev_core_in_web bun compile
     ev_web_exit=$?
     [ $ev_web_exit -eq 0 ] && ev_core_log_success "Web client built successfully."
     return $ev_web_exit
@@ -55,7 +55,7 @@ ev_web_build() {
 ev_web_test() {
     ev_core_require_cmd "bun" || return 1
     ev_core_log_info "Running web tests..."
-   ev_core_in_web bun run test
+    ev_core_in_web bun test
     ev_web_exit=$?
     [ $ev_web_exit -eq 0 ] && ev_core_log_success "All web tests passed."
     return $ev_web_exit

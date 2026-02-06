@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { IconChartPie } from "@tabler/icons-react";
 import { Label, Pie, PieChart } from "recharts";
 import {
   Card,
@@ -18,17 +17,11 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/primitives/chart";
-import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/primitives/empty";
 import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import { BOOKING_STATUS } from "@/lib/constants";
 import type { StatusCount, BookingStatus } from "@/types/gql";
-import { STATUS_CHART_CONFIG } from "./constants";
+import { STATUS_CHART_CONFIG } from "../constants";
+import Placeholder from "./placeholder";
 
 export function StatusChartSkeleton() {
   return (
@@ -45,22 +38,6 @@ export function StatusChartSkeleton() {
 type Props = {
   data: StatusCount[];
 };
-
-function Placeholder() {
-  return (
-    <Empty className="mx-auto aspect-square max-h-[300px]">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <IconChartPie />
-        </EmptyMedia>
-        <EmptyTitle>No bookings yet</EmptyTitle>
-        <EmptyDescription>
-          Status distribution will appear here once you have bookings.
-        </EmptyDescription>
-      </EmptyHeader>
-    </Empty>
-  );
-}
 
 export default function StatusChart({ data }: Props) {
   const chartData = React.useMemo(() => {

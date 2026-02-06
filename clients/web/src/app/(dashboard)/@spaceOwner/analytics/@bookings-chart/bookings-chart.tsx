@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { IconChartLine } from "@tabler/icons-react";
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { Skeleton } from "@/components/primitives/skeleton";
@@ -19,13 +18,6 @@ import {
   ChartTooltipContent,
 } from "@/components/primitives/chart";
 import {
-  Empty,
-  EmptyDescription,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-} from "@/components/primitives/empty";
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -37,11 +29,12 @@ import {
   ToggleGroupItem,
 } from "@/components/primitives/toggle-group";
 import MaybePlaceholder from "@/components/status/maybe-placeholder";
+import Placeholder from "./placeholder";
 import {
   BOOKINGS_CHART_CONFIG,
   TIME_RANGES,
   type TimeRange,
-} from "./constants";
+} from "../constants";
 
 type ChartSkeletonProps = {
   height?: number;
@@ -70,22 +63,6 @@ type BookingsTrendItem = {
 type Props = {
   data: BookingsTrendItem[];
 };
-
-function Placeholder() {
-  return (
-    <Empty className="h-[250px]">
-      <EmptyHeader>
-        <EmptyMedia variant="icon">
-          <IconChartLine />
-        </EmptyMedia>
-        <EmptyTitle>No booking data</EmptyTitle>
-        <EmptyDescription>
-          Booking trends will appear here once you receive bookings.
-        </EmptyDescription>
-      </EmptyHeader>
-    </Empty>
-  );
-}
 
 export default function BookingsChart({ data }: Props) {
   const isMobile = useIsMobile();

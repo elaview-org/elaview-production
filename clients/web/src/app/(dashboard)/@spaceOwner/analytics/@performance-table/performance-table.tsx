@@ -18,7 +18,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
-import type { SpacePerformanceItem } from "@/types/gql";
 
 type TableRow = {
   id: string;
@@ -94,6 +93,16 @@ const columns = [
   occupancyColumn,
   ratingColumn,
 ];
+
+type SpacePerformanceItem = {
+  id: string;
+  title: string;
+  image: string | null;
+  totalBookings: number;
+  totalRevenue: number | null;
+  averageRating: number | null;
+  occupancyRate: number | null;
+};
 
 type Props = {
   data: SpacePerformanceItem[];

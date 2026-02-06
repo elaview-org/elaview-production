@@ -13,8 +13,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/primitives/chart";
-import { SPACE_REVENUE_CHART_CONFIG } from "./constants";
-import type { SpacePerformanceItem } from "@/types/gql";
+import { SPACE_REVENUE_CHART_CONFIG } from "../constants";
+
+type SpacePerformanceItem = {
+  id: string;
+  title: string;
+  totalRevenue: number | null;
+};
 
 type Props = {
   data: SpacePerformanceItem[];

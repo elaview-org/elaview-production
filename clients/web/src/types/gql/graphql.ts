@@ -4117,58 +4117,17 @@ export type AdvertiserOverviewDataQuery = {
   };
 };
 
-export type SpaceOwnerAnalyticsPageQueryVariables = Exact<{
-  startDate: Scalars["DateTime"]["input"];
-  endDate: Scalars["DateTime"]["input"];
-}>;
+export type AnalyticsBookingsChart_QueryFragmentFragment = {
+  spaceOwnerDailyStats: Array<{
+    __typename: "DailyStats";
+    date: string;
+    bookings: number;
+  }>;
+} & { " $fragmentName"?: "AnalyticsBookingsChart_QueryFragmentFragment" };
 
-export type SpaceOwnerAnalyticsPageQuery = {
+export type AnalyticsComparison_QueryFragmentFragment = {
   spaceOwnerAnalytics: {
     __typename: "SpaceOwnerAnalytics";
-    bookingHeatmap: Array<Array<number>>;
-    summary: {
-      __typename: "SpaceOwnerSummary";
-      totalBookings: number;
-      previousTotalBookings: number;
-      totalRevenue: number | null;
-      previousTotalRevenue: number | null;
-      averageRating: number | null;
-      completionRate: number | null;
-      avgBookingDuration: number | null;
-      previousAvgBookingDuration: number | null;
-      occupancyRate: number | null;
-      previousOccupancyRate: number | null;
-      repeatAdvertiserRate: number | null;
-      previousRepeatAdvertiserRate: number | null;
-      forecastedRevenue: number | null;
-    };
-    statusDistribution: Array<{
-      __typename: "StatusCount";
-      status: BookingStatus;
-      count: number;
-    }>;
-    spacePerformance: Array<{
-      __typename: "SpacePerformanceItem";
-      id: string;
-      title: string;
-      image: string | null;
-      totalBookings: number;
-      totalRevenue: number | null;
-      averageRating: number | null;
-      occupancyRate: number | null;
-    }>;
-    monthlyStats: Array<{
-      __typename: "MonthlyStats";
-      month: string;
-      revenue: number | null;
-      bookings: number;
-    }>;
-    ratingTrends: Array<{
-      __typename: "RatingTrendPoint";
-      month: string;
-      rating: number;
-      reviews: number;
-    }>;
     periodComparison: {
       __typename: "PeriodComparison";
       current: {
@@ -4192,6 +4151,104 @@ export type SpaceOwnerAnalyticsPageQuery = {
         completionRate: number | null;
       };
     };
+  };
+} & { " $fragmentName"?: "AnalyticsComparison_QueryFragmentFragment" };
+
+export type AnalyticsHeatmapChart_QueryFragmentFragment = {
+  spaceOwnerAnalytics: {
+    __typename: "SpaceOwnerAnalytics";
+    bookingHeatmap: Array<Array<number>>;
+  };
+} & { " $fragmentName"?: "AnalyticsHeatmapChart_QueryFragmentFragment" };
+
+export type AnalyticsMonthlyChart_QueryFragmentFragment = {
+  spaceOwnerAnalytics: {
+    __typename: "SpaceOwnerAnalytics";
+    monthlyStats: Array<{
+      __typename: "MonthlyStats";
+      month: string;
+      revenue: number | null;
+      bookings: number;
+    }>;
+  };
+} & { " $fragmentName"?: "AnalyticsMonthlyChart_QueryFragmentFragment" };
+
+export type AnalyticsPerformanceTable_QueryFragmentFragment = {
+  spaceOwnerAnalytics: {
+    __typename: "SpaceOwnerAnalytics";
+    spacePerformance: Array<{
+      __typename: "SpacePerformanceItem";
+      id: string;
+      title: string;
+      image: string | null;
+      totalBookings: number;
+      totalRevenue: number | null;
+      averageRating: number | null;
+      occupancyRate: number | null;
+    }>;
+  };
+} & { " $fragmentName"?: "AnalyticsPerformanceTable_QueryFragmentFragment" };
+
+export type AnalyticsRatingChart_QueryFragmentFragment = {
+  spaceOwnerAnalytics: {
+    __typename: "SpaceOwnerAnalytics";
+    ratingTrends: Array<{
+      __typename: "RatingTrendPoint";
+      month: string;
+      rating: number;
+      reviews: number;
+    }>;
+  };
+} & { " $fragmentName"?: "AnalyticsRatingChart_QueryFragmentFragment" };
+
+export type AnalyticsRevenueChart_QueryFragmentFragment = {
+  spaceOwnerAnalytics: {
+    __typename: "SpaceOwnerAnalytics";
+    spacePerformance: Array<{
+      __typename: "SpacePerformanceItem";
+      id: string;
+      title: string;
+      totalRevenue: number | null;
+    }>;
+  };
+} & { " $fragmentName"?: "AnalyticsRevenueChart_QueryFragmentFragment" };
+
+export type AnalyticsStatusChart_QueryFragmentFragment = {
+  spaceOwnerAnalytics: {
+    __typename: "SpaceOwnerAnalytics";
+    statusDistribution: Array<{
+      __typename: "StatusCount";
+      status: BookingStatus;
+      count: number;
+    }>;
+  };
+} & { " $fragmentName"?: "AnalyticsStatusChart_QueryFragmentFragment" };
+
+export type AnalyticsSummary_QueryFragmentFragment = {
+  spaceOwnerAnalytics: {
+    __typename: "SpaceOwnerAnalytics";
+    summary: {
+      __typename: "SpaceOwnerSummary";
+      totalBookings: number;
+      previousTotalBookings: number;
+      totalRevenue: number | null;
+      previousTotalRevenue: number | null;
+      averageRating: number | null;
+      completionRate: number | null;
+      avgBookingDuration: number | null;
+      previousAvgBookingDuration: number | null;
+      occupancyRate: number | null;
+      previousOccupancyRate: number | null;
+      repeatAdvertiserRate: number | null;
+      previousRepeatAdvertiserRate: number | null;
+      forecastedRevenue: number | null;
+    };
+  };
+} & { " $fragmentName"?: "AnalyticsSummary_QueryFragmentFragment" };
+
+export type AnalyticsTopPerformers_QueryFragmentFragment = {
+  spaceOwnerAnalytics: {
+    __typename: "SpaceOwnerAnalytics";
     topPerformers: {
       __typename: "SpaceOwnerTopPerformers";
       bestRevenue: {
@@ -4231,11 +4288,26 @@ export type SpaceOwnerAnalyticsPageQuery = {
       } | null;
     };
   };
-  spaceOwnerDailyStats: Array<{
-    __typename: "DailyStats";
-    date: string;
-    bookings: number;
-  }>;
+} & { " $fragmentName"?: "AnalyticsTopPerformers_QueryFragmentFragment" };
+
+export type AnalyticsDataQueryVariables = Exact<{
+  startDate: Scalars["DateTime"]["input"];
+  endDate: Scalars["DateTime"]["input"];
+}>;
+
+export type AnalyticsDataQuery = {
+  " $fragmentRefs"?: {
+    AnalyticsSummary_QueryFragmentFragment: AnalyticsSummary_QueryFragmentFragment;
+    AnalyticsBookingsChart_QueryFragmentFragment: AnalyticsBookingsChart_QueryFragmentFragment;
+    AnalyticsStatusChart_QueryFragmentFragment: AnalyticsStatusChart_QueryFragmentFragment;
+    AnalyticsMonthlyChart_QueryFragmentFragment: AnalyticsMonthlyChart_QueryFragmentFragment;
+    AnalyticsRatingChart_QueryFragmentFragment: AnalyticsRatingChart_QueryFragmentFragment;
+    AnalyticsHeatmapChart_QueryFragmentFragment: AnalyticsHeatmapChart_QueryFragmentFragment;
+    AnalyticsComparison_QueryFragmentFragment: AnalyticsComparison_QueryFragmentFragment;
+    AnalyticsTopPerformers_QueryFragmentFragment: AnalyticsTopPerformers_QueryFragmentFragment;
+    AnalyticsRevenueChart_QueryFragmentFragment: AnalyticsRevenueChart_QueryFragmentFragment;
+    AnalyticsPerformanceTable_QueryFragmentFragment: AnalyticsPerformanceTable_QueryFragmentFragment;
+  };
 };
 
 export type BookingCard_BookingFragmentFragment = {
@@ -7972,6 +8044,894 @@ export const AdvertiserOverviewTopSpaces_QueryFragmentFragmentDoc = {
   ],
 } as unknown as DocumentNode<
   AdvertiserOverviewTopSpaces_QueryFragmentFragment,
+  unknown
+>;
+export const AnalyticsBookingsChart_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsBookingsChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerDailyStats" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "date" } },
+                { kind: "Field", name: { kind: "Name", value: "bookings" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AnalyticsBookingsChart_QueryFragmentFragment,
+  unknown
+>;
+export const AnalyticsComparison_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsComparison_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "periodComparison" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "current" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "period" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "startDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "endDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "bookings" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "revenue" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avgRating" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "completionRate" },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "previous" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "period" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "startDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "endDate" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "bookings" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "revenue" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "avgRating" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "completionRate" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AnalyticsComparison_QueryFragmentFragment,
+  unknown
+>;
+export const AnalyticsHeatmapChart_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsHeatmapChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "bookingHeatmap" },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AnalyticsHeatmapChart_QueryFragmentFragment,
+  unknown
+>;
+export const AnalyticsMonthlyChart_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsMonthlyChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "monthlyStats" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "months" },
+                      value: { kind: "IntValue", value: "12" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "month" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "revenue" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "bookings" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AnalyticsMonthlyChart_QueryFragmentFragment,
+  unknown
+>;
+export const AnalyticsPerformanceTable_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsPerformanceTable_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spacePerformance" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      { kind: "Field", name: { kind: "Name", value: "image" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalBookings" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalRevenue" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "averageRating" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "occupancyRate" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AnalyticsPerformanceTable_QueryFragmentFragment,
+  unknown
+>;
+export const AnalyticsRatingChart_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsRatingChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "ratingTrends" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "months" },
+                      value: { kind: "IntValue", value: "12" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "month" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "rating" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "reviews" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AnalyticsRatingChart_QueryFragmentFragment,
+  unknown
+>;
+export const AnalyticsRevenueChart_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsRevenueChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spacePerformance" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalRevenue" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AnalyticsRevenueChart_QueryFragmentFragment,
+  unknown
+>;
+export const AnalyticsStatusChart_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsStatusChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "statusDistribution" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "status" },
+                      },
+                      { kind: "Field", name: { kind: "Name", value: "count" } },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AnalyticsStatusChart_QueryFragmentFragment,
+  unknown
+>;
+export const AnalyticsSummary_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsSummary_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "summary" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalBookings" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "previousTotalBookings" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalRevenue" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "previousTotalRevenue" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "averageRating" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "completionRate" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "avgBookingDuration" },
+                      },
+                      {
+                        kind: "Field",
+                        name: {
+                          kind: "Name",
+                          value: "previousAvgBookingDuration",
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "occupancyRate" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "previousOccupancyRate" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "repeatAdvertiserRate" },
+                      },
+                      {
+                        kind: "Field",
+                        name: {
+                          kind: "Name",
+                          value: "previousRepeatAdvertiserRate",
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "forecastedRevenue" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AnalyticsSummary_QueryFragmentFragment, unknown>;
+export const AnalyticsTopPerformers_QueryFragmentFragmentDoc = {
+  kind: "Document",
+  definitions: [
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsTopPerformers_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "topPerformers" },
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "bestRevenue" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "title" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "value" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "change" },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "bestRating" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "title" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "value" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "reviews" },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "bestOccupancy" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "title" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "value" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "change" },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "mostBookings" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "title" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "value" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "change" },
+                            },
+                          ],
+                        },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "needsAttention" },
+                        selectionSet: {
+                          kind: "SelectionSet",
+                          selections: [
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "id" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "title" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "occupancy" },
+                            },
+                            {
+                              kind: "Field",
+                              name: { kind: "Name", value: "bookings" },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AnalyticsTopPerformers_QueryFragmentFragment,
   unknown
 >;
 export const BookingCard_BookingFragmentFragmentDoc = {
@@ -12475,13 +13435,13 @@ export const AdvertiserOverviewDataDocument = {
   AdvertiserOverviewDataQuery,
   AdvertiserOverviewDataQueryVariables
 >;
-export const SpaceOwnerAnalyticsPageDocument = {
+export const AnalyticsDataDocument = {
   kind: "Document",
   definitions: [
     {
       kind: "OperationDefinition",
       operation: "query",
-      name: { kind: "Name", value: "SpaceOwnerAnalyticsPage" },
+      name: { kind: "Name", value: "AnalyticsData" },
       variableDefinitions: [
         {
           kind: "VariableDefinition",
@@ -12512,6 +13472,77 @@ export const SpaceOwnerAnalyticsPageDocument = {
           },
         },
       ],
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "FragmentSpread",
+            name: { kind: "Name", value: "AnalyticsSummary_QueryFragment" },
+          },
+          {
+            kind: "FragmentSpread",
+            name: {
+              kind: "Name",
+              value: "AnalyticsBookingsChart_QueryFragment",
+            },
+          },
+          {
+            kind: "FragmentSpread",
+            name: { kind: "Name", value: "AnalyticsStatusChart_QueryFragment" },
+          },
+          {
+            kind: "FragmentSpread",
+            name: {
+              kind: "Name",
+              value: "AnalyticsMonthlyChart_QueryFragment",
+            },
+          },
+          {
+            kind: "FragmentSpread",
+            name: { kind: "Name", value: "AnalyticsRatingChart_QueryFragment" },
+          },
+          {
+            kind: "FragmentSpread",
+            name: {
+              kind: "Name",
+              value: "AnalyticsHeatmapChart_QueryFragment",
+            },
+          },
+          {
+            kind: "FragmentSpread",
+            name: { kind: "Name", value: "AnalyticsComparison_QueryFragment" },
+          },
+          {
+            kind: "FragmentSpread",
+            name: {
+              kind: "Name",
+              value: "AnalyticsTopPerformers_QueryFragment",
+            },
+          },
+          {
+            kind: "FragmentSpread",
+            name: {
+              kind: "Name",
+              value: "AnalyticsRevenueChart_QueryFragment",
+            },
+          },
+          {
+            kind: "FragmentSpread",
+            name: {
+              kind: "Name",
+              value: "AnalyticsPerformanceTable_QueryFragment",
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsSummary_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
       selectionSet: {
         kind: "SelectionSet",
         selections: [
@@ -12606,6 +13637,88 @@ export const SpaceOwnerAnalyticsPageDocument = {
                     ],
                   },
                 },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsBookingsChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerDailyStats" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                { kind: "Field", name: { kind: "Name", value: "date" } },
+                { kind: "Field", name: { kind: "Name", value: "bookings" } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsStatusChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "statusDistribution" },
@@ -12620,41 +13733,46 @@ export const SpaceOwnerAnalyticsPageDocument = {
                     ],
                   },
                 },
-                {
-                  kind: "Field",
-                  name: { kind: "Name", value: "spacePerformance" },
-                  arguments: [
-                    {
-                      kind: "Argument",
-                      name: { kind: "Name", value: "first" },
-                      value: { kind: "IntValue", value: "10" },
-                    },
-                  ],
-                  selectionSet: {
-                    kind: "SelectionSet",
-                    selections: [
-                      { kind: "Field", name: { kind: "Name", value: "id" } },
-                      { kind: "Field", name: { kind: "Name", value: "title" } },
-                      { kind: "Field", name: { kind: "Name", value: "image" } },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "totalBookings" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "totalRevenue" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "averageRating" },
-                      },
-                      {
-                        kind: "Field",
-                        name: { kind: "Name", value: "occupancyRate" },
-                      },
-                    ],
-                  },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsMonthlyChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
                 },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "monthlyStats" },
@@ -12680,6 +13798,46 @@ export const SpaceOwnerAnalyticsPageDocument = {
                     ],
                   },
                 },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsRatingChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "ratingTrends" },
@@ -12705,10 +13863,90 @@ export const SpaceOwnerAnalyticsPageDocument = {
                     ],
                   },
                 },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsHeatmapChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "bookingHeatmap" },
                 },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsComparison_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "periodComparison" },
@@ -12792,6 +14030,46 @@ export const SpaceOwnerAnalyticsPageDocument = {
                     ],
                   },
                 },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsTopPerformers_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
                 {
                   kind: "Field",
                   name: { kind: "Name", value: "topPerformers" },
@@ -12929,9 +14207,22 @@ export const SpaceOwnerAnalyticsPageDocument = {
               ],
             },
           },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsRevenueChart_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
           {
             kind: "Field",
-            name: { kind: "Name", value: "spaceOwnerDailyStats" },
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
             arguments: [
               {
                 kind: "Argument",
@@ -12953,8 +14244,103 @@ export const SpaceOwnerAnalyticsPageDocument = {
             selectionSet: {
               kind: "SelectionSet",
               selections: [
-                { kind: "Field", name: { kind: "Name", value: "date" } },
-                { kind: "Field", name: { kind: "Name", value: "bookings" } },
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spacePerformance" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalRevenue" },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: "FragmentDefinition",
+      name: { kind: "Name", value: "AnalyticsPerformanceTable_QueryFragment" },
+      typeCondition: {
+        kind: "NamedType",
+        name: { kind: "Name", value: "Query" },
+      },
+      selectionSet: {
+        kind: "SelectionSet",
+        selections: [
+          {
+            kind: "Field",
+            name: { kind: "Name", value: "spaceOwnerAnalytics" },
+            arguments: [
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "startDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "startDate" },
+                },
+              },
+              {
+                kind: "Argument",
+                name: { kind: "Name", value: "endDate" },
+                value: {
+                  kind: "Variable",
+                  name: { kind: "Name", value: "endDate" },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: "SelectionSet",
+              selections: [
+                {
+                  kind: "Field",
+                  name: { kind: "Name", value: "spacePerformance" },
+                  arguments: [
+                    {
+                      kind: "Argument",
+                      name: { kind: "Name", value: "first" },
+                      value: { kind: "IntValue", value: "10" },
+                    },
+                  ],
+                  selectionSet: {
+                    kind: "SelectionSet",
+                    selections: [
+                      { kind: "Field", name: { kind: "Name", value: "id" } },
+                      { kind: "Field", name: { kind: "Name", value: "title" } },
+                      { kind: "Field", name: { kind: "Name", value: "image" } },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalBookings" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "totalRevenue" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "averageRating" },
+                      },
+                      {
+                        kind: "Field",
+                        name: { kind: "Name", value: "occupancyRate" },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -12962,10 +14348,7 @@ export const SpaceOwnerAnalyticsPageDocument = {
       },
     },
   ],
-} as unknown as DocumentNode<
-  SpaceOwnerAnalyticsPageQuery,
-  SpaceOwnerAnalyticsPageQueryVariables
->;
+} as unknown as DocumentNode<AnalyticsDataQuery, AnalyticsDataQueryVariables>;
 export const BookingDetailDocument = {
   kind: "Document",
   definitions: [

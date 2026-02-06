@@ -1,7 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import {
+  Area,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Bar,
+  ComposedChart,
+} from "recharts";
 import {
   Card,
   CardAction,
@@ -24,16 +31,16 @@ import {
 } from "@/components/primitives/select";
 import {
   MONTH_RANGES,
-  MONTHLY_CHART_CONFIG,
+  RATING_CHART_CONFIG,
   type MonthRange,
-} from "./constants";
-import type { MonthlyStats } from "@/types/gql";
+} from "../constants";
+import type { RatingTrendPoint } from "@/types/gql";
 
 type Props = {
-  data: MonthlyStats[];
+  data: RatingTrendPoint[];
 };
 
-export default function MonthlyChart({ data }: Props) {
+export default function RatingChart({ data }: Props) {
   const [monthRange, setMonthRange] = React.useState<MonthRange>("12m");
 
   const filteredData = React.useMemo(() => {
@@ -41,10 +48,8 @@ export default function MonthlyChart({ data }: Props) {
     const monthsToShow = range?.months ?? 12;
     return data.slice(-monthsToShow).map((item) => ({
       ...item,
-      revenue: Number(item.revenue ?? 0),
       monthLabel: new Date(item.month + "-01").toLocaleDateString("en-US", {
         month: "short",
-        year: "2-digit",
       }),
     }));
   }, [data, monthRange]);
@@ -52,8 +57,10 @@ export default function MonthlyChart({ data }: Props) {
   return (
     <Card className="@container/card">
       <CardHeader>
-        <CardTitle>Monthly Revenue & Bookings</CardTitle>
-        <CardDescription>Revenue and booking trends over time</CardDescription>
+        <CardTitle>Rating Trend</CardTitle>
+        <CardDescription>
+          Average rating and review volume over time
+        </CardDescription>
         <CardAction>
           <Select
             value={monthRange}
@@ -78,10 +85,24 @@ export default function MonthlyChart({ data }: Props) {
       </CardHeader>
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
-          config={MONTHLY_CHART_CONFIG}
-          className="aspect-auto h-[300px] w-full"
+          config={RATING_CHART_CONFIG}
+          className="aspect-auto h-[250px] w-full"
         >
-          <BarChart data={filteredData}>
+          <ComposedChart data={filteredData}>
+            <defs>
+              <linearGradient id="fillRating" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-rating)"
+                  stopOpacity={0.8}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="var(--color-rating)"
+                  stopOpacity={0.1}
+                />
+              </linearGradient>
+            </defs>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="monthLabel"
@@ -90,20 +111,15 @@ export default function MonthlyChart({ data }: Props) {
               tickMargin={8}
             />
             <YAxis
-              yAxisId="revenue"
+              yAxisId="rating"
+              domain={[3.5, 5]}
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) =>
-                new Intl.NumberFormat("en-US", {
-                  style: "currency",
-                  currency: "USD",
-                  notation: "compact",
-                }).format(value)
-              }
+              tickFormatter={(value) => value.toFixed(1)}
             />
             <YAxis
-              yAxisId="bookings"
+              yAxisId="reviews"
               orientation="right"
               tickLine={false}
               axisLine={false}
@@ -114,34 +130,31 @@ export default function MonthlyChart({ data }: Props) {
               content={
                 <ChartTooltipContent
                   formatter={(value, name) => {
-                    if (name === "revenue") {
-                      return [
-                        new Intl.NumberFormat("en-US", {
-                          style: "currency",
-                          currency: "USD",
-                        }).format(Number(value)),
-                        "Revenue",
-                      ];
+                    if (name === "rating") {
+                      return [`★ ${Number(value).toFixed(1)}`, "Rating"];
                     }
-                    return [value, "Bookings"];
+                    return [value, "Reviews"];
                   }}
                   indicator="dot"
                 />
               }
             />
             <Bar
-              yAxisId="revenue"
-              dataKey="revenue"
-              fill="var(--color-revenue)"
+              yAxisId="reviews"
+              dataKey="reviews"
+              fill="var(--color-reviews)"
               radius={[4, 4, 0, 0]}
+              opacity={0.5}
             />
-            <Bar
-              yAxisId="bookings"
-              dataKey="bookings"
-              fill="var(--color-bookings)"
-              radius={[4, 4, 0, 0]}
+            <Area
+              yAxisId="rating"
+              dataKey="rating"
+              type="monotone"
+              fill="url(#fillRating)"
+              stroke="var(--color-rating)"
+              strokeWidth={2}
             />
-          </BarChart>
+          </ComposedChart>
         </ChartContainer>
       </CardContent>
     </Card>

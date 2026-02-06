@@ -156,8 +156,11 @@
   * {
     @apply border-border outline-ring/50;
   }
-
+  :root {
+    --font-inter: var(--font-inter);
+  }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-inter);
   }
 }

@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import { MapContainer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import ThemedTileLayer from "@/components/composed/themed-tile-layer";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";

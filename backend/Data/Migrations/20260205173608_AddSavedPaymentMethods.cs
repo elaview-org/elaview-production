@@ -3,14 +3,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace ElaviewBackend.Data.Migrations
-{
+namespace ElaviewBackend.Data.Migrations {
     /// <inheritdoc />
-    public partial class AddSavedPaymentMethods : Migration
-    {
+    public partial class AddSavedPaymentMethods : Migration {
         /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
+        protected override void Up(MigrationBuilder migrationBuilder) {
             migrationBuilder.AddColumn<string>(
                 name: "StripeCustomerId",
                 table: "advertiser_profiles",
@@ -20,8 +17,7 @@ namespace ElaviewBackend.Data.Migrations
 
             migrationBuilder.CreateTable(
                 name: "saved_payment_methods",
-                columns: table => new
-                {
+                columns: table => new {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     AdvertiserProfileId = table.Column<Guid>(type: "uuid", nullable: false),
                     StripePaymentMethodId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
@@ -32,8 +28,7 @@ namespace ElaviewBackend.Data.Migrations
                     IsDefault = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP")
                 },
-                constraints: table =>
-                {
+                constraints: table => {
                     table.PrimaryKey("PK_saved_payment_methods", x => x.Id);
                     table.ForeignKey(
                         name: "FK_saved_payment_methods_advertiser_profiles_AdvertiserProfile~",
@@ -56,8 +51,7 @@ namespace ElaviewBackend.Data.Migrations
         }
 
         /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
+        protected override void Down(MigrationBuilder migrationBuilder) {
             migrationBuilder.DropTable(
                 name: "saved_payment_methods");
 

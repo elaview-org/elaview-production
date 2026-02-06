@@ -41,6 +41,14 @@ Backend (backend:*):
 
 Web (web:*):
 
+    web:install             install dependencies (frozen lockfile)
+    web:lint                lint web client
+    web:typecheck           type-check web client
+    web:build               build web client
+    web:test                run web tests
+    web:test:coverage       run web tests with coverage
+    web:format              format web client code
+    web:format:check        check code formatting
     web:reset               clean artifacts and reinstall dependencies
 
 Mobile (mobile:*):

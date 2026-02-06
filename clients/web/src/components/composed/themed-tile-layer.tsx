@@ -20,5 +20,11 @@ export default function ThemedTileLayer() {
   const { resolvedTheme } = useTheme();
   const layer = TILE_LAYERS[resolvedTheme === "dark" ? "dark" : "light"];
 
-  return <TileLayer key={resolvedTheme} url={layer.url} attribution={layer.attribution} />;
+  return (
+    <TileLayer
+      key={resolvedTheme}
+      url={layer.url}
+      attribution={layer.attribution}
+    />
+  );
 }

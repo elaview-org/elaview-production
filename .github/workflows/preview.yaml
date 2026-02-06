@@ -1,0 +1,19 @@
+name: Preview
+
+on:
+  merge_group:
+    branches: [ main ]
+
+concurrency:
+  group: preview-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ELAVIEW_ENVIRONMENT: staging
+  DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "TODO"

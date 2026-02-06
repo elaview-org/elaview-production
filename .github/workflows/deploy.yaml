@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ experimental/ci-cd ]
+    branches: [ main ]
 
 concurrency:
   group: deploy-${{ github.ref }}

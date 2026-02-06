@@ -2,7 +2,7 @@ name: Preview
 
 on:
   merge_group:
-    branches: [ experimental/ci-cd ]
+    branches: [ main ]
 
 concurrency:
   group: preview-${{ github.ref }}

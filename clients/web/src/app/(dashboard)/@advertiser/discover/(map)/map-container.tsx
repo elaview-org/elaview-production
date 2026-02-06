@@ -1,14 +1,8 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMap,
-  useMapEvents,
-} from "react-leaflet";
+import { MapContainer, Marker, Popup, useMap, useMapEvents } from "react-leaflet";
+import ThemedTileLayer from "@/components/composed/themed-tile-layer";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import Image from "next/image";
@@ -159,10 +153,7 @@ export default function DiscoverMapContainer({
         className="h-full w-full"
         zoomControl={true}
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <ThemedTileLayer />
         <GeolocationButton />
         <MapEventHandler />
         {spaces.map((space) => (

@@ -1,7 +1,8 @@
 "use client";
 
 import { ReactNode, useEffect, useState } from "react";
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import { MapContainer, Marker, Popup, useMap } from "react-leaflet";
+import ThemedTileLayer from "./themed-tile-layer";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { cn } from "@/lib/utils";
@@ -154,10 +155,7 @@ export default function MapViewImpl<TData>({
         className="h-full w-full"
         zoomControl
       >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <ThemedTileLayer />
         {enableGeolocation && <GeolocationButton />}
         {onViewChange && <ViewWatcher onViewChange={onViewChange} />}
         {data.map((item) => {

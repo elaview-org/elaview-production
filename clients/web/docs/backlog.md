@@ -271,6 +271,38 @@ Shared routes (spaces, messages, notifications, settings) render as direct `chil
 - [ ] `settings` — extract with role-aware branching (Phase 3)
 
 ---
+
+## Space Owner Calendar — GraphQL Migration
+
+**Date:** 2026-02-09 | **Status:** Done
+
+Migrated `/calendar` from mock JSON to live GraphQL data and implemented all feasible unchecked features from `docs/user-profiles.md`.
+
+**Implemented:**
+
+- [x] Async server component fetching `mySpaces` with nested `bookings` + `blockedDates`
+- [x] Client wrapper managing state (view, selected space, status filter, blocked dates)
+- [x] Server actions for `blockDates` / `unblockDates` with `revalidatePath`
+- [x] Space selector dropdown (All Spaces / individual with color dot)
+- [x] Booking status multi-select filter
+- [x] Drag-to-block dates in month view (when space selected)
+- [x] Click-to-block/unblock single dates
+- [x] Bulk block date range dialog with space selector, date range, optional reason
+- [x] iCal export (RFC 5545 `.ics` download with bookings + blocked dates)
+- [x] US federal holiday markers with tooltips (10 holidays, computed)
+- [x] CSS variable colors replacing hardcoded Tailwind colors
+- [x] Computed installation deadlines (3 days before startDate for PAID/FILE_DOWNLOADED)
+- [x] `MaybePlaceholder` + `placeholder.tsx` for empty state
+- [x] Deleted `mock.json`
+
+**Deferred (backend not ready):**
+
+- [ ] Pricing calendar — `PricingRule` types not in GraphQL schema yet
+- [ ] Recurring availability patterns — requires backend iteration
+
+**Files:** `src/app/(dashboard)/@spaceOwner/calendar/`
+
+---
 ## Pre-Launch Reminders
 
 - [ ] Add footer attribution for third-party assets (see [docs/acknowledgements.md](./acknowledgements.md))

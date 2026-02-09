@@ -366,4 +366,13 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture)
         await context.SaveChangesAsync();
         return blockedDates;
     }
+
+    protected async Task<PricingRule> SeedPricingRuleAsync(Guid spaceId, Action<PricingRule>? customize = null) {
+        var rule = PricingRuleFactory.Create(spaceId, customize);
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.PricingRules.Add(rule);
+        await context.SaveChangesAsync();
+        return rule;
+    }
 }

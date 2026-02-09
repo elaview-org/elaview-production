@@ -1,32 +1,21 @@
 "use client";
 
 import { Badge } from "@/components/primitives/badge";
-import { cn } from "@/lib/utils";
+import { cn, formatDateRange } from "@/lib/utils";
 import { BookingStatus } from "@/types/gql/graphql";
 import { IconAlertTriangle } from "@tabler/icons-react";
-import { SPACE_COLORS, STATUS_LABELS } from "./constants";
-import mock from "./mock.json";
-
-type Booking = (typeof mock.bookings)[number];
+import {
+  SPACE_COLORS,
+  STATUS_LABELS,
+  INSTALLATION_DEADLINE_DAYS,
+} from "./constants";
+import type { CalendarBooking, CalendarSpace } from "./types";
 
 type Props = {
+  spaces: CalendarSpace[];
+  bookings: CalendarBooking[];
   selectedSpaceId: string | null;
-  onBookingClick?: (booking: Booking) => void;
 };
-
-function formatDateRange(startDate: string, endDate: string): string {
-  const start = new Date(startDate);
-  const end = new Date(endDate);
-  const options: Intl.DateTimeFormatOptions = {
-    month: "short",
-    day: "numeric",
-  };
-
-  if (start.getMonth() === end.getMonth()) {
-    return `${start.toLocaleDateString("en-US", options)} - ${end.getDate()}`;
-  }
-  return `${start.toLocaleDateString("en-US", options)} - ${end.toLocaleDateString("en-US", options)}`;
-}
 
 function daysUntil(dateStr: string): number {
   const date = new Date(dateStr);
@@ -36,14 +25,26 @@ function daysUntil(dateStr: string): number {
   return Math.ceil((date.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+function getInstallationDeadline(booking: CalendarBooking): string | null {
+  if (
+    booking.status !== BookingStatus.Paid &&
+    booking.status !== BookingStatus.FileDownloaded
+  )
+    return null;
+  const start = new Date(booking.startDate + "T00:00:00");
+  start.setDate(start.getDate() - INSTALLATION_DEADLINE_DAYS);
+  return start.toISOString().split("T")[0];
+}
+
 export default function UpcomingEvents({
+  spaces,
+  bookings,
   selectedSpaceId,
-  onBookingClick,
 }: Props) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const upcomingBookings = mock.bookings
+  const upcomingBookings = bookings
     .filter((booking) => {
       if (selectedSpaceId && booking.spaceId !== selectedSpaceId) return false;
       const endDate = new Date(booking.endDate);
@@ -55,18 +56,18 @@ export default function UpcomingEvents({
     )
     .slice(0, 5);
 
-  const deadlines = mock.bookings
+  const deadlines = bookings
     .filter((booking) => {
-      if (!booking.installationDeadline) return false;
+      const deadline = getInstallationDeadline(booking);
+      if (!deadline) return false;
       if (selectedSpaceId && booking.spaceId !== selectedSpaceId) return false;
-      const deadline = new Date(booking.installationDeadline);
-      return deadline >= today;
+      return new Date(deadline) >= today;
     })
-    .sort(
-      (a, b) =>
-        new Date(a.installationDeadline!).getTime() -
-        new Date(b.installationDeadline!).getTime()
-    );
+    .sort((a, b) => {
+      const da = getInstallationDeadline(a)!;
+      const db = getInstallationDeadline(b)!;
+      return new Date(da).getTime() - new Date(db).getTime();
+    });
 
   return (
     <div className="bg-card flex flex-col gap-4 rounded-xl border p-4">
@@ -78,16 +79,16 @@ export default function UpcomingEvents({
           </div>
           <div className="flex flex-col gap-2">
             {deadlines.map((booking) => {
-              const space = mock.spaces.find((s) => s.id === booking.spaceId);
+              const space = spaces.find((s) => s.id === booking.spaceId);
               const color =
                 SPACE_COLORS[(space?.colorIndex ?? 0) % SPACE_COLORS.length];
-              const days = daysUntil(booking.installationDeadline!);
+              const deadline = getInstallationDeadline(booking)!;
+              const days = daysUntil(deadline);
 
               return (
-                <button
+                <div
                   key={`deadline-${booking.id}`}
-                  onClick={() => onBookingClick?.(booking)}
-                  className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-left transition-colors hover:bg-amber-100 dark:border-amber-900 dark:bg-amber-950/50 dark:hover:bg-amber-950"
+                  className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 dark:border-amber-900 dark:bg-amber-950/50"
                 >
                   <div
                     className={cn(
@@ -110,7 +111,7 @@ export default function UpcomingEvents({
                           : `Due in ${days} days`}
                     </p>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -126,15 +127,14 @@ export default function UpcomingEvents({
         ) : (
           <div className="flex flex-col gap-2">
             {upcomingBookings.map((booking) => {
-              const space = mock.spaces.find((s) => s.id === booking.spaceId);
+              const space = spaces.find((s) => s.id === booking.spaceId);
               const color =
                 SPACE_COLORS[(space?.colorIndex ?? 0) % SPACE_COLORS.length];
 
               return (
-                <button
+                <div
                   key={booking.id}
-                  onClick={() => onBookingClick?.(booking)}
-                  className="hover:bg-muted/50 flex items-start gap-3 rounded-lg border p-3 text-left transition-colors"
+                  className="flex items-start gap-3 rounded-lg border p-3"
                 >
                   <div
                     className={cn(
@@ -151,14 +151,14 @@ export default function UpcomingEvents({
                     </p>
                     <div className="mt-1 flex items-center gap-2">
                       <Badge variant="secondary" className="text-xs">
-                        {STATUS_LABELS[booking.status as BookingStatus]}
+                        {STATUS_LABELS[booking.status]}
                       </Badge>
                       <span className="text-muted-foreground text-xs">
                         {formatDateRange(booking.startDate, booking.endDate)}
                       </span>
                     </div>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>

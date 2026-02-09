@@ -2,7 +2,6 @@ import "server-only";
 
 import {
   ApolloClient,
-  ApolloLink,
   HttpLink,
   InMemoryCache,
   type OperationVariables,
@@ -14,7 +13,6 @@ import { registerApolloClient } from "@apollo/client-integration-nextjs";
 import { cookies } from "next/headers";
 import { type FragmentType, getFragmentData } from "@/types/gql";
 import env from "@/lib/env";
-import { loggingLink } from "@/lib/logger";
 import { redirect } from "next/navigation";
 
 const {
@@ -28,16 +26,13 @@ const {
         resultCaching: true,
       }),
       queryDeduplication: true,
-      link: ApolloLink.from([
-        loggingLink,
-        new HttpLink({
-          uri: `${env.client.apiUrl}/graphql`,
-          headers: {
-            cookie: (await cookies()).toString(),
-          },
-          fetchOptions: {},
-        }),
-      ]),
+      link: new HttpLink({
+        uri: `${env.client.apiUrl}/graphql`,
+        headers: {
+          cookie: (await cookies()).toString(),
+        },
+        fetchOptions: {},
+      }),
     })
 );
 

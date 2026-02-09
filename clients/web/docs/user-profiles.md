@@ -79,22 +79,22 @@ Each profile has its own `navigation-bar.data.ts`:
 | Bookings  | ✅ Functional | GraphQL     | Filtering, actions, detail page wired |
 | Earnings  | ✅ Functional | GraphQL     | Fully integrated                      |
 | Analytics | ✅ Functional | GraphQL     | Fully integrated                      |
-| Calendar  | ⚠️ Partial   | Mock JSON   | Views implemented, needs GraphQL      |
+| Calendar  | ✅ Functional | GraphQL     | Multi-space views, blocking, export   |
 | Profile   | ✅ Functional | GraphQL     | Real reviews from API                 |
 | Settings  | ✅ Functional | GraphQL     | Stripe Connect, notifications working |
 
 ### Advertiser Routes
 
-| Route     | Status       | Data Source | Notes                              |
-|-----------|--------------|-------------|------------------------------------|
-| Overview  | ✅ Functional | GraphQL     | Parallel routes, all sections live |
-| Discover  | ✅ Functional | GraphQL     | Grid/Table/Map views working       |
-| Campaigns | ⚠️ Partial   | GraphQL     | Query works, mutations not wired   |
-| Bookings  | ⚠️ Partial   | GraphQL     | Query works, mutations needed      |
-| Spending  | ❌ Mock Only  | Mock        | No GraphQL integration             |
-| Analytics | ✅ Functional | GraphQL     | Parallel routes, reach chart mocked|
-| Profile   | ✅ Functional | GraphQL     | Real campaign data                 |
-| Settings  | ✅ Functional | GraphQL     | Notifications, delete working      |
+| Route     | Status       | Data Source | Notes                               |
+|-----------|--------------|-------------|-------------------------------------|
+| Overview  | ✅ Functional | GraphQL     | Parallel routes, all sections live  |
+| Discover  | ✅ Functional | GraphQL     | Grid/Table/Map views working        |
+| Campaigns | ⚠️ Partial   | GraphQL     | Query works, mutations not wired    |
+| Bookings  | ⚠️ Partial   | GraphQL     | Query works, mutations needed       |
+| Spending  | ❌ Mock Only  | Mock        | No GraphQL integration              |
+| Analytics | ✅ Functional | GraphQL     | Parallel routes, reach chart mocked |
+| Profile   | ✅ Functional | GraphQL     | Real campaign data                  |
+| Settings  | ✅ Functional | GraphQL     | Notifications, delete working       |
 
 ---
 
@@ -642,14 +642,14 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 **Queries (exist in schema):**
 
 - `spaceOwnerAnalytics(startDate, endDate)` - Aggregated analytics data
-  - `summary` - All 8 metrics with previous period values
-  - `statusDistribution` - Counts by booking status
-  - `spacePerformance(first)` - Top spaces by revenue
-  - `monthlyStats(months)` - Monthly revenue trends
-  - `ratingTrends(months)` - Rating trends with review volume
-  - `bookingHeatmap` - 7×24 matrix for activity heatmap
-  - `periodComparison` - This period vs previous period
-  - `topPerformers` - Top space, best rated, most booked
+    - `summary` - All 8 metrics with previous period values
+    - `statusDistribution` - Counts by booking status
+    - `spacePerformance(first)` - Top spaces by revenue
+    - `monthlyStats(months)` - Monthly revenue trends
+    - `ratingTrends(months)` - Rating trends with review volume
+    - `bookingHeatmap` - 7×24 matrix for activity heatmap
+    - `periodComparison` - This period vs previous period
+    - `topPerformers` - Top space, best rated, most booked
 - `spaceOwnerDailyStats(startDate, endDate)` - Daily stats for bookings trend chart
 
 **Frontend Status:** ✅ Fully functional
@@ -660,51 +660,7 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 **Purpose:** Visual availability and booking management.
 
-#### Implementation Checklist
-
-**Core Features:**
-
-- [x] Month view calendar
-- [x] Week view calendar
-- [x] Day view calendar
-- [x] Multi-space color coding
-- [x] Booking events display
-- [x] Blocked dates display
-- [x] Installation deadlines markers
-- [x] Click to view booking details
-
-**Interactivity:**
-
-- [ ] Drag to block dates
-- [x] Click to block/unblock dates (implemented in /listings/[id] calendar)
-- [x] Filter by space
-- [ ] Filter by booking status
-- [ ] Bulk block date ranges
-
-**Additional Features:**
-
-- [ ] Sync with Google Calendar
-- [ ] iCal export
-- [ ] Recurring availability patterns
-- [ ] Holiday markers
-- [ ] Pricing calendar (dynamic pricing)
-
-#### Backend Note
-
-**Queries:**
-
-- `mySpaces` with nested `bookings(where: {startDate: {lte: $end}, endDate: {gte: $start}})` - Works but expensive
-- `blockedDatesBySpace(spaceId, first)` - Blocked dates for a space ✅
-
-**Mutations:**
-
-- `blockDates(input: {spaceId, dates, reason})` - Block dates ✅
-- `unblockDates(input: {spaceId, dates})` - Unblock dates ✅
-
-**Note:** Space-specific calendar with block/unblock is implemented in `/listings/[id]`. Global calendar route still
-uses mock data.
-
-**Frontend Status:** ⚠️ Global calendar uses mock. Space-specific calendar in /listings/[id] is functional.
+**Status:** ✅ Functional | GraphQL — See [backlog.md](./backlog.md#space-owner-calendar--graphql-migration) for implementation details and deferred items.
 
 ---
 

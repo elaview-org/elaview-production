@@ -45,7 +45,8 @@ export type MapSpace = {
 
 type Props = {
   spaces: MapSpace[];
-  onSpaceSelect: (space: MapSpace) => void;
+  onSpaceSelectAction: (space: MapSpace) => void;
+  onSpaceDetailSelectAction: (space: MapSpace) => void;
   center?: [number, number];
   zoom?: number;
 };
@@ -115,7 +116,8 @@ function MapEventHandler({
 
 export default function DiscoverMapContainer({
   spaces,
-  onSpaceSelect,
+  onSpaceSelectAction,
+  onSpaceDetailSelectAction,
   center = [38.0293, -78.4767],
   zoom = 13,
 }: Props) {
@@ -134,7 +136,7 @@ export default function DiscoverMapContainer({
   }
 
   return (
-    <div className="relative h-[600px] w-full overflow-hidden rounded-lg">
+    <div className="relative z-40 h-[600px] w-full overflow-hidden rounded-lg">
       <style jsx global>{`
         .price-marker {
           background: transparent;
@@ -168,7 +170,7 @@ export default function DiscoverMapContainer({
             position={[space.latitude, space.longitude]}
             icon={createPriceIcon(space.pricePerDay)}
             eventHandlers={{
-              click: () => onSpaceSelect(space),
+              click: () => onSpaceSelectAction(space),
             }}
           >
             <Popup>
@@ -207,7 +209,7 @@ export default function DiscoverMapContainer({
                   <Button
                     size="sm"
                     className="mt-2 w-full"
-                    onClick={() => onSpaceSelect(space)}
+                    onClick={() => onSpaceDetailSelectAction(space)}
                   >
                     View Details
                   </Button>

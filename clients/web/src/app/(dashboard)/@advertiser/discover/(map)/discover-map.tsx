@@ -41,8 +41,7 @@ type Props = {
 
 export default function DiscoverMap({ data }: Props) {
   const [selectedSpace, setSelectedSpace] = useState<MapSpace | null>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
-
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const spaces: MapSpace[] = data.map((d) => {
     const space = getFragmentData(DiscoverMap_SpaceFragment, d);
     return {
@@ -64,16 +63,23 @@ export default function DiscoverMap({ data }: Props) {
 
   const handleSpaceSelect = (space: MapSpace) => {
     setSelectedSpace(space);
-    setPreviewOpen(true);
   };
 
+  const handleSpaceDetailsSelect = (space: MapSpace) => {
+    setSelectedSpace(space);
+    setDetailsOpen(true);
+  };
   return (
     <MaybePlaceholder data={data} placeholder={<MapPlaceholder />}>
-      <MapContainer spaces={spaces} onSpaceSelect={handleSpaceSelect} />
+      <MapContainer
+        spaces={spaces}
+        onSpaceSelectAction={handleSpaceSelect}
+        onSpaceDetailSelectAction={handleSpaceDetailsSelect}
+      />
       <SpacePreview
         space={selectedSpace}
-        open={previewOpen}
-        onOpenChange={setPreviewOpen}
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
       />
     </MaybePlaceholder>
   );

@@ -80,6 +80,8 @@ public sealed class Space : EntityBase {
     public ICollection<Review> Reviews { get; init; } = [];
 
     public ICollection<BlockedDate> BlockedDates { get; init; } = [];
+
+    public ICollection<PricingRule> PricingRules { get; init; } = [];
 }
 
 public sealed class SpaceConfig :

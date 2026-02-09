@@ -271,3 +271,8 @@ public enum Granularity {
     Week,
     Month
 }
+
+public enum PricingRuleType {
+    Fixed,
+    Multiplier
+}

@@ -41,6 +41,8 @@ public static class Services {
             .AddScoped<ISpaceRepository, SpaceRepository>()
             .AddScoped<IBlockedDateService, BlockedDateService>()
             .AddScoped<IBlockedDateRepository, BlockedDateRepository>()
+            .AddScoped<IPricingRuleService, PricingRuleService>()
+            .AddScoped<IPricingRuleRepository, PricingRuleRepository>()
             .AddScoped<ICampaignService, CampaignService>()
             .AddScoped<ICampaignRepository, CampaignRepository>()
             .AddScoped<IBookingService, BookingService>()

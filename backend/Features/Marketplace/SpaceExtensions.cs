@@ -31,4 +31,14 @@ public static class SpaceExtensions {
     ) {
         return spaceService.GetReviewsBySpaceId(space.Id);
     }
+
+    public static async Task<List<DatePrice>> GetEffectivePrices(
+        [Parent] Space space,
+        DateOnly startDate,
+        DateOnly endDate,
+        IPricingRuleService pricingRuleService,
+        CancellationToken ct
+    ) {
+        return await pricingRuleService.GetEffectivePricesForRangeAsync(space.Id, startDate, endDate, ct);
+    }
 }

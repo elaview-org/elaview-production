@@ -30,7 +30,8 @@ public interface IBookingService {
 
 public sealed class BookingService(
     IBookingRepository repository,
-    INotificationService notificationService
+    INotificationService notificationService,
+    IPricingRuleService pricingRuleService
 ) : IBookingService {
     private const decimal PlatformFeePercent = 0.10m;
 
@@ -97,7 +98,10 @@ public sealed class BookingService(
         if (await repository.HasBlockedDatesInRangeAsync(input.SpaceId, startDateOnly, endDateOnly, ct))
             throw new ConflictException("Booking", "Space has blocked dates in the requested range");
 
-        var subtotal = space.PricePerDay * totalDays;
+        var pricingEndDate = endDateOnly.AddDays(-1);
+        var dailyPrices = await pricingRuleService.GetEffectivePricesForRangeAsync(space.Id, startDateOnly, pricingEndDate, ct);
+        var subtotal = dailyPrices.Sum(dp => dp.EffectivePrice);
+        var averagePricePerDay = totalDays > 0 ? subtotal / totalDays : space.PricePerDay;
         var installationFee = space.InstallationFee ?? 0;
         var platformFee = subtotal * PlatformFeePercent;
 
@@ -107,7 +111,7 @@ public sealed class BookingService(
             StartDate = input.StartDate,
             EndDate = input.EndDate,
             TotalDays = totalDays,
-            PricePerDay = space.PricePerDay,
+            PricePerDay = averagePricePerDay,
             SubtotalAmount = subtotal,
             InstallationFee = installationFee,
             PlatformFeePercent = PlatformFeePercent,

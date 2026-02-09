@@ -2,6 +2,7 @@ import MediaCard, { MediaCardSkeleton } from "@/components/composed/media-card";
 import { SPACE_TYPE } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
+import { IconStar } from "@tabler/icons-react";
 
 export const DiscoverSpaceCard_SpaceFragment = graphql(`
   fragment DiscoverSpaceCard_SpaceFragment on Space {
@@ -13,6 +14,7 @@ export const DiscoverSpaceCard_SpaceFragment = graphql(`
     images
     type
     pricePerDay
+    averageRating
   }
 `);
 
@@ -37,8 +39,25 @@ export default function SpaceCard({ data }: Props) {
           className:
             "text-muted-foreground bg-background p-1 tracking-wide uppercase",
         },
+        {
+          position: "bottom-right",
+          content: "Book Now",
+          className:
+            "bg-primary text-primary-foreground opacity-0 transition-opacity group-hover:opacity-100",
+        },
       ]}
-      metaLeft={`${space.city}, ${space.state}`}
+      metaLeft={
+        space.averageRating ? (
+          <span className="flex items-center gap-1">
+            <IconStar className="size-3.5 fill-current text-amber-500" />
+            {space.averageRating.toFixed(1)}
+            <span className="text-muted-foreground">·</span>
+            {space.city}, {space.state}
+          </span>
+        ) : (
+          `${space.city}, ${space.state}`
+        )
+      }
       metaRight={`${formatCurrency(space.pricePerDay as number)}/day`}
     />
   );

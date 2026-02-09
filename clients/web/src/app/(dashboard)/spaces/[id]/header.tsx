@@ -9,8 +9,9 @@ import {
 } from "@/components/primitives/tooltip";
 import { SPACE_STATUS, SPACE_TYPE } from "@/lib/constants";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
-import { IconChevronLeft } from "@tabler/icons-react";
+import { IconChevronLeft, IconShare2 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const Header_SharedSpaceFragment = graphql(`
   fragment Header_SharedSpaceFragment on Space {
@@ -28,6 +29,16 @@ export default function Header({ data }: Props) {
   const router = useRouter();
   const space = getFragmentData(Header_SharedSpaceFragment, data);
 
+  const handleShare = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      await navigator.share({ title: space.title, url });
+    } else {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link copied");
+    }
+  };
+
   return (
     <div className="flex items-center gap-4">
       <Tooltip>
@@ -43,6 +54,16 @@ export default function Header({ data }: Props) {
         {SPACE_STATUS.labels[space.status]}
       </Badge>
       <Badge variant="outline">{SPACE_TYPE.labels[space.type]}</Badge>
+      <div className="ml-auto">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" onClick={handleShare}>
+              <IconShare2 className="size-5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Share</TooltipContent>
+        </Tooltip>
+      </div>
     </div>
   );
 }

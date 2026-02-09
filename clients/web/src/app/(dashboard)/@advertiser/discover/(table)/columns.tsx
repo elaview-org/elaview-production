@@ -4,6 +4,7 @@ import {
   actionsColumn,
   currencyColumn,
   imageTextColumn,
+  numberColumn,
   textColumn,
 } from "@/components/composed/table-view";
 import { SPACE_TYPE } from "@/lib/constants";
@@ -18,6 +19,7 @@ export type SpaceRow = {
   images: string[];
   type: SpaceType;
   pricePerDay: number;
+  averageRating: number | null;
 };
 
 export const columns = [
@@ -37,6 +39,12 @@ export const columns = [
     key: "type",
     header: "Type",
     value: (row) => SPACE_TYPE.labels[row.type],
+  }),
+  numberColumn<SpaceRow>({
+    key: "averageRating",
+    header: "Rating",
+    value: (row) =>
+      row.averageRating ? Number(row.averageRating.toFixed(1)) : null,
   }),
   currencyColumn<SpaceRow>({
     key: "pricePerDay",

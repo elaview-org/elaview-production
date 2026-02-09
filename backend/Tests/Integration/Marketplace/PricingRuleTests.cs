@@ -227,14 +227,14 @@ public sealed class PricingRuleTests(IntegrationTestFixture fixture)
         var rule = await SeedPricingRuleAsync(space.Id);
 
         var response = await Client.MutateAsync<DeletePricingRuleResponse>("""
-            mutation($id: ID!) {
-                deletePricingRule(id: $id) {
+            mutation($input: DeletePricingRuleInput!) {
+                deletePricingRule(input: $input) {
                     deletedRuleId
                     errors { __typename }
                 }
             }
             """,
-            new { id = rule.Id });
+            new { input = new { id = rule.Id } });
 
         response.Data!.DeletePricingRule.Errors.Should().BeNullOrEmpty();
         response.Data!.DeletePricingRule.DeletedRuleId.Should().Be(rule.Id);
@@ -249,14 +249,14 @@ public sealed class PricingRuleTests(IntegrationTestFixture fixture)
         var rule = await SeedPricingRuleAsync(space.Id);
 
         var response = await Client.MutateAsync<DeletePricingRuleResponse>("""
-            mutation($id: ID!) {
-                deletePricingRule(id: $id) {
+            mutation($input: DeletePricingRuleInput!) {
+                deletePricingRule(input: $input) {
                     deletedRuleId
                     errors { __typename }
                 }
             }
             """,
-            new { id = rule.Id });
+            new { input = new { id = rule.Id } });
 
         response.Data!.DeletePricingRule.Errors.Should().NotBeNullOrEmpty();
         response.Data!.DeletePricingRule.Errors!.First().TypeName.Should().Be("ForbiddenError");
@@ -303,7 +303,7 @@ public sealed class PricingRuleTests(IntegrationTestFixture fixture)
         });
 
         var response = await Client.QueryAsync<EffectivePriceByDateResponse>("""
-            query($spaceId: ID!, $date: Date!) {
+            query($spaceId: ID!, $date: LocalDate!) {
                 effectivePriceByDate(spaceId: $spaceId, date: $date) {
                     effectivePrice
                     appliedRuleId
@@ -337,7 +337,7 @@ public sealed class PricingRuleTests(IntegrationTestFixture fixture)
         });
 
         var response = await Client.QueryAsync<EffectivePriceByDateResponse>("""
-            query($spaceId: ID!, $date: Date!) {
+            query($spaceId: ID!, $date: LocalDate!) {
                 effectivePriceByDate(spaceId: $spaceId, date: $date) {
                     effectivePrice
                     appliedRuleId
@@ -362,7 +362,7 @@ public sealed class PricingRuleTests(IntegrationTestFixture fixture)
         var targetDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(5));
 
         var response = await Client.QueryAsync<EffectivePriceByDateResponse>("""
-            query($spaceId: ID!, $date: Date!) {
+            query($spaceId: ID!, $date: LocalDate!) {
                 effectivePriceByDate(spaceId: $spaceId, date: $date) {
                     effectivePrice
                     appliedRuleId
@@ -408,7 +408,7 @@ public sealed class PricingRuleTests(IntegrationTestFixture fixture)
         });
 
         var response = await Client.QueryAsync<EffectivePriceByDateResponse>("""
-            query($spaceId: ID!, $date: Date!) {
+            query($spaceId: ID!, $date: LocalDate!) {
                 effectivePriceByDate(spaceId: $spaceId, date: $date) {
                     effectivePrice
                     appliedRuleLabel

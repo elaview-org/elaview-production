@@ -31,8 +31,8 @@ Backend (backend:*):
     backend:exec            execute command in a backend container
     backend:install         restore .NET dependencies
     backend:build           build backend in Release mode
-    backend:lint            check code formatting
     backend:format          format code
+    backend:format:check    check code formatting
     backend:test            run all tests
     backend:test:unit       run unit tests only
     backend:test:integration run integration tests only

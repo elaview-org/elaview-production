@@ -62,21 +62,21 @@ ev_backend_build() {
     return $ev_backend_exit
 }
 
-ev_backend_lint() {
-    ev_core_require_cmd "dotnet" || return 1
-    ev_core_log_info "Checking code formatting..."
-    ev_core_in_backend dotnet format ElaviewBackend.csproj --verify-no-changes --exclude Data/Migrations
-    ev_backend_exit=$?
-    [ $ev_backend_exit -eq 0 ] && ev_core_log_success "Code formatting check passed."
-    return $ev_backend_exit
-}
-
 ev_backend_format() {
     ev_core_require_cmd "dotnet" || return 1
     ev_core_log_info "Formatting code..."
     ev_core_in_backend dotnet format ElaviewBackend.csproj
     ev_backend_exit=$?
     [ $ev_backend_exit -eq 0 ] && ev_core_log_success "Code formatted successfully."
+    return $ev_backend_exit
+}
+
+ev_backend_format_check() {
+    ev_core_require_cmd "dotnet" || return 1
+    ev_core_log_info "Checking code formatting..."
+    ev_core_in_backend dotnet format ElaviewBackend.csproj --verify-no-changes
+    ev_backend_exit=$?
+    [ $ev_backend_exit -eq 0 ] && ev_core_log_success "Code formatting check passed."
     return $ev_backend_exit
 }
 
@@ -140,8 +140,8 @@ ev_backend_dispatch() {
         exec)             ev_backend_exec "$@" ;;
         install)          ev_backend_install ;;
         build)            ev_backend_build ;;
-        lint)             ev_backend_lint ;;
         format)           ev_backend_format ;;
+        format:check)     ev_backend_format_check ;;
         test)             ev_backend_test ;;
         test:unit)        ev_backend_test_unit ;;
         test:integration) ev_backend_test_integration ;;
@@ -149,7 +149,7 @@ ev_backend_dispatch() {
         reset)            ev_backend_reset ;;
         *)
             ev_core_log_error "Unknown backend command: $cmd"
-            echo "Available: start, stop, restart, logs, status, exec, install, build, lint, format, test, test:unit, test:integration, publish, reset"
+            echo "Available: start, stop, restart, logs, status, exec, install, build, lint, format, format:check, test, test:unit, test:integration, publish, reset"
             return 1
             ;;
     esac

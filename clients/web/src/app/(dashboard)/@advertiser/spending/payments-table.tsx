@@ -16,13 +16,38 @@ import TableView, {
   textColumn,
 } from "@/components/composed/table-view";
 import { PAYMENT_STATUS } from "@/lib/constants";
-import { PaymentStatus } from "@/types/gql/graphql";
+import { PaymentStatus, graphql } from "@/types/gql";
 
-type PaymentData = {
+export const PaymentsTable_PaymentFragment = graphql(`
+  fragment PaymentsTable_PaymentFragment on Payment {
+    id
+    amount
+    status
+    type
+    createdAt
+    paidAt
+    receiptUrl
+    booking {
+      id
+      space {
+        title
+        images
+      }
+      campaign {
+        name
+      }
+    }
+  }
+`);
+
+export type PaymentData = {
   id: string;
-  amount: string;
+  amount: number;
   status: PaymentStatus | string;
+  type: string;
   createdAt: string;
+  paidAt: string | null;
+  receiptUrl: string | null;
   booking: {
     id: string;
     space: {
@@ -32,7 +57,7 @@ type PaymentData = {
     campaign: {
       name: string;
     } | null;
-  } | null;
+  };
 };
 
 function StatusIcon({ status }: { status: PaymentStatus | string }) {

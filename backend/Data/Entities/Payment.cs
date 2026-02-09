@@ -25,6 +25,9 @@ public sealed class Payment : EntityBase {
     [MaxLength(255)]
     public string? StripeChargeId { get; set; }
 
+    [MaxLength(500)]
+    public string? ReceiptUrl { get; set; }
+
     public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
 
     public DateTime? PaidAt { get; set; }

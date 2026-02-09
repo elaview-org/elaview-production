@@ -1,4 +1,5 @@
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.Users;
 using HotChocolate.Authorization;
 
 namespace ElaviewBackend.Features.Payments;
@@ -20,4 +21,21 @@ public static partial class PaymentQueries {
     public static IQueryable<Payment> GetPaymentsByBooking(
         [ID] Guid bookingId, IPaymentService paymentService
     ) => paymentService.GetByBookingId(bookingId);
+
+    [Authorize]
+    [UsePaging]
+    [UseProjection]
+    [UseFiltering]
+    [UseSorting]
+    public static IQueryable<Payment> GetMyPayments(
+        IUserService userService,
+        IPaymentService paymentService
+    ) => paymentService.GetByAdvertiserUserId(userService.GetPrincipalId());
+
+    [Authorize]
+    public static async Task<SpendingSummary> GetAdvertiserSpendingSummary(
+        IUserService userService,
+        IPaymentService paymentService,
+        CancellationToken ct
+    ) => await paymentService.GetSpendingSummaryAsync(userService.GetPrincipalId(), ct);
 }

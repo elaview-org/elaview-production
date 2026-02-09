@@ -59,9 +59,3 @@ export const TOOLBAR_PROPS = {
   },
   views: new Set([ViewOptions.Table]),
 };
-
-export const PAYMENT_TYPE_LABELS: Record<string, string> = {
-  FULL: "Full Payment",
-  DEPOSIT: "Deposit",
-  BALANCE: "Balance",
-};

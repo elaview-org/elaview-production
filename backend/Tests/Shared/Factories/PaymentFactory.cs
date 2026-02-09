@@ -26,6 +26,7 @@ public static class PaymentFactory {
             p.Status = PaymentStatus.Succeeded;
             p.PaidAt = DateTime.UtcNow;
             p.StripeChargeId = $"ch_{Faker.Random.AlphaNumeric(24)}";
+            p.ReceiptUrl = $"https://pay.stripe.com/receipts/{Faker.Random.AlphaNumeric(32)}";
         });
     }
 

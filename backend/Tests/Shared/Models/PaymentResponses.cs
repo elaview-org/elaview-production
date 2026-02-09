@@ -5,7 +5,8 @@ public record PaymentNode(
     string Status,
     decimal Amount,
     string StripePaymentIntentId,
-    DateTime? PaidAt
+    DateTime? PaidAt,
+    string? ReceiptUrl = null
 );
 
 public record PaymentByIdResponse(PaymentNode? PaymentById);
@@ -16,6 +17,17 @@ public record PaymentsConnection(
     int? TotalCount = null);
 
 public record PaymentsByBookingResponse(PaymentsConnection PaymentsByBooking);
+
+public record MyPaymentsResponse(PaymentsConnection MyPayments);
+
+public record SpendingSummaryNode(
+    decimal TotalSpent,
+    decimal PendingPayments,
+    decimal ThisMonthSpending,
+    decimal LastMonthSpending
+);
+
+public record GetAdvertiserSpendingSummaryResponse(SpendingSummaryNode AdvertiserSpendingSummary);
 
 public record PayoutNode(
     Guid Id,

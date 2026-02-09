@@ -7,7 +7,9 @@ namespace ElaviewBackend.Features.Payments;
 public interface IPaymentService {
     IQueryable<Payment> GetById(Guid id);
     IQueryable<Payment> GetByBookingId(Guid bookingId);
+    IQueryable<Payment> GetByAdvertiserUserId(Guid userId);
     Task<Payment?> GetByIdAsync(Guid id, CancellationToken ct);
+    Task<SpendingSummary> GetSpendingSummaryAsync(Guid userId, CancellationToken ct);
     Task<PaymentIntentResult> CreatePaymentIntentAsync(Guid userId, Guid bookingId, CancellationToken ct);
     Task<Payment> ConfirmPaymentAsync(string paymentIntentId, CancellationToken ct);
 }
@@ -22,8 +24,39 @@ public sealed class PaymentService(
     public IQueryable<Payment> GetByBookingId(Guid bookingId)
         => repository.GetByBookingId(bookingId);
 
+    public IQueryable<Payment> GetByAdvertiserUserId(Guid userId)
+        => repository.GetByAdvertiserUserId(userId);
+
     public async Task<Payment?> GetByIdAsync(Guid id, CancellationToken ct)
         => await repository.GetByIdAsync(id, ct);
+
+    public async Task<SpendingSummary> GetSpendingSummaryAsync(Guid userId, CancellationToken ct) {
+        var now = DateTime.UtcNow;
+        var startOfMonth = new DateTime(now.Year, now.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var startOfLastMonth = startOfMonth.AddMonths(-1);
+
+        var payments = await repository.GetByAdvertiserUserIdAsync(userId, ct);
+
+        var totalSpent = payments
+            .Where(p => p.Status == PaymentStatus.Succeeded)
+            .Sum(p => p.Amount);
+
+        var pendingPayments = payments
+            .Where(p => p.Status == PaymentStatus.Pending)
+            .Sum(p => p.Amount);
+
+        var thisMonthSpending = payments
+            .Where(p => p.Status == PaymentStatus.Succeeded && p.PaidAt >= startOfMonth)
+            .Sum(p => p.Amount);
+
+        var lastMonthSpending = payments
+            .Where(p => p.Status == PaymentStatus.Succeeded &&
+                        p.PaidAt >= startOfLastMonth &&
+                        p.PaidAt < startOfMonth)
+            .Sum(p => p.Amount);
+
+        return new SpendingSummary(totalSpent, pendingPayments, thisMonthSpending, lastMonthSpending);
+    }
 
     public async Task<PaymentIntentResult> CreatePaymentIntentAsync(Guid userId, Guid bookingId, CancellationToken ct) {
         var booking = await repository.GetBookingInfoByIdAsync(bookingId, ct)
@@ -86,7 +119,14 @@ public sealed class PaymentService(
         if (paymentIntent.Status != "succeeded")
             throw new PaymentException("confirmation", "Payment has not succeeded");
 
-        await repository.UpdateStatusAsync(payment, PaymentStatus.Succeeded, paymentIntent.LatestChargeId, ct);
+        string? receiptUrl = null;
+        if (paymentIntent.LatestChargeId is not null) {
+            var chargeService = new ChargeService();
+            var charge = await chargeService.GetAsync(paymentIntent.LatestChargeId, cancellationToken: ct);
+            receiptUrl = charge.ReceiptUrl;
+        }
+
+        await repository.UpdateStatusAsync(payment, PaymentStatus.Succeeded, paymentIntent.LatestChargeId, receiptUrl, ct);
         await repository.UpdateBookingToPaidAsync(payment.BookingId, ct);
 
         await transactionRepository.AddAsync(new Transaction {
@@ -107,4 +147,11 @@ public record PaymentIntentResult(
     string ClientSecret,
     string PaymentIntentId,
     decimal Amount
+);
+
+public record SpendingSummary(
+    decimal TotalSpent,
+    decimal PendingPayments,
+    decimal ThisMonthSpending,
+    decimal LastMonthSpending
 );

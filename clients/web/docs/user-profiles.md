@@ -91,7 +91,7 @@ Each profile has its own `navigation-bar.data.ts`:
 | Discover  | ✅ Functional | GraphQL     | Grid/Table/Map views working        |
 | Campaigns | ⚠️ Partial   | GraphQL     | Query works, mutations not wired    |
 | Bookings  | ⚠️ Partial   | GraphQL     | Query works, mutations needed       |
-| Spending  | ❌ Mock Only  | Mock        | No GraphQL integration              |
+| Spending  | ✅ Functional | GraphQL     | Full integration with filters       |
 | Analytics | ✅ Functional | GraphQL     | Parallel routes, reach chart mocked |
 | Profile   | ✅ Functional | GraphQL     | Real campaign data                  |
 | Settings  | ✅ Functional | GraphQL     | Notifications, delete working       |
@@ -944,27 +944,27 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 **Main Page:**
 
-- [ ] Summary cards (Total Spent, This Month, Pending Payments, Active Campaigns)
-- [ ] Spending chart with daily/monthly aggregation
-- [ ] Transactions table
-- [ ] Filter by date range
-- [ ] Filter by campaign
-- [ ] Export to CSV
+- [x] Summary cards (Total Spent, This Month, Pending Payments, Active Campaigns)
+- [x] Spending chart with daily/monthly aggregation
+- [x] Transactions table
+- [x] Filter by date range
+- [x] Filter by campaign
+- [x] Export to CSV
 
 **Payment History:**
 
-- [ ] Payment list with pagination
-- [ ] Filter by status (Succeeded, Pending, Failed, Refunded)
-- [ ] Payment detail modal
-- [ ] Associated booking link
-- [ ] Receipt download
+- [x] Payment list with pagination
+- [x] Filter by status (Succeeded, Pending, Failed, Refunded)
+- [x] Payment detail modal
+- [x] Associated booking link
+- [x] Receipt download
 
 **Payment Methods:**
 
-- [ ] Saved cards list
-- [ ] Add new card (Stripe Elements)
-- [ ] Set default card
-- [ ] Remove card
+- [x] Saved cards list
+- [x] Add new card (Stripe Elements)
+- [x] Set default card
+- [x] Remove card
 
 #### Backend Note
 
@@ -973,16 +973,17 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - `myBookingsAsAdvertiser` with nested `payments` - Can aggregate client-side
 - `paymentsByBooking(bookingId)` - Payment history for specific booking
 
-**Missing:**
+**Queries (now available):**
 
-- `advertiserSpendingSummary` - Aggregated totals
-- `myPayments` query for advertiser (like `myPayouts` for owner)
+- `advertiserSpendingSummary` - Aggregated totals (totalSpent, pendingPayments, thisMonth, lastMonth)
+- `myPayments` - Paginated payment list with filtering/sorting
+- `receiptUrl` field on Payment type - Stripe receipt URL
 
 **Mutations (exist in schema):**
 
 - `requestRefund(input: {paymentId, amount, reason})`
 
-**Frontend Status:** ❌ Entirely mocked
+**Frontend Status:** ✅ Fully functional (GraphQL integrated, filters, payment history subroute, payment methods)
 
 ---
 

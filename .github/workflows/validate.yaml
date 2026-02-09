@@ -62,8 +62,8 @@ jobs:
       - name: Restore
         run: ev backend:install
 
-      - name: Lint
-        run: ev backend:lint
+      - name: Format Check
+        run: ev backend:format:check
 
       - name: Build
         run: ev backend:build

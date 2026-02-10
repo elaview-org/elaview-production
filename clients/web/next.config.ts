@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   cacheComponents: true,
   output: "standalone",
-  serverExternalPackages: ["pino", "pino-pretty"],
   // logging: false,
   env: {
     API_URL: process.env.ELAVIEW_WEB_API_URL,

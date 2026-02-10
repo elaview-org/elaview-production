@@ -1,3 +1,5 @@
+using ElaviewBackend.Data.Entities;
+
 namespace ElaviewBackend.Features.Marketplace;
 
 public record CreateBookingInput(
@@ -5,4 +7,11 @@ public record CreateBookingInput(
     DateTime StartDate,
     DateTime EndDate,
     string? AdvertiserNotes
+);
+
+public record DisputeProofInput(
+    [property: ID] Guid BookingId,
+    DisputeIssueType IssueType,
+    string Reason,
+    List<string>? PhotoUrls = null
 );

@@ -1,3 +1,4 @@
+using ElaviewBackend.Data;
 using ElaviewBackend.Data.Entities;
 using ElaviewBackend.Tests.Integration.Fixtures;
 using ElaviewBackend.Tests.Shared.Extensions;
@@ -137,6 +138,106 @@ public sealed class BookingStatusTransitionTests(IntegrationTestFixture fixture)
 
         response.Data!.MarkInstalled.Errors.Should().NotBeNullOrEmpty();
         response.Data!.MarkInstalled.Errors!.First().TypeName.Should()
+            .Be("InvalidStatusTransitionError");
+    }
+
+    [Theory]
+    [InlineData(BookingStatus.PendingApproval)]
+    [InlineData(BookingStatus.Approved)]
+    [InlineData(BookingStatus.Paid)]
+    [InlineData(BookingStatus.FileDownloaded)]
+    [InlineData(BookingStatus.Installed)]
+    [InlineData(BookingStatus.Completed)]
+    [InlineData(BookingStatus.Cancelled)]
+    [InlineData(BookingStatus.Disputed)]
+    public async Task ApproveProof_NotVerified_ReturnsInvalidStatusTransition(
+        BookingStatus initialStatus) {
+        var (advertiser, advertiserProfile) = await SeedAdvertiserAsync();
+        var (_, ownerProfile) = await SeedSpaceOwnerAsync();
+        await LoginAsync(advertiser.Email, "Test123!");
+
+        var campaign = await SeedCampaignAsync(advertiserProfile.Id);
+        var space = await SeedSpaceAsync(ownerProfile.Id);
+        var booking = await SeedBookingWithStatusAsync(campaign.Id, space.Id, initialStatus);
+
+        using (var scope = Fixture.Services.CreateScope()) {
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            context.BookingProofs.Add(new BookingProof {
+                Id = Guid.NewGuid(),
+                BookingId = booking.Id,
+                Photos = ["https://example.com/photo.jpg"],
+                Status = ProofStatus.Pending,
+                SubmittedAt = DateTime.UtcNow,
+                AutoApproveAt = DateTime.UtcNow.AddHours(48),
+                CreatedAt = DateTime.UtcNow
+            });
+            await context.SaveChangesAsync();
+        }
+
+        var response = await Client.MutateAsync<ApproveProofResponse>("""
+            mutation($input: ApproveProofInput!) {
+                approveProof(input: $input) {
+                    booking { id status }
+                    errors { __typename }
+                }
+            }
+            """, new { input = new { bookingId = booking.Id } });
+
+        response.Data!.ApproveProof.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.ApproveProof.Errors!.First().TypeName.Should()
+            .Be("InvalidStatusTransitionError");
+    }
+
+    [Theory]
+    [InlineData(BookingStatus.PendingApproval)]
+    [InlineData(BookingStatus.Approved)]
+    [InlineData(BookingStatus.Paid)]
+    [InlineData(BookingStatus.FileDownloaded)]
+    [InlineData(BookingStatus.Installed)]
+    [InlineData(BookingStatus.Completed)]
+    [InlineData(BookingStatus.Cancelled)]
+    [InlineData(BookingStatus.Disputed)]
+    public async Task DisputeProof_NotVerified_ReturnsInvalidStatusTransition(
+        BookingStatus initialStatus) {
+        var (advertiser, advertiserProfile) = await SeedAdvertiserAsync();
+        var (_, ownerProfile) = await SeedSpaceOwnerAsync();
+        await LoginAsync(advertiser.Email, "Test123!");
+
+        var campaign = await SeedCampaignAsync(advertiserProfile.Id);
+        var space = await SeedSpaceAsync(ownerProfile.Id);
+        var booking = await SeedBookingWithStatusAsync(campaign.Id, space.Id, initialStatus);
+
+        using (var scope = Fixture.Services.CreateScope()) {
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            context.BookingProofs.Add(new BookingProof {
+                Id = Guid.NewGuid(),
+                BookingId = booking.Id,
+                Photos = ["https://example.com/photo.jpg"],
+                Status = ProofStatus.Pending,
+                SubmittedAt = DateTime.UtcNow,
+                AutoApproveAt = DateTime.UtcNow.AddHours(48),
+                CreatedAt = DateTime.UtcNow
+            });
+            await context.SaveChangesAsync();
+        }
+
+        var response = await Client.MutateAsync<DisputeProofResponse>("""
+            mutation($input: DisputeProofInput!) {
+                disputeProof(input: $input) {
+                    booking { id status }
+                    errors { __typename }
+                }
+            }
+            """, new {
+            input = new {
+                bookingId = booking.Id,
+                issueType = "POOR_QUALITY",
+                reason = "Not acceptable"
+            }
+        });
+
+        response.Data!.DisputeProof.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.DisputeProof.Errors!.First().TypeName.Should()
             .Be("InvalidStatusTransitionError");
     }
 

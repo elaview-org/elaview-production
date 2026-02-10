@@ -88,21 +88,15 @@ type AdvertiserPeriodData {
 
 type AdvertiserProfile {
   campaigns(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [CampaignSortInput!]
     where: CampaignFilterInput
@@ -198,28 +192,17 @@ type AdvertiserTopPerformers {
   needsReview: AdvertiserAttentionItem
 }
 
-"""
-Defines when a policy shall be executed.
-"""
+"""Defines when a policy shall be executed."""
 enum ApplyPolicy {
-  """
-  After the resolver was executed.
-  """
+  """After the resolver was executed."""
   AFTER_RESOLVER
-  """
-  Before the resolver was executed.
-  """
+  """Before the resolver was executed."""
   BEFORE_RESOLVER
-  """
-  The policy is applied in the validation step before the execution.
-  """
+  """The policy is applied in the validation step before the execution."""
   VALIDATION
 }
 
-union ApproveBookingError =
-  | ForbiddenError
-  | InvalidStatusTransitionError
-  | NotFoundError
+union ApproveBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
 
 input ApproveBookingInput {
   id: ID!
@@ -231,6 +214,17 @@ type ApproveBookingPayload {
   errors: [ApproveBookingError!]
 }
 
+union ApproveProofError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input ApproveProofInput {
+  bookingId: ID!
+}
+
+type ApproveProofPayload {
+  booking: Booking
+  errors: [ApproveProofError!]
+}
+
 type AttentionItem {
   bookings: Int!
   id: UUID!
@@ -238,11 +232,7 @@ type AttentionItem {
   title: String!
 }
 
-union BlockDatesError =
-  | ConflictError
-  | ForbiddenError
-  | NotFoundError
-  | ValidationError
+union BlockDatesError = ConflictError | ForbiddenError | NotFoundError | ValidationError
 
 input BlockDatesInput {
   dates: [LocalDate!]!
@@ -284,39 +274,23 @@ input BlockedDateSortInput {
   spaceId: SortEnumType
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type BlockedDatesBySpaceConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [BlockedDatesBySpaceEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [BlockedDate!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
+  """Identifies the total count of items in the connection."""
   totalCount: Int!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type BlockedDatesBySpaceEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: BlockedDate!
 }
 
@@ -552,67 +526,39 @@ input BookingStatusOperationFilterInput {
   nin: [BookingStatus!]
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type BookingsConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [BookingsEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Booking!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type BookingsEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Booking!
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type BookingsRequiringActionConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [BookingsRequiringActionEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Booking!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type BookingsRequiringActionEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Booking!
 }
 
@@ -626,21 +572,15 @@ type Campaign {
   advertiserProfile: AdvertiserProfile!
   advertiserProfileId: UUID!
   bookings(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [BookingSortInput!]
     where: BookingFilterInput
@@ -710,42 +650,25 @@ input CampaignStatusOperationFilterInput {
   nin: [CampaignStatus!]
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type CampaignsConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [CampaignsEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Campaign!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type CampaignsEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Campaign!
 }
 
-union CancelBookingError =
-  | ForbiddenError
-  | InvalidStatusTransitionError
-  | NotFoundError
+union CancelBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
 
 input CancelBookingInput {
   id: ID!
@@ -823,21 +746,15 @@ type Conversation {
   createdAt: DateTime!
   id: UUID!
   messages(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [MessageSortInput!]
     where: MessageFilterInput
@@ -933,11 +850,7 @@ type CreateCampaignPayload {
   errors: [CreateCampaignError!]
 }
 
-union CreatePaymentIntentError =
-  | ConflictError
-  | ForbiddenError
-  | InvalidStatusTransitionError
-  | NotFoundError
+union CreatePaymentIntentError = ConflictError | ForbiddenError | InvalidStatusTransitionError | NotFoundError
 
 input CreatePaymentIntentInput {
   bookingId: ID!
@@ -948,6 +861,24 @@ type CreatePaymentIntentPayload {
   clientSecret: String
   errors: [CreatePaymentIntentError!]
   paymentIntentId: String
+}
+
+union CreatePricingRuleError = ForbiddenError | NotFoundError | ValidationError
+
+input CreatePricingRuleInput {
+  daysOfWeek: [Int!]
+  endDate: LocalDate
+  label: String
+  priority: Int!
+  spaceId: ID!
+  startDate: LocalDate
+  type: PricingRuleType!
+  value: Decimal!
+}
+
+type CreatePricingRulePayload {
+  errors: [CreatePricingRuleError!]
+  pricingRule: PricingRule
 }
 
 union CreateReviewError = ConflictError | ForbiddenError | NotFoundError
@@ -1008,9 +939,14 @@ type DailyStats {
   spending: Decimal!
 }
 
-"""
-The `DateTime` scalar represents an ISO-8601 compliant date time type.
-"""
+type DatePrice {
+  appliedRuleId: UUID
+  appliedRuleLabel: String
+  date: LocalDate!
+  effectivePrice: Decimal!
+}
+
+"""The `DateTime` scalar represents an ISO-8601 compliant date time type."""
 scalar DateTime
 
 input DateTimeOperationFilterInput {
@@ -1039,9 +975,7 @@ type DeactivateSpacePayload {
   space: Space
 }
 
-"""
-The `Decimal` scalar type represents a decimal floating-point number.
-"""
+"""The `Decimal` scalar type represents a decimal floating-point number."""
 scalar Decimal
 
 input DecimalOperationFilterInput {
@@ -1100,6 +1034,17 @@ type DeletePaymentMethodPayload {
   success: Boolean
 }
 
+union DeletePricingRuleError = ForbiddenError | NotFoundError
+
+input DeletePricingRuleInput {
+  id: ID!
+}
+
+type DeletePricingRulePayload {
+  deletedRuleId: UUID
+  errors: [DeletePricingRuleError!]
+}
+
 input DeleteReviewInput {
   id: ID!
 }
@@ -1130,10 +1075,7 @@ type DeleteUserPayload {
   success: Boolean
 }
 
-union DisconnectStripeAccountError =
-  | NotFoundError
-  | PaymentError
-  | ValidationError
+union DisconnectStripeAccountError = NotFoundError | PaymentError | ValidationError
 
 type DisconnectStripeAccountPayload {
   errors: [DisconnectStripeAccountError!]
@@ -1156,6 +1098,20 @@ input DisputeIssueTypeOperationFilterInput {
   nin: [DisputeIssueType!]
 }
 
+union DisputeProofError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input DisputeProofInput {
+  bookingId: ID!
+  issueType: DisputeIssueType!
+  photoUrls: [String!]
+  reason: String!
+}
+
+type DisputeProofPayload {
+  booking: Booking
+  errors: [DisputeProofError!]
+}
+
 type EarningsDataPoint {
   amount: Decimal!
   date: DateTime!
@@ -1167,6 +1123,12 @@ type EarningsSummary {
   pendingPayouts: Decimal
   thisMonthEarnings: Decimal
   totalEarnings: Decimal
+}
+
+type EffectivePricePayload {
+  appliedRuleId: UUID
+  appliedRuleLabel: String
+  effectivePrice: Decimal!
 }
 
 interface Error {
@@ -1220,35 +1182,21 @@ enum Granularity {
   WEEK
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type IncomingBookingRequestsConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [IncomingBookingRequestsEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Booking!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type IncomingBookingRequestsEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Booking!
 }
 
@@ -1335,6 +1283,13 @@ input ListFilterInputTypeOfPayoutFilterInput {
   some: PayoutFilterInput
 }
 
+input ListFilterInputTypeOfPricingRuleFilterInput {
+  all: PricingRuleFilterInput
+  any: Boolean
+  none: PricingRuleFilterInput
+  some: PricingRuleFilterInput
+}
+
 input ListFilterInputTypeOfRefundFilterInput {
   all: RefundFilterInput
   any: Boolean
@@ -1361,6 +1316,13 @@ input ListFilterInputTypeOfSpaceFilterInput {
   any: Boolean
   none: SpaceFilterInput
   some: SpaceFilterInput
+}
+
+input ListIntOperationFilterInput {
+  all: IntOperationFilterInput
+  any: Boolean
+  none: IntOperationFilterInput
+  some: IntOperationFilterInput
 }
 
 input ListStringOperationFilterInput {
@@ -1449,10 +1411,7 @@ type MarkConversationReadPayload {
   participant: ConversationParticipant
 }
 
-union MarkFileDownloadedError =
-  | ForbiddenError
-  | InvalidStatusTransitionError
-  | NotFoundError
+union MarkFileDownloadedError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
 
 input MarkFileDownloadedInput {
   id: ID!
@@ -1463,10 +1422,7 @@ type MarkFileDownloadedPayload {
   errors: [MarkFileDownloadedError!]
 }
 
-union MarkInstalledError =
-  | ForbiddenError
-  | InvalidStatusTransitionError
-  | NotFoundError
+union MarkInstalledError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
 
 input MarkInstalledInput {
   id: ID!
@@ -1543,67 +1499,39 @@ input MessageTypeOperationFilterInput {
   nin: [MessageType!]
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type MessagesByConversationConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [MessagesByConversationEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Message!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type MessagesByConversationEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Message!
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type MessagesConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [MessagesEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Message!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type MessagesEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Message!
 }
 
@@ -1615,350 +1543,226 @@ type MonthlyStats {
 
 type Mutation {
   approveBooking(input: ApproveBookingInput!): ApproveBookingPayload!
+  approveProof(input: ApproveProofInput!): ApproveProofPayload!
   blockDates(input: BlockDatesInput!): BlockDatesPayload!
   cancelBooking(input: CancelBookingInput!): CancelBookingPayload!
   cancelCampaign(input: CancelCampaignInput!): CancelCampaignPayload!
   changePassword(input: ChangePasswordInput!): ChangePasswordPayload!
   confirmPayment(input: ConfirmPaymentInput!): ConfirmPaymentPayload!
-  confirmSetupIntent(
-    input: ConfirmSetupIntentInput!
-  ): ConfirmSetupIntentPayload!
+  confirmSetupIntent(input: ConfirmSetupIntentInput!): ConfirmSetupIntentPayload!
   connectStripeAccount: ConnectStripeAccountPayload!
-  createBooking(
-    campaignId: ID!
-    input: CreateBookingInput!
-  ): CreateBookingPayload!
-  createBookingConversation(
-    input: CreateBookingConversationInput!
-  ): CreateBookingConversationPayload!
+  createBooking(campaignId: ID!, input: CreateBookingInput!): CreateBookingPayload!
+  createBookingConversation(input: CreateBookingConversationInput!): CreateBookingConversationPayload!
   createCampaign(input: CreateCampaignInput!): CreateCampaignPayload!
-  createPaymentIntent(
-    input: CreatePaymentIntentInput!
-  ): CreatePaymentIntentPayload!
+  createPaymentIntent(input: CreatePaymentIntentInput!): CreatePaymentIntentPayload!
+  createPricingRule(input: CreatePricingRuleInput!): CreatePricingRulePayload!
   createReview(bookingId: ID!, input: CreateReviewInput!): CreateReviewPayload!
   createSetupIntent: CreateSetupIntentPayload!
   createSpace(input: CreateSpaceInput!): CreateSpacePayload!
   deactivateSpace(input: DeactivateSpaceInput!): DeactivateSpacePayload!
   deleteCampaign(input: DeleteCampaignInput!): DeleteCampaignPayload!
   deleteMyAccount(input: DeleteMyAccountInput!): DeleteMyAccountPayload!
-  deleteNotification(
-    input: DeleteNotificationInput!
-  ): DeleteNotificationPayload!
-  deletePaymentMethod(
-    input: DeletePaymentMethodInput!
-  ): DeletePaymentMethodPayload!
+  deleteNotification(input: DeleteNotificationInput!): DeleteNotificationPayload!
+  deletePaymentMethod(input: DeletePaymentMethodInput!): DeletePaymentMethodPayload!
+  deletePricingRule(input: DeletePricingRuleInput!): DeletePricingRulePayload!
   deleteReview(input: DeleteReviewInput!): DeleteReviewPayload!
   deleteSpace(input: DeleteSpaceInput!): DeleteSpacePayload!
   deleteUser(input: DeleteUserInput!): DeleteUserPayload!
   disconnectStripeAccount: DisconnectStripeAccountPayload!
+  disputeProof(input: DisputeProofInput!): DisputeProofPayload!
   markAllNotificationsRead: MarkAllNotificationsReadPayload!
-  markConversationRead(
-    input: MarkConversationReadInput!
-  ): MarkConversationReadPayload!
-  markFileDownloaded(
-    input: MarkFileDownloadedInput!
-  ): MarkFileDownloadedPayload!
+  markConversationRead(input: MarkConversationReadInput!): MarkConversationReadPayload!
+  markFileDownloaded(input: MarkFileDownloadedInput!): MarkFileDownloadedPayload!
   markInstalled(input: MarkInstalledInput!): MarkInstalledPayload!
-  markNotificationRead(
-    input: MarkNotificationReadInput!
-  ): MarkNotificationReadPayload!
+  markNotificationRead(input: MarkNotificationReadInput!): MarkNotificationReadPayload!
   notifyTyping(input: NotifyTypingInput!): NotifyTypingPayload!
   processPayout(input: ProcessPayoutInput!): ProcessPayoutPayload!
   reactivateSpace(input: ReactivateSpaceInput!): ReactivateSpacePayload!
   refreshStripeAccountStatus: RefreshStripeAccountStatusPayload!
   rejectBooking(input: RejectBookingInput!): RejectBookingPayload!
-  requestManualPayout(
-    input: RequestManualPayoutInput!
-  ): RequestManualPayoutPayload!
+  requestManualPayout(input: RequestManualPayoutInput!): RequestManualPayoutPayload!
   requestRefund(input: RequestRefundInput!): RequestRefundPayload!
   retryPayout(input: RetryPayoutInput!): RetryPayoutPayload!
   sendMessage(input: SendMessageInput!): SendMessagePayload!
-  setDefaultPaymentMethod(
-    input: SetDefaultPaymentMethodInput!
-  ): SetDefaultPaymentMethodPayload!
+  setDefaultPaymentMethod(input: SetDefaultPaymentMethodInput!): SetDefaultPaymentMethodPayload!
   submitCampaign(input: SubmitCampaignInput!): SubmitCampaignPayload!
   submitProof(input: SubmitProofInput!): SubmitProofPayload!
   unblockDates(input: UnblockDatesInput!): UnblockDatesPayload!
-  updateAdvertiserProfile(
-    input: UpdateAdvertiserProfileInput!
-  ): UpdateAdvertiserProfilePayload!
+  updateAdvertiserProfile(input: UpdateAdvertiserProfileInput!): UpdateAdvertiserProfilePayload!
   updateCampaign(id: ID!, input: UpdateCampaignInput!): UpdateCampaignPayload!
   updateCurrentUser(input: UpdateCurrentUserInput!): UpdateCurrentUserPayload!
-  updateNotificationPreference(
-    input: UpdateNotificationPreferenceInput!
-  ): UpdateNotificationPreferencePayload!
+  updateNotificationPreference(input: UpdateNotificationPreferenceInput!): UpdateNotificationPreferencePayload!
+  updatePricingRule(id: ID!, input: UpdatePricingRuleInput!): UpdatePricingRulePayload!
   updateReview(id: ID!, input: UpdateReviewInput!): UpdateReviewPayload!
   updateSpace(id: ID!, input: UpdateSpaceInput!): UpdateSpacePayload!
-  updateSpaceOwnerProfile(
-    input: UpdateSpaceOwnerProfileInput!
-  ): UpdateSpaceOwnerProfilePayload!
+  updateSpaceOwnerProfile(input: UpdateSpaceOwnerProfileInput!): UpdateSpaceOwnerProfilePayload!
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type MyBookingsAsAdvertiserConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [MyBookingsAsAdvertiserEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Booking!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
+  """Identifies the total count of items in the connection."""
   totalCount: Int!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type MyBookingsAsAdvertiserEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Booking!
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type MyBookingsAsOwnerConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [MyBookingsAsOwnerEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Booking!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
+  """Identifies the total count of items in the connection."""
   totalCount: Int!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type MyBookingsAsOwnerEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Booking!
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type MyCampaignsConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [MyCampaignsEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Campaign!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type MyCampaignsEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Campaign!
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type MyConversationsConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [MyConversationsEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Conversation!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type MyConversationsEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Conversation!
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type MyNotificationsConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [MyNotificationsEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Notification!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type MyNotificationsEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Notification!
 }
 
-"""
-A connection to a list of items.
-"""
-type MyPayoutsConnection {
-  """
-  A list of edges.
-  """
-  edges: [MyPayoutsEdge!]
-  """
-  A flattened list of the nodes.
-  """
-  nodes: [Payout!]
-  """
-  Information to aid in pagination.
-  """
+"""A connection to a list of items."""
+type MyPaymentsConnection {
+  """A list of edges."""
+  edges: [MyPaymentsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Payment!]
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
-type MyPayoutsEdge {
-  """
-  A cursor for use in pagination.
-  """
+"""An edge in a connection."""
+type MyPaymentsEdge {
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
+  node: Payment!
+}
+
+"""A connection to a list of items."""
+type MyPayoutsConnection {
+  """A list of edges."""
+  edges: [MyPayoutsEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Payout!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""An edge in a connection."""
+type MyPayoutsEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
   node: Payout!
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type MyReviewsConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [MyReviewsEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Review!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type MyReviewsEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Review!
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type MySpacesConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [MySpacesEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Space!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
+  """Identifies the total count of items in the connection."""
   totalCount: Int!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type MySpacesEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Space!
 }
 
@@ -2068,13 +1872,9 @@ type NotifyTypingPayload {
   errors: [NotifyTypingError!]
 }
 
-"""
-Information about pagination in a connection.
-"""
+"""Information about pagination in a connection."""
 type PageInfo {
-  """
-  When paginating forwards, the cursor to continue.
-  """
+  """When paginating forwards, the cursor to continue."""
   endCursor: String
   """
   Indicates whether more edges exist following the set defined by the clients arguments.
@@ -2084,9 +1884,7 @@ type PageInfo {
   Indicates whether more edges exist prior the set defined by the clients arguments.
   """
   hasPreviousPage: Boolean!
-  """
-  When paginating backwards, the cursor to continue.
-  """
+  """When paginating backwards, the cursor to continue."""
   startCursor: String
 }
 
@@ -2098,22 +1896,17 @@ type Payment {
   failureReason: String
   id: UUID!
   paidAt: DateTime
+  receiptUrl: String
   refunds(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [RefundSortInput!]
     where: RefundFilterInput
@@ -2149,6 +1942,7 @@ input PaymentFilterInput {
   id: UuidOperationFilterInput
   or: [PaymentFilterInput!]
   paidAt: DateTimeOperationFilterInput
+  receiptUrl: StringOperationFilterInput
   refunds: ListFilterInputTypeOfRefundFilterInput
   status: PaymentStatusOperationFilterInput
   stripeChargeId: StringOperationFilterInput
@@ -2165,6 +1959,7 @@ input PaymentSortInput {
   failureReason: SortEnumType
   id: SortEnumType
   paidAt: SortEnumType
+  receiptUrl: SortEnumType
   status: SortEnumType
   stripeChargeId: SortEnumType
   stripeFee: SortEnumType
@@ -2200,35 +1995,21 @@ input PaymentTypeOperationFilterInput {
   nin: [PaymentType!]
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type PaymentsByBookingConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [PaymentsByBookingEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Payment!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type PaymentsByBookingEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Payment!
 }
 
@@ -2347,6 +2128,81 @@ type PeriodData {
   startDate: DateTime!
 }
 
+type PricingRule {
+  createdAt: DateTime!
+  daysOfWeek: [Int!]
+  endDate: LocalDate
+  id: UUID!
+  label: String
+  priority: Int!
+  space: Space!
+  spaceId: UUID!
+  startDate: LocalDate
+  type: PricingRuleType!
+  value: Decimal!
+}
+
+input PricingRuleFilterInput {
+  and: [PricingRuleFilterInput!]
+  createdAt: DateTimeOperationFilterInput
+  daysOfWeek: ListIntOperationFilterInput
+  endDate: LocalDateOperationFilterInput
+  id: UuidOperationFilterInput
+  label: StringOperationFilterInput
+  or: [PricingRuleFilterInput!]
+  priority: IntOperationFilterInput
+  space: SpaceFilterInput
+  spaceId: UuidOperationFilterInput
+  startDate: LocalDateOperationFilterInput
+  type: PricingRuleTypeOperationFilterInput
+  value: DecimalOperationFilterInput
+}
+
+input PricingRuleSortInput {
+  createdAt: SortEnumType
+  endDate: SortEnumType
+  id: SortEnumType
+  label: SortEnumType
+  priority: SortEnumType
+  space: SpaceSortInput
+  spaceId: SortEnumType
+  startDate: SortEnumType
+  type: SortEnumType
+  value: SortEnumType
+}
+
+enum PricingRuleType {
+  FIXED
+  MULTIPLIER
+}
+
+input PricingRuleTypeOperationFilterInput {
+  eq: PricingRuleType
+  in: [PricingRuleType!]
+  neq: PricingRuleType
+  nin: [PricingRuleType!]
+}
+
+"""A connection to a list of items."""
+type PricingRulesBySpaceConnection {
+  """A list of edges."""
+  edges: [PricingRulesBySpaceEdge!]
+  """A flattened list of the nodes."""
+  nodes: [PricingRule!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type PricingRulesBySpaceEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: PricingRule!
+}
+
 union ProcessPayoutError = ConflictError | NotFoundError | PaymentError
 
 input ProcessPayoutInput {
@@ -2395,28 +2251,20 @@ input ProofStatusOperationFilterInput {
 }
 
 type Query {
-  advertiserAnalytics(
-    endDate: DateTime!
-    startDate: DateTime!
-  ): AdvertiserAnalytics!
+  advertiserAnalytics(endDate: DateTime!, startDate: DateTime!): AdvertiserAnalytics!
   advertiserDailyStats(endDate: DateTime!, startDate: DateTime!): [DailyStats!]!
+  advertiserSpendingSummary: SpendingSummary!
   blockedDatesBySpace(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
     endDate: LocalDate
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [BlockedDateSortInput!]
     spaceId: ID!
@@ -2425,325 +2273,256 @@ type Query {
   ): BlockedDatesBySpaceConnection
   bookingById(id: ID!): Booking
   bookingsRequiringAction(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
   ): BookingsRequiringActionConnection
   campaignById(id: ID!): Campaign
-  earningsByDateRange(
-    end: DateTime!
-    granularity: Granularity!
-    start: DateTime!
-  ): [EarningsDataPoint!]!
+  earningsByDateRange(end: DateTime!, granularity: Granularity!, start: DateTime!): [EarningsDataPoint!]!
   earningsSummary: EarningsSummary!
+  effectivePriceByDate(date: LocalDate!, spaceId: ID!): EffectivePricePayload!
   exportBookingsAsCsv(input: ExportBookingsInput): ExportBookingsPayload!
   incomingBookingRequests(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [BookingSortInput!]
   ): IncomingBookingRequestsConnection
   me: User
   messagesByConversation(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
     conversationId: ID!
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [MessageSortInput!]
     where: MessageFilterInput
   ): MessagesByConversationConnection
   myActivityFeed(first: Int!): [ActivityEvent!]!
   myBookingsAsAdvertiser(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [BookingSortInput!]
+    searchText: String
     where: BookingFilterInput
   ): MyBookingsAsAdvertiserConnection
   myBookingsAsOwner(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [BookingSortInput!]
     searchText: String
     where: BookingFilterInput
   ): MyBookingsAsOwnerConnection
   myCampaigns(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [CampaignSortInput!]
     where: CampaignFilterInput
   ): MyCampaignsConnection
   myConversations(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [ConversationSortInput!]
     where: ConversationFilterInput
   ): MyConversationsConnection
   myNotificationPreferences: [NotificationPreference!]!
   myNotifications(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [NotificationSortInput!]
     where: NotificationFilterInput
   ): MyNotificationsConnection
-  myPayouts(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+  myPayments(
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [PaymentSortInput!]
+    where: PaymentFilterInput
+  ): MyPaymentsConnection
+  myPayouts(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
     """
-    Returns the last _n_ elements from the list.
+    Returns the elements in the list that come before the specified cursor.
     """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [PayoutSortInput!]
     where: PayoutFilterInput
   ): MyPayoutsConnection
   myReviews(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [ReviewSortInput!]
   ): MyReviewsConnection
-  mySavedPaymentMethods(
-    order: [SavedPaymentMethodSortInput!]
-    where: SavedPaymentMethodFilterInput
-  ): [SavedPaymentMethod!]!
+  mySavedPaymentMethods(order: [SavedPaymentMethodSortInput!], where: SavedPaymentMethodFilterInput): [SavedPaymentMethod!]!
   mySpaces(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [SpaceSortInput!]
     where: SpaceFilterInput
   ): MySpacesConnection
   paymentById(id: ID!): Payment
   paymentsByBooking(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
     bookingId: ID!
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [PaymentSortInput!]
     where: PaymentFilterInput
   ): PaymentsByBookingConnection
   payoutById(id: ID!): Payout
-  reviewByBooking(bookingId: ID!, reviewerType: ReviewerType!): Review
-  reviewsBySpace(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+  pricingRulesBySpace(
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [PricingRuleSortInput!]
+    spaceId: ID!
+    where: PricingRuleFilterInput
+  ): PricingRulesBySpaceConnection
+  reviewByBooking(bookingId: ID!, reviewerType: ReviewerType!): Review
+  reviewsBySpace(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
     """
-    Returns the last _n_ elements from the list.
+    Returns the elements in the list that come before the specified cursor.
     """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [ReviewSortInput!]
     spaceId: ID!
   ): ReviewsBySpaceConnection
   spaceById(id: ID!): Space
-  spaceOwnerAnalytics(
-    endDate: DateTime!
-    startDate: DateTime!
-  ): SpaceOwnerAnalytics!
+  spaceOwnerAnalytics(endDate: DateTime!, startDate: DateTime!): SpaceOwnerAnalytics!
   spaceOwnerDailyStats(endDate: DateTime!, startDate: DateTime!): [DailyStats!]!
   spaces(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [SpaceSortInput!]
     where: SpaceFilterInput
   ): SpacesConnection
   transactionsByBooking(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
     bookingId: ID!
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [TransactionSortInput!]
     where: TransactionFilterInput
@@ -2776,10 +2555,7 @@ type ReactivateSpacePayload {
   space: Space
 }
 
-union RefreshStripeAccountStatusError =
-  | NotFoundError
-  | PaymentError
-  | ValidationError
+union RefreshStripeAccountStatusError = NotFoundError | PaymentError | ValidationError
 
 type RefreshStripeAccountStatusPayload {
   errors: [RefreshStripeAccountStatusError!]
@@ -2843,42 +2619,25 @@ input RefundStatusOperationFilterInput {
   nin: [RefundStatus!]
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type RefundsConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [RefundsEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Refund!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type RefundsEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Refund!
 }
 
-union RejectBookingError =
-  | ForbiddenError
-  | InvalidStatusTransitionError
-  | NotFoundError
+union RejectBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
 
 input RejectBookingInput {
   id: ID!
@@ -2901,11 +2660,7 @@ type RequestManualPayoutPayload {
   manualPayout: ManualPayout
 }
 
-union RequestRefundError =
-  | InvalidStatusTransitionError
-  | NotFoundError
-  | PaymentError
-  | ValidationError
+union RequestRefundError = InvalidStatusTransitionError | NotFoundError | PaymentError | ValidationError
 
 input RequestRefundInput {
   amount: Decimal!
@@ -2918,10 +2673,7 @@ type RequestRefundPayload {
   refund: Refund
 }
 
-union RetryPayoutError =
-  | InvalidStatusTransitionError
-  | NotFoundError
-  | PaymentError
+union RetryPayoutError = InvalidStatusTransitionError | NotFoundError | PaymentError
 
 input RetryPayoutInput {
   payoutId: ID!
@@ -2992,67 +2744,39 @@ input ReviewerTypeOperationFilterInput {
   nin: [ReviewerType!]
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type ReviewsBySpaceConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [ReviewsBySpaceEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Review!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type ReviewsBySpaceEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Review!
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type ReviewsConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [ReviewsEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Review!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type ReviewsEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Review!
 }
 
@@ -3134,21 +2858,15 @@ type Space {
   averageRating: Float
   blockedDates: [BlockedDate!]!
   bookings(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [BookingSortInput!]
     where: BookingFilterInput
@@ -3158,6 +2876,7 @@ type Space {
   description: String
   dimensions: String
   dimensionsText: String
+  effectivePrices(endDate: LocalDate!, startDate: LocalDate!): [DatePrice!]!
   height: Float
   id: UUID!
   images: [String!]!
@@ -3168,23 +2887,18 @@ type Space {
   minDuration: Int!
   owner: SpaceOwnerProfile
   pricePerDay: Decimal!
+  pricingRules: [PricingRule!]!
   rejectionReason: String
   reviews(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [ReviewSortInput!]
     where: ReviewFilterInput
@@ -3225,6 +2939,7 @@ input SpaceFilterInput {
   minDuration: IntOperationFilterInput
   or: [SpaceFilterInput!]
   pricePerDay: DecimalOperationFilterInput
+  pricingRules: ListFilterInputTypeOfPricingRuleFilterInput
   rejectionReason: StringOperationFilterInput
   reviews: ListFilterInputTypeOfReviewFilterInput
   spaceOwnerProfile: SpaceOwnerProfileFilterInput
@@ -3266,41 +2981,29 @@ type SpaceOwnerProfile {
   payouts: [Payout!]!
   responseRate: Float!
   reviews(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [ReviewSortInput!]
     where: ReviewFilterInput
   ): ReviewsConnection
   spaces(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
+    """Returns the elements in the list that come after the specified cursor."""
     after: String
     """
     Returns the elements in the list that come before the specified cursor.
     """
     before: String
-    """
-    Returns the first _n_ elements from the list.
-    """
+    """Returns the first _n_ elements from the list."""
     first: Int
-    """
-    Returns the last _n_ elements from the list.
-    """
+    """Returns the last _n_ elements from the list."""
     last: Int
     order: [SpaceSortInput!]
     where: SpaceFilterInput
@@ -3449,40 +3152,31 @@ input SpaceTypeOperationFilterInput {
   nin: [SpaceType!]
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type SpacesConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [SpacesEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Space!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
+  """Identifies the total count of items in the connection."""
   totalCount: Int!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type SpacesEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Space!
+}
+
+type SpendingSummary {
+  lastMonthSpending: Decimal
+  pendingPayments: Decimal
+  thisMonthSpending: Decimal
+  totalSpent: Decimal
 }
 
 type StatusCount {
@@ -3505,10 +3199,7 @@ input StringOperationFilterInput {
   startsWith: String
 }
 
-union SubmitCampaignError =
-  | ForbiddenError
-  | InvalidStatusTransitionError
-  | NotFoundError
+union SubmitCampaignError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
 
 input SubmitCampaignInput {
   id: ID!
@@ -3519,10 +3210,7 @@ type SubmitCampaignPayload {
   errors: [SubmitCampaignError!]
 }
 
-union SubmitProofError =
-  | ForbiddenError
-  | InvalidStatusTransitionError
-  | NotFoundError
+union SubmitProofError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
 
 input SubmitProofInput {
   bookingId: ID!
@@ -3603,35 +3291,21 @@ input TransactionTypeOperationFilterInput {
   nin: [TransactionType!]
 }
 
-"""
-A connection to a list of items.
-"""
+"""A connection to a list of items."""
 type TransactionsByBookingConnection {
-  """
-  A list of edges.
-  """
+  """A list of edges."""
   edges: [TransactionsByBookingEdge!]
-  """
-  A flattened list of the nodes.
-  """
+  """A flattened list of the nodes."""
   nodes: [Transaction!]
-  """
-  Information to aid in pagination.
-  """
+  """Information to aid in pagination."""
   pageInfo: PageInfo!
 }
 
-"""
-An edge in a connection.
-"""
+"""An edge in a connection."""
 type TransactionsByBookingEdge {
-  """
-  A cursor for use in pagination.
-  """
+  """A cursor for use in pagination."""
   cursor: String!
-  """
-  The item at the end of the edge.
-  """
+  """The item at the end of the edge."""
   node: Transaction!
 }
 
@@ -3671,10 +3345,7 @@ type UpdateAdvertiserProfilePayload {
   errors: [UpdateAdvertiserProfileError!]
 }
 
-union UpdateCampaignError =
-  | ForbiddenError
-  | InvalidStatusTransitionError
-  | NotFoundError
+union UpdateCampaignError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
 
 input UpdateCampaignInput {
   description: String
@@ -3714,6 +3385,23 @@ type UpdateNotificationPreferencePayload {
   preference: NotificationPreference!
 }
 
+union UpdatePricingRuleError = ForbiddenError | NotFoundError | ValidationError
+
+input UpdatePricingRuleInput {
+  daysOfWeek: [Int!]
+  endDate: LocalDate
+  label: String
+  priority: Int
+  startDate: LocalDate
+  type: PricingRuleType
+  value: Decimal
+}
+
+type UpdatePricingRulePayload {
+  errors: [UpdatePricingRuleError!]
+  pricingRule: PricingRule
+}
+
 union UpdateReviewError = ForbiddenError | NotFoundError | ValidationError
 
 input UpdateReviewInput {
@@ -3726,11 +3414,7 @@ type UpdateReviewPayload {
   review: Review
 }
 
-union UpdateSpaceError =
-  | ForbiddenError
-  | GeocodingError
-  | NotFoundError
-  | ValidationError
+union UpdateSpaceError = ForbiddenError | GeocodingError | NotFoundError | ValidationError
 
 input UpdateSpaceInput {
   address: String

@@ -654,6 +654,10 @@ namespace ElaviewBackend.Data.Migrations
                     b.Property<DateTime?>("PaidAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("ReceiptUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
@@ -740,6 +744,51 @@ namespace ElaviewBackend.Data.Migrations
                     b.HasIndex("Status");
 
                     b.ToTable("payouts");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.PricingRule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.PrimitiveCollection<string>("DaysOfWeek")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Label")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SpaceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateOnly?>("StartDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<decimal>("Value")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SpaceId");
+
+                    b.ToTable("pricing_rules");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Data.Entities.Refund", b =>
@@ -1428,6 +1477,17 @@ namespace ElaviewBackend.Data.Migrations
                     b.Navigation("SpaceOwnerProfile");
                 });
 
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.PricingRule", b =>
+                {
+                    b.HasOne("ElaviewBackend.Data.Entities.Space", "Space")
+                        .WithMany("PricingRules")
+                        .HasForeignKey("SpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Space");
+                });
+
             modelBuilder.Entity("ElaviewBackend.Data.Entities.Refund", b =>
                 {
                     b.HasOne("ElaviewBackend.Data.Entities.Booking", "Booking")
@@ -1558,6 +1618,8 @@ namespace ElaviewBackend.Data.Migrations
                     b.Navigation("BlockedDates");
 
                     b.Navigation("Bookings");
+
+                    b.Navigation("PricingRules");
 
                     b.Navigation("Reviews");
                 });

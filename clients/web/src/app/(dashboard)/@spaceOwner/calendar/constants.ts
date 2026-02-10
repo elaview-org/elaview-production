@@ -11,18 +11,7 @@ export type CalendarView = (typeof CALENDAR_VIEWS)[number]["value"];
 
 export const STATUS_LABELS = BOOKING_STATUS.labels;
 
-export const STATUS_COLORS: Record<BookingStatus, string> = {
-  [BookingStatus.PendingApproval]: "bg-amber-500",
-  [BookingStatus.Approved]: "bg-blue-500",
-  [BookingStatus.Paid]: "bg-emerald-500",
-  [BookingStatus.FileDownloaded]: "bg-cyan-500",
-  [BookingStatus.Installed]: "bg-violet-500",
-  [BookingStatus.Verified]: "bg-green-500",
-  [BookingStatus.Completed]: "bg-primary",
-  [BookingStatus.Disputed]: "bg-destructive",
-  [BookingStatus.Rejected]: "bg-muted-foreground",
-  [BookingStatus.Cancelled]: "bg-muted-foreground",
-};
+export const STATUS_INDICATORS = BOOKING_STATUS.indicators;
 
 export const ACTIVE_STATUSES = [
   BookingStatus.PendingApproval,
@@ -33,19 +22,38 @@ export const ACTIVE_STATUSES = [
   BookingStatus.Verified,
 ] as const;
 
+export const STATUS_FILTER_OPTIONS = [
+  { value: BookingStatus.PendingApproval, label: "Pending" },
+  { value: BookingStatus.Approved, label: "Approved" },
+  { value: BookingStatus.Paid, label: "Paid" },
+  { value: BookingStatus.FileDownloaded, label: "Downloaded" },
+  { value: BookingStatus.Installed, label: "Installed" },
+  { value: BookingStatus.Verified, label: "Verified" },
+  { value: BookingStatus.Completed, label: "Completed" },
+  { value: BookingStatus.Cancelled, label: "Cancelled" },
+] as const;
+
 export const SPACE_COLORS = [
-  { bg: "bg-blue-500", border: "border-blue-500", text: "text-blue-500" },
+  { bg: "bg-chart-1", border: "border-chart-1", text: "text-chart-1" },
+  { bg: "bg-chart-2", border: "border-chart-2", text: "text-chart-2" },
+  { bg: "bg-chart-3", border: "border-chart-3", text: "text-chart-3" },
+  { bg: "bg-chart-4", border: "border-chart-4", text: "text-chart-4" },
+  { bg: "bg-chart-5", border: "border-chart-5", text: "text-chart-5" },
   {
-    bg: "bg-emerald-500",
-    border: "border-emerald-500",
-    text: "text-emerald-500",
+    bg: "bg-chart-bookings",
+    border: "border-chart-bookings",
+    text: "text-chart-bookings",
   },
-  { bg: "bg-violet-500", border: "border-violet-500", text: "text-violet-500" },
-  { bg: "bg-amber-500", border: "border-amber-500", text: "text-amber-500" },
-  { bg: "bg-rose-500", border: "border-rose-500", text: "text-rose-500" },
-  { bg: "bg-cyan-500", border: "border-cyan-500", text: "text-cyan-500" },
-  { bg: "bg-orange-500", border: "border-orange-500", text: "text-orange-500" },
-  { bg: "bg-pink-500", border: "border-pink-500", text: "text-pink-500" },
+  {
+    bg: "bg-chart-revenue",
+    border: "border-chart-revenue",
+    text: "text-chart-revenue",
+  },
+  {
+    bg: "bg-chart-rating",
+    border: "border-chart-rating",
+    text: "text-chart-rating",
+  },
 ] as const;
 
 export const DAYS_OF_WEEK = [
@@ -72,3 +80,45 @@ export const MONTHS = [
   "November",
   "December",
 ] as const;
+
+export const INSTALLATION_DEADLINE_DAYS = 3;
+
+type Holiday = { name: string; date: Date };
+
+function nthWeekdayOfMonth(
+  year: number,
+  month: number,
+  weekday: number,
+  n: number
+): Date {
+  const first = new Date(year, month, 1);
+  const firstWeekday = first.getDay();
+  const day = 1 + ((weekday - firstWeekday + 7) % 7) + (n - 1) * 7;
+  return new Date(year, month, day);
+}
+
+function lastWeekdayOfMonth(
+  year: number,
+  month: number,
+  weekday: number
+): Date {
+  const last = new Date(year, month + 1, 0);
+  const lastWeekday = last.getDay();
+  const diff = (lastWeekday - weekday + 7) % 7;
+  return new Date(year, month, last.getDate() - diff);
+}
+
+export function getHolidaysForYear(year: number): Holiday[] {
+  return [
+    { name: "New Year's Day", date: new Date(year, 0, 1) },
+    { name: "MLK Day", date: nthWeekdayOfMonth(year, 0, 1, 3) },
+    { name: "Presidents' Day", date: nthWeekdayOfMonth(year, 1, 1, 3) },
+    { name: "Memorial Day", date: lastWeekdayOfMonth(year, 4, 1) },
+    { name: "Independence Day", date: new Date(year, 6, 4) },
+    { name: "Labor Day", date: nthWeekdayOfMonth(year, 8, 1, 1) },
+    { name: "Columbus Day", date: nthWeekdayOfMonth(year, 9, 1, 2) },
+    { name: "Veterans Day", date: new Date(year, 10, 11) },
+    { name: "Thanksgiving", date: nthWeekdayOfMonth(year, 10, 4, 4) },
+    { name: "Christmas", date: new Date(year, 11, 25) },
+  ];
+}

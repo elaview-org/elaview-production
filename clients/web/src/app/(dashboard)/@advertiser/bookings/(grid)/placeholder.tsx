@@ -16,12 +16,12 @@ type Props = {
 };
 
 const TAB_MESSAGES: Record<FilterTabKey, string> = {
-  pending: "No pending booking requests at the moment",
-  approved: "No approved bookings awaiting payment",
-  active: "No active bookings right now",
-  verification: "No bookings pending your verification",
+  pending: "No pending booking requests",
+  approved: "No approved bookings waiting for payment",
+  active: "No active bookings",
+  verification: "No bookings pending your review",
   completed: "No completed bookings yet",
-  all: "Start by discovering ad spaces to book",
+  all: "Bookings will appear here once you book spaces",
 };
 
 export default function Placeholder({ tabKey }: Props) {

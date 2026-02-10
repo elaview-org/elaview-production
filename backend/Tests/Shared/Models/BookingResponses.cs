@@ -49,3 +49,11 @@ public record MarkFileDownloadedPayload(BookingNode Booking, List<MutationError>
 public record MarkInstalledResponse(MarkInstalledPayload MarkInstalled);
 
 public record MarkInstalledPayload(BookingNode Booking, List<MutationError>? Errors);
+
+public record ApproveProofResponse(ApproveProofPayload ApproveProof);
+
+public record ApproveProofPayload(BookingNode Booking, List<MutationError>? Errors);
+
+public record DisputeProofResponse(DisputeProofPayload DisputeProof);
+
+public record DisputeProofPayload(BookingNode Booking, List<MutationError>? Errors);

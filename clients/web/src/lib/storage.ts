@@ -31,6 +31,7 @@ const storage = {
   },
   drafts: {
     createSpace: createKey("drafts", "create-space"),
+    createCampaign: createKey("drafts", "create-campaign"),
   },
 } as const;
 

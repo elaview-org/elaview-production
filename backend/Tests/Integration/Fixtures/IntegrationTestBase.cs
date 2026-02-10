@@ -312,6 +312,27 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture)
         return booking;
     }
 
+    protected async Task<(Booking Booking, BookingProof Proof)> SeedVerifiedBookingWithProofAsync(
+        Guid campaignId, Guid spaceId) {
+        var booking = BookingFactory.CreateWithStatus(campaignId, spaceId, BookingStatus.Verified);
+        var proof = new BookingProof {
+            Id = Guid.NewGuid(),
+            BookingId = booking.Id,
+            Photos = ["https://example.com/photo1.jpg", "https://example.com/photo2.jpg"],
+            Status = ProofStatus.Pending,
+            SubmittedAt = DateTime.UtcNow.AddHours(-1),
+            AutoApproveAt = DateTime.UtcNow.AddHours(47),
+            CreatedAt = DateTime.UtcNow.AddHours(-1)
+        };
+
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.Bookings.Add(booking);
+        context.BookingProofs.Add(proof);
+        await context.SaveChangesAsync();
+        return (booking, proof);
+    }
+
     protected async Task<Payment> SeedPaymentAsync(Guid bookingId,
         PaymentStatus status = PaymentStatus.Pending) {
         var payment = status == PaymentStatus.Succeeded
@@ -365,5 +386,14 @@ public abstract class IntegrationTestBase(IntegrationTestFixture fixture)
         context.BlockedDates.AddRange(blockedDates);
         await context.SaveChangesAsync();
         return blockedDates;
+    }
+
+    protected async Task<PricingRule> SeedPricingRuleAsync(Guid spaceId, Action<PricingRule>? customize = null) {
+        var rule = PricingRuleFactory.Create(spaceId, customize);
+        using var scope = Fixture.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        context.PricingRules.Add(rule);
+        await context.SaveChangesAsync();
+        return rule;
     }
 }

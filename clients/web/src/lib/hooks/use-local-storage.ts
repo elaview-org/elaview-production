@@ -1,14 +1,25 @@
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useRef, useSyncExternalStore } from "react";
 
 export function useLocalStorage<T>(key: string, defaultValue: T) {
+  const cachedRef = useRef<{ raw: string | null; parsed: T } | null>(null);
+
   const getSnapshot = useCallback((): T => {
-    const stored = localStorage.getItem(key);
-    if (stored === null) return defaultValue;
-    try {
-      return JSON.parse(stored) as T;
-    } catch {
-      return defaultValue;
+    const raw = localStorage.getItem(key);
+    if (cachedRef.current && cachedRef.current.raw === raw) {
+      return cachedRef.current.parsed;
     }
+    const parsed: T =
+      raw === null
+        ? defaultValue
+        : (() => {
+            try {
+              return JSON.parse(raw) as T;
+            } catch {
+              return defaultValue;
+            }
+          })();
+    cachedRef.current = { raw, parsed };
+    return parsed;
   }, [key, defaultValue]);
 
   const getServerSnapshot = useCallback((): T => defaultValue, [defaultValue]);

@@ -15,6 +15,7 @@ export const DiscoverTable_SpaceFragment = graphql(`
     images
     type
     pricePerDay
+    averageRating
   }
 `);
 
@@ -33,6 +34,7 @@ export default function DiscoverTable({ data }: Props) {
       images: space.images as string[],
       type: space.type,
       pricePerDay: Number(space.pricePerDay),
+      averageRating: space.averageRating ? Number(space.averageRating) : null,
     };
   });
 

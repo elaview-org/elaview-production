@@ -1,22 +1,12 @@
 import { SpaceType } from "@/types/gql/graphql";
 import { ViewOptions } from "@/types/constants";
 
-export const PHASE_1_TYPES = [
-  SpaceType.Storefront,
-  SpaceType.WindowDisplay,
-  SpaceType.Other,
-] as const;
-
-export const SORT_OPTIONS = [
-  { value: "newest", label: "Newest First" },
-  { value: "price_asc", label: "Price: Low to High" },
-  { value: "price_desc", label: "Price: High to Low" },
-  { value: "rating", label: "Highest Rated" },
-] as const;
-
-export type SortOption = (typeof SORT_OPTIONS)[number]["value"];
-
-export const DEFAULT_SORT: SortOption = "newest";
+export const PRICE_RANGES: Record<string, { gte: number; lte?: number }> = {
+  "0-50": { gte: 0, lte: 50 },
+  "50-100": { gte: 50, lte: 100 },
+  "100-200": { gte: 100, lte: 200 },
+  "200+": { gte: 200 },
+};
 
 export const TOOLBAR_PROPS = {
   searchTarget: "spaces",
@@ -25,9 +15,13 @@ export const TOOLBAR_PROPS = {
       key: "type",
       placeholder: "Type",
       fields: [
-        { value: "storefront", label: "Storefront" },
-        { value: "window_display", label: "Window Display" },
-        { value: "other", label: "Other" },
+        { value: SpaceType.Storefront, label: "Storefront" },
+        { value: SpaceType.WindowDisplay, label: "Window Display" },
+        { value: SpaceType.Billboard, label: "Billboard" },
+        { value: SpaceType.DigitalDisplay, label: "Digital Display" },
+        { value: SpaceType.VehicleWrap, label: "Vehicle Wrap" },
+        { value: SpaceType.Transit, label: "Transit" },
+        { value: SpaceType.Other, label: "Other" },
       ],
     },
     {
@@ -43,16 +37,11 @@ export const TOOLBAR_PROPS = {
   ],
   sort: {
     fields: [
-      { value: "price", label: "Price" },
+      { value: "pricePerDay", label: "Price" },
+      { value: "averageRating", label: "Rating" },
       { value: "createdAt", label: "Date Added" },
-      { value: "rating", label: "Rating" },
+      { value: "totalBookings", label: "Bookings" },
     ],
   },
   views: new Set([ViewOptions.Grid, ViewOptions.Table, ViewOptions.Map]),
-};
-
-export type FilterState = {
-  priceRange: [number, number];
-  spaceTypes: SpaceType[];
-  searchQuery: string;
 };

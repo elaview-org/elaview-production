@@ -63,6 +63,7 @@ jobs:
     name: "Security: Web Audit"
     needs: [static-analysis-web]
     runs-on: ubuntu-latest
+    continue-on-error: true
     defaults:
       run:
         shell: devbox run -- bash -e {0}
@@ -78,12 +79,13 @@ jobs:
         run: ev web:install
 
       - name: Audit
-        run: ev web:audit || echo "::warning::Web dependency vulnerabilities found"
+        run: ev web:audit
 
   security-backend-audit:
     name: "Security: Backend Audit"
     needs: [static-analysis-backend]
     runs-on: ubuntu-latest
+    continue-on-error: true
     defaults:
       run:
         shell: devbox run -- bash -e {0}
@@ -99,12 +101,13 @@ jobs:
         run: ev backend:install
 
       - name: Audit
-        run: ev backend:audit || echo "::warning::Backend dependency vulnerabilities found"
+        run: ev backend:audit
 
   security-secrets:
     name: "Security: Secret Scan"
     needs: [static-analysis-web, static-analysis-backend]
     runs-on: ubuntu-latest
+    continue-on-error: true
     defaults:
       run:
         shell: devbox run -- bash -e {0}
@@ -117,7 +120,7 @@ jobs:
           enable-cache: true
 
       - name: Scan
-        run: ev repo:secrets || echo "::warning::Potential secrets detected"
+        run: ev repo:secrets
 
   build-test-backend:
     name: "Build & Test: Backend"

@@ -90,8 +90,8 @@ Each profile has its own `navigation-bar.data.ts`:
 |-----------|--------------|-------------|---------------------------------------------------------|
 | Overview  | ✅ Functional | GraphQL     | Parallel routes, all sections live                      |
 | Discover  | ✅ Functional | GraphQL     | Grid/Table/Map views, filters, search, sort, pagination |
-| Campaigns | ⚠️ Partial   | GraphQL     | Query works, mutations not wired                        |
-| Bookings  | ⚠️ Partial   | GraphQL     | Query works, mutations needed                           |
+| Campaigns | ✅ Functional | GraphQL     | Full CRUD, detail page, mutations wired                 |
+| Bookings  | ✅ Functional | GraphQL     | Full filtering, actions, detail page wired              |
 | Spending  | ✅ Functional | GraphQL     | Full integration with filters                           |
 | Analytics | ✅ Functional | GraphQL     | Parallel routes, reach chart mocked                     |
 | Profile   | ✅ Functional | GraphQL     | Real campaign data                                      |
@@ -796,36 +796,39 @@ implementation details and deferred items.
 
 **Main Page:**
 
-- [ ] Campaign cards grid with status badges
-- [ ] Real GraphQL query (`myCampaigns`)
-- [ ] Fragment masking pattern
-- [ ] Create campaign modal/wizard
-- [ ] Empty state placeholder
-- [ ] Loading skeleton
-- [ ] Status filter tabs (Draft, Active, Completed, Cancelled)
-- [ ] Search by campaign name
-- [ ] Sort options (Name, Date, Budget)
+- [x] Campaign cards grid with status badges
+- [x] Real GraphQL query (`myCampaigns`)
+- [x] Fragment masking pattern
+- [x] Create campaign modal/wizard
+- [x] Empty state placeholder
+- [x] Loading skeleton
+- [x] Status filter tabs (Draft, Active, Completed, Cancelled)
+- [x] Search by campaign name
+- [x] Sort options (Name, Date, Budget)
+- [x] Server-side filtering, sorting, pagination
 
 **Create Campaign Modal:**
 
-- [ ] Step 1: Campaign details (name, description, goals)
-- [ ] Step 2: Target audience
-- [ ] Step 3: Budget and dates
-- [ ] Step 4: Creative upload (PDF/PNG/JPG)
-- [ ] Step 5: Preview before creation
-- [ ] File validation (type, size, dimensions)
-- [ ] `createCampaign` mutation
+- [x] Step 1: Campaign details (name, description, goals)
+- [x] Step 2: Budget and dates
+- [x] Step 3: Creative upload (Cloudinary signed upload)
+- [x] Step 4: Preview before creation
+- [x] Per-step Zod validation with error messages
+- [x] `createCampaign` mutation
+- [x] Draft saving to localStorage (auto-save, discard button)
 
 **Detail Page (`/campaigns/[id]`):**
 
-- [ ] Header with campaign name and status
-- [ ] Campaign info section
-- [ ] Creative preview/download
-- [ ] Associated bookings list
-- [ ] Budget vs spent display
-- [ ] Performance metrics (if available)
-- [ ] Edit campaign button
-- [ ] Cancel campaign button
+- [x] Header with campaign name and status
+- [x] Campaign info section (editable form with `updateCampaign`)
+- [x] Creative preview with upload replacement
+- [x] Associated bookings list (Suspense-wrapped)
+- [x] Budget vs spent display with progress bar
+- [x] Performance metrics (spaces booked, total spend, budget remaining)
+- [x] Status-based dropdown actions (submit, cancel, delete)
+- [x] Fixed bottom action bar
+- [x] Delete with name-match confirmation dialog
+- [x] Loading skeleton
 
 **Campaign Statuses:**
 
@@ -855,7 +858,7 @@ implementation details and deferred items.
 **Campaign fields:** `id`, `name`, `description`, `status`, `imageUrl`, `startDate`, `endDate`, `totalBudget`, `goals`,
 `targetAudience`, `spacesCount`, `totalSpend`, `bookings`
 
-**Frontend Status:** Query works. Mutations not wired.
+**Frontend Status:** ✅ Fully functional (queries + mutations wired, detail page complete)
 
 ---
 
@@ -1087,8 +1090,8 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 | Query                    | Purpose                 | Implemented |
 |--------------------------|-------------------------|-------------|
 | `spaces`                 | Browse available spaces | ✅           |
-| `myCampaigns`            | Advertiser's campaigns  | ⚠️          |
-| `campaignById(id)`       | Single campaign details | ❌           |
+| `myCampaigns`            | Advertiser's campaigns  | ✅           |
+| `campaignById(id)`       | Single campaign details | ✅           |
 | `myBookingsAsAdvertiser` | Advertiser's bookings   | ✅           |
 | `paymentsByBooking(id)`  | Payments for booking    | ❌           |
 
@@ -1133,11 +1136,11 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 
 | Mutation         | Purpose               | Implemented |
 |------------------|-----------------------|-------------|
-| `createCampaign` | Create new campaign   | ❌           |
-| `updateCampaign` | Edit campaign details | ❌           |
-| `submitCampaign` | Submit for booking    | ❌           |
-| `cancelCampaign` | Cancel campaign       | ❌           |
-| `deleteCampaign` | Remove draft campaign | ❌           |
+| `createCampaign` | Create new campaign   | ✅           |
+| `updateCampaign` | Edit campaign details | ✅           |
+| `submitCampaign` | Submit for booking    | ✅           |
+| `cancelCampaign` | Cancel campaign       | ✅           |
+| `deleteCampaign` | Remove draft campaign | ✅           |
 
 **Payment:**
 

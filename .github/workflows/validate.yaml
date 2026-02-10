@@ -2,7 +2,7 @@ name: Validate
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 concurrency:
   group: validate-${{ github.ref }}
@@ -13,8 +13,8 @@ env:
   DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
 
 jobs:
-  validate-web:
-    name: Validate Web
+  static-analysis-web:
+    name: "Static Analysis: Web"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -39,14 +39,8 @@ jobs:
       - name: Typecheck
         run: ev web:typecheck
 
-      - name: Test
-        run: ev web:test:coverage
-
-      - name: Build
-        run: ev web:build
-
-  validate-backend:
-    name: Validate Backend
+  static-analysis-backend:
+    name: "Static Analysis: Backend"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -65,8 +59,134 @@ jobs:
       - name: Format Check
         run: ev backend:format:check
 
+  security-web-audit:
+    name: "Security: Web Audit"
+    needs: [static-analysis-web]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        shell: devbox run -- bash -e {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Devbox
+        uses: jetify-com/devbox-install-action@v0.14.0
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: ev web:install
+
+      - name: Audit
+        run: ev web:audit
+
+  security-backend-audit:
+    name: "Security: Backend Audit"
+    needs: [static-analysis-backend]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        shell: devbox run -- bash -e {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Devbox
+        uses: jetify-com/devbox-install-action@v0.14.0
+        with:
+          enable-cache: true
+
+      - name: Restore
+        run: ev backend:install
+
+      - name: Audit
+        run: ev backend:audit
+
+  security-secrets:
+    name: "Security: Secret Scan"
+    needs: [static-analysis-web, static-analysis-backend]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        shell: devbox run -- bash -e {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Devbox
+        uses: jetify-com/devbox-install-action@v0.14.0
+        with:
+          enable-cache: true
+
+      - name: Scan
+        run: ev repo:secrets
+
+  build-test-backend:
+    name: "Build & Test: Backend"
+    needs: [security-web-audit, security-backend-audit, security-secrets]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: devbox run -- bash -e {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Devbox
+        uses: jetify-com/devbox-install-action@v0.14.0
+        with:
+          enable-cache: true
+
+      - name: Restore
+        run: ev backend:install
+
       - name: Build
         run: ev backend:build
 
       - name: Test
         run: ev backend:test
+
+  build-test-web:
+    name: "Build & Test: Web"
+    needs: [security-web-audit, security-backend-audit, security-secrets]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: devbox run -- bash -e {0}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Devbox
+        uses: jetify-com/devbox-install-action@v0.14.0
+        with:
+          enable-cache: true
+
+      - name: Install
+        run: ev web:install
+
+      - name: Test
+        run: ev web:test:coverage
+
+      - name: Build
+        run: ev web:build
+
+  ci-pass:
+    name: CI Pass
+    if: always()
+    needs:
+      - static-analysis-web
+      - static-analysis-backend
+      - build-test-backend
+      - build-test-web
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check results
+        run: |
+          if [[ "${{ needs.static-analysis-web.result }}" != "success" ||
+                "${{ needs.static-analysis-backend.result }}" != "success" ||
+                "${{ needs.build-test-backend.result }}" != "success" ||
+                "${{ needs.build-test-web.result }}" != "success" ]]; then
+            echo "::error::Required jobs failed or were cancelled"
+            exit 1
+          fi
+          echo "All required checks passed"

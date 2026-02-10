@@ -5,7 +5,9 @@
       "Bash(npx expo-doctor@latest:*)",
       "Bash(gh api:*)",
       "Bash(gh pr view:*)",
-      "Bash(gh pr merge:*)"
+      "Bash(gh pr merge:*)",
+      "Bash(gh ruleset:*)",
+      "Bash(ls:*)"
     ],
     "deny": [],
     "ask": []

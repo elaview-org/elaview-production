@@ -88,6 +88,15 @@ ev_web_format_check() {
     return $ev_web_exit
 }
 
+ev_web_audit() {
+    ev_core_require_cmd "bun" || return 1
+    ev_core_log_info "Auditing web dependencies..."
+    ev_core_in_web bun pm audit
+    ev_web_exit=$?
+    [ $ev_web_exit -eq 0 ] && ev_core_log_success "Dependency audit passed."
+    return $ev_web_exit
+}
+
 ev_web_dispatch() {
     cmd="$1"
     shift
@@ -101,10 +110,11 @@ ev_web_dispatch() {
         test:coverage)      ev_web_test_coverage ;;
         format)             ev_web_format ;;
         format:check)       ev_web_format_check ;;
+        audit)              ev_web_audit ;;
         reset)              ev_web_reset ;;
         *)
             ev_core_log_error "Unknown web command: $cmd"
-            echo "Available: install, lint, typecheck, build, test, test:coverage, format, format:check, reset"
+            echo "Available: install, lint, typecheck, build, test, test:coverage, format, format:check, audit, reset"
             return 1
             ;;
     esac

@@ -116,6 +116,15 @@ ev_backend_publish() {
     return $ev_backend_exit
 }
 
+ev_backend_audit() {
+    ev_core_require_cmd "dotnet" || return 1
+    ev_core_log_info "Auditing backend dependencies..."
+    ev_core_in_backend dotnet list ElaviewBackend.csproj package --vulnerable --include-transitive
+    ev_backend_exit=$?
+    [ $ev_backend_exit -eq 0 ] && ev_core_log_success "Dependency audit passed."
+    return $ev_backend_exit
+}
+
 ev_backend_reset() {
     ev_core_require_cmd "dotnet" || return 1
     ev_core_log_info "Cleaning backend artifacts..."
@@ -146,10 +155,11 @@ ev_backend_dispatch() {
         test:unit)        ev_backend_test_unit ;;
         test:integration) ev_backend_test_integration ;;
         publish)          ev_backend_publish ;;
+        audit)            ev_backend_audit ;;
         reset)            ev_backend_reset ;;
         *)
             ev_core_log_error "Unknown backend command: $cmd"
-            echo "Available: start, stop, restart, logs, status, exec, install, build, lint, format, format:check, test, test:unit, test:integration, publish, reset"
+            echo "Available: start, stop, restart, logs, status, exec, install, build, format, format:check, test, test:unit, test:integration, publish, audit, reset"
             return 1
             ;;
     esac

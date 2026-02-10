@@ -214,6 +214,17 @@ type ApproveBookingPayload {
   errors: [ApproveBookingError!]
 }
 
+union ApproveProofError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input ApproveProofInput {
+  bookingId: ID!
+}
+
+type ApproveProofPayload {
+  booking: Booking
+  errors: [ApproveProofError!]
+}
+
 type AttentionItem {
   bookings: Int!
   id: UUID!
@@ -1087,6 +1098,20 @@ input DisputeIssueTypeOperationFilterInput {
   nin: [DisputeIssueType!]
 }
 
+union DisputeProofError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
+
+input DisputeProofInput {
+  bookingId: ID!
+  issueType: DisputeIssueType!
+  photoUrls: [String!]
+  reason: String!
+}
+
+type DisputeProofPayload {
+  booking: Booking
+  errors: [DisputeProofError!]
+}
+
 type EarningsDataPoint {
   amount: Decimal!
   date: DateTime!
@@ -1518,6 +1543,7 @@ type MonthlyStats {
 
 type Mutation {
   approveBooking(input: ApproveBookingInput!): ApproveBookingPayload!
+  approveProof(input: ApproveProofInput!): ApproveProofPayload!
   blockDates(input: BlockDatesInput!): BlockDatesPayload!
   cancelBooking(input: CancelBookingInput!): CancelBookingPayload!
   cancelCampaign(input: CancelCampaignInput!): CancelCampaignPayload!
@@ -1543,6 +1569,7 @@ type Mutation {
   deleteSpace(input: DeleteSpaceInput!): DeleteSpacePayload!
   deleteUser(input: DeleteUserInput!): DeleteUserPayload!
   disconnectStripeAccount: DisconnectStripeAccountPayload!
+  disputeProof(input: DisputeProofInput!): DisputeProofPayload!
   markAllNotificationsRead: MarkAllNotificationsReadPayload!
   markConversationRead(input: MarkConversationReadInput!): MarkConversationReadPayload!
   markFileDownloaded(input: MarkFileDownloadedInput!): MarkFileDownloadedPayload!
@@ -2304,6 +2331,7 @@ type Query {
     """Returns the last _n_ elements from the list."""
     last: Int
     order: [BookingSortInput!]
+    searchText: String
     where: BookingFilterInput
   ): MyBookingsAsAdvertiserConnection
   myBookingsAsOwner(

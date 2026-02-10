@@ -6,8 +6,8 @@ import {
 } from "@/components/primitives/card";
 import { Badge } from "@/components/primitives/badge";
 import { Separator } from "@/components/primitives/separator";
-import { formatCurrency } from "@/lib/utils";
-import { PAYOUT_STAGE, PAYOUT_STATUS } from "@/lib/constants";
+import { formatCurrency } from "@/lib/core/utils";
+import { PAYOUT_STAGE, PAYOUT_STATUS } from "@/lib/core/constants";
 import type { PayoutStage, PayoutStatus } from "@/types/gql/graphql";
 
 type Props = {

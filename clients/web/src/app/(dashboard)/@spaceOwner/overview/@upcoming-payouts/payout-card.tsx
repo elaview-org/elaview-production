@@ -2,7 +2,7 @@
 
 import { Badge } from "@/components/primitives/badge";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { formatCurrency, formatTime } from "@/lib/utils";
+import { formatCurrency, formatTime } from "@/lib/core/utils";
 import {
   FragmentType,
   getFragmentData,

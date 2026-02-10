@@ -1,6 +1,6 @@
 import MediaCard, { MediaCardSkeleton } from "@/components/composed/media-card";
-import { SPACE_TYPE } from "@/lib/constants";
-import { formatCurrency } from "@/lib/utils";
+import { SPACE_TYPE } from "@/lib/core/constants";
+import { formatCurrency } from "@/lib/core/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import { IconStar } from "@tabler/icons-react";
 

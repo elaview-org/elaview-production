@@ -1,5 +1,5 @@
 import { Skeleton } from "@/components/primitives/skeleton";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { ReactNode } from "react";

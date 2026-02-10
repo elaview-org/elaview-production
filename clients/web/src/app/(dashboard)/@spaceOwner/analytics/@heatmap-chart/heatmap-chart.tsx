@@ -14,7 +14,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/primitives/tooltip";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { DAYS_OF_WEEK, HOURS_OF_DAY } from "../constants";
 
 type HeatmapCell = {

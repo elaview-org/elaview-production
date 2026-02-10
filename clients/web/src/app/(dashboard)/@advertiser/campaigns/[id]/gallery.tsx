@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
 import { updateCampaignImageAction } from "../campaigns.actions";
 import { toast } from "sonner";
-import env from "@/lib/env";
+import env from "@/lib/core/env";
 
 export const Gallery_CampaignFragment = graphql(`
   fragment Gallery_CampaignFragment on Campaign {

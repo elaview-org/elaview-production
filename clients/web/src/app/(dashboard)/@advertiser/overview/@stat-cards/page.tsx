@@ -1,7 +1,7 @@
 import SummaryCard, {
   SummaryCardGrid,
 } from "@/components/composed/summary-card";
-import { calculateTrend, formatCurrency } from "@/lib/utils";
+import { calculateTrend, formatCurrency } from "@/lib/core/utils";
 import { graphql } from "@/types/gql";
 import api from "../api";
 import {

@@ -1,5 +1,5 @@
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/core/utils";
 
 export const Performance_CampaignFragment = graphql(`
   fragment Performance_CampaignFragment on Campaign {

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useRef, useState, useTransition } from "react";
 import { updateSpaceImagesAction } from "../listings.actions";
 import { toast } from "sonner";
-import env from "@/lib/env";
+import env from "@/lib/core/env";
 
 export const Gallery_SpaceFragment = graphql(`
   fragment Gallery_SpaceFragment on Space {

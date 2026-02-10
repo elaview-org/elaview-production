@@ -4,7 +4,7 @@ import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import SummaryCard, {
   SummaryCardGrid,
 } from "@/components/composed/summary-card";
-import { calculateTrend, formatCurrency } from "@/lib/utils";
+import { calculateTrend, formatCurrency } from "@/lib/core/utils";
 
 export const SpendingCards_SpendingSummaryFragment = graphql(`
   fragment SpendingCards_SpendingSummaryFragment on SpendingSummary {

@@ -41,7 +41,7 @@ import {
   graphql,
 } from "@/types/gql";
 import type { BookingsTable_BookingFragmentFragment } from "@/types/gql/graphql";
-import { BOOKING_STATUS } from "@/lib/constants";
+import { BOOKING_STATUS } from "@/lib/core/constants";
 import { type FilterTabKey } from "../constants";
 import {
   approveBookingAction,

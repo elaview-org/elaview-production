@@ -6,7 +6,7 @@ import {
 import { Card, CardContent } from "@/components/primitives/card";
 import { Skeleton } from "@/components/primitives/skeleton";
 import StarRating from "@/components/primitives/star-rating";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from "@/lib/core/utils";
 
 type Props = {
   rating: number;

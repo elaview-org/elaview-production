@@ -3,7 +3,7 @@ import api from "@/lib/gql/server";
 import { graphql, SortEnumType } from "@/types/gql";
 import { z } from "zod";
 import { ViewOptions } from "@/types/constants";
-import storage from "@/lib/storage";
+import storage from "@/lib/core/storage";
 import Toolbar from "@/components/composed/toolbar";
 import { TOOLBAR_PROPS, PRICE_RANGES } from "./constants";
 import DiscoverGrid from "./(grid)/discover-grid";

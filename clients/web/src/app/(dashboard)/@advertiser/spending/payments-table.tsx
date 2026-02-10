@@ -15,7 +15,7 @@ import TableView, {
   imageTextColumn,
   textColumn,
 } from "@/components/composed/table-view";
-import { PAYMENT_STATUS } from "@/lib/constants";
+import { PAYMENT_STATUS } from "@/lib/core/constants";
 import { PaymentStatus, graphql } from "@/types/gql";
 
 export const PaymentsTable_PaymentFragment = graphql(`

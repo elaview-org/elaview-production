@@ -14,7 +14,7 @@ import { Button } from "@/components/primitives/button";
 import { Input } from "@/components/primitives/input";
 import { Label } from "@/components/primitives/label";
 import { toast } from "sonner";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/core/utils";
 import { requestWithdrawalAction } from "./earnings.actions";
 
 type Props = {

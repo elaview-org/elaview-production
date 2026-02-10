@@ -1,5 +1,5 @@
 import api from "@/lib/gql/server";
-import { formatDate, getInitials } from "@/lib/utils";
+import { formatDate, getInitials } from "@/lib/core/utils";
 import { graphql } from "@/types/gql";
 import {
   Avatar,

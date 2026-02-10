@@ -12,7 +12,7 @@ import { CombinedGraphQLErrors } from "@apollo/client/errors";
 import { registerApolloClient } from "@apollo/client-integration-nextjs";
 import { cookies } from "next/headers";
 import { type FragmentType, getFragmentData } from "@/types/gql";
-import env from "@/lib/env";
+import env from "@/lib/core/env";
 import { redirect } from "next/navigation";
 
 const {

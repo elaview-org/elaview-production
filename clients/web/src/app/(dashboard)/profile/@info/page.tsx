@@ -1,6 +1,6 @@
 import { IconAd, IconStar, IconStarFilled } from "@tabler/icons-react";
 import ProfileCardBase from "@/components/composed/profile-card";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/core/utils";
 import { graphql, ProfileType } from "@/types/gql";
 import api from "../api";
 

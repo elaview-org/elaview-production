@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/primitives/dialog";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 
 type Props = Omit<React.ComponentProps<typeof Dialog>, "children"> & {
   title: string;

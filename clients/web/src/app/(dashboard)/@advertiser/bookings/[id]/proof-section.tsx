@@ -14,7 +14,7 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { Badge } from "@/components/primitives/badge";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/core/utils";
 import type { ProofStatus } from "@/types/gql/graphql";
 
 type Props = {

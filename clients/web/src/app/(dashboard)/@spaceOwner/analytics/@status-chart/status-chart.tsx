@@ -18,7 +18,7 @@ import {
   ChartTooltipContent,
 } from "@/components/primitives/chart";
 import MaybePlaceholder from "@/components/status/maybe-placeholder";
-import { BOOKING_STATUS } from "@/lib/constants";
+import { BOOKING_STATUS } from "@/lib/core/constants";
 import type { StatusCount, BookingStatus } from "@/types/gql";
 import { STATUS_CHART_CONFIG } from "../constants";
 import Placeholder from "./placeholder";

@@ -7,7 +7,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/primitives/tooltip";
-import { SPACE_STATUS, SPACE_TYPE } from "@/lib/constants";
+import { SPACE_STATUS, SPACE_TYPE } from "@/lib/core/constants";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import { IconChevronLeft, IconShare2 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";

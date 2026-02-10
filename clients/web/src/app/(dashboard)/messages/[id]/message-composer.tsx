@@ -3,7 +3,7 @@
 import * as React from "react";
 import { KeyboardEvent, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/primitives/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { PaperclipIcon, SendIcon, XIcon } from "lucide-react";
 
 type Props = {

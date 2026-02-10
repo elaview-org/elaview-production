@@ -12,8 +12,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/primitives/dropdown-menu";
-import { PAYMENT_STATUS } from "@/lib/constants";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { PAYMENT_STATUS } from "@/lib/core/constants";
+import { formatDate, formatCurrency } from "@/lib/core/utils";
 import { PaymentStatus } from "@/types/gql";
 import { PAYMENT_TYPE_LABELS } from "../constants";
 import type { PaymentHistoryData } from "./payments-table";

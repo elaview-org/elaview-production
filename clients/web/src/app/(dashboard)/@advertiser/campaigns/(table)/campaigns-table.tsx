@@ -38,7 +38,7 @@ import {
   graphql,
 } from "@/types/gql";
 import type { CampaignsTable_CampaignFragmentFragment } from "@/types/gql/graphql";
-import { CAMPAIGN_STATUS } from "@/lib/constants";
+import { CAMPAIGN_STATUS } from "@/lib/core/constants";
 import { type FilterTabKey } from "../constants";
 import {
   submitCampaignAction,

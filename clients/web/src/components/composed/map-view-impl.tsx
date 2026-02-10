@@ -5,7 +5,7 @@ import { MapContainer, Marker, Popup, useMap } from "react-leaflet";
 import ThemedTileLayer from "./themed-tile-layer";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { Button } from "@/components/primitives/button";
 import { IconCurrentLocation } from "@tabler/icons-react";
 

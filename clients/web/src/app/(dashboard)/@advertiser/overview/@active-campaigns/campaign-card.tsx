@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/primitives/badge";
 import { Progress } from "@/components/primitives/progress";
-import { formatCurrency, formatDateRange } from "@/lib/utils";
+import { formatCurrency, formatDateRange } from "@/lib/core/utils";
 import { CAMPAIGN_STATUS_CONFIG } from "../constants";
 import { graphql, type FragmentType, getFragmentData } from "@/types/gql";
 

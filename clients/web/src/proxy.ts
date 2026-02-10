@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import storage from "@/lib/storage";
+import storage from "@/lib/core/storage";
 
 const AUTH_COOKIE = storage.authentication.token;
 

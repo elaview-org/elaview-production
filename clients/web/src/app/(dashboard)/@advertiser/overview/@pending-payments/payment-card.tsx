@@ -8,7 +8,7 @@ import {
   AvatarImage,
 } from "@/components/primitives/avatar";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { formatCurrency, formatDate, getInitials } from "@/lib/utils";
+import { formatCurrency, formatDate, getInitials } from "@/lib/core/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import Link from "next/link";
 

@@ -20,7 +20,7 @@ import TableView, {
   textColumn,
 } from "@/components/composed/table-view";
 import { Button } from "@/components/primitives/button";
-import { PAYOUT_STAGE, PAYOUT_STATUS } from "@/lib/constants";
+import { PAYOUT_STAGE, PAYOUT_STATUS } from "@/lib/core/constants";
 import { PayoutStage, PayoutStatus, graphql } from "@/types/gql";
 import { retryPayoutAction } from "./payouts.actions";
 

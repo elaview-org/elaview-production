@@ -11,7 +11,7 @@ import PerformerCard, {
 import SectionCard, {
   SectionCardSkeleton,
 } from "@/components/composed/section-card";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/core/utils";
 import type { SpaceOwnerTopPerformers } from "@/types/gql";
 
 export function TopPerformersSkeleton() {

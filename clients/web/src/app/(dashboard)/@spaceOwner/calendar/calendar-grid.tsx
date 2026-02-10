@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/primitives/tooltip";
-import { cn, formatCurrency, formatDateRange } from "@/lib/utils";
+import { cn, formatCurrency, formatDateRange } from "@/lib/core/utils";
 import { BookingStatus } from "@/types/gql/graphql";
 import { IconAlertTriangle, IconStar } from "@tabler/icons-react";
 import {

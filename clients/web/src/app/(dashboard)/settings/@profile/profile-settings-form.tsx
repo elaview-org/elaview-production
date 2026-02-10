@@ -22,8 +22,8 @@ import {
 } from "@/components/primitives/avatar";
 import { Spinner } from "@/components/primitives/spinner";
 import { updateProfileAction, updateAvatarAction } from "../settings.actions";
-import { getInitials } from "@/lib/utils";
-import env from "@/lib/env";
+import { getInitials } from "@/lib/core/utils";
+import env from "@/lib/core/env";
 import { toast } from "sonner";
 
 type Props = {

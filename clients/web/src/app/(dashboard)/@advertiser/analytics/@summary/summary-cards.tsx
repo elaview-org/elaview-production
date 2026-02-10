@@ -1,7 +1,7 @@
 import SummaryCard, {
   SummaryCardGrid,
 } from "@/components/composed/summary-card";
-import { calculateTrend, formatCurrency, formatNumber } from "@/lib/utils";
+import { calculateTrend, formatCurrency, formatNumber } from "@/lib/core/utils";
 import type { AdvertiserSummary } from "@/types/gql";
 
 type Props = {

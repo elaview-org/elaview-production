@@ -1,5 +1,5 @@
 import { IconCheck, IconX } from "@tabler/icons-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import type { BookingStatus } from "@/types/gql/graphql";
 import {
   TIMELINE_STEPS,

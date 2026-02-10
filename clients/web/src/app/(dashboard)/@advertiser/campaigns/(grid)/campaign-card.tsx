@@ -1,6 +1,6 @@
 import MediaCard from "@/components/composed/media-card";
-import { CAMPAIGN_STATUS } from "@/lib/constants";
-import { formatCurrency } from "@/lib/utils";
+import { CAMPAIGN_STATUS } from "@/lib/core/constants";
+import { formatCurrency } from "@/lib/core/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 
 export const CampaignCard_CampaignFragment = graphql(`

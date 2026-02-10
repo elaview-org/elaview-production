@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/primitives/badge";
 import ProgressSteps from "@/components/composed/progress-steps";
-import { cn, formatDateRange } from "@/lib/utils";
+import { cn, formatDateRange } from "@/lib/core/utils";
 import {
   ActiveBookingStatus,
   BOOKING_STATUS_CONFIG,

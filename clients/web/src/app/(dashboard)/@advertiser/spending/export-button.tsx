@@ -2,8 +2,8 @@
 
 import { IconDownload } from "@tabler/icons-react";
 import { Button } from "@/components/primitives/button";
-import { PAYMENT_STATUS } from "@/lib/constants";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { PAYMENT_STATUS } from "@/lib/core/constants";
+import { formatDate, formatCurrency } from "@/lib/core/utils";
 import { PaymentStatus } from "@/types/gql";
 import type { PaymentData } from "./payments-table";
 

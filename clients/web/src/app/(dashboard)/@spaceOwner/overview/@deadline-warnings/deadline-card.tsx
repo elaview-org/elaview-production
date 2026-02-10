@@ -9,7 +9,7 @@ import {
 } from "@/components/primitives/avatar";
 import { Badge } from "@/components/primitives/badge";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { formatDateRange, getInitials, cn } from "@/lib/utils";
+import { formatDateRange, getInitials, cn } from "@/lib/core/utils";
 import {
   FragmentType,
   getFragmentData,

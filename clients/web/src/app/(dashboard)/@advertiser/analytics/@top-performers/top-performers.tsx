@@ -11,7 +11,7 @@ import PerformerCard, {
 import SectionCard, {
   SectionCardSkeleton,
 } from "@/components/composed/section-card";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber } from "@/lib/core/utils";
 import type { AdvertiserTopPerformers } from "@/types/gql";
 
 export function TopPerformersSkeleton() {

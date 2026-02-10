@@ -7,7 +7,7 @@ import {
   numberColumn,
   textColumn,
 } from "@/components/composed/table-view";
-import { SPACE_TYPE } from "@/lib/constants";
+import { SPACE_TYPE } from "@/lib/core/constants";
 import { SpaceType } from "@/types/gql/graphql";
 import { IconCalendar, IconEye } from "@tabler/icons-react";
 

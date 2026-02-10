@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import api from "@/lib/gql/server";
 import { graphql, type CampaignFilterInput } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
-import storage from "@/lib/storage";
+import storage from "@/lib/core/storage";
 import Toolbar from "@/components/composed/toolbar";
 import CreateCampaign from "./create-campaign";
 import CampaignsGrid from "./(grid)/campaigns-grid";

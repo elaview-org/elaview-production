@@ -11,7 +11,7 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "@/components/primitives/avatar";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from "@/lib/core/utils";
 
 type Props = {
   campaign?: {

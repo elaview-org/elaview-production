@@ -38,7 +38,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/primitives/table";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 
 type SkeletonType =
   | "select"

@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import dynamic from "next/dynamic";
 import type { LatLngBounds } from "leaflet";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { Skeleton } from "@/components/primitives/skeleton";
 
 type Accessor<TData, TValue> = keyof TData | ((item: TData) => TValue);

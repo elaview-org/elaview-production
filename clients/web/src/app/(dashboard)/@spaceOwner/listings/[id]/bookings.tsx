@@ -1,6 +1,6 @@
 import api from "@/lib/gql/server";
-import { BOOKING_STATUS } from "@/lib/constants";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { BOOKING_STATUS } from "@/lib/core/constants";
+import { formatCurrency, formatDate } from "@/lib/core/utils";
 import { Badge } from "@/components/primitives/badge";
 import { graphql } from "@/types/gql";
 import Link from "next/link";

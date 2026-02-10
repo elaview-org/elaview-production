@@ -18,7 +18,7 @@ import { CSSProperties } from "react";
 import ContentHeader from "@/app/(dashboard)/content-header";
 import RoleBasedView from "@/app/(dashboard)/role-based-view";
 import { cookies } from "next/headers";
-import storage from "@/lib/storage";
+import storage from "@/lib/core/storage";
 import assert from "node:assert";
 
 export default async function Layout(props: LayoutProps<"/">) {

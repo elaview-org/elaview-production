@@ -11,7 +11,7 @@ import {
 import { createClient } from "graphql-ws";
 import React, { Suspense } from "react";
 import * as api from "@apollo/client/react";
-import env from "@/lib/env";
+import env from "@/lib/core/env";
 
 function makeClient() {
   const httpLink = new HttpLink({

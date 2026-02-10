@@ -4,7 +4,7 @@ import { ApolloWrapper } from "@/lib/gql/client";
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/primitives/sonner";
-import storage from "@/lib/storage";
+import storage from "@/lib/core/storage";
 
 export const metadata: Metadata = {
   title: "Elaview",

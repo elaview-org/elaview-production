@@ -24,7 +24,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/primitives/tooltip";
-import { SPACE_STATUS } from "@/lib/constants";
+import { SPACE_STATUS } from "@/lib/core/constants";
 import {
   FragmentType,
   getFragmentData,

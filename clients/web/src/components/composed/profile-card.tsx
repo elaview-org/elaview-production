@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/primitives/card";
 import { Separator } from "@/components/primitives/separator";
 import { Skeleton } from "@/components/primitives/skeleton";
 import { IconRosetteDiscountCheck, IconSettings } from "@tabler/icons-react";
-import { cn, getInitials } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/core/utils";
 
 type Stat = {
   value: ReactNode;

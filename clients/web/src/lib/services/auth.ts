@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import storage from "@/lib/storage";
+import storage from "@/lib/core/storage";
 
 export async function redirectIfAuthenticated(url: string) {
   if ((await cookies()).get(storage.authentication.token)) {

@@ -11,7 +11,7 @@ import {
   ToggleGroup,
   ToggleGroupItem,
 } from "@/components/primitives/toggle-group";
-import { TIME_RANGES, type TimeRange } from "@/lib/constants";
+import { TIME_RANGES, type TimeRange } from "@/lib/core/constants";
 
 type Props = {
   value: TimeRange;

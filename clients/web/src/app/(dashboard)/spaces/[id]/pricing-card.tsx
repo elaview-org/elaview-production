@@ -11,7 +11,7 @@ import {
 } from "@/components/primitives/card";
 import { Input } from "@/components/primitives/input";
 import { Separator } from "@/components/primitives/separator";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/core/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 
 export const PricingCard_SpaceFragment = graphql(`

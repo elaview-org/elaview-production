@@ -5,7 +5,7 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { Separator } from "@/components/primitives/separator";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/core/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 
 export const SpaceInfo_SpaceFragment = graphql(`

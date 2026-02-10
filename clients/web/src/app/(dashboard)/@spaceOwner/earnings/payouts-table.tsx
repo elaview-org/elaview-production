@@ -15,7 +15,7 @@ import TableView, {
   stackColumn,
   textColumn,
 } from "@/components/composed/table-view";
-import { PAYOUT_STAGE, PAYOUT_STATUS } from "@/lib/constants";
+import { PAYOUT_STAGE, PAYOUT_STATUS } from "@/lib/core/constants";
 import { PayoutStage, PayoutStatus, graphql } from "@/types/gql";
 
 export const PayoutsTable_PayoutFragment = graphql(`

@@ -3,8 +3,8 @@
 import { IconDownload } from "@tabler/icons-react";
 import { Button } from "@/components/primitives/button";
 import type { PayoutsTable_PayoutFragmentFragment } from "@/types/gql/graphql";
-import { PAYOUT_STATUS, PAYOUT_STAGE } from "@/lib/constants";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { PAYOUT_STATUS, PAYOUT_STAGE } from "@/lib/core/constants";
+import { formatDate, formatCurrency } from "@/lib/core/utils";
 import { PayoutStage, PayoutStatus } from "@/types/gql";
 
 type Props = {

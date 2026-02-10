@@ -1,4 +1,4 @@
-import { BOOKING_STATUS } from "@/lib/constants";
+import { BOOKING_STATUS } from "@/lib/core/constants";
 import { BookingStatus } from "@/types/gql/graphql";
 
 export const CALENDAR_VIEWS = [

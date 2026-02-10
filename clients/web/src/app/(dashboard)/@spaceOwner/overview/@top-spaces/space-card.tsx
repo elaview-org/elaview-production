@@ -5,7 +5,7 @@ import {
   IconStar,
 } from "@tabler/icons-react";
 import RankedCard from "@/components/composed/ranked-card";
-import { formatCurrency, formatNumber } from "@/lib/utils";
+import { formatCurrency, formatNumber } from "@/lib/core/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import mock from "./mock.json";
 

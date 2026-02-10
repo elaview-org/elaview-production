@@ -3,7 +3,7 @@
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { Button } from "@/components/primitives/button";
 import ActionCard from "@/components/composed/action-card";
-import { formatCurrency, formatDateRange, formatTime } from "@/lib/utils";
+import { formatCurrency, formatDateRange, formatTime } from "@/lib/core/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 
 export const OverviewPendingRequestsRequestCard_BookingFragment = graphql(`

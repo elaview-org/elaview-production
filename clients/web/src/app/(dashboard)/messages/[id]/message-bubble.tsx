@@ -1,6 +1,6 @@
 "use client";
 
-import { cn, getInitials } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/core/utils";
 import {
   Avatar,
   AvatarFallback,

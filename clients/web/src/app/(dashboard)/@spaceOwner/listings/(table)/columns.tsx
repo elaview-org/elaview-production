@@ -8,7 +8,7 @@ import {
   dateColumn,
   actionsColumn,
 } from "@/components/composed/table-view";
-import { SPACE_STATUS, SPACE_TYPE } from "@/lib/constants";
+import { SPACE_STATUS, SPACE_TYPE } from "@/lib/core/constants";
 import { SpaceStatus, SpaceType } from "@/types/gql/graphql";
 import {
   IconEdit,

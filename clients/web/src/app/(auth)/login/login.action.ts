@@ -1,8 +1,8 @@
 "use server";
 
 import { ActionState } from "@/types/actions";
-import env from "@/lib/env";
-import storage from "@/lib/storage";
+import env from "@/lib/core/env";
+import storage from "@/lib/core/storage";
 
 import assert from "node:assert";
 import { redirect } from "next/navigation";

@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/primitives/select";
 import Modal from "@/components/composed/modal";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { SPACE_COLORS } from "./constants";
 import type { CalendarSpace } from "./types";
 

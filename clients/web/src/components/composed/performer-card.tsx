@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/primitives/badge";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 
 type Props = {
   icon: ReactNode;

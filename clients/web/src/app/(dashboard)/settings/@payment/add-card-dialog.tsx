@@ -17,7 +17,7 @@ import {
 } from "@/components/primitives/dialog";
 import { Button } from "@/components/primitives/button";
 import { toast } from "sonner";
-import env from "@/lib/env";
+import env from "@/lib/core/env";
 import {
   createSetupIntentAction,
   confirmSetupIntentAction,

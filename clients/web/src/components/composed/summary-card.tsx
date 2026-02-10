@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { ReactNode } from "react";
 
 type TrendBadge = {

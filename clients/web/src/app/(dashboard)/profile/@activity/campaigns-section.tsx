@@ -21,7 +21,7 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "@/components/primitives/empty";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { formatCurrency, formatDate } from "@/lib/core/utils";
 import { CampaignStatus } from "@/types/gql";
 
 type Campaign = {

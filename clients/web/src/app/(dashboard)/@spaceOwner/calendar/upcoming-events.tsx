@@ -1,7 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/primitives/badge";
-import { cn, formatDateRange } from "@/lib/utils";
+import { cn, formatDateRange } from "@/lib/core/utils";
 import { BookingStatus } from "@/types/gql/graphql";
 import { IconAlertTriangle } from "@tabler/icons-react";
 import {

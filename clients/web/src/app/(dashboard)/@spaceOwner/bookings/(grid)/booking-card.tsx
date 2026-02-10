@@ -1,5 +1,5 @@
 import MediaCard from "@/components/composed/media-card";
-import { BOOKING_STATUS } from "@/lib/constants";
+import { BOOKING_STATUS } from "@/lib/core/constants";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 
 export const BookingCard_BookingFragment = graphql(`

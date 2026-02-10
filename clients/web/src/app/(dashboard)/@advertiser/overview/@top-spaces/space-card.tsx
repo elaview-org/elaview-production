@@ -1,6 +1,6 @@
 import { IconCalendar, IconStar } from "@tabler/icons-react";
 import RankedCard from "@/components/composed/ranked-card";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/core/utils";
 
 type Space = {
   id: string;

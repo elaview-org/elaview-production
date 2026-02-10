@@ -13,8 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/primitives/dropdown-menu";
 import type { PayoutsHistoryTable_PayoutFragmentFragment } from "@/types/gql/graphql";
-import { PAYOUT_STATUS, PAYOUT_STAGE } from "@/lib/constants";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { PAYOUT_STATUS, PAYOUT_STAGE } from "@/lib/core/constants";
+import { formatDate, formatCurrency } from "@/lib/core/utils";
 import { PayoutStage, PayoutStatus } from "@/types/gql";
 
 type Props = {

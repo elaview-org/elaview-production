@@ -4,7 +4,7 @@ import { ReactNode, useActionState, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/primitives/button";
 import Modal from "@/components/composed/modal";
 import { Input } from "@/components/primitives/input";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import {
   IconBuildingStore,
   IconCamera,
@@ -27,10 +27,10 @@ import {
 } from "./schemas";
 import { createSpaceAction, type CreateSpaceState } from "./listings.actions";
 import { toast } from "sonner";
-import env from "@/lib/env";
+import env from "@/lib/core/env";
 import Image from "next/image";
 import { useLocalStorage } from "@/lib/hooks/use-local-storage";
-import storage from "@/lib/storage";
+import storage from "@/lib/core/storage";
 
 type FormData = Partial<CreateSpaceFormData>;
 

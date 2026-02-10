@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import api from "@/lib/gql/server";
-import env from "@/lib/env";
-import storage from "@/lib/storage";
+import env from "@/lib/core/env";
+import storage from "@/lib/core/storage";
 import { graphql, type ProfileType } from "@/types/gql";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";

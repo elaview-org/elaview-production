@@ -12,7 +12,7 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { Button } from "@/components/primitives/button";
-import env from "@/lib/env";
+import env from "@/lib/core/env";
 import { submitProofAction } from "../bookings.actions";
 
 type Props = {

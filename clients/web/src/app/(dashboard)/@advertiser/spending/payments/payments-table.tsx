@@ -19,7 +19,7 @@ import TableView, {
   textColumn,
 } from "@/components/composed/table-view";
 import { Button } from "@/components/primitives/button";
-import { PAYMENT_STATUS } from "@/lib/constants";
+import { PAYMENT_STATUS } from "@/lib/core/constants";
 import { PaymentStatus, graphql } from "@/types/gql";
 import { PAYMENT_TYPE_LABELS } from "../constants";
 import PaymentDetail from "../payment-detail";

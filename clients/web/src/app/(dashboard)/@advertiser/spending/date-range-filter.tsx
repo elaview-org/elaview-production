@@ -12,7 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/primitives/popover";
 import { Calendar } from "@/components/primitives/calendar";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 
 export default function DateRangeFilter() {
   const router = useRouter();

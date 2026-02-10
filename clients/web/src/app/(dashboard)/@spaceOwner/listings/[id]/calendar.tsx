@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useTransition } from "react";
 import { Button } from "@/components/primitives/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { blockDatesAction, unblockDatesAction } from "./calendar.actions";
 import { toast } from "sonner";

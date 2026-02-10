@@ -9,8 +9,8 @@ import MapView, {
   type MapViewState,
 } from "@/components/composed/map-view";
 import { useSearchParamsUpdater } from "@/lib/hooks/use-search-params-updater";
-import { formatCurrency } from "@/lib/utils";
-import { SPACE_TYPE } from "@/lib/constants";
+import { formatCurrency } from "@/lib/core/utils";
+import { SPACE_TYPE } from "@/lib/core/constants";
 import { Badge } from "@/components/primitives/badge";
 import { Button } from "@/components/primitives/button";
 

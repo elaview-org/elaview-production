@@ -5,7 +5,7 @@ import { Checkbox } from "@/components/primitives/checkbox";
 import { FieldGroup } from "@/components/primitives/field";
 import { NotificationType } from "@/types/gql/graphql";
 import { updateNotificationPreferenceAction } from "../settings.actions";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 
 type NotificationPreference = {
   id: string;

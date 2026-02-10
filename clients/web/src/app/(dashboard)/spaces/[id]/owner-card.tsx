@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
-import { getInitials } from "@/lib/utils";
+import { getInitials } from "@/lib/core/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import { IconStar } from "@tabler/icons-react";
 

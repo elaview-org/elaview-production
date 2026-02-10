@@ -24,7 +24,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/primitives/tooltip";
-import { CAMPAIGN_STATUS } from "@/lib/constants";
+import { CAMPAIGN_STATUS } from "@/lib/core/constants";
 import {
   FragmentType,
   getFragmentData,

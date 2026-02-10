@@ -1,6 +1,6 @@
 import { IconArrowUp, IconArrowDown, IconMinus } from "@tabler/icons-react";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { cn, formatCurrency } from "@/lib/utils";
+import { cn, formatCurrency } from "@/lib/core/utils";
 
 type Format = "number" | "currency" | "percent" | "rating";
 

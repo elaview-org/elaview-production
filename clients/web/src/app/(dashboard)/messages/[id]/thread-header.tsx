@@ -14,8 +14,8 @@ import Image from "next/image";
 import { Button } from "@/components/primitives/button";
 import { Badge } from "@/components/primitives/badge";
 import { Separator } from "@/components/primitives/separator";
-import { BOOKING_STATUS } from "@/lib/constants";
-import { formatCurrency, formatDate } from "@/lib/utils";
+import { BOOKING_STATUS } from "@/lib/core/constants";
+import { formatCurrency, formatDate } from "@/lib/core/utils";
 import { graphql, getFragmentData, type FragmentType } from "@/types/gql";
 
 export const ThreadHeader_ConversationFragment = graphql(`

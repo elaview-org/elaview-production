@@ -19,7 +19,7 @@ import {
 } from "@/components/primitives/chart";
 import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import Placeholder from "./placeholder";
-import { BOOKING_STATUS } from "@/lib/constants";
+import { BOOKING_STATUS } from "@/lib/core/constants";
 import { BookingStatus, type StatusCount } from "@/types/gql";
 import { STATUS_CHART_CONFIG } from "../constants";
 

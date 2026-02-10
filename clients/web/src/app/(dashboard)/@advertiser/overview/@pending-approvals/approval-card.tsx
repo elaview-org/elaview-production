@@ -3,7 +3,7 @@
 import { IconCheck, IconX, IconPhoto } from "@tabler/icons-react";
 import { Button } from "@/components/primitives/button";
 import ActionCard from "@/components/composed/action-card";
-import { formatDate } from "@/lib/utils";
+import { formatDate } from "@/lib/core/utils";
 import { graphql, type FragmentType, getFragmentData } from "@/types/gql";
 
 export const AdvertiserOverviewPendingApprovalsApprovalCard_BookingFragment =

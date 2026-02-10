@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { Badge } from "@/components/primitives/badge";
-import { calculateTrend, formatCurrency } from "@/lib/utils";
+import { calculateTrend, formatCurrency } from "@/lib/core/utils";
 import WithdrawDialog from "./withdraw-dialog";
 
 export const BalanceCards_EarningsSummaryFragment = graphql(`

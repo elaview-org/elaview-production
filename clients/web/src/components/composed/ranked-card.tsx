@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 
 type Props = {
   href: string;

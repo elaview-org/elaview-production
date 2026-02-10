@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { cn, formatTime, truncateText, getInitials } from "@/lib/utils";
+import { cn, formatTime, truncateText, getInitials } from "@/lib/core/utils";
 import {
   Avatar,
   AvatarFallback,

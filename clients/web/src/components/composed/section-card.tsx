@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "@/components/primitives/card";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import ErrorState from "@/components/status/error-state";
 
 type Props = {

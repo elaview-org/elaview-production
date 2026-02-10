@@ -17,7 +17,7 @@ import {
   ChartTooltipContent,
 } from "@/components/primitives/chart";
 import TimeRangeSelector from "@/components/composed/time-range-selector";
-import { TIME_RANGES, type TimeRange } from "@/lib/constants";
+import { TIME_RANGES, type TimeRange } from "@/lib/core/constants";
 import { CHART_CONFIG } from "../constants";
 
 type ChartDataPoint = {

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { ViewOptions } from "@/types/constants";
-import storage from "@/lib/storage";
+import storage from "@/lib/core/storage";
 import Toolbar from "@/components/composed/toolbar";
 import { GridViewSkeleton } from "@/components/composed/grid-view";
 import { TOOLBAR_PROPS } from "./constants";

@@ -8,7 +8,7 @@ import MapView, {
   type MapViewState,
 } from "@/components/composed/map-view";
 import { useSearchParamsUpdater } from "@/lib/hooks/use-search-params-updater";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency } from "@/lib/core/utils";
 
 let globalMountCounter = 0;
 

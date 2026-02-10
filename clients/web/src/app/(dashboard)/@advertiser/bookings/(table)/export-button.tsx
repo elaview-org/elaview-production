@@ -3,8 +3,8 @@
 import { IconDownload } from "@tabler/icons-react";
 import { Button } from "@/components/primitives/button";
 import type { BookingsTable_AdvertiserBookingFragmentFragment } from "@/types/gql/graphql";
-import { BOOKING_STATUS } from "@/lib/constants";
-import { formatDate, formatCurrency } from "@/lib/utils";
+import { BOOKING_STATUS } from "@/lib/core/constants";
+import { formatDate, formatCurrency } from "@/lib/core/utils";
 
 type Props = {
   bookings: BookingsTable_AdvertiserBookingFragmentFragment[];

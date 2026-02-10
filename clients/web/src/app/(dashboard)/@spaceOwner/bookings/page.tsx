@@ -7,7 +7,7 @@ import {
   SortEnumType,
 } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
-import storage from "@/lib/storage";
+import storage from "@/lib/core/storage";
 import Toolbar from "@/components/composed/toolbar";
 import BookingsGrid from "./(grid)/bookings-grid";
 import BookingsTable from "./(table)/bookings-table";

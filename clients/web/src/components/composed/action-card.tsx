@@ -7,7 +7,7 @@ import {
 } from "@/components/primitives/avatar";
 import { Badge } from "@/components/primitives/badge";
 import { Skeleton } from "@/components/primitives/skeleton";
-import { cn, getInitials } from "@/lib/utils";
+import { cn, getInitials } from "@/lib/core/utils";
 
 type Props = {
   avatar?: string | null;

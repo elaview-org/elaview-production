@@ -20,7 +20,7 @@ import {
   ToggleGroupItem,
 } from "@/components/primitives/toggle-group";
 import { Checkbox } from "@/components/primitives/checkbox";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/core/utils";
 import {
   Tooltip,
   TooltipContent,

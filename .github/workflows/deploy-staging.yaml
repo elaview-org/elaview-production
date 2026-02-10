@@ -1,15 +1,15 @@
-name: Deploy
+name: Deploy Production
 
 on:
   push:
     branches: [ main ]
 
 concurrency:
-  group: deploy-${{ github.ref }}
+  group: deploy-staging-${{ github.ref }}
   cancel-in-progress: false
 
 env:
-  ELAVIEW_ENVIRONMENT: production
+  ELAVIEW_ENVIRONMENT: staging
   DOPPLER_TOKEN: ${{ secrets.DOPPLER_TOKEN }}
 
 jobs:

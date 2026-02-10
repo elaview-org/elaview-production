@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(pnpm typecheck:*)",
-      "Bash(npx expo-doctor@latest:*)"
+      "Bash(npx expo-doctor@latest:*)",
+      "Bash(gh api:*)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr merge:*)"
     ],
     "deny": [],
     "ask": []

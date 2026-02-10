@@ -31,9 +31,10 @@ src/app/(dashboard)/
 │
 ├── @advertiser/
 │   ├── overview/           # Dashboard landing
-│   ├── discover/           # Space discovery
-│   │   ├── @grid/          # Grid view
-│   │   └── @map/           # Map view
+│   ├── discover/           # Space discovery (grid/table/map views)
+│   │   ├── (grid)/         # Grid view
+│   │   ├── (table)/        # Table view
+│   │   └── (map)/          # Map view
 │   ├── campaigns/          # Campaign management
 │   │   └── [id]/           # Campaign detail
 │   ├── bookings/           # Booking management
@@ -85,16 +86,16 @@ Each profile has its own `navigation-bar.data.ts`:
 
 ### Advertiser Routes
 
-| Route     | Status       | Data Source | Notes                               |
-|-----------|--------------|-------------|-------------------------------------|
-| Overview  | ✅ Functional | GraphQL     | Parallel routes, all sections live  |
-| Discover  | ✅ Functional | GraphQL     | Grid/Table/Map views working        |
-| Campaigns | ⚠️ Partial   | GraphQL     | Query works, mutations not wired    |
-| Bookings  | ⚠️ Partial   | GraphQL     | Query works, mutations needed       |
-| Spending  | ❌ Mock Only  | Mock        | No GraphQL integration              |
-| Analytics | ✅ Functional | GraphQL     | Parallel routes, reach chart mocked |
-| Profile   | ✅ Functional | GraphQL     | Real campaign data                  |
-| Settings  | ✅ Functional | GraphQL     | Notifications, delete working       |
+| Route     | Status       | Data Source | Notes                                                   |
+|-----------|--------------|-------------|---------------------------------------------------------|
+| Overview  | ✅ Functional | GraphQL     | Parallel routes, all sections live                      |
+| Discover  | ✅ Functional | GraphQL     | Grid/Table/Map views, filters, search, sort, pagination |
+| Campaigns | ✅ Functional | GraphQL     | Full CRUD, detail page, mutations wired                 |
+| Bookings  | ✅ Functional | GraphQL     | Full filtering, actions, detail page wired              |
+| Spending  | ✅ Functional | GraphQL     | Full integration with filters                           |
+| Analytics | ✅ Functional | GraphQL     | Parallel routes, reach chart mocked                     |
+| Profile   | ✅ Functional | GraphQL     | Real campaign data                                      |
+| Settings  | ✅ Functional | GraphQL     | Notifications, delete working                           |
 
 ---
 
@@ -660,7 +661,8 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 **Purpose:** Visual availability and booking management.
 
-**Status:** ✅ Functional | GraphQL — See [backlog.md](./backlog.md#space-owner-calendar--graphql-migration) for implementation details and deferred items.
+**Status:** ✅ Functional | GraphQL — See [backlog.md](./backlog.md#space-owner-calendar--graphql-migration) for
+implementation details and deferred items.
 
 ---
 
@@ -729,49 +731,53 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 **Main Page:**
 
-- [x] Parallel routes for grid and map views
-- [x] Real GraphQL query (`spaces`)
-- [x] Grid view with space cards
-- [x] Map view with markers
-- [x] View toggle (grid/map)
-- [x] Loading skeleton
-- [ ] Filter panel (location, price, space type, availability)
-- [ ] Search by location with autocomplete
-- [ ] Sort options (Price, Rating, Distance)
-- [ ] Save to favorites
-- [ ] Pagination/infinite scroll
+- [x] Three-view layout: grid, table, map (route groups `(grid)/`, `(table)/`, `(map)/`)
+- [x] Real GraphQL query (`spaces`) with parameterized variables
+- [x] View toggle (grid/table/map) with cookie persistence
+- [x] Loading skeleton per view
+- [x] Filter by space type (all types, GraphQL enum values)
+- [x] Filter by price range (predefined brackets with `gte`/`lte`)
+- [x] Search by title and city (text search with `contains`)
+- [x] Sort options (Price, Rating, Date Added, Bookings)
+- [x] Cursor-based pagination with `pageInfo`
+- [x] `@include` directives per view (only fetch needed fragments)
+- [x] Base filter always includes `status: { eq: ACTIVE }`
 
 **Grid View:**
 
 - [x] Space cards with images
 - [x] Price per day display
 - [x] Space type badge
-- [ ] Quick book button
-- [ ] Favorite toggle
+- [x] Average rating display with star icon
+- [x] Hover "Book Now" badge
+
+**Table View:**
+
+- [x] TanStack Table with image+text, location, type, rating, price columns
+- [x] Actions column (View Details, Book Now)
 
 **Map View:**
 
-- [x] Interactive map with markers
+- [x] Shared `MapView` component (replaces custom Leaflet implementation)
 - [x] Price badges on markers
-- [ ] Marker clustering
-- [ ] Click to preview space
-- [ ] Geolocation button
+- [x] Click marker for popup (image, type badge, price, address, View Details + Request Booking links)
+- [x] Geolocation button
+- [x] URL bounds sync with 300ms debounce (pan/zoom re-fetches for visible area)
 
-**Space Detail (Modal or Page):**
+**Space Detail (`/spaces/[id]`):**
 
-- [ ] Photo gallery carousel
-- [ ] Space specifications
-- [ ] Owner info card with rating
-- [ ] Availability calendar preview
-- [ ] Price calculator
-- [ ] "Request Booking" CTA
-- [ ] Share functionality
+- [x] Photo gallery carousel
+- [x] Space specifications
+- [x] Owner info card with rating (star icon + `averageRating`)
+- [x] Price calculator (duration input with min/max, estimated total)
+- [x] "Request Booking" CTA (disabled, pending booking flow)
+- [x] Share button (`navigator.share()` with clipboard fallback)
 
 #### Backend Note
 
 **Queries (exist in schema):**
 
-- `spaces` - Paginated with extensive filtering and sorting
+- `spaces` - Paginated with filtering (`where: SpaceFilterInput`), sorting (`order: [SpaceSortInput!]`)
 - `spaceById(id)` - Space details with owner info
 
 **Space fields available:** `id`, `title`, `description`, `address`, `city`, `state`, `zipCode`, `latitude`,
@@ -790,36 +796,39 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 **Main Page:**
 
-- [ ] Campaign cards grid with status badges
-- [ ] Real GraphQL query (`myCampaigns`)
-- [ ] Fragment masking pattern
-- [ ] Create campaign modal/wizard
-- [ ] Empty state placeholder
-- [ ] Loading skeleton
-- [ ] Status filter tabs (Draft, Active, Completed, Cancelled)
-- [ ] Search by campaign name
-- [ ] Sort options (Name, Date, Budget)
+- [x] Campaign cards grid with status badges
+- [x] Real GraphQL query (`myCampaigns`)
+- [x] Fragment masking pattern
+- [x] Create campaign modal/wizard
+- [x] Empty state placeholder
+- [x] Loading skeleton
+- [x] Status filter tabs (Draft, Active, Completed, Cancelled)
+- [x] Search by campaign name
+- [x] Sort options (Name, Date, Budget)
+- [x] Server-side filtering, sorting, pagination
 
 **Create Campaign Modal:**
 
-- [ ] Step 1: Campaign details (name, description, goals)
-- [ ] Step 2: Target audience
-- [ ] Step 3: Budget and dates
-- [ ] Step 4: Creative upload (PDF/PNG/JPG)
-- [ ] Step 5: Preview before creation
-- [ ] File validation (type, size, dimensions)
-- [ ] `createCampaign` mutation
+- [x] Step 1: Campaign details (name, description, goals)
+- [x] Step 2: Budget and dates
+- [x] Step 3: Creative upload (Cloudinary signed upload)
+- [x] Step 4: Preview before creation
+- [x] Per-step Zod validation with error messages
+- [x] `createCampaign` mutation
+- [x] Draft saving to localStorage (auto-save, discard button)
 
 **Detail Page (`/campaigns/[id]`):**
 
-- [ ] Header with campaign name and status
-- [ ] Campaign info section
-- [ ] Creative preview/download
-- [ ] Associated bookings list
-- [ ] Budget vs spent display
-- [ ] Performance metrics (if available)
-- [ ] Edit campaign button
-- [ ] Cancel campaign button
+- [x] Header with campaign name and status
+- [x] Campaign info section (editable form with `updateCampaign`)
+- [x] Creative preview with upload replacement
+- [x] Associated bookings list (Suspense-wrapped)
+- [x] Budget vs spent display with progress bar
+- [x] Performance metrics (spaces booked, total spend, budget remaining)
+- [x] Status-based dropdown actions (submit, cancel, delete)
+- [x] Fixed bottom action bar
+- [x] Delete with name-match confirmation dialog
+- [x] Loading skeleton
 
 **Campaign Statuses:**
 
@@ -849,7 +858,7 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 **Campaign fields:** `id`, `name`, `description`, `status`, `imageUrl`, `startDate`, `endDate`, `totalBudget`, `goals`,
 `targetAudience`, `spacesCount`, `totalSpend`, `bookings`
 
-**Frontend Status:** Query works. Mutations not wired.
+**Frontend Status:** ✅ Fully functional (queries + mutations wired, detail page complete)
 
 ---
 
@@ -865,10 +874,13 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - [x] Real GraphQL query (`myBookingsAsAdvertiser`)
 - [x] Status badges with colors
 - [x] Loading skeleton
-- [ ] Tab filters (Pending, Active, Completed, All)
-- [ ] Search by space or campaign
-- [ ] Date range filter
-- [ ] Sort options
+- [x] Tab filters (Pending, Approved, Active, Verification, Completed, All)
+- [x] Search by space or campaign
+- [x] Date range filter
+- [x] Sort options (Start Date, End Date, Created Date, Amount)
+- [x] Pagination with cursor-based navigation
+- [x] Export CSV
+- [x] Table row actions (Cancel, Approve, Dispute)
 
 **Filter Tabs:**
 
@@ -883,17 +895,19 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 - [x] Status timeline visualization
 - [x] Space info card
-- [x] Payment summary
+- [x] Payment summary / Financial summary
 - [x] Approve installation button
 - [x] Open dispute button
-- [x] Dispute modal with reason selection
-- [ ] Header with booking dates
-- [ ] Campaign info card
-- [ ] Creative preview
-- [ ] Verification photos display
-- [ ] Message thread link
-- [ ] Real GraphQL query (`bookingById`)
-- [ ] Mutation integration
+- [x] Dispute modal with issue type selection
+- [x] Header with booking dates and status badge
+- [x] Campaign info card with owner info
+- [x] Verification photos display (proof section)
+- [x] Message owner button
+- [x] Real GraphQL query (`bookingById`)
+- [x] Mutation integration (cancel, approveProof, disputeProof)
+- [x] Cancel dialog with reason
+- [x] Loading skeleton
+- [x] Dispute section (read-only display)
 
 **Status-Based Actions:**
 
@@ -921,18 +935,17 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - `createPaymentIntent(input: {bookingId})` → Returns `clientSecret` for Stripe
 - `confirmPayment(input: {paymentIntentId})`
 
-**Missing for verification approval:**
+**Mutations for verification approval:**
 
-- No mutation for advertiser to approve/dispute installation proof
-- Recommended: `approveProof(input: {bookingId})` and `disputeProof(input: {bookingId, issueType, reason, photos})`
-- `BookingDispute` type exists but no mutation to create from advertiser side
+- `approveProof(input: {bookingId})` - Advertiser approves installation proof
+- `disputeProof(input: {bookingId, issueType, reason})` - Advertiser disputes installation
 
 **Subscriptions (exist in schema):**
 
 - `onBookingUpdate(bookingId)`
 - `onProofUpdate(bookingId)`
 
-**Frontend Status:** Query works. Payment flow and proof approval mutations not wired.
+**Frontend Status:** Fully wired. GraphQL queries, filters, sort, pagination, and mutations (cancel, approveProof, disputeProof) all integrated.
 
 ---
 
@@ -944,27 +957,27 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 
 **Main Page:**
 
-- [ ] Summary cards (Total Spent, This Month, Pending Payments, Active Campaigns)
-- [ ] Spending chart with daily/monthly aggregation
-- [ ] Transactions table
-- [ ] Filter by date range
-- [ ] Filter by campaign
-- [ ] Export to CSV
+- [x] Summary cards (Total Spent, This Month, Pending Payments, Active Campaigns)
+- [x] Spending chart with daily/monthly aggregation
+- [x] Transactions table
+- [x] Filter by date range
+- [x] Filter by campaign
+- [x] Export to CSV
 
 **Payment History:**
 
-- [ ] Payment list with pagination
-- [ ] Filter by status (Succeeded, Pending, Failed, Refunded)
-- [ ] Payment detail modal
-- [ ] Associated booking link
-- [ ] Receipt download
+- [x] Payment list with pagination
+- [x] Filter by status (Succeeded, Pending, Failed, Refunded)
+- [x] Payment detail modal
+- [x] Associated booking link
+- [x] Receipt download
 
 **Payment Methods:**
 
-- [ ] Saved cards list
-- [ ] Add new card (Stripe Elements)
-- [ ] Set default card
-- [ ] Remove card
+- [x] Saved cards list
+- [x] Add new card (Stripe Elements)
+- [x] Set default card
+- [x] Remove card
 
 #### Backend Note
 
@@ -973,16 +986,17 @@ These routes exist in both `@spaceOwner` and `@advertiser` with similar implemen
 - `myBookingsAsAdvertiser` with nested `payments` - Can aggregate client-side
 - `paymentsByBooking(bookingId)` - Payment history for specific booking
 
-**Missing:**
+**Queries (now available):**
 
-- `advertiserSpendingSummary` - Aggregated totals
-- `myPayments` query for advertiser (like `myPayouts` for owner)
+- `advertiserSpendingSummary` - Aggregated totals (totalSpent, pendingPayments, thisMonth, lastMonth)
+- `myPayments` - Paginated payment list with filtering/sorting
+- `receiptUrl` field on Payment type - Stripe receipt URL
 
 **Mutations (exist in schema):**
 
 - `requestRefund(input: {paymentId, amount, reason})`
 
-**Frontend Status:** ❌ Entirely mocked
+**Frontend Status:** ✅ Fully functional (GraphQL integrated, filters, payment history subroute, payment methods)
 
 ---
 
@@ -1076,8 +1090,8 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 | Query                    | Purpose                 | Implemented |
 |--------------------------|-------------------------|-------------|
 | `spaces`                 | Browse available spaces | ✅           |
-| `myCampaigns`            | Advertiser's campaigns  | ⚠️          |
-| `campaignById(id)`       | Single campaign details | ❌           |
+| `myCampaigns`            | Advertiser's campaigns  | ✅           |
+| `campaignById(id)`       | Single campaign details | ✅           |
 | `myBookingsAsAdvertiser` | Advertiser's bookings   | ✅           |
 | `paymentsByBooking(id)`  | Payments for booking    | ❌           |
 
@@ -1122,11 +1136,11 @@ query advertiserAnalytics(dateRange: DateRangeInput): AdvertiserAnalytics
 
 | Mutation         | Purpose               | Implemented |
 |------------------|-----------------------|-------------|
-| `createCampaign` | Create new campaign   | ❌           |
-| `updateCampaign` | Edit campaign details | ❌           |
-| `submitCampaign` | Submit for booking    | ❌           |
-| `cancelCampaign` | Cancel campaign       | ❌           |
-| `deleteCampaign` | Remove draft campaign | ❌           |
+| `createCampaign` | Create new campaign   | ✅           |
+| `updateCampaign` | Edit campaign details | ✅           |
+| `submitCampaign` | Submit for booking    | ✅           |
+| `cancelCampaign` | Cancel campaign       | ✅           |
+| `deleteCampaign` | Remove draft campaign | ✅           |
 
 **Payment:**
 

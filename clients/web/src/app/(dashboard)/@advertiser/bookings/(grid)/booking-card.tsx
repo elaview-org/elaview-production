@@ -1,5 +1,6 @@
 import MediaCard from "@/components/composed/media-card";
 import { BOOKING_STATUS } from "@/lib/constants";
+import { formatCurrency } from "@/lib/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 
 export const BookingCard_AdvertiserBookingFragment = graphql(`
@@ -57,7 +58,7 @@ export default function BookingCard({ data }: Props) {
         },
       ]}
       metaLeft={dateRange}
-      metaRight={`$${Number(booking.totalAmount).toLocaleString()}`}
+      metaRight={formatCurrency(Number(booking.totalAmount))}
     />
   );
 }

@@ -13,7 +13,9 @@ public interface IPaymentRepository {
     Task<BookingPaymentInfo?> GetBookingInfoForPaymentAsync(Guid bookingId, Guid userId, CancellationToken ct);
     Task<BookingPaymentInfo?> GetBookingInfoByIdAsync(Guid bookingId, CancellationToken ct);
     Task<Payment> AddAsync(Payment payment, CancellationToken ct);
-    Task<Payment> UpdateStatusAsync(Payment payment, PaymentStatus status, string? chargeId, CancellationToken ct);
+    IQueryable<Payment> GetByAdvertiserUserId(Guid userId);
+    Task<List<Payment>> GetByAdvertiserUserIdAsync(Guid userId, CancellationToken ct);
+    Task<Payment> UpdateStatusAsync(Payment payment, PaymentStatus status, string? chargeId, string? receiptUrl, CancellationToken ct);
     Task<Payment> UpdateRefundStatusAsync(Payment payment, PaymentStatus status, CancellationToken ct);
     Task UpdateBookingToPaidAsync(Guid bookingId, CancellationToken ct);
     Task SaveChangesAsync(CancellationToken ct);
@@ -57,17 +59,27 @@ public sealed class PaymentRepository(
             .Select(b => new BookingPaymentInfo(b.Id, b.Status, b.TotalAmount, b.Campaign.AdvertiserProfile.UserId))
             .FirstOrDefaultAsync(ct);
 
+    public IQueryable<Payment> GetByAdvertiserUserId(Guid userId)
+        => context.Payments.Where(p => p.Booking.Campaign.AdvertiserProfile.UserId == userId);
+
+    public async Task<List<Payment>> GetByAdvertiserUserIdAsync(Guid userId, CancellationToken ct)
+        => await context.Payments
+            .Where(p => p.Booking.Campaign.AdvertiserProfile.UserId == userId)
+            .ToListAsync(ct);
+
     public async Task<Payment> AddAsync(Payment payment, CancellationToken ct) {
         context.Payments.Add(payment);
         await context.SaveChangesAsync(ct);
         return payment;
     }
 
-    public async Task<Payment> UpdateStatusAsync(Payment payment, PaymentStatus status, string? chargeId, CancellationToken ct) {
+    public async Task<Payment> UpdateStatusAsync(Payment payment, PaymentStatus status, string? chargeId, string? receiptUrl, CancellationToken ct) {
         var entry = context.Entry(payment);
         entry.Property(p => p.Status).CurrentValue = status;
         if (chargeId is not null)
             entry.Property(p => p.StripeChargeId).CurrentValue = chargeId;
+        if (receiptUrl is not null)
+            entry.Property(p => p.ReceiptUrl).CurrentValue = receiptUrl;
         entry.Property(p => p.PaidAt).CurrentValue = DateTime.UtcNow;
         await context.SaveChangesAsync(ct);
         return payment;

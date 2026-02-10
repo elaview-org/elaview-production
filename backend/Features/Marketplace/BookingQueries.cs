@@ -21,8 +21,9 @@ public static partial class BookingQueries {
     [UseSorting]
     public static IQueryable<Booking> GetMyBookingsAsAdvertiser(
         IUserService userService,
-        IBookingService bookingService
-    ) => bookingService.GetByAdvertiserUserId(userService.GetPrincipalId());
+        IBookingService bookingService,
+        string? searchText = null
+    ) => bookingService.GetByAdvertiserUserId(userService.GetPrincipalId(), searchText);
 
     [Authorize]
     [UsePaging(IncludeTotalCount = true)]

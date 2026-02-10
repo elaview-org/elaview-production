@@ -4,7 +4,8 @@ import {
   IconPhoto,
   IconEye,
 } from "@tabler/icons-react";
-import { CampaignStatus } from "@/types/gql/graphql";
+import { CampaignStatus, SortEnumType } from "@/types/gql/graphql";
+import type { CampaignSortInput } from "@/types/gql/graphql";
 import { ViewOptions } from "@/types/constants";
 
 export const CAMPAIGN_STEPS = [
@@ -45,6 +46,28 @@ export function getStatusFilter(tabKey: FilterTabKey) {
   return { status: { in: [...tab.statuses] } };
 }
 
+export function getSortInput(
+  sortField?: string,
+  sortOrder?: string
+): CampaignSortInput[] | undefined {
+  if (!sortField) return [{ createdAt: SortEnumType.Desc }];
+
+  const order = sortOrder === "asc" ? SortEnumType.Asc : SortEnumType.Desc;
+
+  switch (sortField) {
+    case "createdAt":
+      return [{ createdAt: order }];
+    case "startDate":
+      return [{ startDate: order }];
+    case "totalBudget":
+      return [{ totalBudget: order }];
+    case "name":
+      return [{ name: order }];
+    default:
+      return [{ createdAt: SortEnumType.Desc }];
+  }
+}
+
 export const TOOLBAR_PROPS = {
   searchTarget: "campaigns",
   filters: [
@@ -52,11 +75,11 @@ export const TOOLBAR_PROPS = {
       key: "status",
       placeholder: "Status",
       fields: [
-        { value: "draft", label: "Draft" },
-        { value: "submitted", label: "Submitted" },
-        { value: "active", label: "Active" },
-        { value: "completed", label: "Completed" },
-        { value: "cancelled", label: "Cancelled" },
+        { value: CampaignStatus.Draft, label: "Draft" },
+        { value: CampaignStatus.Submitted, label: "Submitted" },
+        { value: CampaignStatus.Active, label: "Active" },
+        { value: CampaignStatus.Completed, label: "Completed" },
+        { value: CampaignStatus.Cancelled, label: "Cancelled" },
       ],
     },
   ],

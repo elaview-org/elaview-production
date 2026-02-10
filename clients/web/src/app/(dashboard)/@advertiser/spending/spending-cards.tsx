@@ -1,24 +1,32 @@
+"use client";
+
+import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import SummaryCard, {
   SummaryCardGrid,
 } from "@/components/composed/summary-card";
 import { calculateTrend, formatCurrency } from "@/lib/utils";
 
-type SpendingSummary = {
-  totalSpent: string;
-  pendingPayments: string;
-  thisMonthSpending: string;
-  lastMonthSpending: string;
-};
+export const SpendingCards_SpendingSummaryFragment = graphql(`
+  fragment SpendingCards_SpendingSummaryFragment on SpendingSummary {
+    totalSpent
+    pendingPayments
+    thisMonthSpending
+    lastMonthSpending
+  }
+`);
 
 type Props = {
-  data: SpendingSummary;
+  data: FragmentType<typeof SpendingCards_SpendingSummaryFragment>;
+  activeCampaignsCount: number;
 };
 
-export default function SpendingCards({ data }: Props) {
-  const totalSpent = Number(data.totalSpent);
-  const pendingPayments = Number(data.pendingPayments);
-  const thisMonthSpending = Number(data.thisMonthSpending);
-  const lastMonthSpending = Number(data.lastMonthSpending);
+export default function SpendingCards({ data, activeCampaignsCount }: Props) {
+  const summary = getFragmentData(SpendingCards_SpendingSummaryFragment, data);
+
+  const totalSpent = Number(summary.totalSpent ?? 0);
+  const pendingPayments = Number(summary.pendingPayments ?? 0);
+  const thisMonthSpending = Number(summary.thisMonthSpending ?? 0);
+  const lastMonthSpending = Number(summary.lastMonthSpending ?? 0);
 
   const monthlyChange = calculateTrend(thisMonthSpending, lastMonthSpending);
   const isNegativeChange = monthlyChange < 0;
@@ -53,11 +61,11 @@ export default function SpendingCards({ data }: Props) {
         description={`Compared to ${formatCurrency(lastMonthSpending, { decimals: true })} last month`}
       />
       <SummaryCard
-        label="Last Month"
-        value={formatCurrency(lastMonthSpending, { decimals: true })}
-        badge={{ type: "text", text: "Previous" }}
-        footer="Previous month total"
-        description="Your spending last month"
+        label="Active Campaigns"
+        value={String(activeCampaignsCount)}
+        badge={{ type: "text", text: "Currently Running" }}
+        footer="Campaigns in progress"
+        description="Active and submitted campaigns"
         showFooterIcon={false}
       />
     </SummaryCardGrid>

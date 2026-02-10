@@ -1,21 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import dynamic from "next/dynamic";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
-import MaybePlaceholder from "@/components/status/maybe-placeholder";
-import SpacePreview from "../space-preview";
-import MapPlaceholder from "./placeholder";
-import type { MapSpace } from "./map-container";
+import MapView, {
+  MapViewSkeleton,
+  type MapViewState,
+} from "@/components/composed/map-view";
+import { useSearchParamsUpdater } from "@/lib/hooks/use-search-params-updater";
+import { formatCurrency } from "@/lib/utils";
+import { SPACE_TYPE } from "@/lib/constants";
+import { Badge } from "@/components/primitives/badge";
+import { Button } from "@/components/primitives/button";
 
-const MapContainer = dynamic(() => import("./map-container"), {
-  ssr: false,
-  loading: () => (
-    <div className="bg-muted flex h-150 w-full items-center justify-center rounded-lg">
-      <div className="text-muted-foreground">Loading map...</div>
-    </div>
-  ),
-});
+let globalMountCounter = 0;
 
 export const DiscoverMap_SpaceFragment = graphql(`
   fragment DiscoverMap_SpaceFragment on Space {
@@ -23,58 +22,126 @@ export const DiscoverMap_SpaceFragment = graphql(`
     title
     address
     city
-    state
-    zipCode
     latitude
     longitude
     pricePerDay
     type
     images
-    width
-    height
   }
 `);
 
-type Props = {
-  data: FragmentType<typeof DiscoverMap_SpaceFragment>[];
+type Bounds = {
+  minLat: number;
+  maxLat: number;
+  minLng: number;
+  maxLng: number;
 };
 
-export default function DiscoverMap({ data }: Props) {
-  const [selectedSpace, setSelectedSpace] = useState<MapSpace | null>(null);
-  const [previewOpen, setPreviewOpen] = useState(false);
+type Props = {
+  data: FragmentType<typeof DiscoverMap_SpaceFragment>[];
+  bounds?: Bounds;
+  zoom?: number;
+};
 
-  const spaces: MapSpace[] = data.map((d) => {
-    const space = getFragmentData(DiscoverMap_SpaceFragment, d);
-    return {
-      id: space.id as string,
-      title: space.title,
-      address: space.address,
-      city: space.city,
-      state: space.state,
-      zipCode: space.zipCode,
-      latitude: space.latitude,
-      longitude: space.longitude,
-      pricePerDay: Number(space.pricePerDay),
-      type: space.type,
-      images: space.images as string[],
-      width: space.width,
-      height: space.height,
-    };
-  });
+export default function DiscoverMap({ data, bounds, zoom }: Props) {
+  const { get, update } = useSearchParamsUpdater();
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const [mapKey, setMapKey] = useState<string | null>(null);
 
-  const handleSpaceSelect = (space: MapSpace) => {
-    setSelectedSpace(space);
-    setPreviewOpen(true);
+  useEffect(() => {
+    setMapKey(`map-${++globalMountCounter}`);
+    return () => setMapKey(null);
+  }, []);
+
+  const spaces = data.map((d) => getFragmentData(DiscoverMap_SpaceFragment, d));
+  const validSpaces = spaces.filter(
+    (s) => s.latitude !== null && s.longitude !== null
+  );
+
+  const center: [number, number] | undefined = bounds
+    ? [(bounds.minLat + bounds.maxLat) / 2, (bounds.minLng + bounds.maxLng) / 2]
+    : undefined;
+
+  const handleViewChange = ({ bounds, zoom }: MapViewState) => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = setTimeout(() => {
+      const mapKeys = new Set(["minLat", "maxLat", "minLng", "maxLng", "zoom"]);
+      const currentFilter = get("filter");
+      const entries = currentFilter
+        ? currentFilter.split(",").filter((e) => !mapKeys.has(e.split(":")[0]))
+        : [];
+      entries.push(
+        `minLat:${bounds.getSouth()}`,
+        `maxLat:${bounds.getNorth()}`,
+        `minLng:${bounds.getWest()}`,
+        `maxLng:${bounds.getEast()}`,
+        `zoom:${zoom}`
+      );
+      update({ filter: entries.join(",") || null });
+    }, 300);
   };
 
+  const mapHeight = "calc(100dvh - 13rem)";
+
+  if (!mapKey) {
+    return <MapViewSkeleton height={mapHeight} />;
+  }
+
   return (
-    <MaybePlaceholder data={data} placeholder={<MapPlaceholder />}>
-      <MapContainer spaces={spaces} onSpaceSelect={handleSpaceSelect} />
-      <SpacePreview
-        space={selectedSpace}
-        open={previewOpen}
-        onOpenChange={setPreviewOpen}
-      />
-    </MaybePlaceholder>
+    <MapView
+      key={mapKey}
+      data={validSpaces}
+      getId={(s) => s.id}
+      latitude={(s) => s.latitude!}
+      longitude={(s) => s.longitude!}
+      markerLabel={(s) => `${formatCurrency(Number(s.pricePerDay))}/day`}
+      onViewChange={handleViewChange}
+      center={center}
+      zoom={zoom}
+      height={mapHeight}
+      enableGeolocation
+      renderPopup={(space) => (
+        <div className="w-[280px]">
+          <div className="bg-muted relative aspect-video w-full">
+            {(space.images as string[])[0] ? (
+              <Image
+                src={(space.images as string[])[0]}
+                alt={space.title}
+                fill
+                className="object-cover"
+                unoptimized
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <span className="text-muted-foreground text-sm">No image</span>
+              </div>
+            )}
+          </div>
+          <div className="p-3">
+            <div className="mb-1 flex items-center justify-between">
+              <Badge variant="secondary" className="text-xs">
+                {SPACE_TYPE.labels[space.type]}
+              </Badge>
+              <span className="text-sm font-semibold">
+                {formatCurrency(Number(space.pricePerDay))}/day
+              </span>
+            </div>
+            <p className="text-muted-foreground line-clamp-1 text-xs">
+              {space.address}, {space.city}
+            </p>
+            <div className="mt-2 flex gap-2">
+              <Button size="sm" variant="outline" className="flex-1" asChild>
+                <Link href={`/spaces/${space.id}`}>View Details</Link>
+              </Button>
+              <Button size="sm" className="flex-1" asChild>
+                <Link href={`/spaces/${space.id}#book`}>Request Booking</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    />
   );
 }

@@ -1,4 +1,5 @@
 using ElaviewBackend.Data;
+using ElaviewBackend.Data.Entities;
 using ElaviewBackend.Tests.Integration.Fixtures;
 using ElaviewBackend.Tests.Shared.Extensions;
 using ElaviewBackend.Tests.Shared.Factories;
@@ -85,6 +86,92 @@ public sealed class BookingQueriesTests(IntegrationTestFixture fixture)
         response.Errors.Should().NotBeNullOrEmpty();
         response.Errors!.Should().ContainSingle()
             .Which.Extensions.Should().ContainKey("code");
+    }
+
+    [Fact]
+    public async Task GetMyBookingsAsAdvertiser_WithSearchText_FiltersResults() {
+        var (advertiser, advertiserProfile) = await SeedAdvertiserAsync();
+        var (_, ownerProfile) = await SeedSpaceOwnerAsync();
+        await LoginAsync(advertiser.Email, "Test123!");
+
+        var campaign = await SeedCampaignAsync(advertiserProfile.Id);
+
+        Guid matchingSpaceId, nonMatchingSpaceId;
+        using (var scope = Fixture.Services.CreateScope()) {
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            var matchingSpace = new Space {
+                Id = Guid.NewGuid(),
+                SpaceOwnerProfileId = ownerProfile.Id,
+                Title = "Downtown Coffee Shop",
+                Description = "A great space",
+                Type = SpaceType.Storefront,
+                Status = SpaceStatus.Active,
+                Address = "123 Main St",
+                City = "New York",
+                State = "NY",
+                Latitude = 40.7128,
+                Longitude = -74.0060,
+                PricePerDay = 50.00m,
+                MinDuration = 7,
+                CreatedAt = DateTime.UtcNow
+            };
+            var nonMatchingSpace = new Space {
+                Id = Guid.NewGuid(),
+                SpaceOwnerProfileId = ownerProfile.Id,
+                Title = "Airport Terminal",
+                Description = "Another space",
+                Type = SpaceType.Storefront,
+                Status = SpaceStatus.Active,
+                Address = "456 Airport Rd",
+                City = "New York",
+                State = "NY",
+                Latitude = 40.7128,
+                Longitude = -74.0060,
+                PricePerDay = 50.00m,
+                MinDuration = 7,
+                CreatedAt = DateTime.UtcNow
+            };
+            context.Spaces.AddRange(matchingSpace, nonMatchingSpace);
+            await context.SaveChangesAsync();
+            matchingSpaceId = matchingSpace.Id;
+            nonMatchingSpaceId = nonMatchingSpace.Id;
+        }
+
+        await SeedBookingAsync(campaign.Id, matchingSpaceId);
+        await SeedBookingAsync(campaign.Id, nonMatchingSpaceId);
+
+        var response = await Client.QueryAsync<MyBookingsAsAdvertiserResponse>("""
+            query($searchText: String) {
+                myBookingsAsAdvertiser(first: 10, searchText: $searchText) {
+                    nodes { id status }
+                }
+            }
+            """, new { searchText = "coffee" });
+
+        response.Errors.Should().BeNullOrEmpty();
+        response.Data!.MyBookingsAsAdvertiser.Nodes.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task GetMyBookingsAsAdvertiser_WithNoMatchingSearch_ReturnsEmpty() {
+        var (advertiser, advertiserProfile) = await SeedAdvertiserAsync();
+        var (_, ownerProfile) = await SeedSpaceOwnerAsync();
+        await LoginAsync(advertiser.Email, "Test123!");
+
+        var campaign = await SeedCampaignAsync(advertiserProfile.Id);
+        var space = await SeedSpaceAsync(ownerProfile.Id);
+        await SeedBookingAsync(campaign.Id, space.Id);
+
+        var response = await Client.QueryAsync<MyBookingsAsAdvertiserResponse>("""
+            query($searchText: String) {
+                myBookingsAsAdvertiser(first: 10, searchText: $searchText) {
+                    nodes { id status }
+                }
+            }
+            """, new { searchText = "nonexistent12345" });
+
+        response.Errors.Should().BeNullOrEmpty();
+        response.Data!.MyBookingsAsAdvertiser.Nodes.Should().BeEmpty();
     }
 
     [Fact]

@@ -33,7 +33,9 @@ export default async function Loading() {
       {view === ViewOptions.Table && (
         <TableViewSkeleton columns={columns} rows={8} />
       )}
-      {view === ViewOptions.Map && <MapViewSkeleton height={600} />}
+      {view === ViewOptions.Map && (
+        <MapViewSkeleton height="calc(100dvh - 13rem)" />
+      )}
       {view === ViewOptions.Grid && <GridViewSkeleton count={8} columns={4} />}
     </div>
   );

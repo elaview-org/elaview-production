@@ -21,6 +21,12 @@ public record SubmitProofInput(
 
 public record SubmitProofPayload(Booking Booking);
 
+public record ApproveProofInput([property: ID] Guid BookingId);
+
+public record ApproveProofPayload(Booking Booking);
+
+public record DisputeProofPayload(Booking Booking);
+
 public record ExportBookingsInput(
     List<BookingStatus>? Statuses,
     DateTime? StartDateFrom,

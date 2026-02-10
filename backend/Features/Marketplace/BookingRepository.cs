@@ -27,6 +27,10 @@ public interface IBookingRepository {
     Task<BookingProof> AddProofAsync(BookingProof proof, CancellationToken ct);
     Task<Booking> UpdateStatusAsync(Booking booking, BookingStatus status, CancellationToken ct);
     IQueryable<Booking> GetByOwnerUserIdWithSearch(Guid userId, string searchText);
+    IQueryable<Booking> GetByAdvertiserUserIdWithSearch(Guid userId, string searchText);
+    Task<BookingProof?> GetProofByBookingIdWithBookingAsync(Guid bookingId, CancellationToken ct);
+    Task UpdateProofStatusAsync(BookingProof proof, ProofStatus status, Guid reviewedByUserId, CancellationToken ct);
+    Task<BookingDispute> AddDisputeAsync(BookingDispute dispute, CancellationToken ct);
     Task SaveChangesAsync(CancellationToken ct);
 }
 
@@ -147,6 +151,35 @@ public sealed class BookingRepository(
                 b.Space.Title.ToLower().Contains(term) ||
                 b.Campaign.AdvertiserProfile.CompanyName!.ToLower().Contains(term) ||
                 b.Campaign.AdvertiserProfile.User.Name.ToLower().Contains(term));
+    }
+
+    public IQueryable<Booking> GetByAdvertiserUserIdWithSearch(Guid userId, string searchText) {
+        var term = searchText.ToLower();
+        return context.Bookings
+            .Where(b => b.Campaign.AdvertiserProfile.UserId == userId)
+            .Where(b =>
+                b.Space.Title.ToLower().Contains(term) ||
+                b.Space.SpaceOwnerProfile.BusinessName!.ToLower().Contains(term) ||
+                b.Space.SpaceOwnerProfile.User.Name.ToLower().Contains(term));
+    }
+
+    public async Task<BookingProof?> GetProofByBookingIdWithBookingAsync(Guid bookingId, CancellationToken ct)
+        => await context.BookingProofs
+            .Include(p => p.Booking).ThenInclude(b => b.Campaign).ThenInclude(c => c.AdvertiserProfile)
+            .Include(p => p.Booking).ThenInclude(b => b.Space).ThenInclude(s => s.SpaceOwnerProfile)
+            .FirstOrDefaultAsync(p => p.BookingId == bookingId, ct);
+
+    public async Task UpdateProofStatusAsync(BookingProof proof, ProofStatus status, Guid reviewedByUserId, CancellationToken ct) {
+        proof.Status = status;
+        proof.ReviewedAt = DateTime.UtcNow;
+        proof.ReviewedByUserId = reviewedByUserId;
+        await context.SaveChangesAsync(ct);
+    }
+
+    public async Task<BookingDispute> AddDisputeAsync(BookingDispute dispute, CancellationToken ct) {
+        context.BookingDisputes.Add(dispute);
+        await context.SaveChangesAsync(ct);
+        return dispute;
     }
 
     public async Task SaveChangesAsync(CancellationToken ct)

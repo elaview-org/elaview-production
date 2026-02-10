@@ -108,6 +108,158 @@ public sealed class BookingMutationsTests(IntegrationTestFixture fixture)
     }
 
     [Fact]
+    public async Task ApproveProof_AsAdvertiser_CompletesBooking() {
+        var (advertiser, advertiserProfile) = await SeedAdvertiserAsync();
+        var (_, ownerProfile) = await SeedSpaceOwnerAsync();
+        await LoginAsync(advertiser.Email, "Test123!");
+
+        var campaign = await SeedCampaignAsync(advertiserProfile.Id);
+        var space = await SeedSpaceAsync(ownerProfile.Id);
+        var (booking, _) = await SeedVerifiedBookingWithProofAsync(campaign.Id, space.Id);
+
+        var response = await Client.MutateAsync<ApproveProofResponse>("""
+                mutation($input: ApproveProofInput!) {
+                    approveProof(input: $input) {
+                        booking {
+                            id
+                            status
+                        }
+                    }
+                }
+                """,
+            new { input = new { bookingId = booking.Id } });
+
+        response.Errors.Should().BeNullOrEmpty();
+        response.Data!.ApproveProof.Booking.Status.Should().Be("COMPLETED");
+    }
+
+    [Fact]
+    public async Task ApproveProof_Unauthenticated_ReturnsAuthError() {
+        var response = await Client.MutateAsync<ApproveProofResponse>("""
+                mutation($input: ApproveProofInput!) {
+                    approveProof(input: $input) {
+                        booking { id }
+                    }
+                }
+                """,
+            new { input = new { bookingId = Guid.NewGuid() } });
+
+        response.Errors.Should().NotBeNullOrEmpty();
+        response.Errors!.Should().ContainSingle()
+            .Which.Extensions.Should().ContainKey("code");
+    }
+
+    [Fact]
+    public async Task ApproveProof_AsOwner_ReturnsForbiddenError() {
+        var (owner, ownerProfile) = await SeedSpaceOwnerAsync();
+        var (_, advertiserProfile) = await SeedAdvertiserAsync();
+        await LoginAsync(owner.Email, "Test123!");
+
+        var campaign = await SeedCampaignAsync(advertiserProfile.Id);
+        var space = await SeedSpaceAsync(ownerProfile.Id);
+        var (booking, _) = await SeedVerifiedBookingWithProofAsync(campaign.Id, space.Id);
+
+        var response = await Client.MutateAsync<ApproveProofResponse>("""
+                mutation($input: ApproveProofInput!) {
+                    approveProof(input: $input) {
+                        booking { id status }
+                        errors { __typename }
+                    }
+                }
+                """,
+            new { input = new { bookingId = booking.Id } });
+
+        response.Data!.ApproveProof.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.ApproveProof.Errors!.First().TypeName.Should()
+            .Be("ForbiddenError");
+    }
+
+    [Fact]
+    public async Task DisputeProof_AsAdvertiser_DisputesBooking() {
+        var (advertiser, advertiserProfile) = await SeedAdvertiserAsync();
+        var (_, ownerProfile) = await SeedSpaceOwnerAsync();
+        await LoginAsync(advertiser.Email, "Test123!");
+
+        var campaign = await SeedCampaignAsync(advertiserProfile.Id);
+        var space = await SeedSpaceAsync(ownerProfile.Id);
+        var (booking, _) = await SeedVerifiedBookingWithProofAsync(campaign.Id, space.Id);
+
+        var response = await Client.MutateAsync<DisputeProofResponse>("""
+                mutation($input: DisputeProofInput!) {
+                    disputeProof(input: $input) {
+                        booking {
+                            id
+                            status
+                        }
+                    }
+                }
+                """,
+            new {
+                input = new {
+                    bookingId = booking.Id,
+                    issueType = "POOR_QUALITY",
+                    reason = "The ad is not properly visible from the street"
+                }
+            });
+
+        response.Errors.Should().BeNullOrEmpty();
+        response.Data!.DisputeProof.Booking.Status.Should().Be("DISPUTED");
+    }
+
+    [Fact]
+    public async Task DisputeProof_Unauthenticated_ReturnsAuthError() {
+        var response = await Client.MutateAsync<DisputeProofResponse>("""
+                mutation($input: DisputeProofInput!) {
+                    disputeProof(input: $input) {
+                        booking { id }
+                    }
+                }
+                """,
+            new {
+                input = new {
+                    bookingId = Guid.NewGuid(),
+                    issueType = "POOR_QUALITY",
+                    reason = "Test"
+                }
+            });
+
+        response.Errors.Should().NotBeNullOrEmpty();
+        response.Errors!.Should().ContainSingle()
+            .Which.Extensions.Should().ContainKey("code");
+    }
+
+    [Fact]
+    public async Task DisputeProof_AsOwner_ReturnsForbiddenError() {
+        var (owner, ownerProfile) = await SeedSpaceOwnerAsync();
+        var (_, advertiserProfile) = await SeedAdvertiserAsync();
+        await LoginAsync(owner.Email, "Test123!");
+
+        var campaign = await SeedCampaignAsync(advertiserProfile.Id);
+        var space = await SeedSpaceAsync(ownerProfile.Id);
+        var (booking, _) = await SeedVerifiedBookingWithProofAsync(campaign.Id, space.Id);
+
+        var response = await Client.MutateAsync<DisputeProofResponse>("""
+                mutation($input: DisputeProofInput!) {
+                    disputeProof(input: $input) {
+                        booking { id status }
+                        errors { __typename }
+                    }
+                }
+                """,
+            new {
+                input = new {
+                    bookingId = booking.Id,
+                    issueType = "POOR_QUALITY",
+                    reason = "Not visible"
+                }
+            });
+
+        response.Data!.DisputeProof.Errors.Should().NotBeNullOrEmpty();
+        response.Data!.DisputeProof.Errors!.First().TypeName.Should()
+            .Be("ForbiddenError");
+    }
+
+    [Fact]
     public async Task CancelBooking_AsAdvertiser_CancelsBooking() {
         var (advertiser, advertiserProfile) = await SeedAdvertiserAsync();
         var (_, ownerProfile) = await SeedSpaceOwnerAsync();

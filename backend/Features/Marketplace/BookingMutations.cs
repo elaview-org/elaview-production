@@ -107,4 +107,32 @@ public static partial class BookingMutations {
         var booking = await bookingService.SubmitProofAsync(userService.GetPrincipalId(), input, ct);
         return new SubmitProofPayload(booking);
     }
+
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
+    [Error<InvalidStatusTransitionException>]
+    public static async Task<ApproveProofPayload> ApproveProof(
+        ApproveProofInput input,
+        IUserService userService,
+        IBookingService bookingService,
+        CancellationToken ct
+    ) {
+        var booking = await bookingService.ApproveProofAsync(userService.GetPrincipalId(), input.BookingId, ct);
+        return new ApproveProofPayload(booking);
+    }
+
+    [Authorize]
+    [Error<NotFoundException>]
+    [Error<ForbiddenException>]
+    [Error<InvalidStatusTransitionException>]
+    public static async Task<DisputeProofPayload> DisputeProof(
+        DisputeProofInput input,
+        IUserService userService,
+        IBookingService bookingService,
+        CancellationToken ct
+    ) {
+        var booking = await bookingService.DisputeProofAsync(userService.GetPrincipalId(), input, ct);
+        return new DisputeProofPayload(booking);
+    }
 }

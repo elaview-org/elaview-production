@@ -9,6 +9,7 @@ namespace ElaviewBackend.Features.Marketplace;
 public interface IBookingService {
     IQueryable<Booking> GetById(Guid id);
     IQueryable<Booking> GetByAdvertiserUserId(Guid userId);
+    IQueryable<Booking> GetByAdvertiserUserId(Guid userId, string? searchText);
     IQueryable<Booking> GetByOwnerUserId(Guid userId);
     IQueryable<Booking> GetByOwnerUserId(Guid userId, string? searchText);
     IQueryable<Booking> GetPendingByOwnerUserId(Guid userId);
@@ -25,6 +26,8 @@ public interface IBookingService {
     Task<Booking> MarkFileDownloadedAsync(Guid userId, Guid id, CancellationToken ct);
     Task<Booking> MarkInstalledAsync(Guid userId, Guid id, CancellationToken ct);
     Task<Booking> SubmitProofAsync(Guid userId, SubmitProofInput input, CancellationToken ct);
+    Task<Booking> ApproveProofAsync(Guid userId, Guid bookingId, CancellationToken ct);
+    Task<Booking> DisputeProofAsync(Guid userId, DisputeProofInput input, CancellationToken ct);
     Task<ExportBookingsPayload> ExportBookingsAsCsvAsync(Guid userId, ExportBookingsInput? input, CancellationToken ct);
 }
 
@@ -40,6 +43,13 @@ public sealed class BookingService(
 
     public IQueryable<Booking> GetByAdvertiserUserId(Guid userId)
         => repository.GetByAdvertiserUserId(userId);
+
+    public IQueryable<Booking> GetByAdvertiserUserId(Guid userId, string? searchText) {
+        if (string.IsNullOrWhiteSpace(searchText))
+            return repository.GetByAdvertiserUserId(userId);
+
+        return repository.GetByAdvertiserUserIdWithSearch(userId, searchText);
+    }
 
     public IQueryable<Booking> GetByOwnerUserId(Guid userId)
         => repository.GetByOwnerUserId(userId);
@@ -236,6 +246,68 @@ public sealed class BookingService(
             NotificationType.ProofUploaded,
             "Verification Photos Submitted",
             $"The space owner has submitted verification photos for your booking at {booking.Space.Title}.",
+            ct);
+
+        return updatedBooking;
+    }
+
+    public async Task<Booking> ApproveProofAsync(Guid userId, Guid bookingId, CancellationToken ct) {
+        var proof = await repository.GetProofByBookingIdWithBookingAsync(bookingId, ct)
+            ?? throw new NotFoundException("BookingProof", bookingId);
+
+        var booking = proof.Booking;
+
+        if (booking.Campaign.AdvertiserProfile.UserId != userId)
+            throw new ForbiddenException("approve proof for this booking");
+
+        if (booking.Status != BookingStatus.Verified)
+            throw new InvalidStatusTransitionException(booking.Status.ToString(), BookingStatus.Completed.ToString());
+
+        await repository.UpdateProofStatusAsync(proof, ProofStatus.Approved, userId, ct);
+        var updatedBooking = await repository.UpdateStatusAsync(booking, BookingStatus.Completed, ct);
+
+        await notificationService.SendBookingNotificationAsync(
+            bookingId,
+            NotificationType.ProofApproved,
+            "Proof Approved",
+            $"The advertiser has approved the verification photos for the booking at {booking.Space.Title}.",
+            ct);
+
+        return updatedBooking;
+    }
+
+    public async Task<Booking> DisputeProofAsync(Guid userId, DisputeProofInput input, CancellationToken ct) {
+        var proof = await repository.GetProofByBookingIdWithBookingAsync(input.BookingId, ct)
+            ?? throw new NotFoundException("BookingProof", input.BookingId);
+
+        var booking = proof.Booking;
+
+        if (booking.Campaign.AdvertiserProfile.UserId != userId)
+            throw new ForbiddenException("dispute proof for this booking");
+
+        if (booking.Status != BookingStatus.Verified)
+            throw new InvalidStatusTransitionException(booking.Status.ToString(), BookingStatus.Disputed.ToString());
+
+        var now = DateTime.UtcNow;
+        var dispute = new BookingDispute {
+            BookingId = input.BookingId,
+            IssueType = input.IssueType,
+            Reason = input.Reason,
+            Photos = input.PhotoUrls ?? [],
+            DisputedByUserId = userId,
+            DisputedAt = now,
+            CreatedAt = now
+        };
+
+        await repository.AddDisputeAsync(dispute, ct);
+        await repository.UpdateProofStatusAsync(proof, ProofStatus.Disputed, userId, ct);
+        var updatedBooking = await repository.UpdateStatusAsync(booking, BookingStatus.Disputed, ct);
+
+        await notificationService.SendBookingNotificationAsync(
+            input.BookingId,
+            NotificationType.ProofDisputed,
+            "Proof Disputed",
+            $"The advertiser has disputed the verification photos for the booking at {booking.Space.Title}.",
             ct);
 
         return updatedBooking;

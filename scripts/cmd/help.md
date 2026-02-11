@@ -47,6 +47,7 @@ Web (web:*):
     web:build               build web client
     web:test                run web tests
     web:test:coverage       run web tests with coverage
+    web:test:e2e            run web E2E tests (Playwright)
     web:format              format web client code
     web:format:check        check code formatting
     web:reset               clean artifacts and reinstall dependencies

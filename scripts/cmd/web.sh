@@ -104,7 +104,7 @@ ev_web_audit() {
 ev_web_test_e2e() {
     ev_core_require_cmd "bun" || return 1
     ev_core_log_info "Running web E2E tests..."
-    ev_core_in_web bun test:e2e "$@"
+    ev_core_in_web bun test:e2e
     ev_web_exit=$?
     [ $ev_web_exit -eq 0 ] && ev_core_log_success "All E2E tests passed."
     return $ev_web_exit

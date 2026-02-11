@@ -2,7 +2,7 @@ name: Validate
 
 on:
   pull_request:
-    branches: [main]
+    branches: [ main ]
 
 concurrency:
   group: validate-${{ github.ref }}
@@ -26,6 +26,13 @@ jobs:
         uses: jetify-com/devbox-install-action@v0.14.0
         with:
           enable-cache: true
+
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: clients/web/node_modules
+          key: bun-${{ hashFiles('clients/web/bun.lock') }}
+          restore-keys: bun-
 
       - name: Install
         run: ev web:install
@@ -53,6 +60,13 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('backend/ElaviewBackend.csproj') }}
+          restore-keys: nuget-
+
       - name: Restore
         run: ev backend:install
 
@@ -61,7 +75,6 @@ jobs:
 
   security-web-audit:
     name: "Security: Web Audit"
-    needs: [static-analysis-web]
     runs-on: ubuntu-latest
     continue-on-error: true
     defaults:
@@ -74,6 +87,13 @@ jobs:
         uses: jetify-com/devbox-install-action@v0.14.0
         with:
           enable-cache: true
+
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: clients/web/node_modules
+          key: bun-${{ hashFiles('clients/web/bun.lock') }}
+          restore-keys: bun-
 
       - name: Install
         run: ev web:install
@@ -83,7 +103,6 @@ jobs:
 
   security-backend-audit:
     name: "Security: Backend Audit"
-    needs: [static-analysis-backend]
     runs-on: ubuntu-latest
     continue-on-error: true
     defaults:
@@ -97,6 +116,13 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('backend/ElaviewBackend.csproj') }}
+          restore-keys: nuget-
+
       - name: Restore
         run: ev backend:install
 
@@ -105,7 +131,6 @@ jobs:
 
   security-secrets:
     name: "Security: Secret Scan"
-    needs: [static-analysis-web, static-analysis-backend]
     runs-on: ubuntu-latest
     continue-on-error: true
     defaults:
@@ -124,7 +149,7 @@ jobs:
 
   build-test-backend:
     name: "Build & Test: Backend"
-    needs: [security-web-audit, security-backend-audit, security-secrets]
+    needs: [ static-analysis-backend, security-backend-audit, security-secrets ]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -136,6 +161,13 @@ jobs:
         uses: jetify-com/devbox-install-action@v0.14.0
         with:
           enable-cache: true
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('backend/ElaviewBackend.csproj') }}
+          restore-keys: nuget-
 
       - name: Restore
         run: ev backend:install
@@ -148,7 +180,7 @@ jobs:
 
   build-test-web:
     name: "Build & Test: Web"
-    needs: [security-web-audit, security-backend-audit, security-secrets]
+    needs: [ static-analysis-web, security-web-audit, security-secrets ]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -160,6 +192,13 @@ jobs:
         uses: jetify-com/devbox-install-action@v0.14.0
         with:
           enable-cache: true
+
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: clients/web/node_modules
+          key: bun-${{ hashFiles('clients/web/bun.lock') }}
+          restore-keys: bun-
 
       - name: Install
         run: ev web:install
@@ -174,17 +213,13 @@ jobs:
     name: CI Pass
     if: always()
     needs:
-      - static-analysis-web
-      - static-analysis-backend
       - build-test-backend
       - build-test-web
     runs-on: ubuntu-latest
     steps:
       - name: Check results
         run: |
-          if [[ "${{ needs.static-analysis-web.result }}" != "success" ||
-                "${{ needs.static-analysis-backend.result }}" != "success" ||
-                "${{ needs.build-test-backend.result }}" != "success" ||
+          if [[ "${{ needs.build-test-backend.result }}" != "success" ||
                 "${{ needs.build-test-web.result }}" != "success" ]]; then
             echo "::error::Required jobs failed or were cancelled"
             exit 1

@@ -14,7 +14,7 @@ on:
         default: false
 
 concurrency:
-  group: deploy-production-${{ github.ref }}
+  group: deploy-${{ github.ref }}
   cancel-in-progress: false
 
 env:

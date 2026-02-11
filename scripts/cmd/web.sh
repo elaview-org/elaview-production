@@ -21,6 +21,10 @@ ev_web_install() {
     ev_core_log_info "Installing web dependencies..."
     ev_core_in_web bun install --frozen-lockfile
     ev_web_exit=$?
+    [ $ev_web_exit -ne 0 ] && return $ev_web_exit
+    ev_core_log_info "Installing Playwright browsers..."
+    ev_core_in_web bunx playwright install
+    ev_web_exit=$?
     [ $ev_web_exit -eq 0 ] && ev_core_log_success "Web dependencies installed."
     return $ev_web_exit
 }
@@ -97,6 +101,15 @@ ev_web_audit() {
     return $ev_web_exit
 }
 
+ev_web_test_e2e() {
+    ev_core_require_cmd "bun" || return 1
+    ev_core_log_info "Running web E2E tests..."
+    ev_core_in_web bun test:e2e
+    ev_web_exit=$?
+    [ $ev_web_exit -eq 0 ] && ev_core_log_success "All E2E tests passed."
+    return $ev_web_exit
+}
+
 ev_web_dispatch() {
     cmd="$1"
     shift
@@ -108,13 +121,14 @@ ev_web_dispatch() {
         build)              ev_web_build ;;
         test)               ev_web_test ;;
         test:coverage)      ev_web_test_coverage ;;
+        test:e2e)           ev_web_test_e2e ;;
         format)             ev_web_format ;;
         format:check)       ev_web_format_check ;;
         audit)              ev_web_audit ;;
         reset)              ev_web_reset ;;
         *)
             ev_core_log_error "Unknown web command: $cmd"
-            echo "Available: install, lint, typecheck, build, test, test:coverage, format, format:check, audit, reset"
+            echo "Available: install, lint, typecheck, build, test, test:coverage, test:e2e, format, format:check, audit, reset"
             return 1
             ;;
     esac

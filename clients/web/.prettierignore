@@ -23,8 +23,8 @@ prisma/migrations
 
 # Testing
 coverage
-playwright-report
-test-results
+src/tests/e2e/reports
+src/tests/e2e/results
 
 # Logs
 *.log

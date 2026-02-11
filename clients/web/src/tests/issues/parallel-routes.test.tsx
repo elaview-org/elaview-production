@@ -1,5 +1,5 @@
 import { render, screen } from "@/tests/utils";
-import RoleBasedView from "@/app/(dashboard)/role-based-view";
+import RoleBasedView from "@/app/(protected)/role-based-view";
 import { describe, expect, it, mock } from "bun:test";
 
 mock.module("@/types/gql", () => ({

@@ -1,7 +1,5 @@
 using CloudinaryDotNet;
 using ElaviewBackend.Data;
-using ElaviewBackend.Data.Seeding;
-using ElaviewBackend.Data.Seeding.Seeders;
 using ElaviewBackend.Features.Auth;
 using ElaviewBackend.Features.Marketplace;
 using ElaviewBackend.Features.Notifications;
@@ -72,10 +70,6 @@ public static class Services {
             .AddScoped<IMessageRepository, MessageRepository>()
             .AddScoped<IAnalyticsRepository, AnalyticsRepository>()
             .AddScoped<IAnalyticsService, AnalyticsService>()
-            .AddScoped<DatabaseSeeder>()
-            .AddScoped<ISeeder, AdminSeeder>()
-            .AddScoped<ISeeder, LegacyDevAccountsSeeder>()
-            .AddScoped<ISeeder, DevelopmentDataSeeder>()
             .AddSingleton(sp => {
                 var settings = sp
                     .GetRequiredService<IOptions<GlobalSettings>>()

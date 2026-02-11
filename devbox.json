@@ -71,6 +71,7 @@
       "export ELAVIEW_DEVBOX_ROOT=\"$(git rev-parse --show-toplevel 2>/dev/null || pwd)\"",
       "export ELAVIEW_EV_CMD=\"$ELAVIEW_DEVBOX_ROOT/scripts/cmd\"",
       "export PATH=\"$ELAVIEW_DEVBOX_ROOT/scripts:$PATH\"",
+      "export PLAYWRIGHT_BROWSERS_PATH=\"$ELAVIEW_DEVBOX_ROOT/.devbox/playwright\"",
       ". \"$ELAVIEW_DEVBOX_ROOT/scripts/init/env.sh\"",
       ". \"$ELAVIEW_DEVBOX_ROOT/scripts/init/clean.sh\""
     ]

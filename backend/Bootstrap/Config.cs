@@ -1,5 +1,4 @@
 using dotenv.net;
-using ElaviewBackend.Data.Seeding;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 
@@ -87,10 +86,8 @@ public static class Config {
             if (isTestOrDev)
                 await dbContext.Database.MigrateAsync();
 
-            if (!isTesting) {
-                var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-                await seeder.SeedAsync();
-            }
+            if (!isTesting)
+                await Data.Seeding.SeedAsync(dbContext, ct: default);
         }
 
         if (!isTestOrDev) {

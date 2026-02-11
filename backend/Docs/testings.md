@@ -15,8 +15,6 @@ appear in production (mapping errors, migration issues, query translation failur
 **Test Isolation**: Each test runs against a clean database state. Respawn resets data between tests without recreating
 schema.
 
-**Shared Factories**: Same factories used for seeding and testing ensures consistency.
-
 ### Directory Structure
 
 ```

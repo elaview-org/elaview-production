@@ -27,10 +27,15 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: clients/web/node_modules
+          key: bun-${{ hashFiles('clients/web/bun.lock') }}
+          restore-keys: bun-
+
       - name: Install
         run: ev web:install
-        with:
-          enable-cache: true
 
       - name: Format
         run: ev web:format:check
@@ -55,10 +60,15 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('backend/ElaviewBackend.csproj') }}
+          restore-keys: nuget-
+
       - name: Restore
         run: ev backend:install
-        with:
-          enable-cache: true
 
       - name: Format Check
         run: ev backend:format:check
@@ -78,10 +88,15 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: clients/web/node_modules
+          key: bun-${{ hashFiles('clients/web/bun.lock') }}
+          restore-keys: bun-
+
       - name: Install
         run: ev web:install
-        with:
-          enable-cache: true
 
       - name: Audit
         run: ev web:audit
@@ -101,10 +116,15 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('backend/ElaviewBackend.csproj') }}
+          restore-keys: nuget-
+
       - name: Restore
         run: ev backend:install
-        with:
-          enable-cache: true
 
       - name: Audit
         run: ev backend:audit
@@ -142,10 +162,15 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ hashFiles('backend/ElaviewBackend.csproj') }}
+          restore-keys: nuget-
+
       - name: Restore
         run: ev backend:install
-        with:
-          enable-cache: true
 
       - name: Build
         run: ev backend:build
@@ -168,10 +193,15 @@ jobs:
         with:
           enable-cache: true
 
+      - name: Cache bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: clients/web/node_modules
+          key: bun-${{ hashFiles('clients/web/bun.lock') }}
+          restore-keys: bun-
+
       - name: Install
         run: ev web:install
-        with:
-          enable-cache: true
 
       - name: Test
         run: ev web:test:coverage

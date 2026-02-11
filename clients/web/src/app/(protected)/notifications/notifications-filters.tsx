@@ -11,9 +11,9 @@ import {
 } from "@/components/primitives/select";
 import { NotificationType } from "@/types/gql";
 import {
-  ADVERTISER_NOTIFICATIONS,
   ADVERTISER_NOTIFICATION_LABELS,
-} from "@/app/(dashboard)/settings/constants";
+  ADVERTISER_NOTIFICATIONS,
+} from "@/app/(protected)/settings/constants";
 
 type Props = {
   filter: "all" | "unread" | NotificationType;

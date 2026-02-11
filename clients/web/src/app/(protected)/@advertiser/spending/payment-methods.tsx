@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
-import PaymentSettingsForm from "@/app/(dashboard)/settings/@payment/payment-settings-form";
+import PaymentSettingsForm from "@/app/(protected)/settings/@payment/payment-settings-form";
 
 type PaymentMethod = {
   id: string;

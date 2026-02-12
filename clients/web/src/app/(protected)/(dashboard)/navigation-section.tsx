@@ -32,10 +32,10 @@ import {
   ProfileType,
   UserRole,
 } from "@/types/gql";
-import adminData from "./@admin/navigation-bar.data";
-import advertiserData from "./@advertiser/navigation-bar.data";
-import marketingData from "./@marketing/navigation-bar.data";
-import spaceOwnerData from "./@spaceOwner/navigation-bar.data";
+import adminData from "../@admin/navigation-bar.data";
+import advertiserData from "../@advertiser/navigation-bar.data";
+import marketingData from "../@marketing/navigation-bar.data";
+import spaceOwnerData from "../@spaceOwner/navigation-bar.data";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

@@ -133,10 +133,16 @@ export default function DiscoverMap({ data, bounds, zoom }: Props) {
             </p>
             <div className="mt-2 flex gap-2">
               <Button size="sm" variant="outline" className="flex-1" asChild>
-                <Link href={`/spaces/${space.id}`}>View Details</Link>
+                <Link href={`/src/app/(protected)/@shared/spaces/${space.id}`}>
+                  View Details
+                </Link>
               </Button>
               <Button size="sm" className="flex-1" asChild>
-                <Link href={`/spaces/${space.id}#book`}>Request Booking</Link>
+                <Link
+                  href={`/src/app/(protected)/@shared/spaces/${space.id}#book`}
+                >
+                  Request Booking
+                </Link>
               </Button>
             </div>
           </div>

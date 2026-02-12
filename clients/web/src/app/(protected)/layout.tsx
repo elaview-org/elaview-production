@@ -12,11 +12,11 @@ import {
   SidebarProvider,
 } from "@/components/primitives/sidebar";
 import { IconInnerShadowTop } from "@tabler/icons-react";
-import { NavigationSection } from "./navigation-section";
-import { UserSection } from "./user-section";
+import { NavigationSection } from "./(dashboard)/navigation-section";
+import { UserSection } from "./(dashboard)/user-section";
 import { CSSProperties } from "react";
-import ContentHeader from "@/app/(protected)/content-header";
-import RoleBasedView from "@/app/(protected)/role-based-view";
+import ContentHeader from "./(dashboard)/content-header";
+import RoleBasedView from "./(dashboard)/role-based-view";
 import { cookies } from "next/headers";
 import storage from "@/lib/core/storage";
 import assert from "node:assert";

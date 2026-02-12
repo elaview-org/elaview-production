@@ -1,5 +1,5 @@
 import { render, screen } from "@/tests/utils";
-import RoleBasedView from "@/app/(protected)/role-based-view";
+import RoleBasedView from "@/app/(protected)/(dashboard)/role-based-view";
 import { describe, expect, it, mock } from "bun:test";
 
 mock.module("@/types/gql", () => ({
@@ -14,7 +14,7 @@ const slots = {
   marketing: <div data-testid="marketing-slot">Marketing</div>,
   spaceOwner: <div data-testid="space-owner-slot">Space Owner</div>,
   advertiser: <div data-testid="advertiser-slot">Advertiser</div>,
-  children: <div data-testid="children-slot">Children</div>,
+  shared: <div data-testid="shared-slot">Shared</div>,
 };
 
 describe.skip("RoleBasedView (parallel routes mitigation)", () => {

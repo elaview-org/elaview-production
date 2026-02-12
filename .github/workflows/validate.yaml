@@ -76,7 +76,6 @@ jobs:
   security-web-audit:
     name: "Security: Web Audit"
     runs-on: ubuntu-latest
-    continue-on-error: true
     defaults:
       run:
         shell: devbox run -- bash -e {0}
@@ -99,12 +98,14 @@ jobs:
         run: ev web:install
 
       - name: Audit
-        run: ev web:audit
+        run: |
+          if ! ev web:audit; then
+            echo "::warning::Web audit found vulnerabilities — review recommended"
+          fi
 
   security-backend-audit:
     name: "Security: Backend Audit"
     runs-on: ubuntu-latest
-    continue-on-error: true
     defaults:
       run:
         shell: devbox run -- bash -e {0}
@@ -127,12 +128,14 @@ jobs:
         run: ev backend:install
 
       - name: Audit
-        run: ev backend:audit
+        run: |
+          if ! ev backend:audit; then
+            echo "::warning::Backend audit found vulnerabilities — review recommended"
+          fi
 
   security-secrets:
     name: "Security: Secret Scan"
     runs-on: ubuntu-latest
-    continue-on-error: true
     defaults:
       run:
         shell: devbox run -- bash -e {0}
@@ -145,7 +148,10 @@ jobs:
           enable-cache: true
 
       - name: Scan
-        run: ev repo:secrets
+        run: |
+          if ! ev repo:secrets; then
+            echo "::warning::Secret scan found potential secrets — review recommended"
+          fi
 
   build-test-backend:
     name: "Build & Test: Backend"

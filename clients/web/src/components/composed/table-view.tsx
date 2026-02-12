@@ -181,39 +181,34 @@ export default function TableView<TData>({
   );
 }
 
+const ImageTextSkeleton = () => (
+  <div className="flex items-center gap-3">
+    <Skeleton className="size-10 rounded" />
+    <Skeleton className="h-4 w-32" />
+  </div>
+);
+
+const StackSkeleton = () => (
+  <div className="flex flex-col gap-1">
+    <Skeleton className="h-4 w-24" />
+    <Skeleton className="h-3 w-20" />
+  </div>
+);
+
+const skeletonCellMap: Record<SkeletonType, React.ReactNode> = {
+  select: <Skeleton className="size-4" />,
+  text: <Skeleton className="h-4 w-32" />,
+  imageText: <ImageTextSkeleton />,
+  stack: <StackSkeleton />,
+  date: <Skeleton className="h-4 w-24" />,
+  currency: <Skeleton className="ml-auto h-4 w-16" />,
+  number: <Skeleton className="ml-auto h-4 w-8" />,
+  badge: <Skeleton className="h-5 w-20 rounded-full" />,
+  actions: <Skeleton className="size-8" />,
+};
+
 function SkeletonCell({ type }: { type: SkeletonType }) {
-  switch (type) {
-    case "select":
-      return <Skeleton className="size-4" />;
-    case "text":
-      return <Skeleton className="h-4 w-32" />;
-    case "imageText":
-      return (
-        <div className="flex items-center gap-3">
-          <Skeleton className="size-10 rounded" />
-          <Skeleton className="h-4 w-32" />
-        </div>
-      );
-    case "stack":
-      return (
-        <div className="flex flex-col gap-1">
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-3 w-20" />
-        </div>
-      );
-    case "date":
-      return <Skeleton className="h-4 w-24" />;
-    case "currency":
-      return <Skeleton className="ml-auto h-4 w-16" />;
-    case "number":
-      return <Skeleton className="ml-auto h-4 w-8" />;
-    case "badge":
-      return <Skeleton className="h-5 w-20 rounded-full" />;
-    case "actions":
-      return <Skeleton className="size-8" />;
-    default:
-      return <Skeleton className="h-4 w-24" />;
-  }
+  return skeletonCellMap[type] ?? skeletonCellMap.text;
 }
 
 type TableViewSkeletonProps<TData> = {
@@ -716,17 +711,17 @@ export function actionsColumn<TData>({
                 return <DropdownMenuSeparator key={index} />;
               }
 
-              const menuItem = item as Exclude<
+              const { href, icon, label, onClick, variant } = item as Exclude<
                 ActionItem<TData>,
                 { separator: true }
               >;
 
-              if (menuItem.href) {
+              if (href) {
                 return (
                   <DropdownMenuItem key={index} asChild>
-                    <Link href={menuItem.href(row.original)}>
-                      {menuItem.icon}
-                      {menuItem.label}
+                    <Link href={href(row.original)}>
+                      {icon}
+                      {label}
                     </Link>
                   </DropdownMenuItem>
                 );
@@ -735,11 +730,11 @@ export function actionsColumn<TData>({
               return (
                 <DropdownMenuItem
                   key={index}
-                  onClick={() => menuItem.onClick?.(row.original)}
-                  variant={menuItem.variant}
+                  onClick={() => onClick?.(row.original)}
+                  variant={variant}
                 >
-                  {menuItem.icon}
-                  {menuItem.label}
+                  {icon}
+                  {label}
                 </DropdownMenuItem>
               );
             })}

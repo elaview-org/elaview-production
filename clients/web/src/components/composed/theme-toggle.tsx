@@ -12,6 +12,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/primitives/dropdown-menu";
 
+const themeOptions = [
+  { value: "light" as const, label: "Light", icon: Sun },
+  { value: "dark" as const, label: "Dark", icon: Moon },
+  { value: "system" as const, label: "System", icon: Monitor },
+] as const;
+
 export function ThemeToggle() {
   const { setTheme, theme } = useTheme();
   const [mounted, setMounted] = React.useState(false);
@@ -20,30 +26,33 @@ export function ThemeToggle() {
     setMounted(true);
   }, []);
 
+  const currentTheme = mounted ? theme : "system";
+  const currentOption =
+    themeOptions.find((option) => option.value === currentTheme) ??
+    themeOptions[2];
+  const Icon = currentOption.icon;
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm">
-          {!mounted && <Monitor />}
-          {mounted && theme === "system" && <Monitor />}
-          {mounted && theme === "light" && <Sun />}
-          {mounted && theme === "dark" && <Moon />}
+          <Icon />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onSelect={() => setTheme("light")}>
-          <Sun className="mr-2 h-4 w-4" />
-          <span>Light</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => setTheme("dark")}>
-          <Moon className="mr-2 h-4 w-4" />
-          <span>Dark</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => setTheme("system")}>
-          <Monitor className="mr-2 h-4 w-4" />
-          <span>System</span>
-        </DropdownMenuItem>
+        {themeOptions.map((option) => {
+          const OptionIcon = option.icon;
+          return (
+            <DropdownMenuItem
+              key={option.value}
+              onSelect={() => setTheme(option.value)}
+            >
+              <OptionIcon />
+              <span>{option.label}</span>
+            </DropdownMenuItem>
+          );
+        })}
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -7,7 +7,14 @@
       "Bash(gh pr view:*)",
       "Bash(gh pr merge:*)",
       "Bash(gh ruleset:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "WebFetch(domain:registry.terraform.io)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:developer.hashicorp.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:www.jetify.com)",
+      "WebFetch(domain:vercel.com)"
     ],
     "deny": [],
     "ask": []

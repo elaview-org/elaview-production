@@ -5,19 +5,15 @@ SCRIPTS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 . "$SCRIPTS_DIR/core/dir.sh"
 
-ev_infra_init() {
+ev_infra_deploy() {
     ev_core_log_info "Initializing OpenTofu..."
-    ev_core_in_infra tofu init "$@"
-}
+    ev_core_in_infra tofu init || return 1
 
-ev_infra_plan() {
-    ev_core_log_info "Running OpenTofu plan..."
-    ev_core_in_infra tofu plan "$@"
-}
-
-ev_infra_apply() {
     ev_core_log_info "Applying OpenTofu changes..."
-    ev_core_in_infra tofu apply "$@"
+    ev_core_in_infra tofu apply -auto-approve || return 1
+
+    ev_core_log_info "Deploying to Vercel..."
+    ev_core_in_web bunx vercel --prod "$@" --token "$ELAVIEW_VERCEL_API_TOKEN"
 }
 
 ev_infra_destroy() {
@@ -25,35 +21,29 @@ ev_infra_destroy() {
     ev_core_in_infra tofu destroy "$@"
 }
 
-ev_infra_output() {
-    ev_core_in_infra tofu output "$@"
-}
-
-ev_infra_validate() {
-    ev_core_log_info "Validating OpenTofu configuration..."
-    ev_core_in_infra tofu validate "$@"
-}
-
-ev_infra_fmt() {
-    ev_core_log_info "Formatting OpenTofu files..."
-    ev_core_in_infra tofu fmt "$@"
-}
-
 ev_infra_dispatch() {
+    if [ "$ELAVIEW_ENVIRONMENT" != "staging" ] && [ "$ELAVIEW_ENVIRONMENT" != "production" ]; then
+        ev_core_log_error "Infra commands are only allowed in staging or production (current: $ELAVIEW_ENVIRONMENT)"
+        return 1
+    fi
+
+    _ev_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [ "$_ev_branch" != "main" ]; then
+        ev_core_log_error "Infra commands are only allowed on the main branch (current: $_ev_branch)"
+        unset _ev_branch
+        return 1
+    fi
+    unset _ev_branch
+
     cmd="$1"
     shift
 
     case "$cmd" in
-        init)     ev_infra_init "$@" ;;
-        plan)     ev_infra_plan "$@" ;;
-        apply)    ev_infra_apply "$@" ;;
-        destroy)  ev_infra_destroy "$@" ;;
-        output)   ev_infra_output "$@" ;;
-        validate) ev_infra_validate "$@" ;;
-        fmt)      ev_infra_fmt "$@" ;;
+        deploy)  ev_infra_deploy "$@" ;;
+        destroy) ev_infra_destroy "$@" ;;
         *)
             ev_core_log_error "Unknown infra command: $cmd"
-            echo "Available: init, plan, apply, destroy, output, validate, fmt"
+            echo "Available: deploy, destroy"
             return 1
             ;;
     esac

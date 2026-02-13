@@ -11,3 +11,11 @@
 .devbox
 
 .gqlenv
+
+# OpenTofu / Terraform
+infra/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+.vercel

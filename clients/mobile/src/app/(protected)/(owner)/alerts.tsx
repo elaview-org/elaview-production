@@ -17,7 +17,7 @@ import { NotificationNode } from "@/types/notifications";
 import { colors, spacing, fontSize } from "@/constants/theme";
 
 const GET_MY_NOTIFICATIONS = api.gql`
-  query GetMyNotifications($first: Int, $after: String) {
+  query GetOwnerNotifications($first: Int, $after: String) {
     myNotifications(
       first: $first
       after: $after
@@ -46,7 +46,7 @@ const GET_MY_NOTIFICATIONS = api.gql`
 `;
 
 const MARK_NOTIFICATION_READ = api.gql`
-  mutation MarkNotificationRead($input: MarkNotificationReadInput!) {
+  mutation MarkOwnerNotificationRead($input: MarkNotificationReadInput!) {
     markNotificationRead(input: $input) {
       notification {
         id
@@ -63,7 +63,7 @@ const MARK_NOTIFICATION_READ = api.gql`
 `;
 
 const MARK_ALL_READ = api.gql`
-  mutation MarkAllNotificationsRead {
+  mutation MarkAllOwnerNotificationsRead {
     markAllNotificationsRead {
       count
     }
@@ -71,7 +71,7 @@ const MARK_ALL_READ = api.gql`
 `;
 
 const ON_NOTIFICATION = api.gql`
-  subscription OnNotification($userId: ID!) {
+  subscription OnOwnerNotification($userId: ID!) {
     onNotification(userId: $userId) {
       id
       type
@@ -86,7 +86,7 @@ const ON_NOTIFICATION = api.gql`
   }
 `;
 
-export default function Alerts() {
+export default function OwnerAlerts() {
   const { theme } = useTheme();
   const { user } = useSession();
 
@@ -100,7 +100,6 @@ export default function Alerts() {
     variables: { userId: user?.id ?? "" },
     skip: !user?.id,
     onData: () => {
-      // Refetch on new notification to keep list fresh
       refetch();
     },
   });
@@ -137,7 +136,6 @@ export default function Alerts() {
   const handleMarkAllRead = useCallback(() => {
     markAllRead({
       update: (cache) => {
-        // Update all notifications in cache to isRead: true
         notifications.forEach((n) => {
           if (!n.isRead) {
             cache.modify({

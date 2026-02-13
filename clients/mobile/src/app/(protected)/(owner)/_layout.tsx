@@ -93,6 +93,24 @@ export default function OwnerLayout() {
             href: null,
           }}
         />
+        <Tabs.Screen
+          name="booking/[id]"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="alerts"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="conversation/[id]"
+          options={{
+            href: null,
+          }}
+        />
       </Tabs>
 
       <DrawerMenu

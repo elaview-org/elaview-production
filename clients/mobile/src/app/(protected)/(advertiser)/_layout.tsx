@@ -1,19 +1,28 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import TopNavBar from "@/components/ui/TopNavBar";
 import DrawerMenu from "@/components/ui/DrawerMenu";
-import { getUnreadCount, mockNotifications } from "@/mocks/notifications";
+import api from "@/api";
 import { colors } from "@/constants/theme";
+
+const GET_UNREAD_COUNT = api.gql`
+  query GetUnreadNotificationsCount {
+    unreadNotificationsCount
+  }
+`;
 
 export default function AdvertiserLayout() {
   const { theme } = useTheme();
   const [drawerVisible, setDrawerVisible] = useState(false);
 
-  // Calculate unread notification count
-  // In production, this would come from an API or global state
-  const unreadCount = useMemo(() => getUnreadCount(mockNotifications), []);
+  // Fetch real unread notification count
+  const { data } = api.query<{ unreadNotificationsCount: number }>(GET_UNREAD_COUNT, {
+    fetchPolicy: "cache-and-network",
+    pollInterval: 30_000, // poll every 30s as fallback
+  });
+  const unreadCount: number = data?.unreadNotificationsCount ?? 0;
 
   return (
     <>
@@ -94,6 +103,18 @@ export default function AdvertiserLayout() {
         />
         <Tabs.Screen
           name="book/[id]"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="booking/[id]"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="conversation/[id]"
           options={{
             href: null,
           }}

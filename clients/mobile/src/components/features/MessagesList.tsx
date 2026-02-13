@@ -1,15 +1,71 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
-import { useRouter } from "expo-router";
+import { View, Text, StyleSheet, FlatList, RefreshControl } from "react-native";
 import { useTheme } from "@/contexts/ThemeContext";
 import Avatar from "@/components/ui/Avatar";
 import Card from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
 import { spacing, fontSize, colors } from "@/constants/theme";
-import { Conversation, formatMessageTime } from "@/mocks/messages";
+import { formatDistanceToNow } from "date-fns";
+
+/**
+ * Shape of a conversation node from the myConversations GraphQL query.
+ */
+export interface ConversationListItem {
+  id: string;
+  bookingId?: string | null;
+  updatedAt: string;
+  booking?: {
+    id: string;
+    space?: {
+      title: string;
+    } | null;
+  } | null;
+  participants: Array<{
+    userId: string;
+    lastReadAt?: string | null;
+    user: {
+      id: string;
+      name: string;
+      avatar?: string | null;
+    };
+  }>;
+  /** We request messages(last:1) to get the latest message */
+  messages?: {
+    nodes?: Array<{
+      id: string;
+      content: string;
+      createdAt: string;
+      senderUserId: string;
+    }> | null;
+  } | null;
+}
 
 interface MessagesListProps {
-  conversations: Conversation[];
-  onConversationPress?: (conversation: Conversation) => void;
+  conversations: ConversationListItem[];
+  currentUserId: string;
+  loading?: boolean;
+  onRefresh?: () => void;
+  onConversationPress?: (conversation: ConversationListItem) => void;
+  onLoadMore?: () => void;
+}
+
+function getOtherParticipant(
+  conversation: ConversationListItem,
+  currentUserId: string,
+) {
+  return conversation.participants.find((p) => p.userId !== currentUserId);
+}
+
+function getUnreadCount(
+  conversation: ConversationListItem,
+  currentUserId: string,
+): number {
+  const myParticipant = conversation.participants.find(
+    (p) => p.userId === currentUserId,
+  );
+  if (!myParticipant?.lastReadAt) return 1; // never read = unread
+  const lastMsg = conversation.messages?.nodes?.[0];
+  if (!lastMsg) return 0;
+  return new Date(lastMsg.createdAt) > new Date(myParticipant.lastReadAt) ? 1 : 0;
 }
 
 /**
@@ -18,79 +74,91 @@ interface MessagesListProps {
  */
 export default function MessagesList({
   conversations,
+  currentUserId,
+  loading,
+  onRefresh,
   onConversationPress,
+  onLoadMore,
 }: MessagesListProps) {
   const { theme } = useTheme();
-  const router = useRouter();
 
-  const handlePress = (conversation: Conversation) => {
+  const handlePress = (conversation: ConversationListItem) => {
     if (onConversationPress) {
       onConversationPress(conversation);
     }
-    // TODO: Navigate to conversation detail
-    // router.push(`/messages/${conversation.id}`);
   };
 
-  const renderConversation = ({ item }: { item: Conversation }) => (
-    <Card onPress={() => handlePress(item)} style={styles.conversationCard}>
-      <View style={styles.conversationContent}>
-        <View style={styles.avatarContainer}>
-          <Avatar
-            source={item.participantAvatar}
-            name={item.participantName}
-            size="md"
-          />
-          {item.unreadCount > 0 && (
-            <View style={styles.unreadBadge}>
-              <Text style={styles.unreadBadgeText}>
-                {item.unreadCount > 9 ? "9+" : item.unreadCount}
+  const renderConversation = ({ item }: { item: ConversationListItem }) => {
+    const other = getOtherParticipant(item, currentUserId);
+    const unread = getUnreadCount(item, currentUserId);
+    const lastMsg = item.messages?.nodes?.[0];
+    const spaceTitle = item.booking?.space?.title;
+
+    return (
+      <Card onPress={() => handlePress(item)} style={styles.conversationCard}>
+        <View style={styles.conversationContent}>
+          <View style={styles.avatarContainer}>
+            <Avatar
+              source={other?.user.avatar ?? undefined}
+              name={other?.user.name ?? "User"}
+              size="md"
+            />
+            {unread > 0 && (
+              <View style={styles.unreadBadge}>
+                <Text style={styles.unreadBadgeText}>
+                  {unread > 9 ? "9+" : unread}
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.textContainer}>
+            <View style={styles.headerRow}>
+              <Text
+                style={[
+                  styles.participantName,
+                  { color: theme.text },
+                  unread > 0 && styles.unreadText,
+                ]}
+                numberOfLines={1}
+              >
+                {other?.user.name ?? "Unknown"}
+              </Text>
+              <Text style={[styles.timestamp, { color: theme.textMuted }]}>
+                {lastMsg
+                  ? formatDistanceToNow(new Date(lastMsg.createdAt), {
+                      addSuffix: true,
+                    })
+                  : ""}
               </Text>
             </View>
-          )}
-        </View>
 
-        <View style={styles.textContainer}>
-          <View style={styles.headerRow}>
+            {spaceTitle && (
+              <Text
+                style={[styles.spaceTitle, { color: theme.textSecondary }]}
+                numberOfLines={1}
+              >
+                {spaceTitle}
+              </Text>
+            )}
+
             <Text
               style={[
-                styles.participantName,
-                { color: theme.text },
-                item.unreadCount > 0 && styles.unreadText,
+                styles.lastMessage,
+                { color: theme.textSecondary },
+                unread > 0 && styles.unreadText,
               ]}
               numberOfLines={1}
             >
-              {item.participantName}
-            </Text>
-            <Text style={[styles.timestamp, { color: theme.textMuted }]}>
-              {formatMessageTime(item.lastMessageTime)}
+              {lastMsg?.content ?? "No messages yet"}
             </Text>
           </View>
-
-          {item.spaceTitle && (
-            <Text
-              style={[styles.spaceTitle, { color: theme.textSecondary }]}
-              numberOfLines={1}
-            >
-              {item.spaceTitle}
-            </Text>
-          )}
-
-          <Text
-            style={[
-              styles.lastMessage,
-              { color: theme.textSecondary },
-              item.unreadCount > 0 && styles.unreadText,
-            ]}
-            numberOfLines={1}
-          >
-            {item.lastMessage}
-          </Text>
         </View>
-      </View>
-    </Card>
-  );
+      </Card>
+    );
+  };
 
-  if (conversations.length === 0) {
+  if (conversations.length === 0 && !loading) {
     return (
       <EmptyState
         icon="chatbubbles-outline"
@@ -107,6 +175,17 @@ export default function MessagesList({
       renderItem={renderConversation}
       contentContainerStyle={styles.listContainer}
       showsVerticalScrollIndicator={false}
+      refreshControl={
+        onRefresh ? (
+          <RefreshControl
+            refreshing={!!loading}
+            onRefresh={onRefresh}
+            tintColor={colors.primary}
+          />
+        ) : undefined
+      }
+      onEndReached={onLoadMore}
+      onEndReachedThreshold={0.3}
     />
   );
 }

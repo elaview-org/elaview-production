@@ -10,6 +10,7 @@ RAILWAY_STAGING_ENVIRONMENT_ID=""
 RAILWAY_PRODUCTION_ENVIRONMENT_ID=""
 RAILWAY_SERVER_SERVICE_ID=""
 RAILWAY_DATABASE_SERVICE_ID=""
+RAILWAY_SERVER_DOMAIN=""
 
 _ev_railway_environment_id() {
     case "$ELAVIEW_ENVIRONMENT" in
@@ -122,6 +123,7 @@ _ev_railway_provision() {
         }')
         _ev_rw_result=$(_ev_railway_api "$_ev_rw_payload")
         _ev_rw_domain=$(printf '%s' "$_ev_rw_result" | jq -r '.data.serviceDomainCreate.domain')
+        RAILWAY_SERVER_DOMAIN="$_ev_rw_domain"
         ev_core_log_success "Server service: $RAILWAY_SERVER_SERVICE_ID"
         ev_core_log_success "Domain: $_ev_rw_domain"
     else
@@ -262,6 +264,7 @@ _ev_railway_ensure_server_domain() {
         _ev_rw_domain=$(printf '%s' "$_ev_rw_result" | jq -r '.data.domains.serviceDomains[0].domain')
         ev_core_log_info "Server domain: $_ev_rw_domain"
     fi
+    RAILWAY_SERVER_DOMAIN="$_ev_rw_domain"
     unset _ev_rw_payload _ev_rw_result _ev_rw_domain_count _ev_rw_domain
 }
 
@@ -276,12 +279,6 @@ _ev_railway_deploy_server() {
 }
 
 ev_infra_deploy() {
-    ev_core_log_info "Initializing OpenTofu..."
-    ev_core_in_infra tofu init || return 1
-
-    ev_core_log_info "Applying OpenTofu changes..."
-    ev_core_in_infra tofu apply -auto-approve || return 1
-
     if [ -z "$RAILWAY_PROJECT_ID" ]; then
         _ev_railway_provision || return 1
     fi
@@ -290,8 +287,21 @@ ev_infra_deploy() {
     _ev_railway_sync_server_vars || return 1
     _ev_railway_deploy_server || return 1
 
+    ev_core_log_info "Updating WEB_API_URL in Doppler..."
+    doppler secrets set "WEB_API_URL=https://${RAILWAY_SERVER_DOMAIN}/api" \
+        --config "$ELAVIEW_ENVIRONMENT" || return 1
+    ev_core_log_success "WEB_API_URL set to https://${RAILWAY_SERVER_DOMAIN}/api"
+
+    ev_core_log_info "Initializing OpenTofu..."
+    ev_core_in_infra tofu init || return 1
+
+    ev_core_log_info "Applying OpenTofu changes..."
+    ev_core_in_infra tofu apply -auto-approve || return 1
+
     ev_core_log_info "Deploying to Vercel..."
-    ev_core_in_web bunx vercel --prod "$@" --token "$ELAVIEW_VERCEL_API_TOKEN"
+    VERCEL_ORG_ID="$ELAVIEW_VERCEL_ORG_ID" \
+    VERCEL_PROJECT_ID="$ELAVIEW_VERCEL_PROJECT_ID" \
+    ev_core_in_web bunx vercel --prod --yes "$@" --token "$ELAVIEW_VERCEL_API_TOKEN"
 }
 
 ev_infra_destroy() {

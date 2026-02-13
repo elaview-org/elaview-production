@@ -15,6 +15,8 @@ public static class Config {
             Stripe.StripeConfiguration.ApiKey = stripeSecretKey;
 
         var configData = new Dictionary<string, string?> {
+            ["Database:ConnectionString"] =
+                envVars["ELAVIEW_BACKEND_DATABASE_URL"]?.ToString(),
             ["Database:Host"] =
                 envVars["ELAVIEW_BACKEND_DATABASE_HOST"]?.ToString(),
             ["Database:Port"] =
@@ -38,11 +40,14 @@ public static class Config {
         var certPassword = envVars["ELAVIEW_BACKEND_SERVER_TLS_CERT_PASSWORD"]
             ?.ToString();
 
+        var port = envVars["ELAVIEW_BACKEND_SERVER_PORT"]?.ToString();
+        if (string.IsNullOrEmpty(port))
+            port = envVars["PORT"]?.ToString();
         var isTestOrDev = builder.Environment.IsDevelopment() ||
                           builder.Environment.EnvironmentName == "Testing";
+        var hasTls = !string.IsNullOrEmpty(certPath);
 
-        if (isTestOrDev) {
-            var port = envVars["ELAVIEW_BACKEND_SERVER_PORT"]?.ToString();
+        if (isTestOrDev || !hasTls) {
             if (!string.IsNullOrEmpty(port))
                 builder.WebHost.ConfigureKestrel((_, serverOptions) => {
                     serverOptions.ListenAnyIP(
@@ -54,10 +59,6 @@ public static class Config {
                 });
         }
         else {
-            if (string.IsNullOrEmpty(certPath))
-                throw new InvalidOperationException(
-                    "ELAVIEW_BACKEND_SERVER_TLS_CERT_PATH is required");
-
             builder.WebHost
                 .UseQuic(options => {
 #pragma warning disable CA2252
@@ -66,8 +67,7 @@ public static class Config {
                 })
                 .ConfigureKestrel((_, serverOptions) => {
                     serverOptions.ListenAnyIP(
-                        int.Parse(envVars["ELAVIEW_BACKEND_SERVER_PORT"]!
-                            .ToString()!),
+                        int.Parse(port!),
                         listenOptions => {
                             listenOptions.Protocols =
                                 HttpProtocols.Http1AndHttp2AndHttp3;
@@ -83,7 +83,7 @@ public static class Config {
 
         using (var scope = app.Services.CreateScope()) {
             var dbContext = scope.ServiceProvider.GetRequiredService<Data.AppDbContext>();
-            if (isTestOrDev)
+            if (!app.Environment.IsProduction())
                 await dbContext.Database.MigrateAsync();
 
             if (!isTesting)
@@ -92,7 +92,12 @@ public static class Config {
 
         if (!isTestOrDev) {
             app.MapOpenApi();
-            app.UseHttpsRedirection();
+
+            var hasTls = !string.IsNullOrEmpty(
+                Environment.GetEnvironmentVariable(
+                    "ELAVIEW_BACKEND_SERVER_TLS_CERT_PATH"));
+            if (hasTls)
+                app.UseHttpsRedirection();
         }
 
         app

@@ -10,8 +10,9 @@
 
 # testing
 /coverage
-src/tests/e2e/results
-src/tests/e2e/reports
+src/tests
+*.test.ts
+*.test.tsx
 
 # next.js
 /.next/
@@ -47,3 +48,6 @@ next-env.d.ts
 
 # devbox
 .devbox
+
+# docs
+docs

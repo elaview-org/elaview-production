@@ -3,7 +3,7 @@
 . "$ELAVIEW_DEVBOX_ROOT/scripts/core/log.sh"
 
 _ev_load_secrets() {
-    doppler secrets download --no-file --format env-no-quotes 2>/dev/null
+    doppler secrets download --no-file --format env-no-quotes --config "$ELAVIEW_ENVIRONMENT" 2>/dev/null
 }
 
 ev() {
@@ -26,7 +26,7 @@ ev() {
     esac
 }
 
-ev_core_log_info "Loading environment variables from Doppler"
+ev_core_log_info "Loading environment variables from Doppler ($ELAVIEW_ENVIRONMENT)"
 
 if ! _ev_secrets=$(_ev_load_secrets); then
     ev_core_log_warn "Doppler not configured. Logging in..."

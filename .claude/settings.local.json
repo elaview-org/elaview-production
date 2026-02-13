@@ -14,7 +14,9 @@
       "WebFetch(domain:developer.hashicorp.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:www.jetify.com)",
-      "WebFetch(domain:vercel.com)"
+      "WebFetch(domain:vercel.com)",
+      "WebFetch(domain:docs.railway.com)",
+      "Bash(source:*)"
     ],
     "deny": [],
     "ask": []

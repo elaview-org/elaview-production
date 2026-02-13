@@ -1017,6 +1017,54 @@
         }
       }
     },
+    "railway@latest": {
+      "last_modified": "2026-02-02T23:09:17Z",
+      "resolved": "github:NixOS/nixpkgs/47472570b1e607482890801aeaf29bfb749884f6#railway",
+      "source": "devbox-search",
+      "version": "4.27.5",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/x9i31qw4i9k1zg73xlbwbzmqwvvsggj5-railway-4.27.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/x9i31qw4i9k1zg73xlbwbzmqwvvsggj5-railway-4.27.5"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ya49vhlfps9zypb69kv5djai17p079zp-railway-4.27.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/ya49vhlfps9zypb69kv5djai17p079zp-railway-4.27.5"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/gljbnshm35avx2ayx655igjjj0s49if7-railway-4.27.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/gljbnshm35avx2ayx655igjjj0s49if7-railway-4.27.5"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/z6i6qqb2n0w3a3h9283g1x0cf6ahi305-railway-4.27.5",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/z6i6qqb2n0w3a3h9283g1x0cf6ahi305-railway-4.27.5"
+        }
+      }
+    },
     "ruby@latest": {
       "last_modified": "2026-01-23T17:20:52Z",
       "plugin_version": "0.0.2",

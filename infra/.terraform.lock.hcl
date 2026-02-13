@@ -20,7 +20,7 @@ provider "registry.opentofu.org/hashicorp/external" {
 
 provider "registry.opentofu.org/vercel/vercel" {
   version     = "2.15.1"
-  constraints = "~> 2.0"
+  constraints = "~> 2.15"
   hashes = [
     "h1:lXB7voApLLs8TVyxjlvj0bK6hSE12S3BEHYgaAwEEDE=",
     "zh:03948804f2458bbdf32a80061597b5d11ccb84527e5839d30c03f737a5b079e1",

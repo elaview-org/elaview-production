@@ -4,7 +4,7 @@ provider "vercel" {
 }
 
 resource "vercel_project" "web" {
-  name            = "elaview-web"
+  name            = "elaview-staging"
   framework       = "nextjs"
   install_command = "bun install"
   build_command   = "bun compile"

@@ -10,6 +10,7 @@ RAILWAY_STAGING_ENVIRONMENT_ID=""
 RAILWAY_PRODUCTION_ENVIRONMENT_ID=""
 RAILWAY_SERVER_SERVICE_ID=""
 RAILWAY_DATABASE_SERVICE_ID=""
+RAILWAY_SERVER_DOMAIN=""
 
 _ev_railway_environment_id() {
     case "$ELAVIEW_ENVIRONMENT" in
@@ -114,16 +115,15 @@ _ev_railway_provision() {
         [ "$RAILWAY_SERVER_SERVICE_ID" = "null" ] || [ -z "$RAILWAY_SERVER_SERVICE_ID" ] && { ev_core_log_error "Failed to create server service"; return 1; }
 
         ev_core_log_info "Generating server domain..."
-        _ev_rw_domain_name=$(printf '%s' "$ELAVIEW_WEB_API_URL" | sed 's|^https\?://||' | sed 's|/.*||' | sed 's|\.up\.railway\.app$||')
         _ev_rw_payload=$(jq -nc \
             --arg sid "$RAILWAY_SERVER_SERVICE_ID" \
-            --arg eid "$_ev_rw_env_id" \
-            --arg domain "$_ev_rw_domain_name" '{
+            --arg eid "$_ev_rw_env_id" '{
             query: "mutation($input: ServiceDomainCreateInput!) { serviceDomainCreate(input: $input) { domain } }",
-            variables: { input: { serviceId: $sid, environmentId: $eid, domain: $domain } }
+            variables: { input: { serviceId: $sid, environmentId: $eid } }
         }')
         _ev_rw_result=$(_ev_railway_api "$_ev_rw_payload")
         _ev_rw_domain=$(printf '%s' "$_ev_rw_result" | jq -r '.data.serviceDomainCreate.domain')
+        RAILWAY_SERVER_DOMAIN="$_ev_rw_domain"
         ev_core_log_success "Server service: $RAILWAY_SERVER_SERVICE_ID"
         ev_core_log_success "Domain: $_ev_rw_domain"
     else
@@ -187,7 +187,7 @@ _ev_railway_sync_database_vars() {
         query: "mutation($sid: String!, $eid: String!, $input: ServiceInstanceUpdateInput!) { serviceInstanceUpdate(serviceId: $sid, environmentId: $eid, input: $input) }",
         variables: { sid: $sid, eid: $eid, input: { source: { image: "postgres:17" } } }
     }')
-    _ev_railway_api "$_ev_rw_payload" > /dev/null 2>&1
+    _ev_railway_api "$_ev_rw_payload" > /dev/null || { ev_core_log_error "Failed to update database service instance"; return 1; }
 
     _ev_rw_payload=$(jq -nc \
         --arg pid "$RAILWAY_PROJECT_ID" \
@@ -196,9 +196,9 @@ _ev_railway_sync_database_vars() {
         query: "mutation($input: EnvironmentTriggersDeployInput!) { environmentTriggersDeploy(input: $input) }",
         variables: { input: { projectId: $pid, serviceId: $sid, environmentId: $eid } }
     }')
-    _ev_railway_api "$_ev_rw_payload" > /dev/null 2>&1
+    _ev_railway_api "$_ev_rw_payload" > /dev/null || { ev_core_log_error "Failed to trigger database deployment"; return 1; }
 
-    ev_core_log_success "Database synced."
+    ev_core_log_success "Database deployed."
     unset _ev_rw_payload _ev_rw_result _ev_rw_has_volume _ev_rw_eid
 }
 
@@ -246,19 +246,26 @@ _ev_railway_ensure_server_domain() {
 
     if [ "$_ev_rw_domain_count" = "0" ] || [ -z "$_ev_rw_domain_count" ]; then
         ev_core_log_info "Creating server domain..."
-        _ev_rw_domain_name=$(printf '%s' "$ELAVIEW_WEB_API_URL" | sed 's|^https\?://||' | sed 's|/.*||' | sed 's|\.up\.railway\.app$||')
         _ev_rw_payload=$(jq -nc \
             --arg sid "$RAILWAY_SERVER_SERVICE_ID" \
-            --arg eid "$(_ev_railway_environment_id)" \
-            --arg domain "$_ev_rw_domain_name" '{
+            --arg eid "$(_ev_railway_environment_id)" '{
             query: "mutation($input: ServiceDomainCreateInput!) { serviceDomainCreate(input: $input) { domain } }",
-            variables: { input: { serviceId: $sid, environmentId: $eid, domain: $domain } }
+            variables: { input: { serviceId: $sid, environmentId: $eid } }
         }')
         _ev_rw_result=$(_ev_railway_api "$_ev_rw_payload")
+        _ev_rw_error=$(printf '%s' "$_ev_rw_result" | jq -r '.errors[0].message // empty')
+        if [ -n "$_ev_rw_error" ]; then
+            ev_core_log_error "Failed to create domain: $_ev_rw_error"
+            return 1
+        fi
         _ev_rw_domain=$(printf '%s' "$_ev_rw_result" | jq -r '.data.serviceDomainCreate.domain')
         ev_core_log_success "Domain: $_ev_rw_domain"
+    else
+        _ev_rw_domain=$(printf '%s' "$_ev_rw_result" | jq -r '.data.domains.serviceDomains[0].domain')
+        ev_core_log_info "Server domain: $_ev_rw_domain"
     fi
-    unset _ev_rw_payload _ev_rw_result _ev_rw_domain_count _ev_rw_domain _ev_rw_domain_name
+    RAILWAY_SERVER_DOMAIN="$_ev_rw_domain"
+    unset _ev_rw_payload _ev_rw_result _ev_rw_domain_count _ev_rw_domain
 }
 
 _ev_railway_deploy_server() {
@@ -272,27 +279,59 @@ _ev_railway_deploy_server() {
 }
 
 ev_infra_deploy() {
+    if [ -z "$RAILWAY_PROJECT_ID" ]; then
+        _ev_railway_provision || return 1
+    fi
+
+    _ev_railway_sync_database_vars "$(_ev_railway_environment_id)" || return 1
+    _ev_railway_sync_server_vars || return 1
+    _ev_railway_deploy_server || return 1
+
+    ev_core_log_info "Updating WEB_API_URL in Doppler..."
+    doppler secrets set "WEB_API_URL=https://${RAILWAY_SERVER_DOMAIN}/api" \
+        --config "$ELAVIEW_ENVIRONMENT" || return 1
+    ev_core_log_success "WEB_API_URL set to https://${RAILWAY_SERVER_DOMAIN}/api"
+
     ev_core_log_info "Initializing OpenTofu..."
     ev_core_in_infra tofu init || return 1
 
     ev_core_log_info "Applying OpenTofu changes..."
     ev_core_in_infra tofu apply -auto-approve || return 1
 
-    if [ -z "$RAILWAY_PROJECT_ID" ]; then
-        _ev_railway_provision || return 1
-    fi
-
-    _ev_railway_sync_database_vars "$(_ev_railway_environment_id)" || return 1
-    _ev_railway_deploy_server || return 1
-    _ev_railway_sync_server_vars || return 1
-
     ev_core_log_info "Deploying to Vercel..."
-    ev_core_in_web bunx vercel --prod "$@" --token "$ELAVIEW_VERCEL_API_TOKEN"
+    VERCEL_ORG_ID="$ELAVIEW_VERCEL_ORG_ID" \
+    VERCEL_PROJECT_ID="$ELAVIEW_VERCEL_PROJECT_ID" \
+    ev_core_in_web bunx vercel --prod --yes "$@" --token "$ELAVIEW_VERCEL_API_TOKEN"
 }
 
 ev_infra_destroy() {
     ev_core_log_info "Destroying OpenTofu resources..."
-    ev_core_in_infra tofu destroy "$@"
+    ev_core_in_infra tofu destroy -auto-approve "$@" || return 1
+
+    ev_core_require_cmd "jq" || return 1
+    ev_core_require_var "ELAVIEW_RAILWAY_API_TOKEN" || return 1
+
+    _ev_rw_pid="$RAILWAY_PROJECT_ID"
+    if [ -z "$_ev_rw_pid" ]; then
+        ev_core_log_info "Looking up Railway project 'elaview-backend'..."
+        _ev_rw_result=$(_ev_railway_api '{"query":"{ projects { edges { node { id name } } } }"}')
+        _ev_rw_pid=$(printf '%s' "$_ev_rw_result" | jq -r '.data.projects.edges[] | select(.node.name == "elaview-backend") | .node.id')
+        unset _ev_rw_result
+    fi
+
+    if [ -n "$_ev_rw_pid" ]; then
+        ev_core_log_info "Deleting Railway project: $_ev_rw_pid"
+        _ev_rw_payload=$(jq -nc --arg id "$_ev_rw_pid" '{
+            query: "mutation($id: String!) { projectDelete(id: $id) }",
+            variables: { id: $id }
+        }')
+        _ev_railway_api "$_ev_rw_payload" > /dev/null || { ev_core_log_error "Failed to delete Railway project"; return 1; }
+        ev_core_log_success "Railway project deleted."
+        unset _ev_rw_payload
+    else
+        ev_core_log_warn "No Railway project found — skipping."
+    fi
+    unset _ev_rw_pid
 }
 
 ev_infra_dispatch() {

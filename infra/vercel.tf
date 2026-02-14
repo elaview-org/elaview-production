@@ -1,13 +1,24 @@
+locals {
+  environment = terraform.workspace
+}
+
 provider "vercel" {
-  api_token = data.external.env.result["VERCEL_API_TOKEN"]
-  team      = data.external.env.result["VERCEL_TEAM_ID"]
+  team = data.external.env.result["VERCEL_TEAM_ID"]
 }
 
 resource "vercel_project" "web" {
-  name            = "elaview-staging"
+  name            = "elaview-${local.environment}"
   framework       = "nextjs"
   install_command = "bun install"
   build_command   = "bun compile"
+}
+
+output "vercel_project_id" {
+  value = vercel_project.web.id
+}
+
+output "vercel_org_id" {
+  value = data.external.env.result["VERCEL_TEAM_ID"]
 }
 
 resource "vercel_project_environment_variables" "web" {

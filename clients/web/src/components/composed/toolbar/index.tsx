@@ -33,36 +33,41 @@ export default function Toolbar(props: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between">
         <ToolbarSearch searchTarget={props.searchTarget} />
-        <ToolbarPagination
-          pageInfo={props.pageInfo}
-          pageSize={props.pageSize}
-        />
 
-        <ToolbarViewSelect
-          views={props.views}
-          currentView={props.currentView}
-          onViewChangeAction={props.onViewChangeAction}
-        />
-        <ToggleButton
-          open={filtersOpen}
-          onClick={() => {
-            setSortOpen(false);
-            setFiltersOpen(!filtersOpen);
-          }}
-          icon={IconFilter}
-          label="Filters"
-        />
-        <ToggleButton
-          open={sortOpen}
-          onClick={() => {
-            setFiltersOpen(false);
-            setSortOpen(!sortOpen);
-          }}
-          icon={IconSortAscending}
-          label="Sort"
-        />
+        {props.currentView !== ViewOptions.Map && (
+          <ToolbarPagination
+            pageInfo={props.pageInfo}
+            pageSize={props.pageSize}
+          />
+        )}
+
+        <div className="flex gap-3">
+          <ToolbarViewSelect
+            views={props.views}
+            currentView={props.currentView}
+            onViewChangeAction={props.onViewChangeAction}
+          />
+          <ToggleButton
+            open={filtersOpen}
+            onClick={() => {
+              setSortOpen(false);
+              setFiltersOpen(!filtersOpen);
+            }}
+            icon={IconFilter}
+            label="Filters"
+          />
+          <ToggleButton
+            open={sortOpen}
+            onClick={() => {
+              setFiltersOpen(false);
+              setSortOpen(!sortOpen);
+            }}
+            icon={IconSortAscending}
+            label="Sort"
+          />
+        </div>
 
         {props.action}
       </div>

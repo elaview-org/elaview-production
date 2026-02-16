@@ -4,15 +4,49 @@ import Card from "@/components/ui/Card";
 import StatusBadge, { BookingStatus } from "@/components/ui/StatusBadge";
 import { useTheme } from "@/contexts/ThemeContext";
 import { spacing, fontSize, colors } from "@/constants/theme";
-import { Booking, formatDateRange } from "@/mocks/bookings";
+
+/** Shape of a booking node returned from the GraphQL list queries */
+export interface BookingListItem {
+  id: string;
+  status: BookingStatus;
+  startDate: string;
+  endDate: string;
+  totalAmount: number | string;
+  pricePerDay: number | string;
+  advertiserNotes?: string | null;
+  space?: {
+    id: string;
+    title: string;
+    type: string;
+    images: string[];
+    spaceOwnerProfile?: {
+      user?: { name: string } | null;
+    } | null;
+  } | null;
+  campaign?: {
+    advertiserProfile?: {
+      user?: { name: string } | null;
+    } | null;
+  } | null;
+}
 
 interface BookingCardProps {
-  booking: Booking;
+  booking: BookingListItem;
   onPress?: () => void;
   /** Shows accept/decline preview for owners */
   showActions?: boolean;
   /** Whether viewing as owner or advertiser */
   perspective?: "owner" | "advertiser";
+}
+
+function formatDateRange(startDate: string, endDate: string): string {
+  const options: Intl.DateTimeFormatOptions = {
+    month: "short",
+    day: "numeric",
+  };
+  const start = new Date(startDate).toLocaleDateString("en-US", options);
+  const end = new Date(endDate).toLocaleDateString("en-US", options);
+  return `${start} - ${end}`;
 }
 
 /**
@@ -27,16 +61,31 @@ export default function BookingCard({
 }: BookingCardProps) {
   const { theme } = useTheme();
 
+  const spaceTitle = booking.space?.title ?? "Untitled Space";
+  const spacePhoto = booking.space?.images?.[0];
+  const ownerName = booking.space?.spaceOwnerProfile?.user?.name ?? "Unknown";
+  const advertiserName =
+    booking.campaign?.advertiserProfile?.user?.name ?? "Unknown";
   const counterpartyName =
-    perspective === "advertiser" ? booking.ownerName : booking.advertiserName;
+    perspective === "advertiser" ? ownerName : advertiserName;
+  const totalAmount = Number(booking.totalAmount);
 
   return (
     <Card onPress={onPress} style={styles.card}>
       <View style={styles.header}>
-        <Image source={{ uri: booking.spacePhoto }} style={styles.image} />
+        {spacePhoto ? (
+          <Image source={{ uri: spacePhoto }} style={styles.image} />
+        ) : (
+          <View style={[styles.image, styles.imagePlaceholder]}>
+            <Ionicons name="image-outline" size={24} color={colors.gray400} />
+          </View>
+        )}
         <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: theme.text }]} numberOfLines={2}>
-            {booking.spaceTitle}
+          <Text
+            style={[styles.title, { color: theme.text }]}
+            numberOfLines={2}
+          >
+            {spaceTitle}
           </Text>
           <Text style={[styles.counterparty, { color: theme.textSecondary }]}>
             {perspective === "advertiser" ? "Owner:" : "Advertiser:"}{" "}
@@ -66,14 +115,14 @@ export default function BookingCard({
             color={theme.textSecondary}
           />
           <Text style={[styles.detailText, { color: theme.text }]}>
-            ${booking.totalPrice.toFixed(0)}
+            ${totalAmount.toFixed(0)}
           </Text>
         </View>
       </View>
 
-      {booking.message &&
+      {booking.advertiserNotes &&
         perspective === "owner" &&
-        booking.status === "pending" && (
+        booking.status === BookingStatus.PendingApproval && (
           <View
             style={[
               styles.messageBox,
@@ -89,12 +138,12 @@ export default function BookingCard({
               style={[styles.messageText, { color: theme.textSecondary }]}
               numberOfLines={2}
             >
-              "{booking.message}"
+              "{booking.advertiserNotes}"
             </Text>
           </View>
         )}
 
-      {showActions && booking.status === "pending" && (
+      {showActions && booking.status === BookingStatus.PendingApproval && (
         <View style={styles.actionHint}>
           <Ionicons
             name="hand-right-outline"
@@ -123,6 +172,10 @@ const styles = StyleSheet.create({
     height: 72,
     borderRadius: 8,
     backgroundColor: colors.gray100,
+  },
+  imagePlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
   },
   headerContent: {
     flex: 1,

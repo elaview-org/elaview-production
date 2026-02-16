@@ -1,14 +1,14 @@
 import { View, Text, Pressable, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter, Href } from "expo-router";
 import { formatDistanceToNow } from "date-fns";
 import { useTheme } from "@/contexts/ThemeContext";
-import { Notification, NotificationType } from "@/types/notifications";
+import { NotificationType } from "@/types/graphql";
+import { NotificationNode } from "@/types/notifications";
 import { colors, spacing, fontSize, borderRadius } from "@/constants/theme";
 
 interface NotificationCardProps {
-  notification: Notification;
-  onPress?: (notification: Notification) => void;
+  notification: NotificationNode;
+  onPress?: (notification: NotificationNode) => void;
 }
 
 // Map notification types to icons and colors
@@ -18,72 +18,118 @@ function getNotificationIcon(type: NotificationType): {
   backgroundColor: string;
 } {
   switch (type) {
-    case "BOOKING_ACCEPTED":
+    case NotificationType.BookingRequested:
+      return {
+        name: "calendar",
+        color: colors.primary,
+        backgroundColor: colors.primaryLight,
+      };
+
+    case NotificationType.BookingApproved:
       return {
         name: "checkmark-circle",
         color: colors.success,
         backgroundColor: "#E8F5E9",
       };
 
-    case "BOOKING_DECLINED":
+    case NotificationType.BookingRejected:
       return {
         name: "close-circle",
         color: colors.error,
         backgroundColor: "#FFEBEE",
       };
 
-    case "VERIFICATION_SUBMITTED":
+    case NotificationType.BookingCancelled:
       return {
-        name: "camera",
-        color: colors.primary,
-        backgroundColor: colors.primaryLight,
+        name: "ban",
+        color: colors.error,
+        backgroundColor: "#FFEBEE",
       };
 
-    case "AUTO_APPROVAL_WARNING":
-      return {
-        name: "time",
-        color: colors.warning,
-        backgroundColor: "#FFF9C4",
-      };
-
-    case "PAYMENT_RECEIVED":
-    case "PAYOUT_SENT":
+    case NotificationType.PaymentReceived:
+    case NotificationType.PayoutProcessed:
       return {
         name: "cash",
         color: colors.success,
         backgroundColor: "#E8F5E9",
       };
 
-    case "PAYMENT_FAILED":
-    case "PAYOUT_FAILED":
+    case NotificationType.PaymentFailed:
+    case NotificationType.PaymentReminder:
       return {
         name: "alert-circle",
         color: colors.error,
         backgroundColor: "#FFEBEE",
       };
 
-    case "BOOKING_APPROVED":
-    case "BOOKING_AUTO_APPROVED":
+    case NotificationType.ProofUploaded:
+      return {
+        name: "camera",
+        color: colors.primary,
+        backgroundColor: colors.primaryLight,
+      };
+
+    case NotificationType.ProofApproved:
       return {
         name: "checkmark-done",
         color: colors.success,
         backgroundColor: "#E8F5E9",
       };
 
-    case "BOOKING_COMPLETED":
-      return {
-        name: "checkmark-circle-outline",
-        color: colors.gray600,
-        backgroundColor: colors.gray100,
-      };
-
-    case "DISPUTE_OPENED":
+    case NotificationType.ProofDisputed:
+    case NotificationType.ProofRejected:
       return {
         name: "warning",
         color: colors.warning,
         backgroundColor: "#FFF9C4",
       };
 
+    case NotificationType.DisputeFiled:
+    case NotificationType.DisputeResolved:
+      return {
+        name: "shield",
+        color: colors.warning,
+        backgroundColor: "#FFF9C4",
+      };
+
+    case NotificationType.MessageReceived:
+      return {
+        name: "chatbubble",
+        color: colors.primary,
+        backgroundColor: colors.primaryLight,
+      };
+
+    case NotificationType.SpaceApproved:
+    case NotificationType.SpaceReactivated:
+      return {
+        name: "business",
+        color: colors.success,
+        backgroundColor: "#E8F5E9",
+      };
+
+    case NotificationType.SpaceRejected:
+    case NotificationType.SpaceSuspended:
+      return {
+        name: "business",
+        color: colors.error,
+        backgroundColor: "#FFEBEE",
+      };
+
+    case NotificationType.RefundProcessed:
+      return {
+        name: "card",
+        color: colors.success,
+        backgroundColor: "#E8F5E9",
+      };
+
+    case NotificationType.SessionExpired:
+      return {
+        name: "log-out",
+        color: colors.warning,
+        backgroundColor: "#FFF9C4",
+      };
+
+    case NotificationType.SystemUpdate:
     default:
       return {
         name: "notifications",
@@ -98,18 +144,10 @@ export default function NotificationCard({
   onPress,
 }: NotificationCardProps) {
   const { theme } = useTheme();
-  const router = useRouter();
   const iconConfig = getNotificationIcon(notification.type);
 
   const handlePress = () => {
-    if (onPress) {
-      onPress(notification);
-    }
-
-    // Navigate to route if provided
-    if (notification.data.route) {
-      router.push(notification.data.route as Href);
-    }
+    if (onPress) onPress(notification);
   };
 
   const formattedTime = formatDistanceToNow(new Date(notification.createdAt), {
@@ -122,7 +160,7 @@ export default function NotificationCard({
       style={({ pressed }) => [
         styles.container,
         {
-          backgroundColor: notification.read
+          backgroundColor: notification.isRead
             ? theme.background
             : theme.backgroundSecondary,
           borderColor: theme.border,
@@ -148,14 +186,14 @@ export default function NotificationCard({
               styles.title,
               {
                 color: theme.text,
-                fontWeight: notification.read ? "500" : "700",
+                fontWeight: notification.isRead ? "500" : "700",
               },
             ]}
             numberOfLines={1}
           >
             {notification.title}
           </Text>
-          {!notification.read && <View style={styles.unreadDot} />}
+          {!notification.isRead && <View style={styles.unreadDot} />}
         </View>
 
         <Text

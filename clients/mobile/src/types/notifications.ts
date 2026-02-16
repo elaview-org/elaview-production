@@ -1,46 +1,21 @@
-// Notification types for Elaview mobile app
+// Notification types aligned with GraphQL schema
+// The NotificationType enum comes from @/types/graphql
 
-export type NotificationType =
-  | "BOOKING_REQUEST"
-  | "BOOKING_ACCEPTED"
-  | "BOOKING_DECLINED"
-  | "BOOKING_CANCELLED"
-  | "PAYMENT_RECEIVED"
-  | "PAYMENT_FAILED"
-  | "FILE_DOWNLOADED"
-  | "INSTALL_REMINDER"
-  | "VERIFICATION_SUBMITTED"
-  | "BOOKING_APPROVED"
-  | "BOOKING_AUTO_APPROVED"
-  | "AUTO_APPROVAL_WARNING"
-  | "DISPUTE_OPENED"
-  | "DISPUTE_RESOLVED"
-  | "PAYOUT_SENT"
-  | "PAYOUT_FAILED"
-  | "BOOKING_COMPLETED";
+import { NotificationType } from "@/types/graphql";
 
-export interface NotificationData {
-  bookingId?: string;
-  spaceId?: string;
-  payoutId?: string;
-  amount?: number;
-  route?: string;
-  [key: string]: unknown;
-}
+export { NotificationType };
 
-export interface Notification {
+/**
+ * Shape of a notification node from the myNotifications GraphQL query.
+ */
+export interface NotificationNode {
   id: string;
   type: NotificationType;
   title: string;
   body: string;
-  data: NotificationData;
-  read: boolean;
-  readAt: Date | null;
-  createdAt: Date;
-}
-
-export interface NotificationIconConfig {
-  name: string;
-  color: string;
-  backgroundColor: string;
+  entityType?: string | null;
+  entityId?: string | null;
+  isRead: boolean;
+  readAt?: string | null;
+  createdAt: string;
 }

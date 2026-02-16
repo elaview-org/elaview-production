@@ -1,7 +1,8 @@
 // Mock bookings data for development
-// These will be replaced with real API data later
+// DEPRECATED: No longer imported. Screens now use real GraphQL data.
+// Kept for reference only.
 
-import { BookingStatus } from "@/components/ui/StatusBadge";
+import { BookingStatus } from "@/types/graphql";
 
 export interface Booking {
   id: string;
@@ -38,7 +39,7 @@ export const mockAdvertiserBookings: Booking[] = [
     advertiserName: "Alex Johnson",
     ownerId: "owner-1",
     ownerName: "Sarah Chen",
-    status: "active",
+    status: BookingStatus.Installed,
     startDate: new Date("2026-01-01"),
     endDate: new Date("2026-01-31"),
     totalPrice: 500,
@@ -58,7 +59,7 @@ export const mockAdvertiserBookings: Booking[] = [
     advertiserName: "Alex Johnson",
     ownerId: "owner-3",
     ownerName: "Emma Williams",
-    status: "verification_pending",
+    status: BookingStatus.Verified,
     startDate: new Date("2026-01-05"),
     endDate: new Date("2026-02-05"),
     totalPrice: 900,
@@ -77,7 +78,7 @@ export const mockAdvertiserBookings: Booking[] = [
     advertiserName: "Alex Johnson",
     ownerId: "owner-2",
     ownerName: "Mike Rodriguez",
-    status: "pending",
+    status: BookingStatus.PendingApproval,
     startDate: new Date("2026-01-15"),
     endDate: new Date("2026-02-15"),
     totalPrice: 300,
@@ -97,7 +98,7 @@ export const mockAdvertiserBookings: Booking[] = [
     advertiserName: "Alex Johnson",
     ownerId: "owner-4",
     ownerName: "David Park",
-    status: "completed",
+    status: BookingStatus.Completed,
     startDate: new Date("2025-11-01"),
     endDate: new Date("2025-11-30"),
     totalPrice: 400,
@@ -121,7 +122,7 @@ export const mockOwnerBookings: Booking[] = [
     advertiserName: "TechStartup Inc.",
     ownerId: "user-1",
     ownerName: "Alex Johnson",
-    status: "pending",
+    status: BookingStatus.PendingApproval,
     startDate: new Date("2026-02-01"),
     endDate: new Date("2026-02-28"),
     totalPrice: 500,
@@ -140,7 +141,7 @@ export const mockOwnerBookings: Booking[] = [
     advertiserName: "Local Bakery Co.",
     ownerId: "user-1",
     ownerName: "Alex Johnson",
-    status: "pending",
+    status: BookingStatus.PendingApproval,
     startDate: new Date("2026-02-15"),
     endDate: new Date("2026-03-15"),
     totalPrice: 500,
@@ -160,7 +161,7 @@ export const mockOwnerBookings: Booking[] = [
     advertiserName: "Fitness Brand",
     ownerId: "user-1",
     ownerName: "Alex Johnson",
-    status: "active",
+    status: BookingStatus.Installed,
     startDate: new Date("2026-01-01"),
     endDate: new Date("2026-01-31"),
     totalPrice: 500,

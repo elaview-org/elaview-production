@@ -7,13 +7,16 @@ public static class Startup {
     public static async Task RunElaviewAsync(this WebApplication app,
         string[] args) {
         var envVars = Environment.GetEnvironmentVariables();
-        var serverPort = envVars["ELAVIEW_BACKEND_SERVER_PORT"]!.ToString();
+        var serverPort = envVars["ELAVIEW_BACKEND_SERVER_PORT"]?.ToString();
+        if (string.IsNullOrEmpty(serverPort))
+            serverPort = envVars["PORT"]?.ToString() ?? "8080";
         var logger = app.Services.GetRequiredService<ILogger<Program>>();
 
+        var hasTls = !string.IsNullOrEmpty(
+            envVars["ELAVIEW_BACKEND_SERVER_TLS_CERT_PATH"]?.ToString());
         app.Services.GetRequiredService<IHostApplicationLifetime>()
             .ApplicationStarted.Register(() => {
-                var protocol =
-                    app.Environment.IsDevelopment() ? "http" : "https";
+                var protocol = hasTls ? "https" : "http";
                 logger.LogInformation(
                     "{Protocol}://localhost:{ServerPort}", protocol, serverPort
                 );

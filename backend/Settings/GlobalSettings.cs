@@ -9,6 +9,8 @@ public class GlobalSettings {
 }
 
 public class DatabaseSettings {
+    public string ConnectionString { get; set; } = "";
+
     public string Host { get; set; } = "";
 
     public string Port { get; set; } = "";
@@ -18,6 +20,9 @@ public class DatabaseSettings {
     public string Password { get; set; } = "";
 
     public string GetConnectionString() {
+        if (!string.IsNullOrEmpty(ConnectionString))
+            return ConnectionString;
+
         return
             $"Host={Host};Port={Port};Database={User};Username={User};Password={Password};Include Error Detail=true";
     }

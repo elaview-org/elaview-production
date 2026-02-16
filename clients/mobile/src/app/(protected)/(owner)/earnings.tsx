@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback } from "react";
 import {
   View,
   Text,
@@ -6,80 +6,272 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
+  ActivityIndicator,
+  Linking,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "@/contexts/ThemeContext";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { spacing, fontSize, colors, borderRadius } from "@/constants/theme";
-import {
-  mockEarningsSummary,
-  mockTransactions,
-  mockPayouts,
-  formatCurrency,
-  EarningsTransaction,
-} from "@/mocks/earnings";
+import api from "@/api";
+import type { PayoutStatus } from "@/types/graphql";
+
+// ── Queries & Mutations ──────────────────────────────────────────────
+
+const EARNINGS_SUMMARY = api.gql`
+  query EarningsSummary {
+    earningsSummary {
+      availableBalance
+      pendingPayouts
+      totalEarnings
+      thisMonthEarnings
+      lastMonthEarnings
+    }
+  }
+`;
+
+const MY_PAYOUTS = api.gql`
+  query MyPayouts($first: Int, $after: String) {
+    myPayouts(first: $first, after: $after, order: [{ createdAt: DESC }]) {
+      edges {
+        cursor
+        node {
+          id
+          amount
+          status
+          stage
+          createdAt
+          processedAt
+          failureReason
+          booking {
+            id
+            space {
+              id
+              title
+            }
+            startDate
+            endDate
+          }
+        }
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+const STRIPE_ACCOUNT_STATUS = api.gql`
+  query StripeAccountStatus {
+    me {
+      id
+      spaceOwnerProfile {
+        id
+        stripeAccountId
+        stripeAccountStatus
+      }
+    }
+  }
+`;
+
+const CONNECT_STRIPE = api.gql`
+  mutation ConnectStripeAccount {
+    connectStripeAccount {
+      accountId
+      onboardingUrl
+      errors {
+        ... on PaymentError { message }
+        ... on NotFoundError { message }
+      }
+    }
+  }
+`;
+
+// ── Helpers ──────────────────────────────────────────────────────────
+
+function formatCurrency(value: number | null | undefined): string {
+  return `$${(value ?? 0).toLocaleString("en-US", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+}
+
+function payoutStatusLabel(status: PayoutStatus): string {
+  const map: Record<PayoutStatus, string> = {
+    COMPLETED: "Completed",
+    PENDING: "Pending",
+    PROCESSING: "Processing",
+    FAILED: "Failed",
+    PARTIALLY_PAID: "Partial",
+  };
+  return map[status] ?? status;
+}
+
+function payoutStatusColor(status: PayoutStatus): string {
+  switch (status) {
+    case "COMPLETED":
+      return colors.success;
+    case "PENDING":
+    case "PROCESSING":
+      return colors.warning;
+    case "FAILED":
+      return colors.error;
+    default:
+      return colors.primary;
+  }
+}
+
+// ── Payout node type ─────────────────────────────────────────────────
+
+interface PayoutNode {
+  id: string;
+  amount: number;
+  status: PayoutStatus;
+  stage: string;
+  createdAt: string;
+  processedAt: string | null;
+  failureReason: string | null;
+  booking: {
+    id: string;
+    space: { id: string; title: string } | null;
+    startDate: string;
+    endDate: string;
+  };
+}
+
+// ── Component ────────────────────────────────────────────────────────
 
 export default function Earnings() {
   const { theme } = useTheme();
-  const [refreshing, setRefreshing] = useState(false);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    setTimeout(() => setRefreshing(false), 1000);
-  };
+  const {
+    data: summaryData,
+    loading: summaryLoading,
+    refetch: refetchSummary,
+  } = api.query<{ earningsSummary: any }>(EARNINGS_SUMMARY);
 
-  const handleWithdraw = () => {
-    // TODO: Navigate to withdrawal flow
-  };
+  const {
+    data: payoutsData,
+    loading: payoutsLoading,
+    refetch: refetchPayouts,
+    fetchMore,
+  } = api.query<{ myPayouts: any }>(MY_PAYOUTS, {
+    variables: { first: 10 },
+  });
 
-  const renderTransaction = (transaction: EarningsTransaction) => {
-    const isPositive = transaction.amount > 0;
+  const {
+    data: stripeData,
+    refetch: refetchStripe,
+  } = api.query<{ me: any }>(STRIPE_ACCOUNT_STATUS);
+
+  const [connectStripe, { loading: connectingStripe }] =
+    api.mutation(CONNECT_STRIPE);
+
+  const summary = summaryData?.earningsSummary;
+  const payoutEdges = payoutsData?.myPayouts?.edges ?? [];
+  const payouts: PayoutNode[] = payoutEdges.map((e: any) => e.node);
+  const pageInfo = payoutsData?.myPayouts?.pageInfo;
+
+  const stripeProfile = stripeData?.me?.spaceOwnerProfile;
+  const stripeConnected = !!stripeProfile?.stripeAccountId;
+  const stripeStatus = stripeProfile?.stripeAccountStatus as string | null;
+
+  const loading = summaryLoading && !summaryData;
+
+  const onRefresh = useCallback(async () => {
+    await Promise.all([refetchSummary(), refetchPayouts(), refetchStripe()]);
+  }, [refetchSummary, refetchPayouts, refetchStripe]);
+
+  const handleLoadMore = useCallback(() => {
+    if (!pageInfo?.hasNextPage) return;
+    fetchMore({ variables: { after: pageInfo.endCursor } });
+  }, [fetchMore, pageInfo]);
+
+  const handleConnectStripe = useCallback(async () => {
+    try {
+      const { data } = await connectStripe();
+      const result = (data as any)?.connectStripeAccount;
+      const url = result?.onboardingUrl as string | undefined;
+      const errors = result?.errors as Array<{ message: string }> | undefined;
+      if (errors?.length) {
+        Alert.alert("Error", errors[0].message);
+        return;
+      }
+      if (url) {
+        await Linking.openURL(url);
+      }
+    } catch {
+      Alert.alert("Error", "Failed to connect Stripe account.");
+    }
+  }, [connectStripe]);
+
+  const renderPayout = (payout: PayoutNode) => {
+    const spaceTitle = payout.booking.space?.title ?? "Unknown Space";
+    const date = new Date(payout.createdAt);
+
     return (
       <View
-        key={transaction.id}
+        key={payout.id}
         style={[styles.transactionRow, { borderBottomColor: theme.border }]}
       >
         <View style={styles.transactionIcon}>
           <Ionicons
-            name={isPositive ? "arrow-down-circle" : "arrow-up-circle"}
+            name={
+              payout.status === "COMPLETED"
+                ? "checkmark-circle"
+                : payout.status === "FAILED"
+                  ? "close-circle"
+                  : "time"
+            }
             size={24}
-            color={isPositive ? colors.success : theme.textSecondary}
+            color={payoutStatusColor(payout.status)}
           />
         </View>
         <View style={styles.transactionDetails}>
           <Text style={[styles.transactionTitle, { color: theme.text }]}>
-            {transaction.description}
+            {spaceTitle}
           </Text>
-          {transaction.spaceTitle && (
-            <Text
-              style={[
-                styles.transactionSubtitle,
-                { color: theme.textSecondary },
-              ]}
-            >
-              {transaction.spaceTitle}
-            </Text>
-          )}
+          <Text
+            style={[
+              styles.transactionSubtitle,
+              { color: theme.textSecondary },
+            ]}
+          >
+            {payoutStatusLabel(payout.status)}
+          </Text>
           <Text style={[styles.transactionDate, { color: theme.textMuted }]}>
-            {transaction.createdAt.toLocaleDateString("en-US", {
+            {date.toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
             })}
           </Text>
         </View>
         <Text
-          style={[
-            styles.transactionAmount,
-            { color: isPositive ? colors.success : theme.text },
-          ]}
+          style={[styles.transactionAmount, { color: colors.success }]}
         >
-          {isPositive ? "+" : ""}
-          {formatCurrency(transaction.amount)}
+          +{formatCurrency(payout.amount)}
         </Text>
       </View>
     );
   };
+
+  // ── Loading state ────────────────────────────────────────────────
+
+  if (loading) {
+    return (
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: theme.background, justifyContent: "center", alignItems: "center" },
+        ]}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
     <ScrollView
@@ -87,7 +279,7 @@ export default function Earnings() {
       contentContainerStyle={styles.contentContainer}
       refreshControl={
         <RefreshControl
-          refreshing={refreshing}
+          refreshing={summaryLoading && !!summaryData}
           onRefresh={onRefresh}
           tintColor={theme.textMuted}
         />
@@ -100,21 +292,25 @@ export default function Earnings() {
           Available Balance
         </Text>
         <Text style={[styles.balanceAmount, { color: theme.text }]}>
-          {formatCurrency(mockEarningsSummary.availableBalance)}
+          {formatCurrency(summary?.availableBalance)}
         </Text>
         <View style={styles.pendingRow}>
           <Ionicons name="time-outline" size={14} color={colors.warning} />
           <Text style={[styles.pendingText, { color: theme.textSecondary }]}>
-            {formatCurrency(mockEarningsSummary.pendingBalance)} pending
+            {formatCurrency(summary?.pendingPayouts)} pending
           </Text>
         </View>
-        <Button
-          title="Withdraw Funds"
-          onPress={handleWithdraw}
-          variant="primary"
-          fullWidth
-          style={styles.withdrawButton}
-        />
+        {stripeConnected && (
+          <Button
+            title="Withdraw Funds"
+            onPress={() => {
+              // TODO: Navigate to withdrawal flow
+            }}
+            variant="primary"
+            fullWidth
+            style={styles.withdrawButton}
+          />
+        )}
       </Card>
 
       {/* Stats Row */}
@@ -124,7 +320,7 @@ export default function Earnings() {
             This Month
           </Text>
           <Text style={[styles.statValue, { color: theme.text }]}>
-            {formatCurrency(mockEarningsSummary.thisMonthEarnings)}
+            {formatCurrency(summary?.thisMonthEarnings)}
           </Text>
         </Card>
         <Card style={styles.statCard}>
@@ -132,65 +328,113 @@ export default function Earnings() {
             Last Month
           </Text>
           <Text style={[styles.statValue, { color: theme.text }]}>
-            {formatCurrency(mockEarningsSummary.lastMonthEarnings)}
+            {formatCurrency(summary?.lastMonthEarnings)}
           </Text>
         </Card>
       </View>
 
-      {/* Recent Activity */}
+      {/* Recent Payouts */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: theme.text }]}>
-            Recent Activity
+            Recent Payouts
           </Text>
-          <TouchableOpacity>
-            <Text style={[styles.seeAllText, { color: colors.primary }]}>
-              See All
-            </Text>
-          </TouchableOpacity>
+          {pageInfo?.hasNextPage && (
+            <TouchableOpacity onPress={handleLoadMore}>
+              <Text style={[styles.seeAllText, { color: colors.primary }]}>
+                Load More
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
         <Card style={styles.transactionsCard}>
-          {mockTransactions.slice(0, 5).map(renderTransaction)}
+          {payoutsLoading && payouts.length === 0 ? (
+            <View style={styles.emptyState}>
+              <ActivityIndicator size="small" color={theme.textMuted} />
+            </View>
+          ) : payouts.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Ionicons
+                name="wallet-outline"
+                size={32}
+                color={theme.textMuted}
+              />
+              <Text
+                style={[styles.emptyStateText, { color: theme.textMuted }]}
+              >
+                No payouts yet
+              </Text>
+            </View>
+          ) : (
+            payouts.map(renderPayout)
+          )}
         </Card>
       </View>
 
-      {/* Payout Methods */}
+      {/* Payout Method (Stripe) */}
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <Text style={[styles.sectionTitle, { color: theme.text }]}>
             Payout Method
           </Text>
-          <TouchableOpacity>
-            <Text style={[styles.seeAllText, { color: colors.primary }]}>
-              Edit
-            </Text>
-          </TouchableOpacity>
         </View>
-        <Card style={styles.payoutMethodCard}>
-          <View style={styles.payoutMethod}>
-            <View
-              style={[
-                styles.payoutIcon,
-                { backgroundColor: theme.backgroundSecondary },
-              ]}
-            >
-              <Ionicons name="card-outline" size={20} color={theme.text} />
-            </View>
-            <View style={styles.payoutDetails}>
-              <Text style={[styles.payoutTitle, { color: theme.text }]}>
-                Bank Account
-              </Text>
-              <Text
-                style={[styles.payoutSubtitle, { color: theme.textSecondary }]}
+        {stripeConnected ? (
+          <Card style={styles.payoutMethodCard}>
+            <View style={styles.payoutMethod}>
+              <View
+                style={[
+                  styles.payoutIcon,
+                  { backgroundColor: theme.backgroundSecondary },
+                ]}
               >
-                ••••4567
+                <Ionicons name="card-outline" size={20} color={theme.text} />
+              </View>
+              <View style={styles.payoutDetails}>
+                <Text style={[styles.payoutTitle, { color: theme.text }]}>
+                  Stripe Account
+                </Text>
+                <Text
+                  style={[
+                    styles.payoutSubtitle,
+                    { color: theme.textSecondary },
+                  ]}
+                >
+                  {stripeStatus === "active"
+                    ? "Active"
+                    : stripeStatus ?? "Connected"}
+                </Text>
+              </View>
+              <View style={styles.defaultBadge}>
+                <Text style={styles.defaultBadgeText}>Default</Text>
+              </View>
+            </View>
+          </Card>
+        ) : (
+          <Card style={styles.payoutMethodCard}>
+            <View style={styles.connectPrompt}>
+              <Ionicons
+                name="warning-outline"
+                size={24}
+                color={colors.warning}
+              />
+              <Text
+                style={[
+                  styles.connectPromptText,
+                  { color: theme.textSecondary },
+                ]}
+              >
+                Connect a Stripe account to receive payouts
               </Text>
+              <Button
+                title={connectingStripe ? "Connecting..." : "Connect Stripe"}
+                onPress={handleConnectStripe}
+                variant="primary"
+                fullWidth
+                style={styles.connectButton}
+              />
             </View>
-            <View style={styles.defaultBadge}>
-              <Text style={styles.defaultBadgeText}>Default</Text>
-            </View>
-          </View>
-        </Card>
+          </Card>
+        )}
       </View>
     </ScrollView>
   );
@@ -331,5 +575,27 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: fontSize.xs,
     fontWeight: "600",
+  },
+  emptyState: {
+    padding: spacing.xl,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyStateText: {
+    fontSize: fontSize.sm,
+    marginTop: spacing.sm,
+  },
+  connectPrompt: {
+    alignItems: "center",
+    padding: spacing.md,
+  },
+  connectPromptText: {
+    fontSize: fontSize.sm,
+    textAlign: "center",
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  connectButton: {
+    marginTop: spacing.xs,
   },
 });

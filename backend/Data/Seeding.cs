@@ -19,13 +19,27 @@ public static class Seeding {
             if (await context.Users.AnyAsync(u => u.Email == account.Email, ct))
                 continue;
 
-            context.Users.Add(new User {
+            var user = new User {
                 Email = account.Email,
                 Password = BCrypt.Net.BCrypt.HashPassword(account.PasswordPrefix + adminPassword),
                 Name = account.Name,
                 Role = account.Role,
                 Status = UserStatus.Active
-            });
+            };
+
+            context.Users.Add(user);
+
+            if (account.Role == UserRole.User) {
+                context.AdvertiserProfiles.Add(new AdvertiserProfile {
+                    UserId = user.Id,
+                    User = user
+                });
+
+                context.SpaceOwnerProfiles.Add(new SpaceOwnerProfile {
+                    UserId = user.Id,
+                    User = user
+                });
+            }
 
             await context.SaveChangesAsync(ct);
         }

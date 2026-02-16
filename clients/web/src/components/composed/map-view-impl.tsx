@@ -160,15 +160,17 @@ export default function MapViewImpl<TData>({
         {onViewChange && <ViewWatcher onViewChange={onViewChange} />}
         {data.map((item) => {
           const id = getValue(item, getId);
-          const lat = getValue(item, latitude);
-          const lng = getValue(item, longitude);
+          const position: [number, number] = [
+            getValue(item, latitude),
+            getValue(item, longitude),
+          ];
           const label = markerLabel ? getValue(item, markerLabel) : undefined;
           const icon = label ? createLabelIcon(label) : undefined;
 
           return (
             <Marker
               key={id}
-              position={[lat, lng]}
+              position={position}
               icon={icon}
               eventHandlers={
                 onMarkerClick ? { click: () => onMarkerClick(item) } : undefined

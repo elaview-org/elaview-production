@@ -1,10 +1,14 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
-import { MapContainer, Marker, Popup, useMap } from "react-leaflet";
+import { ReactNode, useEffect, useRef, useState } from "react";
+import { createRoot, Root } from "react-dom/client";
+import { MapContainer, useMap } from "react-leaflet";
 import ThemedTileLayer from "./themed-tile-layer";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
+import "leaflet.markercluster";
 import { cn } from "@/lib/core/utils";
 import { Button } from "@/components/primitives/button";
 import { IconCurrentLocation } from "@tabler/icons-react";
@@ -100,6 +104,139 @@ function ViewWatcher({ onViewChange }: ViewWatcherProps) {
   return null;
 }
 
+type MarkerClusterGroupProps<TData> = {
+  data: TData[];
+  getId: Accessor<TData, string>;
+  latitude: Accessor<TData, number>;
+  longitude: Accessor<TData, number>;
+  markerLabel?: Accessor<TData, string>;
+  renderPopup?: (item: TData) => ReactNode;
+  onMarkerClick?: (item: TData) => void;
+};
+
+function MarkerClusterGroup<TData>({
+  data,
+  getId,
+  latitude,
+  longitude,
+  markerLabel,
+  renderPopup,
+  onMarkerClick,
+}: MarkerClusterGroupProps<TData>) {
+  const map = useMap();
+  const clusterGroupRef = useRef<L.MarkerClusterGroup | null>(null);
+  const markersRef = useRef<Map<string, L.Marker>>(new Map());
+  const popupRootsRef = useRef<Map<string, Root>>(new Map());
+
+  useEffect(() => {
+    // Create cluster group
+    if (!clusterGroupRef.current) {
+      clusterGroupRef.current = L.markerClusterGroup({
+        chunkedLoading: true,
+        maxClusterRadius: 50,
+      });
+      map.addLayer(clusterGroupRef.current);
+    }
+
+    const clusterGroup = clusterGroupRef.current;
+
+    const markersRefs = markersRef.current;
+    const popupRootsRefs = popupRootsRef.current;
+    // Capture ref values for cleanup
+    const currentMarkers = new Map(markersRefs);
+    const currentPopupRoots = new Map(popupRootsRefs);
+    // Clear existing markers and popup roots
+    currentMarkers.forEach((marker) => {
+      clusterGroup.removeLayer(marker);
+    });
+    currentPopupRoots.forEach((root) => {
+      root.unmount();
+    });
+    markersRef.current.clear();
+    popupRootsRef.current.clear();
+
+    // Add new markers
+    data.forEach((item) => {
+      const id = getValue(item, getId);
+      const position: [number, number] = [
+        getValue(item, latitude),
+        getValue(item, longitude),
+      ];
+      const label = markerLabel ? getValue(item, markerLabel) : undefined;
+      const icon = label ? createLabelIcon(label) : undefined;
+
+      const marker = L.marker(position, { icon });
+
+      // Add popup if renderPopup is provided
+      if (renderPopup) {
+        const popupContainer = document.createElement("div");
+        const popup = L.popup({
+          content: popupContainer,
+          className: "custom-popup",
+        });
+        marker.bindPopup(popup);
+
+        // Create React root for popup content
+        const root = createRoot(popupContainer);
+        popupRootsRef.current.set(id, root);
+
+        // Render popup content when popup opens
+        marker.on("popupopen", () => {
+          root.render(renderPopup(item));
+        });
+
+        // Cleanup root when popup closes
+        marker.on("popupclose", () => {
+          root.render(null);
+        });
+      }
+
+      // Add click handler if onMarkerClick is provided
+      if (onMarkerClick) {
+        marker.on("click", () => {
+          onMarkerClick(item);
+        });
+      }
+
+      clusterGroup.addLayer(marker);
+      markersRef.current.set(id, marker);
+    });
+
+    // Cleanup - use captured values
+    return () => {
+      const cleanupClusterGroup = clusterGroupRef.current;
+      const cleanupMarkers = new Map(markersRefs);
+      const cleanupPopupRoots = new Map(popupRootsRefs);
+
+      if (cleanupClusterGroup) {
+        cleanupMarkers.forEach((marker) => {
+          cleanupClusterGroup.removeLayer(marker);
+        });
+        cleanupPopupRoots.forEach((root) => {
+          setTimeout(() => {
+            root.unmount();
+          }, 0);
+        });
+        map.removeLayer(cleanupClusterGroup);
+        clusterGroupRef.current = null;
+        markersRefs.clear();
+        popupRootsRefs.clear();
+      }
+    };
+  }, [
+    map,
+    data,
+    getId,
+    latitude,
+    longitude,
+    markerLabel,
+    renderPopup,
+    onMarkerClick,
+  ]);
+
+  return null;
+}
+
 function createLabelIcon(label: string): L.DivIcon {
   return L.divIcon({
     className: "map-view-marker",
@@ -158,28 +295,15 @@ export default function MapViewImpl<TData>({
         <ThemedTileLayer />
         {enableGeolocation && <GeolocationButton />}
         {onViewChange && <ViewWatcher onViewChange={onViewChange} />}
-        {data.map((item) => {
-          const id = getValue(item, getId);
-          const position: [number, number] = [
-            getValue(item, latitude),
-            getValue(item, longitude),
-          ];
-          const label = markerLabel ? getValue(item, markerLabel) : undefined;
-          const icon = label ? createLabelIcon(label) : undefined;
-
-          return (
-            <Marker
-              key={id}
-              position={position}
-              icon={icon}
-              eventHandlers={
-                onMarkerClick ? { click: () => onMarkerClick(item) } : undefined
-              }
-            >
-              {renderPopup && <Popup>{renderPopup(item)}</Popup>}
-            </Marker>
-          );
-        })}
+        <MarkerClusterGroup
+          data={data}
+          getId={getId}
+          latitude={latitude}
+          longitude={longitude}
+          markerLabel={markerLabel}
+          renderPopup={renderPopup}
+          onMarkerClick={onMarkerClick}
+        />
       </MapContainer>
     </div>
   );

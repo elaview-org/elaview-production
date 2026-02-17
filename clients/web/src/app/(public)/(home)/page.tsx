@@ -1,8 +1,14 @@
-import UnderConstruction from "@/components/status/under-construction";
 import { authenticatedRedirect } from "@/lib/services/auth";
+import Hero from "./hero";
+import FeaturedSpaces from "./featured-spaces";
 
 export default async function Page() {
   await authenticatedRedirect();
 
-  return <UnderConstruction />;
+  return (
+    <div className="flex flex-col gap-16 md:gap-24">
+      <Hero />
+      <FeaturedSpaces />
+    </div>
+  );
 }

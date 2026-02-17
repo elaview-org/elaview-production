@@ -72,6 +72,12 @@ type Documents = {
     "\n  fragment PaymentsHistoryTable_PaymentFragment on Payment {\n    id\n    amount\n    status\n    type\n    createdAt\n    paidAt\n    failureReason\n    receiptUrl\n    booking {\n      id\n      space {\n        title\n        images\n      }\n      campaign {\n        name\n      }\n    }\n  }\n": typeof types.PaymentsHistoryTable_PaymentFragmentFragmentDoc,
     "\n  fragment SpendingCards_SpendingSummaryFragment on SpendingSummary {\n    totalSpent\n    pendingPayments\n    thisMonthSpending\n    lastMonthSpending\n  }\n": typeof types.SpendingCards_SpendingSummaryFragmentFragmentDoc,
     "\n        mutation RequestRefund($input: RequestRefundInput!) {\n          requestRefund(input: $input) {\n            refund {\n              id\n              amount\n              status\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.RequestRefundDocument,
+    "\n  fragment Gallery_SharedSpaceFragment on Space {\n    title\n    images\n  }\n": typeof types.Gallery_SharedSpaceFragmentFragmentDoc,
+    "\n  fragment Header_SharedSpaceFragment on Space {\n    title\n    status\n    type\n  }\n": typeof types.Header_SharedSpaceFragmentFragmentDoc,
+    "\n  fragment OwnerCard_SpaceFragment on Space {\n    averageRating\n    spaceOwnerProfile {\n      businessName\n      user {\n        name\n        avatar\n      }\n    }\n  }\n": typeof types.OwnerCard_SpaceFragmentFragmentDoc,
+    "\n        query SharedSpaceDetail($id: ID!) {\n          spaceById(id: $id) {\n            id\n            ...Header_SharedSpaceFragment\n            ...Gallery_SharedSpaceFragment\n            ...SpaceInfo_SpaceFragment\n            ...PricingCard_SpaceFragment\n            ...OwnerCard_SpaceFragment\n          }\n        }\n      ": typeof types.SharedSpaceDetailDocument,
+    "\n  fragment PricingCard_SpaceFragment on Space {\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n  }\n": typeof types.PricingCard_SpaceFragmentFragmentDoc,
+    "\n  fragment SpaceInfo_SpaceFragment on Space {\n    description\n    address\n    city\n    state\n    zipCode\n    width\n    height\n    dimensionsText\n    traffic\n    availableFrom\n    availableTo\n    averageRating\n    totalBookings\n  }\n": typeof types.SpaceInfo_SpaceFragmentFragmentDoc,
     "\n  mutation SendMessage($input: SendMessageInput!) {\n    sendMessage(input: $input) {\n      message {\n        id\n        content\n        type\n        attachments\n        createdAt\n        senderUser {\n          id\n          name\n          avatar\n        }\n      }\n      errors {\n        ... on ForbiddenError {\n          message\n        }\n      }\n    }\n  }\n": typeof types.SendMessageDocument,
     "\n  mutation MarkConversationRead($input: MarkConversationReadInput!) {\n    markConversationRead(input: $input) {\n      participant {\n        id\n        lastReadAt\n      }\n      errors {\n        ... on ForbiddenError {\n          message\n        }\n      }\n    }\n  }\n": typeof types.MarkConversationReadDocument,
     "\n  query LoadEarlierMessages($conversationId: ID!, $before: String) {\n    messagesByConversation(\n      conversationId: $conversationId\n      last: 50\n      before: $before\n      order: [{ createdAt: ASC }]\n    ) {\n      nodes {\n        id\n        content\n        type\n        attachments\n        createdAt\n        senderUser {\n          id\n          name\n          avatar\n        }\n      }\n      pageInfo {\n        hasPreviousPage\n        startCursor\n      }\n    }\n  }\n": typeof types.LoadEarlierMessagesDocument,
@@ -118,12 +124,6 @@ type Documents = {
     "\n        mutation ConfirmSetupIntent($input: ConfirmSetupIntentInput!) {\n          confirmSetupIntent(input: $input) {\n            paymentMethod {\n              id\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.ConfirmSetupIntentDocument,
     "\n        mutation SetDefaultPaymentMethod(\n          $input: SetDefaultPaymentMethodInput!\n        ) {\n          setDefaultPaymentMethod(input: $input) {\n            paymentMethod {\n              id\n              isDefault\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.SetDefaultPaymentMethodDocument,
     "\n        mutation DeletePaymentMethod($input: DeletePaymentMethodInput!) {\n          deletePaymentMethod(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.DeletePaymentMethodDocument,
-    "\n  fragment Gallery_SharedSpaceFragment on Space {\n    title\n    images\n  }\n": typeof types.Gallery_SharedSpaceFragmentFragmentDoc,
-    "\n  fragment Header_SharedSpaceFragment on Space {\n    title\n    status\n    type\n  }\n": typeof types.Header_SharedSpaceFragmentFragmentDoc,
-    "\n  fragment OwnerCard_SpaceFragment on Space {\n    averageRating\n    spaceOwnerProfile {\n      businessName\n      user {\n        name\n        avatar\n      }\n    }\n  }\n": typeof types.OwnerCard_SpaceFragmentFragmentDoc,
-    "\n        query SharedSpaceDetail($id: ID!) {\n          spaceById(id: $id) {\n            id\n            ...Header_SharedSpaceFragment\n            ...Gallery_SharedSpaceFragment\n            ...SpaceInfo_SpaceFragment\n            ...PricingCard_SpaceFragment\n            ...OwnerCard_SpaceFragment\n          }\n        }\n      ": typeof types.SharedSpaceDetailDocument,
-    "\n  fragment PricingCard_SpaceFragment on Space {\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n  }\n": typeof types.PricingCard_SpaceFragmentFragmentDoc,
-    "\n  fragment SpaceInfo_SpaceFragment on Space {\n    description\n    address\n    city\n    state\n    zipCode\n    width\n    height\n    dimensionsText\n    traffic\n    availableFrom\n    availableTo\n    averageRating\n    totalBookings\n  }\n": typeof types.SpaceInfo_SpaceFragmentFragmentDoc,
     "\n  fragment AnalyticsBookingsChart_QueryFragment on Query {\n    spaceOwnerDailyStats(startDate: $startDate, endDate: $endDate) {\n      date\n      bookings\n    }\n  }\n": typeof types.AnalyticsBookingsChart_QueryFragmentFragmentDoc,
     "\n  fragment AnalyticsComparison_QueryFragment on Query {\n    spaceOwnerAnalytics(startDate: $startDate, endDate: $endDate) {\n      periodComparison {\n        current {\n          period\n          startDate\n          endDate\n          bookings\n          revenue\n          avgRating\n          completionRate\n        }\n        previous {\n          period\n          startDate\n          endDate\n          bookings\n          revenue\n          avgRating\n          completionRate\n        }\n      }\n    }\n  }\n": typeof types.AnalyticsComparison_QueryFragmentFragmentDoc,
     "\n  fragment AnalyticsHeatmapChart_QueryFragment on Query {\n    spaceOwnerAnalytics(startDate: $startDate, endDate: $endDate) {\n      bookingHeatmap\n    }\n  }\n": typeof types.AnalyticsHeatmapChart_QueryFragmentFragmentDoc,
@@ -194,6 +194,8 @@ type Documents = {
     "\n  fragment OverviewUpcomingPayoutsPayoutCard_PayoutFragment on Payout {\n    id\n    amount\n    stage\n    status\n    createdAt\n    booking {\n      space {\n        title\n      }\n    }\n  }\n": typeof types.OverviewUpcomingPayoutsPayoutCard_PayoutFragmentFragmentDoc,
     "\n      query OverviewData {\n        ...OverviewStatCards_QueryFragment\n        ...OverviewDeadlineWarnings_QueryFragment\n        ...OverviewPendingRequests_QueryFragment\n        ...OverviewActiveBookings_QueryFragment\n        ...OverviewTopSpaces_QueryFragment\n        ...OverviewUpcomingPayouts_QueryFragment\n        ...OverviewActivityChart_QueryFragment\n        ...OverviewRecentActivity_QueryFragment\n      }\n    ": typeof types.OverviewDataDocument,
     "\n        query DashboardUser {\n          me {\n            id\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      ": typeof types.DashboardUserDocument,
+    "\n  fragment FeaturedSpaceCard_SpaceFragment on Space {\n    id\n    title\n    description\n    city\n    state\n    images\n    type\n    pricePerDay\n    averageRating\n  }\n": typeof types.FeaturedSpaceCard_SpaceFragmentFragmentDoc,
+    "\n        query FeaturedSpaces {\n          spaces(first: 8, where: { status: { eq: ACTIVE } }) {\n            nodes {\n              id\n              ...FeaturedSpaceCard_SpaceFragment\n            }\n          }\n        }\n      ": typeof types.FeaturedSpacesDocument,
     "\n      mutation SwitchProfile($input: UpdateCurrentUserInput!) {\n        updateCurrentUser(input: $input) {\n          user {\n            id\n            activeProfileType\n          }\n          errors {\n            ... on Error {\n              message\n            }\n          }\n        }\n      }\n    ": typeof types.SwitchProfileDocument,
 };
 const documents: Documents = {
@@ -255,6 +257,12 @@ const documents: Documents = {
     "\n  fragment PaymentsHistoryTable_PaymentFragment on Payment {\n    id\n    amount\n    status\n    type\n    createdAt\n    paidAt\n    failureReason\n    receiptUrl\n    booking {\n      id\n      space {\n        title\n        images\n      }\n      campaign {\n        name\n      }\n    }\n  }\n": types.PaymentsHistoryTable_PaymentFragmentFragmentDoc,
     "\n  fragment SpendingCards_SpendingSummaryFragment on SpendingSummary {\n    totalSpent\n    pendingPayments\n    thisMonthSpending\n    lastMonthSpending\n  }\n": types.SpendingCards_SpendingSummaryFragmentFragmentDoc,
     "\n        mutation RequestRefund($input: RequestRefundInput!) {\n          requestRefund(input: $input) {\n            refund {\n              id\n              amount\n              status\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": types.RequestRefundDocument,
+    "\n  fragment Gallery_SharedSpaceFragment on Space {\n    title\n    images\n  }\n": types.Gallery_SharedSpaceFragmentFragmentDoc,
+    "\n  fragment Header_SharedSpaceFragment on Space {\n    title\n    status\n    type\n  }\n": types.Header_SharedSpaceFragmentFragmentDoc,
+    "\n  fragment OwnerCard_SpaceFragment on Space {\n    averageRating\n    spaceOwnerProfile {\n      businessName\n      user {\n        name\n        avatar\n      }\n    }\n  }\n": types.OwnerCard_SpaceFragmentFragmentDoc,
+    "\n        query SharedSpaceDetail($id: ID!) {\n          spaceById(id: $id) {\n            id\n            ...Header_SharedSpaceFragment\n            ...Gallery_SharedSpaceFragment\n            ...SpaceInfo_SpaceFragment\n            ...PricingCard_SpaceFragment\n            ...OwnerCard_SpaceFragment\n          }\n        }\n      ": types.SharedSpaceDetailDocument,
+    "\n  fragment PricingCard_SpaceFragment on Space {\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n  }\n": types.PricingCard_SpaceFragmentFragmentDoc,
+    "\n  fragment SpaceInfo_SpaceFragment on Space {\n    description\n    address\n    city\n    state\n    zipCode\n    width\n    height\n    dimensionsText\n    traffic\n    availableFrom\n    availableTo\n    averageRating\n    totalBookings\n  }\n": types.SpaceInfo_SpaceFragmentFragmentDoc,
     "\n  mutation SendMessage($input: SendMessageInput!) {\n    sendMessage(input: $input) {\n      message {\n        id\n        content\n        type\n        attachments\n        createdAt\n        senderUser {\n          id\n          name\n          avatar\n        }\n      }\n      errors {\n        ... on ForbiddenError {\n          message\n        }\n      }\n    }\n  }\n": types.SendMessageDocument,
     "\n  mutation MarkConversationRead($input: MarkConversationReadInput!) {\n    markConversationRead(input: $input) {\n      participant {\n        id\n        lastReadAt\n      }\n      errors {\n        ... on ForbiddenError {\n          message\n        }\n      }\n    }\n  }\n": types.MarkConversationReadDocument,
     "\n  query LoadEarlierMessages($conversationId: ID!, $before: String) {\n    messagesByConversation(\n      conversationId: $conversationId\n      last: 50\n      before: $before\n      order: [{ createdAt: ASC }]\n    ) {\n      nodes {\n        id\n        content\n        type\n        attachments\n        createdAt\n        senderUser {\n          id\n          name\n          avatar\n        }\n      }\n      pageInfo {\n        hasPreviousPage\n        startCursor\n      }\n    }\n  }\n": types.LoadEarlierMessagesDocument,
@@ -301,12 +309,6 @@ const documents: Documents = {
     "\n        mutation ConfirmSetupIntent($input: ConfirmSetupIntentInput!) {\n          confirmSetupIntent(input: $input) {\n            paymentMethod {\n              id\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": types.ConfirmSetupIntentDocument,
     "\n        mutation SetDefaultPaymentMethod(\n          $input: SetDefaultPaymentMethodInput!\n        ) {\n          setDefaultPaymentMethod(input: $input) {\n            paymentMethod {\n              id\n              isDefault\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": types.SetDefaultPaymentMethodDocument,
     "\n        mutation DeletePaymentMethod($input: DeletePaymentMethodInput!) {\n          deletePaymentMethod(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": types.DeletePaymentMethodDocument,
-    "\n  fragment Gallery_SharedSpaceFragment on Space {\n    title\n    images\n  }\n": types.Gallery_SharedSpaceFragmentFragmentDoc,
-    "\n  fragment Header_SharedSpaceFragment on Space {\n    title\n    status\n    type\n  }\n": types.Header_SharedSpaceFragmentFragmentDoc,
-    "\n  fragment OwnerCard_SpaceFragment on Space {\n    averageRating\n    spaceOwnerProfile {\n      businessName\n      user {\n        name\n        avatar\n      }\n    }\n  }\n": types.OwnerCard_SpaceFragmentFragmentDoc,
-    "\n        query SharedSpaceDetail($id: ID!) {\n          spaceById(id: $id) {\n            id\n            ...Header_SharedSpaceFragment\n            ...Gallery_SharedSpaceFragment\n            ...SpaceInfo_SpaceFragment\n            ...PricingCard_SpaceFragment\n            ...OwnerCard_SpaceFragment\n          }\n        }\n      ": types.SharedSpaceDetailDocument,
-    "\n  fragment PricingCard_SpaceFragment on Space {\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n  }\n": types.PricingCard_SpaceFragmentFragmentDoc,
-    "\n  fragment SpaceInfo_SpaceFragment on Space {\n    description\n    address\n    city\n    state\n    zipCode\n    width\n    height\n    dimensionsText\n    traffic\n    availableFrom\n    availableTo\n    averageRating\n    totalBookings\n  }\n": types.SpaceInfo_SpaceFragmentFragmentDoc,
     "\n  fragment AnalyticsBookingsChart_QueryFragment on Query {\n    spaceOwnerDailyStats(startDate: $startDate, endDate: $endDate) {\n      date\n      bookings\n    }\n  }\n": types.AnalyticsBookingsChart_QueryFragmentFragmentDoc,
     "\n  fragment AnalyticsComparison_QueryFragment on Query {\n    spaceOwnerAnalytics(startDate: $startDate, endDate: $endDate) {\n      periodComparison {\n        current {\n          period\n          startDate\n          endDate\n          bookings\n          revenue\n          avgRating\n          completionRate\n        }\n        previous {\n          period\n          startDate\n          endDate\n          bookings\n          revenue\n          avgRating\n          completionRate\n        }\n      }\n    }\n  }\n": types.AnalyticsComparison_QueryFragmentFragmentDoc,
     "\n  fragment AnalyticsHeatmapChart_QueryFragment on Query {\n    spaceOwnerAnalytics(startDate: $startDate, endDate: $endDate) {\n      bookingHeatmap\n    }\n  }\n": types.AnalyticsHeatmapChart_QueryFragmentFragmentDoc,
@@ -377,6 +379,8 @@ const documents: Documents = {
     "\n  fragment OverviewUpcomingPayoutsPayoutCard_PayoutFragment on Payout {\n    id\n    amount\n    stage\n    status\n    createdAt\n    booking {\n      space {\n        title\n      }\n    }\n  }\n": types.OverviewUpcomingPayoutsPayoutCard_PayoutFragmentFragmentDoc,
     "\n      query OverviewData {\n        ...OverviewStatCards_QueryFragment\n        ...OverviewDeadlineWarnings_QueryFragment\n        ...OverviewPendingRequests_QueryFragment\n        ...OverviewActiveBookings_QueryFragment\n        ...OverviewTopSpaces_QueryFragment\n        ...OverviewUpcomingPayouts_QueryFragment\n        ...OverviewActivityChart_QueryFragment\n        ...OverviewRecentActivity_QueryFragment\n      }\n    ": types.OverviewDataDocument,
     "\n        query DashboardUser {\n          me {\n            id\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      ": types.DashboardUserDocument,
+    "\n  fragment FeaturedSpaceCard_SpaceFragment on Space {\n    id\n    title\n    description\n    city\n    state\n    images\n    type\n    pricePerDay\n    averageRating\n  }\n": types.FeaturedSpaceCard_SpaceFragmentFragmentDoc,
+    "\n        query FeaturedSpaces {\n          spaces(first: 8, where: { status: { eq: ACTIVE } }) {\n            nodes {\n              id\n              ...FeaturedSpaceCard_SpaceFragment\n            }\n          }\n        }\n      ": types.FeaturedSpacesDocument,
     "\n      mutation SwitchProfile($input: UpdateCurrentUserInput!) {\n        updateCurrentUser(input: $input) {\n          user {\n            id\n            activeProfileType\n          }\n          errors {\n            ... on Error {\n              message\n            }\n          }\n        }\n      }\n    ": types.SwitchProfileDocument,
 };
 
@@ -629,6 +633,30 @@ export function graphql(source: "\n        mutation RequestRefund($input: Reques
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function graphql(source: "\n  fragment Gallery_SharedSpaceFragment on Space {\n    title\n    images\n  }\n"): (typeof documents)["\n  fragment Gallery_SharedSpaceFragment on Space {\n    title\n    images\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment Header_SharedSpaceFragment on Space {\n    title\n    status\n    type\n  }\n"): (typeof documents)["\n  fragment Header_SharedSpaceFragment on Space {\n    title\n    status\n    type\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment OwnerCard_SpaceFragment on Space {\n    averageRating\n    spaceOwnerProfile {\n      businessName\n      user {\n        name\n        avatar\n      }\n    }\n  }\n"): (typeof documents)["\n  fragment OwnerCard_SpaceFragment on Space {\n    averageRating\n    spaceOwnerProfile {\n      businessName\n      user {\n        name\n        avatar\n      }\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        query SharedSpaceDetail($id: ID!) {\n          spaceById(id: $id) {\n            id\n            ...Header_SharedSpaceFragment\n            ...Gallery_SharedSpaceFragment\n            ...SpaceInfo_SpaceFragment\n            ...PricingCard_SpaceFragment\n            ...OwnerCard_SpaceFragment\n          }\n        }\n      "): (typeof documents)["\n        query SharedSpaceDetail($id: ID!) {\n          spaceById(id: $id) {\n            id\n            ...Header_SharedSpaceFragment\n            ...Gallery_SharedSpaceFragment\n            ...SpaceInfo_SpaceFragment\n            ...PricingCard_SpaceFragment\n            ...OwnerCard_SpaceFragment\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment PricingCard_SpaceFragment on Space {\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n  }\n"): (typeof documents)["\n  fragment PricingCard_SpaceFragment on Space {\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment SpaceInfo_SpaceFragment on Space {\n    description\n    address\n    city\n    state\n    zipCode\n    width\n    height\n    dimensionsText\n    traffic\n    availableFrom\n    availableTo\n    averageRating\n    totalBookings\n  }\n"): (typeof documents)["\n  fragment SpaceInfo_SpaceFragment on Space {\n    description\n    address\n    city\n    state\n    zipCode\n    width\n    height\n    dimensionsText\n    traffic\n    availableFrom\n    availableTo\n    averageRating\n    totalBookings\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function graphql(source: "\n  mutation SendMessage($input: SendMessageInput!) {\n    sendMessage(input: $input) {\n      message {\n        id\n        content\n        type\n        attachments\n        createdAt\n        senderUser {\n          id\n          name\n          avatar\n        }\n      }\n      errors {\n        ... on ForbiddenError {\n          message\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation SendMessage($input: SendMessageInput!) {\n    sendMessage(input: $input) {\n      message {\n        id\n        content\n        type\n        attachments\n        createdAt\n        senderUser {\n          id\n          name\n          avatar\n        }\n      }\n      errors {\n        ... on ForbiddenError {\n          message\n        }\n      }\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -810,30 +838,6 @@ export function graphql(source: "\n        mutation SetDefaultPaymentMethod(\n  
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n        mutation DeletePaymentMethod($input: DeletePaymentMethodInput!) {\n          deletePaymentMethod(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "): (typeof documents)["\n        mutation DeletePaymentMethod($input: DeletePaymentMethodInput!) {\n          deletePaymentMethod(input: $input) {\n            success\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      "];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  fragment Gallery_SharedSpaceFragment on Space {\n    title\n    images\n  }\n"): (typeof documents)["\n  fragment Gallery_SharedSpaceFragment on Space {\n    title\n    images\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  fragment Header_SharedSpaceFragment on Space {\n    title\n    status\n    type\n  }\n"): (typeof documents)["\n  fragment Header_SharedSpaceFragment on Space {\n    title\n    status\n    type\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  fragment OwnerCard_SpaceFragment on Space {\n    averageRating\n    spaceOwnerProfile {\n      businessName\n      user {\n        name\n        avatar\n      }\n    }\n  }\n"): (typeof documents)["\n  fragment OwnerCard_SpaceFragment on Space {\n    averageRating\n    spaceOwnerProfile {\n      businessName\n      user {\n        name\n        avatar\n      }\n    }\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n        query SharedSpaceDetail($id: ID!) {\n          spaceById(id: $id) {\n            id\n            ...Header_SharedSpaceFragment\n            ...Gallery_SharedSpaceFragment\n            ...SpaceInfo_SpaceFragment\n            ...PricingCard_SpaceFragment\n            ...OwnerCard_SpaceFragment\n          }\n        }\n      "): (typeof documents)["\n        query SharedSpaceDetail($id: ID!) {\n          spaceById(id: $id) {\n            id\n            ...Header_SharedSpaceFragment\n            ...Gallery_SharedSpaceFragment\n            ...SpaceInfo_SpaceFragment\n            ...PricingCard_SpaceFragment\n            ...OwnerCard_SpaceFragment\n          }\n        }\n      "];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  fragment PricingCard_SpaceFragment on Space {\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n  }\n"): (typeof documents)["\n  fragment PricingCard_SpaceFragment on Space {\n    pricePerDay\n    installationFee\n    minDuration\n    maxDuration\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  fragment SpaceInfo_SpaceFragment on Space {\n    description\n    address\n    city\n    state\n    zipCode\n    width\n    height\n    dimensionsText\n    traffic\n    availableFrom\n    availableTo\n    averageRating\n    totalBookings\n  }\n"): (typeof documents)["\n  fragment SpaceInfo_SpaceFragment on Space {\n    description\n    address\n    city\n    state\n    zipCode\n    width\n    height\n    dimensionsText\n    traffic\n    availableFrom\n    availableTo\n    averageRating\n    totalBookings\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -1114,6 +1118,14 @@ export function graphql(source: "\n      query OverviewData {\n        ...Overvi
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n        query DashboardUser {\n          me {\n            id\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      "): (typeof documents)["\n        query DashboardUser {\n          me {\n            id\n            ...NavigationSection_UserFragment\n            ...UserSection_UserFragment\n            ...RoleBasedView_UserFragment\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment FeaturedSpaceCard_SpaceFragment on Space {\n    id\n    title\n    description\n    city\n    state\n    images\n    type\n    pricePerDay\n    averageRating\n  }\n"): (typeof documents)["\n  fragment FeaturedSpaceCard_SpaceFragment on Space {\n    id\n    title\n    description\n    city\n    state\n    images\n    type\n    pricePerDay\n    averageRating\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n        query FeaturedSpaces {\n          spaces(first: 8, where: { status: { eq: ACTIVE } }) {\n            nodes {\n              id\n              ...FeaturedSpaceCard_SpaceFragment\n            }\n          }\n        }\n      "): (typeof documents)["\n        query FeaturedSpaces {\n          spaces(first: 8, where: { status: { eq: ACTIVE } }) {\n            nodes {\n              id\n              ...FeaturedSpaceCard_SpaceFragment\n            }\n          }\n        }\n      "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

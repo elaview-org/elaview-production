@@ -12,6 +12,7 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
     "src/types/gql/**",
+    "src/tests/e2e/**",
     "coverage/**",
   ]),
 ]);

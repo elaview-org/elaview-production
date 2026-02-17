@@ -17,8 +17,9 @@
     "format:check": "prettier --check .",
     "gql:codegen": "graphql-codegen --config src/lib/gql/codegen.ts",
     "gql:codegen:watch": "graphql-codegen --config src/lib/gql/codegen.ts --watch",
-    "test:watch": "bun test --watch",
-    "test:coverage": "bun test --coverage",
+    "test": "bun test src/tests/issues src/tests/integration src/tests/snapshots",
+    "test:watch": "bun run test --watch",
+    "test:coverage": "bun run test --coverage",
     "test:e2e": "playwright test --config src/playwright.config.ts"
   },
   "dependencies": {

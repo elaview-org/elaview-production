@@ -32,6 +32,26 @@ export async function loginViaApi({
   return authCookie;
 }
 
+export async function registerViaApi({
+  name,
+  email,
+  password,
+}: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<void> {
+  const res = await fetch(`${apiUrl}/auth/signup`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name, email, password }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`Registration failed for ${email}: ${res.status}`);
+  }
+}
+
 export async function graphqlMutation(
   authCookie: string,
   query: string,

@@ -45,6 +45,10 @@ export async function createSpaceAction(
   const parsed = createSpaceSchema.safeParse(rawData);
 
   if (!parsed.success) {
+    console.error(
+      "[createSpaceAction] Zod validation failed:",
+      JSON.stringify(parsed.error.flatten())
+    );
     return {
       success: false,
       message: "Validation failed",
@@ -72,6 +76,7 @@ export async function createSpaceAction(
     maxDuration: parsed.data.maxDuration || null,
   };
 
+  let spaceId: string;
   try {
     const result = await api.mutate({
       mutation: graphql(`
@@ -109,18 +114,17 @@ export async function createSpaceAction(
       };
     }
 
-    revalidatePath("/listings");
-    redirect(`/listings/${payload.space.id}`);
+    spaceId = payload.space.id;
   } catch (error) {
-    if (error instanceof Error && error.message === "NEXT_REDIRECT") {
-      throw error;
-    }
     return {
       success: false,
       message: error instanceof Error ? error.message : "An error occurred",
       fieldErrors: {},
     };
   }
+
+  revalidatePath("/listings");
+  redirect(`/listings/${spaceId}`);
 }
 
 export async function updateSpaceAction(
@@ -347,16 +351,14 @@ export async function deleteSpaceAction(
     }
 
     revalidatePath("/listings");
-    redirect("/listings");
   } catch (error) {
-    if (error instanceof Error && error.message === "NEXT_REDIRECT") {
-      throw error;
-    }
     return {
       success: false,
       error: error instanceof Error ? error.message : "An error occurred",
     };
   }
+
+  redirect("/listings");
 }
 
 export interface BulkActionResult {

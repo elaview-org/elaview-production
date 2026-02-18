@@ -83,7 +83,7 @@ export default function ProfileSettingsForm({
     startUploadTransition(async () => {
       try {
         const sigResponse = await fetch(
-          `${env.client.apiUrl}/api/storage/upload-signature`,
+          `${env.client.apiUrl}/storage/upload-signature`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },

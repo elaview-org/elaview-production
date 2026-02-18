@@ -1,6 +1,13 @@
 "use client";
 
-import { ReactNode, useActionState, useEffect, useRef, useState } from "react";
+import {
+  ReactNode,
+  startTransition,
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Button } from "@/components/primitives/button";
 import Modal from "@/components/composed/modal";
 import { Input } from "@/components/primitives/input";
@@ -173,13 +180,15 @@ export default function CreateSpace() {
     fd.append("state", formData.state ?? "");
     fd.append("zipCode", formData.zipCode ?? "");
     fd.append("pricePerDay", String(formData.pricePerDay ?? ""));
-    fd.append("installationFee", String(formData.installationFee ?? ""));
     fd.append("minDuration", String(formData.minDuration ?? 1));
-    fd.append("maxDuration", String(formData.maxDuration ?? ""));
-    fd.append("width", String(formData.width ?? ""));
-    fd.append("height", String(formData.height ?? ""));
+    if (formData.installationFee != null)
+      fd.append("installationFee", String(formData.installationFee));
+    if (formData.maxDuration != null)
+      fd.append("maxDuration", String(formData.maxDuration));
+    if (formData.width != null) fd.append("width", String(formData.width));
+    if (formData.height != null) fd.append("height", String(formData.height));
 
-    action(fd);
+    startTransition(() => action(fd));
   };
 
   return (
@@ -994,7 +1003,7 @@ function PreviewSection({
 
 async function uploadImage(file: File, folder: string): Promise<string> {
   const sigResponse = await fetch(
-    `${env.client.apiUrl}/api/storage/upload-signature`,
+    `${env.client.apiUrl}/storage/upload-signature`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

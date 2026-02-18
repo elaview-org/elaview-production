@@ -731,7 +731,7 @@ function ReviewSection({
 
 async function uploadImage(file: File, folder: string): Promise<string> {
   const sigResponse = await fetch(
-    `${env.client.apiUrl}/api/storage/upload-signature`,
+    `${env.client.apiUrl}/storage/upload-signature`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

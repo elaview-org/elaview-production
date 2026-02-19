@@ -1,12 +1,12 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/primitives/button";
 import { Input } from "@/components/primitives/input";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import { IconCheck, IconLoader2 } from "@tabler/icons-react";
 import { TYPE_LABELS } from "../constants";
-import { updateSpaceAction, type UpdateSpaceState } from "../listings.actions";
+import api from "@/api/client";
 import { toast } from "sonner";
 
 export const Details_SpaceFragment = graphql(`
@@ -39,14 +39,7 @@ export default function Details({ data }: Props) {
   const space = getFragmentData(Details_SpaceFragment, data);
   const prevSuccessRef = useRef(false);
 
-  const boundAction = updateSpaceAction.bind(null, space.id);
-  const [state, action, pending] = useActionState<UpdateSpaceState, FormData>(
-    boundAction,
-    {
-      success: false,
-      message: "",
-    }
-  );
+  const [state, action, pending] = api.listings.useUpdateSpace(space.id);
 
   useEffect(() => {
     if (state.message) {

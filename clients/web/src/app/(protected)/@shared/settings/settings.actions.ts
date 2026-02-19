@@ -2,7 +2,7 @@
 
 import api from "@/lib/gql/server";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { logout } from "@/lib/services/auth.actions";
+import { logout } from "@/api/client/auth.actions";
 import {
   graphql,
   type NotificationType,

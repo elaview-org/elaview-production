@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Button } from "@/components/primitives/button";
 import {
   Dialog,
@@ -18,10 +18,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
-import {
-  bulkDeactivateSpacesAction,
-  bulkDeleteSpacesAction,
-} from "../listings.actions";
+import api from "@/api/client";
 
 type Props = {
   selectedIds: string[];
@@ -31,15 +28,18 @@ type Props = {
 export default function BulkActions({ selectedIds, onClearSelection }: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
-  const [isPending, startTransition] = useTransition();
+  const { bulkDeactivate, isPending: isDeactivatePending } =
+    api.listings.useBulkDeactivateSpaces();
+  const { bulkDelete, isPending: isDeletePending } =
+    api.listings.useBulkDeleteSpaces();
+  const isPending = isDeactivatePending || isDeletePending;
 
   const count = selectedIds.length;
   const confirmValue = count.toString();
   const isConfirmValid = confirmText === confirmValue;
 
   const handleDeactivate = () => {
-    startTransition(async () => {
-      const result = await bulkDeactivateSpacesAction(selectedIds);
+    bulkDeactivate(selectedIds, (result) => {
       if (result.success) {
         toast.success(`Deactivated ${result.successCount} spaces`);
         onClearSelection();
@@ -55,8 +55,7 @@ export default function BulkActions({ selectedIds, onClearSelection }: Props) {
   };
 
   const handleDelete = () => {
-    startTransition(async () => {
-      const result = await bulkDeleteSpacesAction(selectedIds);
+    bulkDelete(selectedIds, (result) => {
       setDeleteDialogOpen(false);
       setConfirmText("");
       if (result.success) {

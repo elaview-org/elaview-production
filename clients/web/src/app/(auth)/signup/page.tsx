@@ -1,7 +1,7 @@
 import { GalleryVerticalEnd } from "lucide-react";
 import Image from "next/image";
 import SignupForm from "@/app/(auth)/signup/signup-form";
-import { authenticatedRedirect } from "@/lib/services/auth";
+import { authenticatedRedirect } from "@/lib/core/auth";
 
 export default async function Page() {
   await authenticatedRedirect();

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  ReactNode,
-  startTransition,
-  useActionState,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ReactNode, startTransition, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/primitives/button";
 import Modal from "@/components/composed/modal";
 import { Input } from "@/components/primitives/input";
@@ -32,7 +25,7 @@ import {
   pricingStepSchema,
   type CreateSpaceFormData,
 } from "./schemas";
-import { createSpaceAction, type CreateSpaceState } from "./listings.actions";
+import api from "@/api/client";
 import { toast } from "sonner";
 import env from "@/lib/core/env";
 import Image from "next/image";
@@ -40,12 +33,6 @@ import { useLocalStorage } from "@/lib/hooks/use-local-storage";
 import storage from "@/lib/core/storage";
 
 type FormData = Partial<CreateSpaceFormData>;
-
-const initialState: CreateSpaceState = {
-  success: false,
-  message: "",
-  fieldErrors: {},
-};
 
 const emptyFormData: FormData = {
   images: [],
@@ -70,10 +57,7 @@ export default function CreateSpace() {
     (formData.images && formData.images.length > 0) ||
     formData.type;
 
-  const [state, action, pending] = useActionState(
-    createSpaceAction,
-    initialState
-  );
+  const [state, action, pending] = api.listings.useCreateSpace();
 
   useEffect(() => {
     if (state.message && !state.success) {

@@ -1,6 +1,5 @@
 "use client";
 
-import signup from "./signup.action";
 import { Button } from "@/components/primitives/button";
 import {
   Field,
@@ -10,20 +9,10 @@ import {
   FieldSeparator,
 } from "@/components/primitives/field";
 import { Input } from "@/components/primitives/input";
-
-import { useActionState } from "react";
+import api from "@/api/client";
 
 export default function SignupForm() {
-  const [state, action, pending] = useActionState(signup, {
-    success: false,
-    message: "",
-    data: {
-      name: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    },
-  });
+  const [state, action, pending] = api.auth.useSignup();
 
   return (
     <form className={"flex flex-col gap-6"} action={action}>

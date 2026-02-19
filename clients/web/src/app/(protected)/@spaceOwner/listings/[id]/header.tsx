@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/primitives/badge";
 import { Button } from "@/components/primitives/button";
 import {
@@ -40,11 +40,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
-import {
-  deactivateSpaceAction,
-  reactivateSpaceAction,
-  deleteSpaceAction,
-} from "../listings.actions";
+import api from "@/api/client";
 import { toast } from "sonner";
 
 const Header_SpaceFragment = graphql(`
@@ -64,11 +60,16 @@ export default function Header({ data }: Props) {
   const space = getFragmentData(Header_SpaceFragment, data);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleteConfirmation, setDeleteConfirmation] = useState("");
-  const [pending, startTransition] = useTransition();
+  const { deactivate, isPending: isDeactivatePending } =
+    api.listings.useDeactivateSpace();
+  const { reactivate, isPending: isReactivatePending } =
+    api.listings.useReactivateSpace();
+  const { deleteSpace, isPending: isDeletePending } =
+    api.listings.useDeleteSpace();
+  const pending = isDeactivatePending || isReactivatePending || isDeletePending;
 
   const handleDeactivate = () => {
-    startTransition(async () => {
-      const result = await deactivateSpaceAction(space.id);
+    deactivate(space.id, (result) => {
       if (result.success) {
         toast.success("Space deactivated");
       } else {
@@ -78,8 +79,7 @@ export default function Header({ data }: Props) {
   };
 
   const handleReactivate = () => {
-    startTransition(async () => {
-      const result = await reactivateSpaceAction(space.id);
+    reactivate(space.id, (result) => {
       if (result.success) {
         toast.success("Space reactivated");
       } else {
@@ -91,8 +91,7 @@ export default function Header({ data }: Props) {
   const handleDelete = () => {
     if (deleteConfirmation !== space.title) return;
 
-    startTransition(async () => {
-      const result = await deleteSpaceAction(space.id);
+    deleteSpace(space.id, (result) => {
       if (!result.success) {
         toast.error(result.error ?? "Failed to delete space");
       }

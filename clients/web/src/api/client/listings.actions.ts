@@ -8,7 +8,7 @@ import {
 } from "@/types/gql";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createSpaceSchema } from "./schemas";
+import { createSpaceSchema } from "@/app/(protected)/@spaceOwner/listings/schemas";
 
 export interface CreateSpaceState {
   success: boolean;
@@ -19,6 +19,13 @@ export interface CreateSpaceState {
 export interface UpdateSpaceState {
   success: boolean;
   message: string;
+}
+
+export interface BulkActionResult {
+  success: boolean;
+  successCount: number;
+  failedCount: number;
+  errors: string[];
 }
 
 export async function createSpaceAction(
@@ -361,13 +368,6 @@ export async function deleteSpaceAction(
   redirect("/listings");
 }
 
-export interface BulkActionResult {
-  success: boolean;
-  successCount: number;
-  failedCount: number;
-  errors: string[];
-}
-
 export async function bulkDeactivateSpacesAction(
   ids: string[]
 ): Promise<BulkActionResult> {
@@ -457,4 +457,93 @@ export async function bulkDeleteSpacesAction(
     failedCount,
     errors,
   };
+}
+
+export async function blockDatesAction(
+  spaceId: string,
+  dates: string[],
+  reason?: string
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const result = await api.mutate({
+      mutation: graphql(`
+        mutation BlockDates($input: BlockDatesInput!) {
+          blockDates(input: $input) {
+            blockedDates {
+              id
+              date
+            }
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+      variables: {
+        input: {
+          spaceId,
+          dates,
+          reason: reason || null,
+        },
+      },
+    });
+
+    const payload = result.data?.blockDates;
+
+    if (payload?.errors?.length) {
+      return { success: false, error: payload.errors[0].message };
+    }
+
+    revalidatePath(`/listings/${spaceId}`);
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
+}
+
+export async function unblockDatesAction(
+  spaceId: string,
+  dates: string[]
+): Promise<{ success: boolean; error: string | null }> {
+  try {
+    const result = await api.mutate({
+      mutation: graphql(`
+        mutation UnblockDates($input: UnblockDatesInput!) {
+          unblockDates(input: $input) {
+            unblockedCount
+            errors {
+              ... on Error {
+                message
+              }
+            }
+          }
+        }
+      `),
+      variables: {
+        input: {
+          spaceId,
+          dates,
+        },
+      },
+    });
+
+    const payload = result.data?.unblockDates;
+
+    if (payload?.errors?.length) {
+      return { success: false, error: payload.errors[0].message };
+    }
+
+    revalidatePath(`/listings/${spaceId}`);
+    return { success: true, error: null };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "An error occurred",
+    };
+  }
 }

@@ -14,7 +14,7 @@ export default function Footer() {
   return (
     <footer className="mt-auto">
       <Separator />
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-8 lg:px-6">
+      <div className="px-public flex flex-col gap-6 py-8">
         <div className="flex items-center gap-2">
           <IconInnerShadowTop className="size-5" />
           <span className="text-base font-semibold">Elaview</span>

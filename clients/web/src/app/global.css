@@ -53,6 +53,9 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-hero-foreground: var(--hero-foreground);
+  --color-hero-muted-foreground: var(--hero-muted-foreground);
+  --color-hero-overlay: var(--hero-overlay);
 }
 
 :root {
@@ -102,6 +105,9 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --hero-foreground: oklch(0.12 0 0);
+  --hero-muted-foreground: oklch(0.32 0 0);
+  --hero-overlay: oklch(1 0 0 / 25%);
 }
 
 :root[data-theme="dark"] {
@@ -150,6 +156,18 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+  --hero-foreground: oklch(0.985 0 0);
+  --hero-muted-foreground: oklch(0.75 0 0);
+  --hero-overlay: oklch(1 0 0 / 5%);
+}
+
+@layer utilities {
+  .px-public {
+    @apply px-8 md:px-36;
+  }
+  .bleed-public {
+    @apply -mx-8 md:-mx-36;
+  }
 }
 
 @layer base {

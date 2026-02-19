@@ -4,7 +4,6 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   cacheComponents: true,
   output: "standalone",
-  // logging: false,
   env: {
     API_URL: process.env.ELAVIEW_WEB_API_URL,
     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
@@ -16,6 +15,7 @@ const nextConfig: NextConfig = {
     globalNotFound: true,
   },
   images: {
+    qualities: [75, 90],
     remotePatterns: [
       {
         protocol: "https",
@@ -28,6 +28,10 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.pravatar.cc",
       },
     ],
   },

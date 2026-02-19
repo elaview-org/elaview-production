@@ -2,10 +2,10 @@ import Link from "next/link";
 import api from "@/api/server";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import { Button } from "@/components/primitives/button";
-import MediaCard, { MediaCardSkeleton } from "@/components/composed/media-card";
+import MediaCard from "@/components/composed/media-card";
 import { SPACE_TYPE } from "@/lib/core/constants";
-import { formatCurrency } from "@/lib/core/utils";
 import { IconStar } from "@tabler/icons-react";
+import { formatCurrency } from "@/lib/core/utils";
 
 const FeaturedSpaceCard_SpaceFragment = graphql(`
   fragment FeaturedSpaceCard_SpaceFragment on Space {
@@ -21,7 +21,7 @@ const FeaturedSpaceCard_SpaceFragment = graphql(`
   }
 `);
 
-export default async function FeaturedSpaces() {
+export default async function Page() {
   const spaces = await api
     .query({
       query: graphql(`
@@ -60,24 +60,6 @@ export default async function FeaturedSpaces() {
           <Button variant="outline" size="lg" asChild>
             <Link href="/spaces">View All Spaces</Link>
           </Button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function FeaturedSpacesSkeleton() {
-  return (
-    <section>
-      <div className="flex flex-col gap-8">
-        <div className="flex flex-col gap-2">
-          <div className="bg-muted h-9 w-48 rounded" />
-          <div className="bg-muted h-5 w-96 rounded" />
-        </div>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <MediaCardSkeleton key={i} />
-          ))}
         </div>
       </div>
     </section>

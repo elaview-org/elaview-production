@@ -51,7 +51,7 @@ export default function Header() {
           : "border-b border-transparent bg-transparent"
       )}
     >
-      <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 lg:px-6">
+      <div className="px-public flex h-14 items-center gap-4">
         <Link href="/" className="flex items-center gap-2">
           <IconInnerShadowTop className="size-5" />
           <span className="text-base font-semibold">Elaview</span>

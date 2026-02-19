@@ -1,6 +1,6 @@
 import { subDays } from "date-fns";
 import { connection } from "next/server";
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import { graphql } from "@/types/gql";
 
 const getAnalytics = api.createFragmentReader(async () => {

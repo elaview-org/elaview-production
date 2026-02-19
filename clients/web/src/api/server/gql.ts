@@ -35,6 +35,7 @@ const {
       }),
     })
 );
+export { PreloadQuery };
 
 function throwIfAuthError(error: unknown) {
   if (
@@ -112,12 +113,10 @@ function createFragmentReader<TQuery>(queryFn: () => Promise<TQuery>) {
   };
 }
 
-const api = {
+const gql = {
   query,
   mutate,
   getClient,
   createFragmentReader,
 };
-
-export default api;
-export { PreloadQuery };
+export default gql;

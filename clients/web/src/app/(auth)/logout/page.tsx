@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { logout } from "@/lib/services/auth.actions";
+import api from "@/api/client";
 
 export default function Page() {
+  const { logout } = api.auth.useLogout();
+
   useEffect(() => {
-    void logout();
-  }, []);
+    logout();
+  }, [logout]);
 }

@@ -1,5 +1,5 @@
 import "server-only";
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import { graphql } from "@/types/gql";
 import assert from "node:assert";
 

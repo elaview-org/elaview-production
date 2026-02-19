@@ -1,4 +1,4 @@
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import { graphql } from "@/types/gql";
 import { cookies } from "next/headers";
 import CalendarWrapper from "./calendar-wrapper";

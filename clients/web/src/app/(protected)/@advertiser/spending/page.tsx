@@ -1,4 +1,4 @@
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import { graphql, type PaymentFilterInput } from "@/types/gql";
 import { subDays } from "date-fns";
 import SpendingCards from "./spending-cards";

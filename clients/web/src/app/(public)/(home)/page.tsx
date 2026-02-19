@@ -1,4 +1,4 @@
-import { authenticatedRedirect } from "@/lib/services/auth";
+import { authenticatedRedirect } from "@/lib/core/auth";
 import Hero from "./hero";
 import FeaturedSpaces from "./featured-spaces";
 

@@ -26,17 +26,17 @@ export default function Page() {
         className="hidden object-cover object-center dark:block"
       />
 
-      <div className="absolute inset-0 bg-hero-overlay" />
+      <div className="bg-hero-overlay absolute inset-0" />
 
       <div className="px-public relative z-10 flex min-h-svh items-center pt-14">
         <div className="flex w-full flex-col items-center text-center md:w-1/2 md:items-start md:text-left">
-          <h1 className="text-4xl leading-tight font-bold tracking-tight text-hero-foreground sm:text-5xl md:text-7xl">
+          <h1 className="text-hero-foreground text-4xl leading-tight font-bold tracking-tight sm:text-5xl md:text-7xl">
             Discover Hidden
             <br />
             Advertising Spaces
           </h1>
 
-          <p className="mt-4 text-2xl text-hero-muted-foreground sm:text-lg md:max-w-sm">
+          <p className="text-hero-muted-foreground mt-4 text-2xl sm:text-lg md:max-w-sm">
             Connect with space owners and advertisers in the most trusted
             advertising marketplace.
           </p>
@@ -51,7 +51,7 @@ export default function Page() {
             </Link>
             <Link
               href="/list-space"
-              className="flex items-center gap-2 rounded-md border border-hero-foreground/20 bg-hero-foreground/5 px-6 py-3.5 text-base font-medium text-hero-foreground backdrop-blur-sm transition-all hover:bg-hero-foreground/10"
+              className="border-hero-foreground/20 bg-hero-foreground/5 text-hero-foreground hover:bg-hero-foreground/10 flex items-center gap-2 rounded-md border px-6 py-3.5 text-base font-medium backdrop-blur-sm transition-all"
             >
               List Properties
               <ArrowRight size={16} strokeWidth={2} />
@@ -64,7 +64,7 @@ export default function Page() {
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div
                     key={i}
-                    className="h-9 w-9 overflow-hidden rounded-full border-2 border-hero-foreground/20 ring-1 ring-black/20"
+                    className="border-hero-foreground/20 h-9 w-9 overflow-hidden rounded-full border-2 ring-1 ring-black/20"
                   >
                     <Image
                       src={`https://i.pravatar.cc/36?img=${i}`}
@@ -90,9 +90,9 @@ export default function Page() {
                     </svg>
                   ))}
                 </div>
-                <p className="text-xs text-hero-foreground/50">
+                <p className="text-hero-foreground/50 text-xs">
                   Trusted by{" "}
-                  <span className="font-medium text-hero-foreground/80">
+                  <span className="text-hero-foreground/80 font-medium">
                     500+
                   </span>{" "}
                   advertisers & space owners

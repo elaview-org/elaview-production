@@ -1,4 +1,4 @@
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import { graphql } from "@/types/gql";
 import { notFound } from "next/navigation";
 import Header from "./header";

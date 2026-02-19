@@ -1,10 +1,8 @@
-import { authenticatedRedirect } from "@/lib/services/auth";
-import HeroSection from "@/components/landing/hero-section";
+import { authenticatedRedirect } from "@/lib/core/auth";
+import HeroSection from "./hero-section";
 
 export default async function Page() {
   await authenticatedRedirect();
 
-  return (
-    <HeroSection />
-  );
+  return <HeroSection />;
 }

@@ -9,22 +9,31 @@ export const photosStepSchema = z.object({
 });
 
 export const detailsStepSchema = z.object({
-  type: z.nativeEnum(SpaceType, { message: "Space type is required" }),
-  title: z.string().min(1, "Title is required").max(100, "Title is too long"),
+  type: z.nativeEnum(SpaceType, { error: "Space type is required" }),
+  title: z
+    .string({ error: "Title is required" })
+    .min(1, "Title is required")
+    .max(100, "Title is too long"),
   description: z.string().max(500, "Description is too long").optional(),
 });
 
 export const locationStepSchema = z.object({
-  address: z.string().min(1, "Address is required"),
-  city: z.string().min(1, "City is required"),
-  state: z.string().length(2, "State must be 2 characters"),
+  address: z
+    .string({ error: "Address is required" })
+    .min(1, "Address is required"),
+  city: z.string({ error: "City is required" }).min(1, "City is required"),
+  state: z
+    .string({ error: "State must be 2 characters" })
+    .length(2, "State must be 2 characters"),
   zipCode: z.string().optional(),
 });
 
 export const pricingStepSchema = z.object({
   width: z.coerce.number().positive("Width must be positive").optional(),
   height: z.coerce.number().positive("Height must be positive").optional(),
-  pricePerDay: z.coerce.number().min(1, "Daily rate must be at least $1"),
+  pricePerDay: z.coerce
+    .number({ error: "Daily rate must be at least $1" })
+    .min(1, "Daily rate must be at least $1"),
   installationFee: z.coerce
     .number()
     .nonnegative("Installation fee cannot be negative")

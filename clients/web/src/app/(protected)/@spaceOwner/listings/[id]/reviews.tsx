@@ -1,4 +1,4 @@
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import { formatDate, getInitials } from "@/lib/core/utils";
 import { graphql } from "@/types/gql";
 import {

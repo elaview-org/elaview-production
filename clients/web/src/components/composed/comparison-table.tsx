@@ -44,6 +44,12 @@ function MetricRowComponent({
   const isPositive = change > 0;
   const isNeutral = change === 0;
 
+  const ChangeIcon = isNeutral
+    ? IconMinus
+    : isPositive
+      ? IconArrowUp
+      : IconArrowDown;
+
   return (
     <div className="flex items-center justify-between border-b py-3 last:border-0">
       <span className="text-muted-foreground text-sm">{label}</span>
@@ -62,9 +68,7 @@ function MetricRowComponent({
             isNeutral && "text-muted-foreground"
           )}
         >
-          {isPositive && <IconArrowUp className="size-3" />}
-          {!isPositive && !isNeutral && <IconArrowDown className="size-3" />}
-          {isNeutral && <IconMinus className="size-3" />}
+          <ChangeIcon className="size-3" />
           {Math.abs(change).toFixed(1)}%
         </div>
       </div>

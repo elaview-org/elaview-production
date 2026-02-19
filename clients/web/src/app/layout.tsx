@@ -1,5 +1,5 @@
 import "./global.css";
-import { ApolloWrapper } from "@/lib/gql/client";
+import { ApolloWrapper } from "@/api/client";
 
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";

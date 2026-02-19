@@ -51,6 +51,31 @@ export default function SummaryCard({
           : "neutral"
       : null;
 
+  const renderBadge = () => {
+    if (!badge) return null;
+
+    if (badge.type === "trend" && trend !== "neutral") {
+      const TrendIcon = trend === "up" ? IconTrendingUp : IconTrendingDown;
+      const formattedValue = `${badge.value > 0 ? "+" : ""}${badge.value.toFixed(1)}%`;
+
+      return (
+        <Badge variant="outline">
+          <TrendIcon />
+          {formattedValue}
+        </Badge>
+      );
+    }
+
+    if (badge.type === "text") {
+      return (
+        <Badge variant="outline" className={badge.className}>
+          {badge.text}
+        </Badge>
+      );
+    }
+
+    return null;
+  };
   return (
     <Card className="@container/card">
       <CardHeader>
@@ -58,20 +83,7 @@ export default function SummaryCard({
         <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
           {value}
         </CardTitle>
-        <CardAction>
-          {badge?.type === "trend" && trend !== "neutral" && (
-            <Badge variant="outline">
-              {trend === "up" ? <IconTrendingUp /> : <IconTrendingDown />}
-              {badge.value > 0 ? "+" : ""}
-              {badge.value.toFixed(1)}%
-            </Badge>
-          )}
-          {badge?.type === "text" && (
-            <Badge variant="outline" className={badge.className}>
-              {badge.text}
-            </Badge>
-          )}
-        </CardAction>
+        <CardAction>{renderBadge()}</CardAction>
       </CardHeader>
       <CardFooter className="flex-col items-start gap-1.5 text-sm">
         <div className="line-clamp-1 flex gap-2 font-medium">

@@ -78,6 +78,26 @@ export function useBreadcrumbLabel(segment: string, label: string | undefined) {
   }, [setLabel, removeLabel, segment, label]);
 }
 
+function BreadcrumbSegmentItem({
+  segment,
+  isLast,
+}: {
+  segment: BreadcrumbSegment;
+  isLast: boolean;
+}) {
+  return (
+    <BreadcrumbItem>
+      {isLast ? (
+        <BreadcrumbPage>{segment.label}</BreadcrumbPage>
+      ) : (
+        <BreadcrumbLink asChild>
+          <Link href={segment.url}>{segment.label}</Link>
+        </BreadcrumbLink>
+      )}
+    </BreadcrumbItem>
+  );
+}
+
 export default function BreadcrumbNav() {
   const pathname = usePathname();
   const ctx = useContext(BreadcrumbContext);
@@ -93,15 +113,7 @@ export default function BreadcrumbNav() {
           return (
             <Fragment key={segment.url}>
               {index > 0 && <BreadcrumbSeparator />}
-              <BreadcrumbItem>
-                {isLast ? (
-                  <BreadcrumbPage>{segment.label}</BreadcrumbPage>
-                ) : (
-                  <BreadcrumbLink asChild>
-                    <Link href={segment.url}>{segment.label}</Link>
-                  </BreadcrumbLink>
-                )}
-              </BreadcrumbItem>
+              <BreadcrumbSegmentItem segment={segment} isLast={isLast} />
             </Fragment>
           );
         })}

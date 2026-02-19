@@ -3,8 +3,8 @@
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import { IconLoader2, IconPhoto, IconPlus, IconX } from "@tabler/icons-react";
 import Image from "next/image";
-import { useRef, useState, useTransition } from "react";
-import { updateSpaceImagesAction } from "../listings.actions";
+import { useRef, useState } from "react";
+import api from "@/api/client";
 import { toast } from "sonner";
 import env from "@/lib/core/env";
 
@@ -25,7 +25,8 @@ export default function Gallery({ data }: Props) {
   const [images, setImages] = useState(space.images);
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
-  const [pending, startTransition] = useTransition();
+  const { updateImages, isPending: pending } =
+    api.listings.useUpdateSpaceImages();
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -51,8 +52,7 @@ export default function Gallery({ data }: Props) {
     setUploading(false);
     if (inputRef.current) inputRef.current.value = "";
 
-    startTransition(async () => {
-      const result = await updateSpaceImagesAction(space.id, newImages);
+    updateImages(space.id, newImages, (result) => {
       if (!result.success) {
         toast.error(result.error ?? "Failed to save images");
         setImages(images);
@@ -66,8 +66,7 @@ export default function Gallery({ data }: Props) {
     const newImages = images.filter((_, i) => i !== index);
     setImages(newImages);
 
-    startTransition(async () => {
-      const result = await updateSpaceImagesAction(space.id, newImages);
+    updateImages(space.id, newImages, (result) => {
       if (!result.success) {
         toast.error(result.error ?? "Failed to remove image");
         setImages(images);
@@ -156,7 +155,7 @@ export default function Gallery({ data }: Props) {
 
 async function uploadImage(file: File, folder: string): Promise<string> {
   const sigResponse = await fetch(
-    `${env.client.apiUrl}/api/storage/upload-signature`,
+    `${env.client.apiUrl}/storage/upload-signature`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },

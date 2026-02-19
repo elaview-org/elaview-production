@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo, useTransition } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/primitives/button";
 import { cn } from "@/lib/core/utils";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
-import { blockDatesAction, unblockDatesAction } from "./calendar.actions";
+import api from "@/api/client";
 import { toast } from "sonner";
 
 type BookedDate = {
@@ -29,7 +29,11 @@ export default function SpaceCalendar({
 }: Props) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [blockedDates, setBlockedDates] = useState(initialBlockedDates);
-  const [pending, startTransition] = useTransition();
+  const { blockDates, isPending: isBlockPending } =
+    api.listings.useBlockDates();
+  const { unblockDates, isPending: isUnblockPending } =
+    api.listings.useUnblockDates();
+  const pending = isBlockPending || isUnblockPending;
 
   const { days, monthLabel } = useMemo(() => {
     const year = currentDate.getFullYear();
@@ -99,25 +103,25 @@ export default function SpaceCalendar({
   ) => {
     if (isBooked || date < today) return;
 
-    startTransition(async () => {
-      if (isBlocked) {
-        const result = await unblockDatesAction(spaceId, [dateStr]);
+    if (isBlocked) {
+      unblockDates(spaceId, [dateStr], (result) => {
         if (result.success) {
           setBlockedDates((prev) => prev.filter((d) => d.date !== dateStr));
           toast.success("Date unblocked");
         } else {
           toast.error(result.error ?? "Failed to unblock date");
         }
-      } else {
-        const result = await blockDatesAction(spaceId, [dateStr]);
+      });
+    } else {
+      blockDates(spaceId, [dateStr], (result) => {
         if (result.success) {
           setBlockedDates((prev) => [...prev, { date: dateStr }]);
           toast.success("Date blocked");
         } else {
           toast.error(result.error ?? "Failed to block date");
         }
-      }
-    });
+      });
+    }
   };
 
   return (

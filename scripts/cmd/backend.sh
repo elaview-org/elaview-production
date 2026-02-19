@@ -4,6 +4,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SCRIPTS_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 . "$SCRIPTS_DIR/core/dir.sh"
+. "$SCRIPTS_DIR/core/auth.sh"
 
 ev_backend_start() {
     ev_core_require_cmd "docker" || return 1
@@ -136,6 +137,82 @@ ev_backend_reset() {
     return $ev_backend_exit
 }
 
+ev_backend_deploy() {
+    ev_core_prompt_token "ELAVIEW_RAILWAY_API_TOKEN" || return 1
+
+    if [ "$ELAVIEW_ENVIRONMENT" != "staging" ] && [ "$ELAVIEW_ENVIRONMENT" != "production" ]; then
+        ev_core_log_error "Deploy is only allowed in staging or production (current: $ELAVIEW_ENVIRONMENT)"
+        return 1
+    fi
+
+    . "$SCRIPTS_DIR/core/railway.sh"
+
+    _ev_railway_resolve_project || _ev_railway_provision || return 1
+
+    if [ -z "$(_ev_railway_environment_id)" ]; then
+        _ev_railway_provision || return 1
+    fi
+
+    _ev_railway_sync_database_vars "$(_ev_railway_environment_id)" || return 1
+    _ev_railway_sync_server_vars || return 1
+    _ev_railway_deploy_server || return 1
+
+    ev_core_log_info "Updating WEB_API_URL in Doppler..."
+    doppler secrets set "WEB_API_URL=https://${RAILWAY_SERVER_DOMAIN}/api" \
+        --config "$ELAVIEW_ENVIRONMENT" || return 1
+
+    ev_core_log_success "WEB_API_URL set to https://${RAILWAY_SERVER_DOMAIN}/api"
+}
+
+ev_backend_destroy() {
+    ev_core_prompt_token "ELAVIEW_RAILWAY_API_TOKEN" || return 1
+
+    if [ "$ELAVIEW_ENVIRONMENT" != "staging" ] && [ "$ELAVIEW_ENVIRONMENT" != "production" ]; then
+        ev_core_log_error "Destroy is only allowed in staging or production (current: $ELAVIEW_ENVIRONMENT)"
+        return 1
+    fi
+
+    . "$SCRIPTS_DIR/core/railway.sh"
+
+    _ev_rw_eid="$(_ev_railway_environment_id)"
+    if [ -z "$_ev_rw_eid" ]; then
+        ev_core_log_warn "No Railway environment ID for '$ELAVIEW_ENVIRONMENT' — skipping."
+        return 0
+    fi
+
+    _ev_railway_destroy_environment "$_ev_rw_eid" || return 1
+    ev_core_log_success "Railway '$ELAVIEW_ENVIRONMENT' environment destroyed."
+    unset _ev_rw_eid
+}
+
+ev_backend_destroy_all() {
+    ev_core_prompt_token "ELAVIEW_RAILWAY_API_TOKEN" || return 1
+
+    if [ "$ELAVIEW_ENVIRONMENT" != "staging" ] && [ "$ELAVIEW_ENVIRONMENT" != "production" ]; then
+        ev_core_log_error "Destroy is only allowed in staging or production (current: $ELAVIEW_ENVIRONMENT)"
+        return 1
+    fi
+
+    . "$SCRIPTS_DIR/core/railway.sh"
+
+    ev_core_require_cmd "jq" || return 1
+
+    _ev_railway_resolve_project
+
+    if [ -n "$RAILWAY_PROJECT_ID" ]; then
+        ev_core_log_info "Deleting Railway project: $RAILWAY_PROJECT_ID"
+        _ev_rw_payload=$(jq -nc --arg id "$RAILWAY_PROJECT_ID" '{
+            query: "mutation($id: String!) { projectDelete(id: $id) }",
+            variables: { id: $id }
+        }')
+        _ev_railway_api "$_ev_rw_payload" > /dev/null || { ev_core_log_error "Failed to delete Railway project"; return 1; }
+        ev_core_log_success "Railway project deleted."
+        unset _ev_rw_payload
+    else
+        ev_core_log_warn "No Railway project found — skipping."
+    fi
+}
+
 ev_backend_dispatch() {
     cmd="$1"
     shift
@@ -157,9 +234,12 @@ ev_backend_dispatch() {
         publish)          ev_backend_publish ;;
         audit)            ev_backend_audit ;;
         reset)            ev_backend_reset ;;
+        deploy)           ev_backend_deploy ;;
+        destroy)          ev_backend_destroy ;;
+        destroy:all)      ev_backend_destroy_all ;;
         *)
             ev_core_log_error "Unknown backend command: $cmd"
-            echo "Available: start, stop, restart, logs, status, exec, install, build, format, format:check, test, test:unit, test:integration, publish, audit, reset"
+            echo "Available: start, stop, restart, logs, status, exec, install, build, format, format:check, test, test:unit, test:integration, publish, audit, reset, deploy, destroy, destroy:all"
             return 1
             ;;
     esac

@@ -1,16 +1,8 @@
 import { View, Text, StyleSheet, ViewStyle } from "react-native";
 import { colors, fontSize, spacing, borderRadius } from "@/constants/theme";
+import { BookingStatus } from "@/types/graphql";
 
-export type BookingStatus =
-  | "pending"
-  | "accepted"
-  | "paid"
-  | "active"
-  | "verification_pending"
-  | "completed"
-  | "cancelled"
-  | "declined"
-  | "disputed";
+export { BookingStatus };
 
 interface StatusBadgeProps {
   status: BookingStatus;
@@ -21,47 +13,52 @@ const statusConfig: Record<
   BookingStatus,
   { label: string; color: string; backgroundColor: string }
 > = {
-  pending: {
+  [BookingStatus.PendingApproval]: {
     label: "Pending",
     color: colors.warning,
     backgroundColor: `${colors.warning}20`,
   },
-  accepted: {
-    label: "Accepted",
+  [BookingStatus.Approved]: {
+    label: "Approved",
     color: colors.primary,
     backgroundColor: `${colors.primary}20`,
   },
-  paid: {
+  [BookingStatus.Paid]: {
     label: "Paid",
     color: colors.primary,
     backgroundColor: `${colors.primary}20`,
   },
-  active: {
+  [BookingStatus.FileDownloaded]: {
+    label: "File Downloaded",
+    color: colors.primary,
+    backgroundColor: `${colors.primary}20`,
+  },
+  [BookingStatus.Installed]: {
     label: "Active",
     color: colors.success,
     backgroundColor: `${colors.success}20`,
   },
-  verification_pending: {
+  [BookingStatus.Verified]: {
     label: "Awaiting Review",
     color: colors.warning,
     backgroundColor: `${colors.warning}20`,
   },
-  completed: {
+  [BookingStatus.Completed]: {
     label: "Completed",
     color: colors.gray600,
     backgroundColor: colors.gray100,
   },
-  cancelled: {
+  [BookingStatus.Cancelled]: {
     label: "Cancelled",
     color: colors.gray600,
     backgroundColor: colors.gray100,
   },
-  declined: {
+  [BookingStatus.Rejected]: {
     label: "Declined",
     color: colors.error,
     backgroundColor: `${colors.error}20`,
   },
-  disputed: {
+  [BookingStatus.Disputed]: {
     label: "Disputed",
     color: colors.error,
     backgroundColor: `${colors.error}20`,
@@ -72,7 +69,11 @@ const statusConfig: Record<
  * StatusBadge - Colored status indicator pill
  */
 export default function StatusBadge({ status, style }: StatusBadgeProps) {
-  const config = statusConfig[status];
+  const config = statusConfig[status] ?? {
+    label: status,
+    color: colors.gray600,
+    backgroundColor: colors.gray100,
+  };
 
   return (
     <View

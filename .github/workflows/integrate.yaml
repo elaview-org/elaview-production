@@ -17,3 +17,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: echo "TODO"
+
+#  deploy:
+#    name: Deploy to Staging
+#    runs-on: ubuntu-latest
+#    defaults:
+#      run:
+#        shell: devbox run -- bash -e {0}
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Setup Devbox
+#        uses: jetify-com/devbox-install-action@v0.14.0
+#        with:
+#          enable-cache: true
+#
+#      - name: Cache bun dependencies
+#        uses: actions/cache@v4
+#        with:
+#          path: clients/web/node_modules
+#          key: bun-${{ hashFiles('clients/web/bun.lock') }}
+#          restore-keys: bun-
+#
+#      - name: Cache NuGet packages
+#        uses: actions/cache@v4
+#        with:
+#          path: ~/.nuget/packages
+#          key: nuget-${{ hashFiles('backend/ElaviewBackend.csproj') }}
+#          restore-keys: nuget-
+#
+#      - name: Install web dependencies
+#        run: ev web:install
+#
+#      - name: Deploy
+#        run: ev infra:deploy

@@ -6,7 +6,7 @@ export default function useIsSharedRoute() {
 }
 
 const sharedRoutes = [
-  "/spaces",
+  // "/spaces",
   "/messages",
   "/notifications",
   "/profile",

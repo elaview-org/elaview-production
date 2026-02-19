@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import { graphql, type CampaignFilterInput } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
 import storage from "@/lib/core/storage";

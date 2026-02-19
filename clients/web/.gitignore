@@ -1,5 +1,3 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
@@ -26,6 +24,8 @@ src/tests/e2e/reports
 .DS_Store
 *.pem
 .claude
+.idea
+.vscode
 
 # debug
 npm-debug.log*

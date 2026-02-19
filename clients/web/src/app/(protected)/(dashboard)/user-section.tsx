@@ -1,6 +1,5 @@
 "use client";
 
-import { useTransition } from "react";
 import { IconMessage, IconSwitchHorizontal } from "@tabler/icons-react";
 import {
   Avatar,
@@ -28,7 +27,7 @@ import {
   graphql,
   ProfileType,
 } from "@/types/gql";
-import { logout, switchProfile } from "@/lib/services/auth.actions";
+import api from "@/api/client";
 import { BadgeCheck, Bell, LogOut, Settings } from "lucide-react";
 
 export const UserSection_UserFragment = graphql(`
@@ -50,8 +49,11 @@ export function UserSection({ data }: Props) {
     data
   );
 
-  const [isPending, startTransition] = useTransition();
   const { isMobile } = useSidebar();
+  const { switchProfile, isPending: isSwitchPending } =
+    api.auth.useSwitchProfile();
+  const { logout, isPending: isLogoutPending } = api.auth.useLogout();
+  const isPending = isSwitchPending || isLogoutPending;
 
   const targetProfile =
     activeProfileType === ProfileType.SpaceOwner
@@ -60,18 +62,6 @@ export function UserSection({ data }: Props) {
 
   const targetLabel =
     targetProfile === ProfileType.SpaceOwner ? "Space Owner" : "Advertiser";
-
-  function handleSwitchProfile() {
-    startTransition(async () => {
-      await switchProfile(targetProfile);
-    });
-  }
-
-  function handleLogout() {
-    startTransition(async () => {
-      await logout();
-    });
-  }
 
   return (
     <SidebarMenu>
@@ -132,7 +122,7 @@ export function UserSection({ data }: Props) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem
-                onSelect={handleSwitchProfile}
+                onSelect={() => switchProfile(targetProfile)}
                 disabled={isPending}
               >
                 <IconSwitchHorizontal
@@ -140,7 +130,7 @@ export function UserSection({ data }: Props) {
                 />
                 Switch to {targetLabel}
               </DropdownMenuItem>
-              <DropdownMenuItem onSelect={handleLogout} disabled={isPending}>
+              <DropdownMenuItem onSelect={logout} disabled={isPending}>
                 <LogOut />
                 Logout
               </DropdownMenuItem>

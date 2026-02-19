@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import {
   graphql,
   type BookingFilterInput,

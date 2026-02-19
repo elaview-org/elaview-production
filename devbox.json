@@ -63,6 +63,9 @@
     },
     "doppler": {
       "version": "latest"
+    },
+    "railway": {
+      "version": "latest"
     }
   },
   "shell": {

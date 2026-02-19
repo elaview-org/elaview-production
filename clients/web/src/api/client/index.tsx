@@ -1,5 +1,8 @@
 "use client";
 
+import auth from "./auth";
+import listings from "./listings";
+
 import { ApolloLink, HttpLink } from "@apollo/client";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { getMainDefinition } from "@apollo/client/utilities";
@@ -10,7 +13,7 @@ import {
 } from "@apollo/client-integration-nextjs";
 import { createClient } from "graphql-ws";
 import React, { Suspense } from "react";
-import * as api from "@apollo/client/react";
+import * as apolloApi from "@apollo/client/react";
 import env from "@/lib/core/env";
 
 function makeClient() {
@@ -62,4 +65,9 @@ export function ApolloWrapper({ children }: React.PropsWithChildren) {
   );
 }
 
+const api = {
+  ...apolloApi,
+  auth,
+  listings,
+} as const;
 export default api;

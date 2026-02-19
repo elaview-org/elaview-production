@@ -1,5 +1,5 @@
 import Link from "next/link";
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 import { Button } from "@/components/primitives/button";
 import MediaCard, { MediaCardSkeleton } from "@/components/composed/media-card";

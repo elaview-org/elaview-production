@@ -8,7 +8,7 @@ import {
   type NotificationsPageQuery,
   type PageInfo,
 } from "@/types/gql";
-import api from "@/lib/gql/client";
+import api from "@/api/client";
 import NotificationsHeader from "./notifications-header";
 import NotificationsFilters from "./notifications-filters";
 import NotificationsList from "./notifications-list";

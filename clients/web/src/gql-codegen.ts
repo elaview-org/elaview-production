@@ -4,16 +4,17 @@ const config: CodegenConfig = {
   overwrite: true,
   schema: process.env.ELAVIEW_WEB_API_URL
     ? `${process.env.ELAVIEW_WEB_API_URL}/graphql`
-    : "./src/lib/gql/schema.graphql",
+    : "./src/schema.graphql",
   documents: [
     "src/app/**/*.{ts,tsx}",
     "src/components/**/*.{ts,tsx}",
     "src/lib/**/*.{ts,tsx}",
+    "src/api/**/*.{ts,tsx}",
     "!src/types/gql/**/*",
   ],
   ignoreNoDocuments: true,
   generates: {
-    "./src/lib/gql/schema.graphql": {
+    "./src/schema.graphql": {
       plugins: ["schema-ast"],
       config: {
         includeDirectives: true,

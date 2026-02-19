@@ -1,5 +1,3 @@
-import api from "@/lib/gql/server";
-import { graphql } from "@/types/gql";
 import {
   Sidebar,
   SidebarContent,
@@ -17,31 +15,10 @@ import { UserSection } from "./(dashboard)/user-section";
 import { CSSProperties } from "react";
 import ContentHeader from "./(dashboard)/content-header";
 import RoleBasedView from "./(dashboard)/role-based-view";
-import { cookies } from "next/headers";
-import storage from "@/lib/core/storage";
-import assert from "node:assert";
+import api from "@/api/server";
 
 export default async function Layout(props: LayoutProps<"/">) {
-  const sidebarOpen =
-    (await cookies()).get(storage.preferences.sidebar.open)?.value !== "false";
-
-  const me = await api
-    .query({
-      query: graphql(`
-        query DashboardUser {
-          me {
-            id
-            ...NavigationSection_UserFragment
-            ...UserSection_UserFragment
-            ...RoleBasedView_UserFragment
-          }
-        }
-      `),
-    })
-    .then((res) => {
-      assert(!!res.data?.me);
-      return res.data?.me;
-    });
+  const [sidebarOpen, me] = await api.user.dashboard();
 
   return (
     <SidebarProvider

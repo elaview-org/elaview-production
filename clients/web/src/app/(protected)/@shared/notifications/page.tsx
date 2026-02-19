@@ -1,4 +1,4 @@
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import { graphql } from "@/types/gql";
 import assert from "node:assert";
 import NotificationsContent from "./notifications-content";

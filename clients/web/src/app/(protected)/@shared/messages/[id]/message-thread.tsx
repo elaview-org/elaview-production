@@ -27,7 +27,7 @@ import {
   type MessageBubble_MessageFragmentFragment,
 } from "@/types/gql";
 import { ConversationItem_ConversationFragment } from "../conversation-item";
-import api from "@/lib/gql/client";
+import api from "@/api/client";
 import { Button } from "@/components/primitives/button";
 import {
   Empty,

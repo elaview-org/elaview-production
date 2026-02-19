@@ -9,7 +9,7 @@ import setCookieParser, { Cookie } from "set-cookie-parser";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { graphql, type ProfileType } from "@/types/gql";
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 
 type LoginState = ActionState<{ email: string; password: string }>;
 

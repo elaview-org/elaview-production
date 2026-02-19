@@ -1,4 +1,4 @@
-import api from "@/lib/gql/server";
+import api from "@/api/server";
 import { BOOKING_STATUS } from "@/lib/core/constants";
 import { formatCurrency, formatDate } from "@/lib/core/utils";
 import { Badge } from "@/components/primitives/badge";

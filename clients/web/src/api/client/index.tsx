@@ -16,6 +16,8 @@ import React, { Suspense } from "react";
 import * as apolloApi from "@apollo/client/react";
 import env from "@/lib/core/env";
 
+import calendar from "./calendar";
+
 function makeClient() {
   const httpLink = new HttpLink({
     uri: `${env.client.apiUrl}/graphql`,
@@ -69,5 +71,6 @@ const api = {
   ...apolloApi,
   auth,
   listings,
+  calendar,
 } as const;
 export default api;

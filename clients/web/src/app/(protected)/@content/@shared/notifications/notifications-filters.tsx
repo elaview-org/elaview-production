@@ -13,7 +13,7 @@ import { NotificationType } from "@/types/gql";
 import {
   ADVERTISER_NOTIFICATION_LABELS,
   ADVERTISER_NOTIFICATIONS,
-} from "@/app/(protected)/@shared/settings/constants";
+} from "@/app/(protected)/@content/@shared/settings/constants";
 
 type Props = {
   filter: "all" | "unread" | NotificationType;

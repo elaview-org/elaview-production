@@ -25,36 +25,17 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/primitives/dropdown-menu";
-import {
-  FragmentType,
-  getFragmentData,
-  graphql,
-  ProfileType,
-  UserRole,
-} from "@/types/gql";
-import adminData from "../@admin/navigation-bar.data";
-import advertiserData from "../@advertiser/navigation-bar.data";
-import marketingData from "../@marketing/navigation-bar.data";
-import spaceOwnerData from "../@spaceOwner/navigation-bar.data";
+import { ProfileType, UserRole } from "@/types/gql";
+import adminData from "@/app/(protected)/@content/@admin/navigation-bar.data";
+import advertiserData from "@/app/(protected)/@content/@advertiser/navigation-bar.data";
+import marketingData from "@/app/(protected)/@content/@marketing/navigation-bar.data";
+import spaceOwnerData from "@/app/(protected)/@content/@spaceOwner/navigation-bar.data";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useUser } from "@/lib/providers/user-provider";
 
-const NavigationSection_UserFragment = graphql(`
-  fragment NavigationSection_UserFragment on User {
-    role
-    activeProfileType
-  }
-`);
-
-type Props = {
-  data: FragmentType<typeof NavigationSection_UserFragment>;
-};
-
-export function NavigationSection({ data }: Props) {
-  const { role, activeProfileType } = getFragmentData(
-    NavigationSection_UserFragment,
-    data
-  );
+export default function Default() {
+  const { role, activeProfileType } = useUser();
 
   const roleData = useMemo(() => {
     switch (role) {

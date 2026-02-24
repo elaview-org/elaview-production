@@ -25,10 +25,7 @@ type Documents = {
     "\n          mutation BulkDeleteSpace($input: DeleteSpaceInput!) {\n            deleteSpace(input: $input) {\n              success\n              errors {\n                ... on Error {\n                  message\n                }\n              }\n            }\n          }\n        ": typeof types.BulkDeleteSpaceDocument,
     "\n        mutation BlockDates($input: BlockDatesInput!) {\n          blockDates(input: $input) {\n            blockedDates {\n              id\n              date\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.BlockDatesDocument,
     "\n        mutation UnblockDates($input: UnblockDatesInput!) {\n          unblockDates(input: $input) {\n            unblockedCount\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": typeof types.UnblockDatesDocument,
-    "\n            query DashboardUser {\n              me {\n                id\n                ...NavigationSection_UserFragment\n                ...UserSection_UserFragment\n                ...RoleBasedView_UserFragment\n              }\n            }\n          ": typeof types.DashboardUserDocument,
-    "\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n": typeof types.NavigationSection_UserFragmentFragmentDoc,
-    "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n": typeof types.RoleBasedView_UserFragmentFragmentDoc,
-    "\n  fragment UserSection_UserFragment on User {\n    email\n    name\n    avatar\n    activeProfileType\n  }\n": typeof types.UserSection_UserFragmentFragmentDoc,
+    "\n          query DashboardUser {\n            me {\n              id\n              ...UserProvider_UserFragment\n            }\n          }\n        ": typeof types.DashboardUserDocument,
     "\n  fragment AnalyticsAdvertiserComparison_QueryFragment on Query {\n    advertiserAnalytics(startDate: $startDate, endDate: $endDate) {\n      periodComparison {\n        current {\n          period\n          startDate\n          endDate\n          bookings\n          spending\n          impressions\n          roi\n        }\n        previous {\n          period\n          startDate\n          endDate\n          bookings\n          spending\n          impressions\n          roi\n        }\n      }\n    }\n  }\n": typeof types.AnalyticsAdvertiserComparison_QueryFragmentFragmentDoc,
     "\n  fragment AnalyticsAdvertiserMonthlyChart_QueryFragment on Query {\n    advertiserAnalytics(startDate: $startDate, endDate: $endDate) {\n      monthlyStats(months: 12) {\n        month\n        spending\n        impressions\n      }\n    }\n  }\n": typeof types.AnalyticsAdvertiserMonthlyChart_QueryFragmentFragmentDoc,
     "\n  fragment AnalyticsAdvertiserPerformanceTable_QueryFragment on Query {\n    advertiserAnalytics(startDate: $startDate, endDate: $endDate) {\n      spacePerformance(first: 10) {\n        id\n        title\n        image\n        totalBookings\n        totalSpend\n        impressions\n        roi\n      }\n    }\n  }\n": typeof types.AnalyticsAdvertiserPerformanceTable_QueryFragmentFragmentDoc,
@@ -197,6 +194,7 @@ type Documents = {
     "\n      query OverviewData {\n        ...OverviewStatCards_QueryFragment\n        ...OverviewDeadlineWarnings_QueryFragment\n        ...OverviewPendingRequests_QueryFragment\n        ...OverviewActiveBookings_QueryFragment\n        ...OverviewTopSpaces_QueryFragment\n        ...OverviewUpcomingPayouts_QueryFragment\n        ...OverviewActivityChart_QueryFragment\n        ...OverviewRecentActivity_QueryFragment\n      }\n    ": typeof types.OverviewDataDocument,
     "\n  fragment FeaturedSpaceCard_SpaceFragment on Space {\n    id\n    title\n    description\n    city\n    state\n    images\n    type\n    pricePerDay\n    averageRating\n  }\n": typeof types.FeaturedSpaceCard_SpaceFragmentFragmentDoc,
     "\n        query FeaturedSpaces {\n          spaces(first: 8, where: { status: { eq: ACTIVE } }) {\n            nodes {\n              id\n              ...FeaturedSpaceCard_SpaceFragment\n            }\n          }\n        }\n      ": typeof types.FeaturedSpacesDocument,
+    "\n  fragment UserProvider_UserFragment on User {\n    id\n    role\n    activeProfileType\n    email\n    name\n    avatar\n  }\n": typeof types.UserProvider_UserFragmentFragmentDoc,
 };
 const documents: Documents = {
     "\n      mutation SwitchProfile($input: UpdateCurrentUserInput!) {\n        updateCurrentUser(input: $input) {\n          user {\n            id\n            activeProfileType\n          }\n          errors {\n            ... on Error {\n              message\n            }\n          }\n        }\n      }\n    ": types.SwitchProfileDocument,
@@ -210,10 +208,7 @@ const documents: Documents = {
     "\n          mutation BulkDeleteSpace($input: DeleteSpaceInput!) {\n            deleteSpace(input: $input) {\n              success\n              errors {\n                ... on Error {\n                  message\n                }\n              }\n            }\n          }\n        ": types.BulkDeleteSpaceDocument,
     "\n        mutation BlockDates($input: BlockDatesInput!) {\n          blockDates(input: $input) {\n            blockedDates {\n              id\n              date\n            }\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": types.BlockDatesDocument,
     "\n        mutation UnblockDates($input: UnblockDatesInput!) {\n          unblockDates(input: $input) {\n            unblockedCount\n            errors {\n              ... on Error {\n                message\n              }\n            }\n          }\n        }\n      ": types.UnblockDatesDocument,
-    "\n            query DashboardUser {\n              me {\n                id\n                ...NavigationSection_UserFragment\n                ...UserSection_UserFragment\n                ...RoleBasedView_UserFragment\n              }\n            }\n          ": types.DashboardUserDocument,
-    "\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n": types.NavigationSection_UserFragmentFragmentDoc,
-    "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n": types.RoleBasedView_UserFragmentFragmentDoc,
-    "\n  fragment UserSection_UserFragment on User {\n    email\n    name\n    avatar\n    activeProfileType\n  }\n": types.UserSection_UserFragmentFragmentDoc,
+    "\n          query DashboardUser {\n            me {\n              id\n              ...UserProvider_UserFragment\n            }\n          }\n        ": types.DashboardUserDocument,
     "\n  fragment AnalyticsAdvertiserComparison_QueryFragment on Query {\n    advertiserAnalytics(startDate: $startDate, endDate: $endDate) {\n      periodComparison {\n        current {\n          period\n          startDate\n          endDate\n          bookings\n          spending\n          impressions\n          roi\n        }\n        previous {\n          period\n          startDate\n          endDate\n          bookings\n          spending\n          impressions\n          roi\n        }\n      }\n    }\n  }\n": types.AnalyticsAdvertiserComparison_QueryFragmentFragmentDoc,
     "\n  fragment AnalyticsAdvertiserMonthlyChart_QueryFragment on Query {\n    advertiserAnalytics(startDate: $startDate, endDate: $endDate) {\n      monthlyStats(months: 12) {\n        month\n        spending\n        impressions\n      }\n    }\n  }\n": types.AnalyticsAdvertiserMonthlyChart_QueryFragmentFragmentDoc,
     "\n  fragment AnalyticsAdvertiserPerformanceTable_QueryFragment on Query {\n    advertiserAnalytics(startDate: $startDate, endDate: $endDate) {\n      spacePerformance(first: 10) {\n        id\n        title\n        image\n        totalBookings\n        totalSpend\n        impressions\n        roi\n      }\n    }\n  }\n": types.AnalyticsAdvertiserPerformanceTable_QueryFragmentFragmentDoc,
@@ -382,6 +377,7 @@ const documents: Documents = {
     "\n      query OverviewData {\n        ...OverviewStatCards_QueryFragment\n        ...OverviewDeadlineWarnings_QueryFragment\n        ...OverviewPendingRequests_QueryFragment\n        ...OverviewActiveBookings_QueryFragment\n        ...OverviewTopSpaces_QueryFragment\n        ...OverviewUpcomingPayouts_QueryFragment\n        ...OverviewActivityChart_QueryFragment\n        ...OverviewRecentActivity_QueryFragment\n      }\n    ": types.OverviewDataDocument,
     "\n  fragment FeaturedSpaceCard_SpaceFragment on Space {\n    id\n    title\n    description\n    city\n    state\n    images\n    type\n    pricePerDay\n    averageRating\n  }\n": types.FeaturedSpaceCard_SpaceFragmentFragmentDoc,
     "\n        query FeaturedSpaces {\n          spaces(first: 8, where: { status: { eq: ACTIVE } }) {\n            nodes {\n              id\n              ...FeaturedSpaceCard_SpaceFragment\n            }\n          }\n        }\n      ": types.FeaturedSpacesDocument,
+    "\n  fragment UserProvider_UserFragment on User {\n    id\n    role\n    activeProfileType\n    email\n    name\n    avatar\n  }\n": types.UserProvider_UserFragmentFragmentDoc,
 };
 
 /**
@@ -445,19 +441,7 @@ export function graphql(source: "\n        mutation UnblockDates($input: Unblock
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n            query DashboardUser {\n              me {\n                id\n                ...NavigationSection_UserFragment\n                ...UserSection_UserFragment\n                ...RoleBasedView_UserFragment\n              }\n            }\n          "): (typeof documents)["\n            query DashboardUser {\n              me {\n                id\n                ...NavigationSection_UserFragment\n                ...UserSection_UserFragment\n                ...RoleBasedView_UserFragment\n              }\n            }\n          "];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n"): (typeof documents)["\n  fragment NavigationSection_UserFragment on User {\n    role\n    activeProfileType\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n"): (typeof documents)["\n  fragment RoleBasedView_UserFragment on User {\n    role\n    activeProfileType\n  }\n"];
-/**
- * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function graphql(source: "\n  fragment UserSection_UserFragment on User {\n    email\n    name\n    avatar\n    activeProfileType\n  }\n"): (typeof documents)["\n  fragment UserSection_UserFragment on User {\n    email\n    name\n    avatar\n    activeProfileType\n  }\n"];
+export function graphql(source: "\n          query DashboardUser {\n            me {\n              id\n              ...UserProvider_UserFragment\n            }\n          }\n        "): (typeof documents)["\n          query DashboardUser {\n            me {\n              id\n              ...UserProvider_UserFragment\n            }\n          }\n        "];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -1130,6 +1114,10 @@ export function graphql(source: "\n  fragment FeaturedSpaceCard_SpaceFragment on
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n        query FeaturedSpaces {\n          spaces(first: 8, where: { status: { eq: ACTIVE } }) {\n            nodes {\n              id\n              ...FeaturedSpaceCard_SpaceFragment\n            }\n          }\n        }\n      "): (typeof documents)["\n        query FeaturedSpaces {\n          spaces(first: 8, where: { status: { eq: ACTIVE } }) {\n            nodes {\n              id\n              ...FeaturedSpaceCard_SpaceFragment\n            }\n          }\n        }\n      "];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment UserProvider_UserFragment on User {\n    id\n    role\n    activeProfileType\n    email\n    name\n    avatar\n  }\n"): (typeof documents)["\n  fragment UserProvider_UserFragment on User {\n    id\n    role\n    activeProfileType\n    email\n    name\n    avatar\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

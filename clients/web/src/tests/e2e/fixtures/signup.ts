@@ -1,6 +1,7 @@
 import { expect, test as base } from "./base";
 
 type Fixtures = {
+  _setup: void;
   signup: (credentials: {
     name: string;
     email: string;
@@ -9,11 +10,14 @@ type Fixtures = {
 };
 
 export const test = base.extend<Fixtures>({
-  setup: async ({ page }, use) => {
-    await page.goto("/");
-    await page.getByRole("link", { name: "Sign Up", exact: true }).click();
-    await use();
-  },
+  _setup: [
+    async ({ page }, use) => {
+      await page.goto("/");
+      await page.getByRole("link", { name: "Sign Up", exact: true }).click();
+      await use();
+    },
+    { auto: true },
+  ],
   signup: async ({ page }, use) => {
     await use(async ({ name, email, password }) => {
       await page.getByLabel("Full Name").fill(name);

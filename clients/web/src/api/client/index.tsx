@@ -50,7 +50,15 @@ function makeClient() {
     : httpLink;
 
   return new ApolloClient({
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      typePolicies: {
+        Query: {
+          fields: {
+            me: { merge: true },
+          },
+        },
+      },
+    }),
     link,
   });
 }

@@ -2,13 +2,13 @@
 
 import api from "@/api/server";
 import {
-  graphql,
   type CreateSpaceInput,
+  graphql,
   type UpdateSpaceInput,
 } from "@/types/gql";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createSpaceSchema } from "@/app/(protected)/@spaceOwner/listings/schemas";
+import { createSpaceSchema } from "@/app/(protected)/@content/@spaceOwner/listings/schemas";
 
 export interface CreateSpaceState {
   success: boolean;

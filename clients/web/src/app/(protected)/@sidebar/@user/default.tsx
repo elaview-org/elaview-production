@@ -20,34 +20,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/primitives/dropdown-menu";
-import Link from "next/link";
-import {
-  FragmentType,
-  getFragmentData,
-  graphql,
-  ProfileType,
-} from "@/types/gql";
+import { useRouter } from "next/navigation";
+import { ProfileType } from "@/types/gql";
 import api from "@/api/client";
 import { BadgeCheck, Bell, LogOut, Settings } from "lucide-react";
+import { useUser } from "@/lib/providers/user-provider";
 
-export const UserSection_UserFragment = graphql(`
-  fragment UserSection_UserFragment on User {
-    email
-    name
-    avatar
-    activeProfileType
-  }
-`);
-
-type Props = {
-  data: FragmentType<typeof UserSection_UserFragment>;
-};
-
-export function UserSection({ data }: Props) {
-  const { email, name, avatar, activeProfileType } = getFragmentData(
-    UserSection_UserFragment,
-    data
-  );
+export default function Default() {
+  const { email, name, avatar, activeProfileType } = useUser();
+  const router = useRouter();
 
   const { isMobile } = useSidebar();
   const { switchProfile, isPending: isSwitchPending } =
@@ -68,23 +49,21 @@ export function UserSection({ data }: Props) {
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/profile">
-                <Avatar className="h-8 w-8 rounded-[50%] grayscale">
-                  <AvatarImage
-                    src={avatar as string | undefined}
-                    alt={name as string | undefined}
-                  />
-                  <AvatarFallback>A</AvatarFallback>
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{name}</span>
-                  <span className="text-muted-foreground truncate text-xs">
-                    {email}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1"></div>
-              </Link>
+            <SidebarMenuButton size="lg">
+              <Avatar className="h-8 w-8 rounded-[50%] grayscale">
+                <AvatarImage
+                  src={avatar as string | undefined}
+                  alt={name as string | undefined}
+                />
+                <AvatarFallback>A</AvatarFallback>
+              </Avatar>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-medium">{name}</span>
+                <span className="text-muted-foreground truncate text-xs">
+                  {email}
+                </span>
+              </div>
+              <div className="flex items-center gap-1"></div>
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -94,29 +73,21 @@ export function UserSection({ data }: Props) {
             sideOffset={4}
           >
             <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href="/profile">
-                  <BadgeCheck />
-                  Profile
-                </Link>
+              <DropdownMenuItem onSelect={() => router.push("/profile")}>
+                <BadgeCheck />
+                Profile
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/notifications">
-                  <Bell />
-                  Notifications
-                </Link>
+              <DropdownMenuItem onSelect={() => router.push("/notifications")}>
+                <Bell />
+                Notifications
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/messages">
-                  <IconMessage />
-                  Messages
-                </Link>
+              <DropdownMenuItem onSelect={() => router.push("/messages")}>
+                <IconMessage />
+                Messages
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings">
-                  <Settings />
-                  Settings
-                </Link>
+              <DropdownMenuItem onSelect={() => router.push("/settings")}>
+                <Settings />
+                Settings
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

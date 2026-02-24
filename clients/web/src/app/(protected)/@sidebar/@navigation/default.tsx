@@ -32,7 +32,7 @@ import marketingData from "@/app/(protected)/@content/@marketing/navigation-bar.
 import spaceOwnerData from "@/app/(protected)/@content/@spaceOwner/navigation-bar.data";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useUser } from "@/lib/providers/user-provider";
+import useUser from "@/lib/hooks/use-user";
 
 export default function Default() {
   const { role, activeProfileType } = useUser();

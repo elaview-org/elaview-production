@@ -11,7 +11,7 @@ import { IconInnerShadowTop } from "@tabler/icons-react";
 
 export default function Layout(props: LayoutProps<"/">) {
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" variant="sidebar">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>

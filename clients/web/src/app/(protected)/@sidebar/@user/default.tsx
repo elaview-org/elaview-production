@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation";
 import { ProfileType } from "@/types/gql";
 import api from "@/api/client";
 import { BadgeCheck, Bell, LogOut, Settings } from "lucide-react";
-import { useUser } from "@/lib/providers/user-provider";
+import useUser from "@/lib/hooks/use-user";
 
 export default function Default() {
   const { email, name, avatar, activeProfileType } = useUser();

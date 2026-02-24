@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, ReactNode, use } from "react";
+import { createContext, ReactNode } from "react";
 import { ResultOf } from "@graphql-typed-document-node/core";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
 
@@ -15,9 +15,9 @@ const UserProvider_UserFragment = graphql(`
   }
 `);
 
-type UserData = ResultOf<typeof UserProvider_UserFragment>;
-
-const UserContext = createContext<UserData | null>(null);
+export const UserContext = createContext<ResultOf<
+  typeof UserProvider_UserFragment
+> | null>(null);
 
 type Props = {
   children: ReactNode;
@@ -30,10 +30,4 @@ export default function UserProvider({ children, data }: Props) {
       {children}
     </UserContext>
   );
-}
-
-export function useUser(): UserData {
-  const ctx = use(UserContext);
-  if (!ctx) throw new Error("useUser must be used within UserProvider");
-  return ctx;
 }

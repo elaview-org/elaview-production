@@ -1,10 +1,10 @@
 import "./global.css";
-import { ApolloWrapper } from "@/api/client";
-
 import type { Metadata } from "next";
+import ApolloProvider from "@/lib/providers/apollo-provider";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/primitives/sonner";
 import storage from "@/lib/core/storage";
+import { makeClient } from "@/api/client";
 
 export const metadata: Metadata = {
   title: "Elaview",
@@ -25,9 +25,11 @@ export default function RootLayout(props: LayoutProps<"/">) {
           enableSystem
           storageKey={storage.preferences.theme}
         >
-          <ApolloWrapper>{props.children}</ApolloWrapper>
-          <Toaster />
+          <ApolloProvider makeClient={makeClient}>
+            {props.children}
+          </ApolloProvider>
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );

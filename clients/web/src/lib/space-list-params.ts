@@ -3,7 +3,13 @@ import { SortEnumType } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
 
 export const spaceListParamsSchema = z.object({
-  first: z.coerce.number().int().positive().max(100).optional().catch(undefined),
+  first: z.coerce
+    .number()
+    .int()
+    .positive()
+    .max(100)
+    .optional()
+    .catch(undefined),
   last: z.coerce.number().int().positive().max(100).optional().catch(undefined),
   after: z.string().optional().catch(undefined),
   before: z.string().optional().catch(undefined),

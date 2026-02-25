@@ -5,7 +5,17 @@ import storage from "@/lib/core/storage";
 import UserProvider from "@/lib/providers/user-provider";
 import api from "@/api/server";
 
-export default async function Layout(props: LayoutProps<"/">) {
+import { ReactNode } from "react";
+
+export default async function Layout({
+  navigation,
+  user,
+  content,
+}: LayoutProps<"/"> & {
+  navigation: ReactNode;
+  user: ReactNode;
+  content: ReactNode;
+}) {
   return (
     <UserProvider data={await api.user.dashboard()}>
       <SidebarProvider
@@ -20,8 +30,9 @@ export default async function Layout(props: LayoutProps<"/">) {
           } as CSSProperties
         }
       >
-        {props.sidebar}
-        {props.content}
+        {navigation}
+        {user}
+        {content}
       </SidebarProvider>
     </UserProvider>
   );

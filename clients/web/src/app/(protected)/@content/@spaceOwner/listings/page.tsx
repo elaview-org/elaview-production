@@ -15,9 +15,18 @@ export default async function Page(props: PageProps<"/listings">) {
     cookies(),
     props.searchParams,
   ]).then(([cookieStore, searchParams]) => {
-    const view = cookieStore.get(storage.preferences.listings.view)?.value as ViewOptions;
-    const { params, filterEntries, hasBounds, boundsFilter, bounds, zoom, order, first } =
-      parseSpaceListParams(searchParams, view);
+    const view = cookieStore.get(storage.preferences.listings.view)
+      ?.value as ViewOptions;
+    const {
+      params,
+      filterEntries,
+      hasBounds,
+      boundsFilter,
+      bounds,
+      zoom,
+      order,
+      first,
+    } = parseSpaceListParams(searchParams, view);
 
     return {
       view,

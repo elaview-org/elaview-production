@@ -1,5 +1,4 @@
 import { expect, test as base } from "@playwright/test";
-import assert from "node:assert";
 
 type Fixtures = {
   seed: string;
@@ -7,8 +6,7 @@ type Fixtures = {
 
 export const test = base.extend<Fixtures>({
   seed: async ({}, use) => {
-    assert(!!process.env.ELAVIEW_E2E_GLOBAL_SEED);
-    await use(process.env.ELAVIEW_E2E_GLOBAL_SEED);
+    await use(Math.random().toString(36).slice(2, 10));
   },
 });
 

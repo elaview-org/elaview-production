@@ -20,5 +20,4 @@ const user = {
         return res.data.me;
       }),
 };
-
 export default user;

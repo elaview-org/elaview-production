@@ -1,12 +1,14 @@
 import { expect, test as base } from "./base";
 
+export type Credentials = {
+  name: string;
+  email: string;
+  password: string;
+};
+
 type Fixtures = {
   _setup: void;
-  signup: (credentials: {
-    name: string;
-    email: string;
-    password: string;
-  }) => Promise<void>;
+  signup: (credentials: Credentials) => Promise<void>;
 };
 
 export const test = base.extend<Fixtures>({

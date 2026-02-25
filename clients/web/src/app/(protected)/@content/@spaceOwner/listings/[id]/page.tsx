@@ -19,7 +19,10 @@ export default async function Page({ params }: PageProps<"/listings/[id]">) {
     return id;
   });
 
-  const space = await api.listings.detail(id).then((res) => res ?? notFound()).catch(() => notFound());
+  const space = await api.listings
+    .detail(id)
+    .then((res) => res ?? notFound())
+    .catch(() => notFound());
 
   return (
     <div className="flex flex-col gap-6">

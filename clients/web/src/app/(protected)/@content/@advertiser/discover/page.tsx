@@ -15,14 +15,30 @@ export default async function Page(props: PageProps<"/discover">) {
     cookies(),
     props.searchParams,
   ]).then(([cookieStore, searchParams]) => {
-    const view = cookieStore.get(storage.preferences.discover.view)?.value as ViewOptions;
-    const { params, allEntries, filterEntries, boundsFilter, bounds, zoom, order, first } =
-      parseSpaceListParams(searchParams, view, ["price"]);
+    const view = cookieStore.get(storage.preferences.discover.view)
+      ?.value as ViewOptions;
+    const {
+      params,
+      allEntries,
+      filterEntries,
+      boundsFilter,
+      bounds,
+      zoom,
+      order,
+      first,
+    } = parseSpaceListParams(searchParams, view, ["price"]);
 
-    const priceRange = allEntries.price ? PRICE_RANGES[allEntries.price] : undefined;
+    const priceRange = allEntries.price
+      ? PRICE_RANGES[allEntries.price]
+      : undefined;
     const priceFilter = priceRange ? { pricePerDay: priceRange } : {};
     const searchFilter = params.q
-      ? { or: [{ title: { contains: params.q } }, { city: { contains: params.q } }] }
+      ? {
+          or: [
+            { title: { contains: params.q } },
+            { city: { contains: params.q } },
+          ],
+        }
       : {};
 
     const filters = [

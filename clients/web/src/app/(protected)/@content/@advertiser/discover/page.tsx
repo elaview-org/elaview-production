@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
 import api from "@/api/server";
-import { graphql, SortEnumType } from "@/types/gql";
-import { z } from "zod";
+import { graphql } from "@/types/gql";
 import { ViewOptions } from "@/types/constants";
 import storage from "@/lib/core/storage";
+import { parseSpaceListParams } from "@/lib/space-list-params";
 import Toolbar from "@/components/composed/toolbar";
 import { TOOLBAR_PROPS, PRICE_RANGES } from "./constants";
 import DiscoverGrid from "./(grid)/discover-grid";
@@ -15,82 +15,14 @@ export default async function Page(props: PageProps<"/discover">) {
     cookies(),
     props.searchParams,
   ]).then(([cookieStore, searchParams]) => {
-    const view = cookieStore.get(storage.preferences.discover.view)
-      ?.value as ViewOptions;
-    const params = z
-      .object({
-        first: z.coerce
-          .number()
-          .int()
-          .positive()
-          .max(100)
-          .optional()
-          .catch(undefined),
-        last: z.coerce
-          .number()
-          .int()
-          .positive()
-          .max(100)
-          .optional()
-          .catch(undefined),
-        after: z.string().optional().catch(undefined),
-        before: z.string().optional().catch(undefined),
-        sort: z.string().optional().catch(undefined),
-        filter: z.string().optional().catch(undefined),
-        q: z.string().optional().catch(undefined),
-      })
-      .parse(searchParams);
+    const view = cookieStore.get(storage.preferences.discover.view)?.value as ViewOptions;
+    const { params, allEntries, filterEntries, boundsFilter, bounds, zoom, order, first } =
+      parseSpaceListParams(searchParams, view, ["price"]);
 
-    const mapKeys = new Set(["minLat", "maxLat", "minLng", "maxLng", "zoom"]);
-    const allEntries = params.filter
-      ? Object.fromEntries(
-          params.filter.split(",").map((entry) => {
-            const [key, ...rest] = entry.split(":");
-            return [key, rest.join(":")];
-          })
-        )
-      : {};
-
-    const mapEntries = {
-      minLat: allEntries.minLat ? Number(allEntries.minLat) : undefined,
-      maxLat: allEntries.maxLat ? Number(allEntries.maxLat) : undefined,
-      minLng: allEntries.minLng ? Number(allEntries.minLng) : undefined,
-      maxLng: allEntries.maxLng ? Number(allEntries.maxLng) : undefined,
-      zoom: allEntries.zoom ? Number(allEntries.zoom) : undefined,
-    };
-
-    const filterEntries = Object.fromEntries(
-      Object.entries(allEntries)
-        .filter(([key]) => !mapKeys.has(key) && key !== "price")
-        .map(([key, value]) => [key, { eq: value }])
-    );
-
-    const priceRange = allEntries.price
-      ? PRICE_RANGES[allEntries.price]
-      : undefined;
+    const priceRange = allEntries.price ? PRICE_RANGES[allEntries.price] : undefined;
     const priceFilter = priceRange ? { pricePerDay: priceRange } : {};
-
-    const hasBounds =
-      mapEntries.minLat !== undefined &&
-      mapEntries.maxLat !== undefined &&
-      mapEntries.minLng !== undefined &&
-      mapEntries.maxLng !== undefined;
-
-    const boundsFilter =
-      view === ViewOptions.Map && hasBounds
-        ? {
-            latitude: { gte: mapEntries.minLat, lte: mapEntries.maxLat },
-            longitude: { gte: mapEntries.minLng, lte: mapEntries.maxLng },
-          }
-        : {};
-
     const searchFilter = params.q
-      ? {
-          or: [
-            { title: { contains: params.q } },
-            { city: { contains: params.q } },
-          ],
-        }
+      ? { or: [{ title: { contains: params.q } }, { city: { contains: params.q } }] }
       : {};
 
     const filters = [
@@ -101,30 +33,16 @@ export default async function Page(props: PageProps<"/discover">) {
       ...(Object.keys(searchFilter).length > 0 ? [searchFilter] : []),
     ];
 
-    const where = filters.length > 1 ? { and: filters } : filters[0];
-
-    const boundsResult = hasBounds
-      ? {
-          minLat: mapEntries.minLat!,
-          maxLat: mapEntries.maxLat!,
-          minLng: mapEntries.minLng!,
-          maxLng: mapEntries.maxLng!,
-        }
-      : undefined;
-
     return {
-      ...(params satisfies Omit<typeof params, "filter" | "sort" | "q">),
       view,
-      bounds: boundsResult,
-      zoom: mapEntries.zoom,
-      first: params.last || params.before ? undefined : (params.first ?? 32),
-      where,
-      order: params.sort?.split(",").map((entry) => {
-        const [key, dir] = entry.split(":");
-        return {
-          [key]: dir === "DESC" ? SortEnumType.Desc : SortEnumType.Asc,
-        };
-      }),
+      bounds,
+      zoom,
+      first,
+      last: params.last,
+      after: params.after,
+      before: params.before,
+      order,
+      where: filters.length > 1 ? { and: filters } : filters[0],
       gridView:
         view === ViewOptions.Grid ||
         !view ||

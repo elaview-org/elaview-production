@@ -1,5 +1,4 @@
 import api from "@/api/server";
-import { graphql } from "@/types/gql";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
@@ -13,31 +12,14 @@ import CalendarWrapper from "./calendar-wrapper";
 import { CalendarSkeleton } from "./calendar";
 
 export default async function Page({ params }: PageProps<"/listings/[id]">) {
-  const space = await api
-    .query({
-      query: graphql(`
-        query SpaceDetail($id: ID!) {
-          spaceById(id: $id) {
-            id
-            averageRating
-            ...Header_SpaceFragment
-            ...Gallery_SpaceFragment
-            ...Details_SpaceFragment
-            ...Performance_SpaceFragment
-          }
-        }
-      `),
-      variables: {
-        id: await params.then(({ id }) => {
-          if (z.uuid().safeParse(id).error) {
-            notFound();
-          }
-          return id;
-        }),
-      },
-    })
-    .then((res) => res.data?.spaceById ?? notFound())
-    .catch(() => notFound());
+  const id = await params.then(({ id }) => {
+    if (z.uuid().safeParse(id).error) {
+      notFound();
+    }
+    return id;
+  });
+
+  const space = await api.listings.detail(id).then((res) => res ?? notFound()).catch(() => notFound());
 
   return (
     <div className="flex flex-col gap-6">

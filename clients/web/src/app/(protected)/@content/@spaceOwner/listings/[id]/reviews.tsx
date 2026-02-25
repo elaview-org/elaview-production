@@ -1,6 +1,5 @@
 import api from "@/api/server";
 import { formatDate, getInitials } from "@/lib/core/utils";
-import { graphql } from "@/types/gql";
 import {
   Avatar,
   AvatarFallback,
@@ -21,31 +20,7 @@ type Props = {
 };
 
 export default async function Reviews({ spaceId, averageRating }: Props) {
-  const reviews = await api
-    .query({
-      query: graphql(`
-        query SpaceReviews($spaceId: ID!, $first: Int) {
-          reviewsBySpace(
-            spaceId: $spaceId
-            first: $first
-            order: [{ createdAt: DESC }]
-          ) {
-            nodes {
-              id
-              rating
-              comment
-              createdAt
-              reviewer {
-                name
-                avatar
-              }
-            }
-          }
-        }
-      `),
-      variables: { spaceId, first: 10 },
-    })
-    .then((res) => res.data?.reviewsBySpace?.nodes ?? []);
+  const reviews = await api.listings.reviews(spaceId);
 
   return (
     <div className="rounded-lg border">

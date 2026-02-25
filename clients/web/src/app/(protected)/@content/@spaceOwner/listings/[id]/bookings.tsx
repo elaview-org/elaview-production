@@ -2,7 +2,6 @@ import api from "@/api/server";
 import { BOOKING_STATUS } from "@/lib/core/constants";
 import { formatCurrency, formatDate } from "@/lib/core/utils";
 import { Badge } from "@/components/primitives/badge";
-import { graphql } from "@/types/gql";
 import Link from "next/link";
 import {
   Empty,
@@ -18,34 +17,7 @@ type Props = {
 };
 
 export default async function Bookings({ spaceId }: Props) {
-  const bookings = await api
-    .query({
-      query: graphql(`
-        query SpaceBookings($spaceId: UUID!, $first: Int) {
-          myBookingsAsOwner(
-            first: $first
-            where: { spaceId: { eq: $spaceId } }
-            order: [{ startDate: DESC }]
-          ) {
-            nodes {
-              id
-              status
-              startDate
-              endDate
-              totalAmount
-              campaign {
-                name
-                advertiserProfile {
-                  companyName
-                }
-              }
-            }
-          }
-        }
-      `),
-      variables: { spaceId, first: 10 },
-    })
-    .then((res) => res.data?.myBookingsAsOwner?.nodes ?? []);
+  const bookings = await api.listings.bookings(spaceId);
 
   if (bookings.length === 0) {
     return (

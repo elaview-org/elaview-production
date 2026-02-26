@@ -1,57 +1,28 @@
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-} from "@/components/primitives/sidebar";
-import { IconInnerShadowTop } from "@tabler/icons-react";
-import { NavigationSection } from "./(dashboard)/navigation-section";
-import { UserSection } from "./(dashboard)/user-section";
+import { SidebarProvider } from "@/components/primitives/sidebar";
 import { CSSProperties } from "react";
-import ContentHeader from "./(dashboard)/content-header";
-import RoleBasedView from "./(dashboard)/role-based-view";
+import { cookies } from "next/headers";
+import storage from "@/lib/core/storage";
+import UserProvider from "@/lib/providers/user-provider";
 import api from "@/api/server";
 
 export default async function Layout(props: LayoutProps<"/">) {
-  const [sidebarOpen, me] = await api.user.dashboard();
-
   return (
-    <SidebarProvider
-      defaultOpen={sidebarOpen}
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as CSSProperties
-      }
-    >
-      <Sidebar collapsible="icon">
-        <SidebarHeader>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton className="hover:bg-inherit active:bg-inherit data-[slot=sidebar-menu-button]:p-1.5!">
-                <IconInnerShadowTop className="size-5!" />
-                <span className="text-base font-semibold">Elaview</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarHeader>
-        <SidebarContent>
-          <NavigationSection data={me} />
-        </SidebarContent>
-        <SidebarFooter>
-          <UserSection data={me} />
-        </SidebarFooter>
-      </Sidebar>
-      <SidebarInset>
-        <ContentHeader />
-        <RoleBasedView data={me} {...props} />
-      </SidebarInset>
-    </SidebarProvider>
+    <UserProvider data={await api.user.dashboard()}>
+      <SidebarProvider
+        defaultOpen={
+          (await cookies()).get(storage.preferences.sidebar.open)?.value !==
+          "false"
+        }
+        style={
+          {
+            "--sidebar-width": "calc(var(--spacing) * 72)",
+            "--header-height": "calc(var(--spacing) * 12)",
+          } as CSSProperties
+        }
+      >
+        {props.sidebar}
+        {props.content}
+      </SidebarProvider>
+    </UserProvider>
   );
 }

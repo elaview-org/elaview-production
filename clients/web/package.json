@@ -20,7 +20,8 @@
     "test": "bun test .test.ts",
     "test:watch": "bun run test --watch",
     "test:coverage": "bun run test --coverage",
-    "test:e2e": "playwright test --config src/playwright.config.ts"
+    "test:e2e": "playwright test --config src/playwright.config.ts",
+    "test:e2e:ui": "bun run test:e2e --ui"
   },
   "dependencies": {
     "@apollo/client": "^4.1.3",

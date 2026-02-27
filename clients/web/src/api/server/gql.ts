@@ -24,6 +24,13 @@ const {
     new ApolloClient({
       cache: new InMemoryCache({
         resultCaching: true,
+        typePolicies: {
+          Query: {
+            fields: {
+              me: { merge: true },
+            },
+          },
+        },
       }),
       queryDeduplication: true,
       link: new HttpLink({

@@ -1,24 +1,16 @@
 "use client";
 
-import auth from "./auth";
-import listings from "./listings";
-
 import { ApolloLink, HttpLink } from "@apollo/client";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { getMainDefinition } from "@apollo/client/utilities";
-import {
-  ApolloClient,
-  ApolloNextAppProvider,
-  InMemoryCache,
-} from "@apollo/client-integration-nextjs";
+import { ApolloClient, InMemoryCache } from "@apollo/client-integration-nextjs";
 import { createClient } from "graphql-ws";
-import React, { Suspense } from "react";
 import * as apolloApi from "@apollo/client/react";
 import env from "@/lib/core/env";
+import auth from "./auth";
+import listings from "./listings";
 
-import calendar from "./calendar";
-
-function makeClient() {
+export function makeClient() {
   const httpLink = new HttpLink({
     uri: `${env.client.apiUrl}/graphql`,
     fetchOptions: {
@@ -52,19 +44,18 @@ function makeClient() {
     : httpLink;
 
   return new ApolloClient({
-    cache: new InMemoryCache(),
+    cache: new InMemoryCache({
+      resultCaching: true,
+      typePolicies: {
+        Query: {
+          fields: {
+            me: { merge: true },
+          },
+        },
+      },
+    }),
     link,
   });
-}
-
-export function ApolloWrapper({ children }: React.PropsWithChildren) {
-  return (
-    <Suspense fallback={null}>
-      <ApolloNextAppProvider makeClient={makeClient}>
-        {children}
-      </ApolloNextAppProvider>
-    </Suspense>
-  );
 }
 
 const api = {

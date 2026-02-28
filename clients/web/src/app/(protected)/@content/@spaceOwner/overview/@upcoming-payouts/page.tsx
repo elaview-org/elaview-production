@@ -3,7 +3,7 @@ import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import PayoutCard from "./payout-card";
 import Placeholder from "./placeholder";
 import { graphql } from "@/types/gql";
-import api from "../api";
+import api from "@/api/server";
 
 const OverviewUpcomingPayouts_QueryFragment = graphql(`
   fragment OverviewUpcomingPayouts_QueryFragment on Query {

@@ -9,6 +9,8 @@ import * as apolloApi from "@apollo/client/react";
 import env from "@/lib/core/env";
 import auth from "./auth";
 import listings from "./listings";
+import calendar from "./calendar";
+import earnings from "./earnings";
 
 export function makeClient() {
   const httpLink = new HttpLink({
@@ -62,5 +64,7 @@ const api = {
   ...apolloApi,
   auth,
   listings,
+  calendar,
+  earnings,
 } as const;
 export default api;

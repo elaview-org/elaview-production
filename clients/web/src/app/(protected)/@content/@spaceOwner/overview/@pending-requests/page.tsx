@@ -3,7 +3,7 @@ import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import RequestCard from "./request-card";
 import Placeholder from "./placeholder";
 import { graphql } from "@/types/gql";
-import api from "../api";
+import api from "@/api/server";
 
 const OverviewPendingRequests_QueryFragment = graphql(`
   fragment OverviewPendingRequests_QueryFragment on Query {

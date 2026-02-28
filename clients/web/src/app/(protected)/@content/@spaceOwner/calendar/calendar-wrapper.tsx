@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { useTransition } from "react";
 import { toast } from "sonner";
 import { BookingStatus } from "@/types/gql/graphql";
 import CalendarHeader from "./calendar-header";
@@ -13,7 +12,8 @@ import type {
   CalendarBooking,
   CalendarBlockedDate,
 } from "./types";
-import { blockDatesAction, unblockDatesAction } from "./calendar.actions";
+import api from "@/api/client";
+
 import BlockDatesDialog from "./block-dates-dialog";
 
 type Props = {
@@ -36,8 +36,10 @@ export default function CalendarWrapper({
     BookingStatus[] | null
   >(null);
   const [blockedDates, setBlockedDates] = React.useState(initialBlockedDates);
-  const [pending, startTransition] = useTransition();
   const [blockDialogOpen, setBlockDialogOpen] = React.useState(false);
+
+  const { unblockDates } = api.calendar.useUnblockDates();
+  const { blockDates, isPending: pending } = api.calendar.useBlockDates();
 
   const filteredBookings = React.useMemo(() => {
     let result = initialBookings;
@@ -64,8 +66,7 @@ export default function CalendarWrapper({
         ...dates.map((date) => ({ spaceId: selectedSpaceId, date })),
       ]);
 
-      startTransition(async () => {
-        const result = await blockDatesAction(selectedSpaceId, dates, reason);
+      blockDates(selectedSpaceId, dates, reason, (result) => {
         if (result.success) {
           toast.success(
             dates.length === 1
@@ -83,7 +84,7 @@ export default function CalendarWrapper({
         }
       });
     },
-    [selectedSpaceId]
+    [selectedSpaceId, blockDates]
   );
 
   const handleUnblockDates = React.useCallback(
@@ -99,8 +100,7 @@ export default function CalendarWrapper({
         )
       );
 
-      startTransition(async () => {
-        const result = await unblockDatesAction(selectedSpaceId, dates);
+      unblockDates(selectedSpaceId, dates, (result) => {
         if (result.success) {
           toast.success(
             dates.length === 1
@@ -113,7 +113,7 @@ export default function CalendarWrapper({
         }
       });
     },
-    [selectedSpaceId, blockedDates]
+    [selectedSpaceId, blockedDates, unblockDates]
   );
 
   return (
@@ -169,8 +169,8 @@ export default function CalendarWrapper({
             ...prev,
             ...dates.map((date) => ({ spaceId, date })),
           ]);
-          startTransition(async () => {
-            const result = await blockDatesAction(spaceId, dates, reason);
+
+          blockDates(spaceId, dates, reason, (result) => {
             if (result.success) {
               toast.success(`${dates.length} dates blocked`);
             } else {

@@ -42,6 +42,7 @@ export async function blockDatesAction(
     }
 
     revalidatePath("/calendar");
+    revalidatePath(`/listings/${spaceId}`);
     return { success: true, error: null };
   } catch (error) {
     return {
@@ -84,6 +85,7 @@ export async function unblockDatesAction(
     }
 
     revalidatePath("/calendar");
+    revalidatePath(`/listings/${spaceId}`);
     return { success: true, error: null };
   } catch (error) {
     return {

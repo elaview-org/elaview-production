@@ -1,8 +1,8 @@
-import api from "@/api/server";
+import gql from "./gql";
 import { graphql } from "@/types/gql";
 
-const getMyOverview = api.createFragmentReader(() =>
-  api.query({
+const getMyOverview = gql.createFragmentReader(() =>
+  gql.query({
     query: graphql(`
       query OverviewData {
         ...OverviewStatCards_QueryFragment
@@ -17,8 +17,7 @@ const getMyOverview = api.createFragmentReader(() =>
     `),
   })
 );
-Object.assign(api, { getMyOverview });
 
-export default api as typeof api & {
-  getMyOverview: typeof getMyOverview;
+export const overview = {
+  getMyOverView: getMyOverview,
 };

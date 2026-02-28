@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import type { Row } from "@tanstack/react-table";
 import {
   IconCircleCheckFilled,
@@ -22,7 +22,7 @@ import TableView, {
 import { Button } from "@/components/primitives/button";
 import { PAYOUT_STAGE, PAYOUT_STATUS } from "@/lib/core/constants";
 import { PayoutStage, PayoutStatus, graphql } from "@/types/gql";
-import { retryPayoutAction } from "./payouts.actions";
+import api from "@/api/client";
 
 export const PayoutsHistoryTable_PayoutFragment = graphql(`
   fragment PayoutsHistoryTable_PayoutFragment on Payout {
@@ -82,12 +82,10 @@ type Props = {
 
 export default function PayoutsHistoryTable({ data }: Props) {
   const [retryingId, setRetryingId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
-
+  const { retryPayout, isPending } = api.earnings.useRetryPayout();
   const handleRetry = (payoutId: string) => {
     setRetryingId(payoutId);
-    startTransition(async () => {
-      const result = await retryPayoutAction(payoutId);
+    retryPayout(payoutId, (result) => {
       if (result.success) {
         toast.success("Payout retry initiated");
       } else {

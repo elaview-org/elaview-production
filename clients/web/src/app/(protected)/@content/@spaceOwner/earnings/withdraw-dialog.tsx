@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,7 @@ import { Input } from "@/components/primitives/input";
 import { Label } from "@/components/primitives/label";
 import { toast } from "sonner";
 import { formatCurrency } from "@/lib/core/utils";
-import { requestWithdrawalAction } from "./earnings.actions";
+import api from "@/api/client";
 
 type Props = {
   availableBalance: number;
@@ -28,8 +28,8 @@ export default function WithdrawDialog({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [customAmount, setCustomAmount] = useState("");
-  const [pending, startTransition] = useTransition();
-
+  const { requestWithdrawal, isPending: pending } =
+    api.earnings.useRequestWithdrawal();
   const canWithdraw = stripeConnected && availableBalance > 0;
   const parsedAmount = parseFloat(customAmount);
   const isValidCustomAmount =
@@ -48,9 +48,7 @@ export default function WithdrawDialog({
       return;
     }
 
-    startTransition(async () => {
-      const result = await requestWithdrawalAction(amount);
-
+    requestWithdrawal(amount, (result) => {
       if (result.success) {
         toast.success(
           `Withdrawal of ${formatCurrency(amount ?? availableBalance, { decimals: true })} requested`

@@ -3,7 +3,7 @@ import SummaryCard, {
 } from "@/components/composed/summary-card";
 import { calculateTrend, formatCurrency } from "@/lib/core/utils";
 import { graphql } from "@/types/gql";
-import api from "../api";
+import api from "@/api/server";
 
 const OverviewStatCards_QueryFragment = graphql(`
   fragment OverviewStatCards_QueryFragment on Query {

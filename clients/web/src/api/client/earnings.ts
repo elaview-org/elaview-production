@@ -1,11 +1,11 @@
 "use client";
 
-import { PayoutActionResult } from "@/app/(protected)/@content/@spaceOwner/earnings/payouts/payouts.actions";
 import { useTransition } from "react";
 import {
   requestWithdrawalAction,
   retryPayoutAction,
   WithdrawalActionResult,
+  PayoutActionResult,
 } from "./earnings.actions";
 
 function useRequestWithdrawal() {

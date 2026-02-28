@@ -1,5 +1,5 @@
 import { graphql } from "@/types/gql";
-import api from "../api";
+import api from "@/api/server";
 import RecentActivity from "./recent-activity";
 
 const OverviewRecentActivity_QueryFragment = graphql(`

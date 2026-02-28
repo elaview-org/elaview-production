@@ -1,5 +1,5 @@
 import { graphql } from "@/types/gql";
-import api from "../api";
+import api from "@/api/server";
 import ActivityChart from "./activity-chart";
 
 const OverviewActivityChart_QueryFragment = graphql(`

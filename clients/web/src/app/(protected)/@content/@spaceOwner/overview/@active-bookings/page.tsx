@@ -3,7 +3,7 @@ import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import BookingCard from "./booking-card";
 import Placeholder from "./placeholder";
 import { graphql } from "@/types/gql";
-import api from "../api";
+import api from "@/api/server";
 
 const OverviewActiveBookings_QueryFragment = graphql(`
   fragment OverviewActiveBookings_QueryFragment on Query {

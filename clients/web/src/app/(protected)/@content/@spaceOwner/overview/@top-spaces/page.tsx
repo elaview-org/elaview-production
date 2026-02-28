@@ -3,7 +3,7 @@ import MaybePlaceholder from "@/components/status/maybe-placeholder";
 import SpaceCard from "./space-card";
 import Placeholder from "./placeholder";
 import { graphql } from "@/types/gql";
-import api from "../api";
+import api from "@/api/server";
 
 const OverviewTopSpaces_QueryFragment = graphql(`
   fragment OverviewTopSpaces_QueryFragment on Query {

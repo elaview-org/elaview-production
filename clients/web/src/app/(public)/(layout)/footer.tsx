@@ -3,11 +3,13 @@ import { IconInnerShadowTop } from "@tabler/icons-react";
 import { Separator } from "@/components/primitives/separator";
 
 const FOOTER_LINKS = [
-  { href: "/help", label: "Help" },
   { href: "/about", label: "About" },
+  { href: "/careers", label: "Careers" },
+  { href: "/how-it-works", label: "How It Works" },
   { href: "/contact", label: "Contact" },
-  { href: "/terms-of-service", label: "Terms of Service" },
-  { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/help", label: "Help" },
+  { href: "/terms-of-service", label: "Terms" },
+  { href: "/privacy-policy", label: "Privacy" },
 ] as const;
 
 export default function Footer() {

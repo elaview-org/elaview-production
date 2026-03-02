@@ -1,9 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  IconUserScan,
-} from "@tabler/icons-react";
+import { IconUserScan } from "@tabler/icons-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -38,7 +36,6 @@ export default function Default() {
     }
   }, [role, activeProfileType]);
 
-  
   const pathname = usePathname();
 
   return (

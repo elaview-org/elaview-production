@@ -1,30 +1,15 @@
 "use client";
 
 import { useMemo } from "react";
-import {
-  IconDots,
-  IconFolder,
-  IconShare3,
-  IconTrash,
-  IconUserScan,
-} from "@tabler/icons-react";
+import { IconUserScan } from "@tabler/icons-react";
 import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from "@/components/primitives/sidebar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/primitives/dropdown-menu";
 import { ProfileType, UserRole } from "@/types/gql";
 import adminData from "@/app/(protected)/@content/@admin/navigation-bar.data";
 import advertiserData from "@/app/(protected)/@content/@advertiser/navigation-bar.data";
@@ -51,7 +36,7 @@ export default function Default() {
     }
   }, [role, activeProfileType]);
 
-  const { isMobile } = useSidebar();
+  // const { isMobile } = useSidebar();
   const pathname = usePathname();
 
   return (
@@ -103,48 +88,48 @@ export default function Default() {
       </SidebarGroup>
       <SidebarGroup className="group-data-[collapsible=icon]:hidden">
         <SidebarGroupLabel>Documents</SidebarGroupLabel>
-        <SidebarMenu>
-          {roleData.documents.map((item) => (
-            <SidebarMenuItem key={item.name}>
-              <SidebarMenuButton asChild>
-                <a href={item.url}>
-                  <item.icon />
-                  <span>{item.name}</span>
-                </a>
-              </SidebarMenuButton>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction
-                    showOnHover
-                    className="data-[state=open]:bg-accent rounded-sm"
-                  >
-                    <IconDots />
-                    <span className="sr-only">More</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  className="w-24 rounded-lg"
-                  side={isMobile ? "bottom" : "right"}
-                  align={isMobile ? "end" : "start"}
-                >
-                  <DropdownMenuItem>
-                    <IconFolder />
-                    <span>Open</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <IconShare3 />
-                    <span>Share</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive">
-                    <IconTrash />
-                    <span>Delete</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
+        {/*<SidebarMenu>*/}
+        {/*  {roleData.documents.map((item) => (*/}
+        {/*    <SidebarMenuItem key={item.name}>*/}
+        {/*      <SidebarMenuButton asChild>*/}
+        {/*        <a href={item.url}>*/}
+        {/*          <item.icon />*/}
+        {/*          <span>{item.name}</span>*/}
+        {/*        </a>*/}
+        {/*      </SidebarMenuButton>*/}
+        {/*      <DropdownMenu>*/}
+        {/*        <DropdownMenuTrigger asChild>*/}
+        {/*          <SidebarMenuAction*/}
+        {/*            showOnHover*/}
+        {/*            className="data-[state=open]:bg-accent rounded-sm"*/}
+        {/*          >*/}
+        {/*            <IconDots />*/}
+        {/*            <span className="sr-only">More</span>*/}
+        {/*          </SidebarMenuAction>*/}
+        {/*        </DropdownMenuTrigger>*/}
+        {/*        <DropdownMenuContent*/}
+        {/*          className="w-24 rounded-lg"*/}
+        {/*          side={isMobile ? "bottom" : "right"}*/}
+        {/*          align={isMobile ? "end" : "start"}*/}
+        {/*        >*/}
+        {/*          <DropdownMenuItem>*/}
+        {/*            <IconFolder />*/}
+        {/*            <span>Open</span>*/}
+        {/*          </DropdownMenuItem>*/}
+        {/*          <DropdownMenuItem>*/}
+        {/*            <IconShare3 />*/}
+        {/*            <span>Share</span>*/}
+        {/*          </DropdownMenuItem>*/}
+        {/*          <DropdownMenuSeparator />*/}
+        {/*          <DropdownMenuItem variant="destructive">*/}
+        {/*            <IconTrash />*/}
+        {/*            <span>Delete</span>*/}
+        {/*          </DropdownMenuItem>*/}
+        {/*        </DropdownMenuContent>*/}
+        {/*      </DropdownMenu>*/}
+        {/*    </SidebarMenuItem>*/}
+        {/*  ))}*/}
+        {/*</SidebarMenu>*/}
       </SidebarGroup>
       <SidebarGroup className={"mt-auto"}>
         <SidebarGroupContent>

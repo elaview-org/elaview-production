@@ -1,11 +1,9 @@
 import { expect, test as base } from "./base";
 import { Page } from "@playwright/test";
 
-type Fixtures = {
-  twoUsers: TwoUsers;
-};
-
-export const test = base.extend<Fixtures>({
+export const test = base.extend<{
+  twoUsers: Omit<TwoUsers, "setup" | "teardown">;
+}>({
   twoUsers: async ({ page, seed }, use) => {
     const twoUsers = new TwoUsers(page, seed, {
       advertiser: {
@@ -19,8 +17,9 @@ export const test = base.extend<Fixtures>({
         password: seed,
       },
     });
-    await twoUsers.init();
+    await twoUsers.setup();
     await use(twoUsers);
+    await twoUsers.teardown();
   },
 });
 
@@ -55,8 +54,7 @@ class User {
 
   public async signup() {
     await this.logout();
-    await this.page.goto("/");
-    await this.page.getByRole("link", { name: "Sign Up", exact: true }).click();
+    await this.page.getByRole("link", { name: "Sign up", exact: true }).click();
     await this.page.getByLabel("Full Name").fill(this.credentials.name);
     await this.page.getByLabel("Email").fill(this.credentials.email);
     await this.page
@@ -68,6 +66,8 @@ class User {
     await this.page.getByRole("button", { name: "Create Account" }).click();
     await this.page.waitForURL("/overview");
   }
+
+  public async deleteAccount() {}
 
   protected async switchToProfile(targetLabel: "Advertiser" | "Space Owner") {
     await this.page
@@ -117,9 +117,6 @@ class SpaceOwner extends User {
   public async createSpace(name: string) {
     await this.page.goto("/listings");
     await this.page.getByRole("button", { name: "New Space" }).click();
-    await this.page
-      .getByPlaceholder("e.g., Downtown Coffee Shop Window")
-      .fill(name);
   }
 }
 
@@ -140,9 +137,14 @@ class TwoUsers {
     this.spaceOwner = new SpaceOwner(page, credentials.spaceOwner);
   }
 
-  public async init() {
+  public async setup() {
     await this.spaceOwner.signup();
     await this.advertiser.signup();
+  }
+
+  public async teardown() {
+    await this.advertiser.deleteAccount();
+    await this.spaceOwner.deleteAccount();
   }
 
   public async asAdvertiser(

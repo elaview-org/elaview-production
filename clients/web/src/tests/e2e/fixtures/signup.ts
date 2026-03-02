@@ -1,6 +1,6 @@
 import { expect, test as base } from "./base";
 
-export type Credentials = {
+type Credentials = {
   name: string;
   email: string;
   password: string;

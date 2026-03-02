@@ -43,7 +43,7 @@ export default function Page() {
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href="/find-spaces"
+              href="/spaces"
               className="flex items-center gap-2 rounded-md border border-[#2E3746]/60 bg-[#2E3746] px-6 py-3.5 text-base font-medium text-white backdrop-blur-sm transition-all hover:bg-[#3a4557]"
             >
               <Search size={16} strokeWidth={2} />

@@ -16,9 +16,9 @@ import { ThemeToggle } from "@/components/composed/theme-toggle";
 import storage from "@/lib/core/storage";
 
 const NAV_LINKS = [
-  { href: "/help", label: "Help" },
-  { href: "/about", label: "About" },
   { href: "/how-it-works", label: "How It Works" },
+  { href: "/careers", label: "Careers" },
+  { href: "/about", label: "About" },
 ] as const;
 
 const COOKIE_KEY = storage.authentication.token + "=";

@@ -5,7 +5,7 @@ export default function Layout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex min-h-svh flex-col overflow-x-clip">
       <Header />
-      <div className="px-public grow">{children}</div>
+      <div className="px-public @container/main grow">{children}</div>
       <Footer />
     </div>
   );

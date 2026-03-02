@@ -7,6 +7,8 @@ import {
 import RankedCard from "@/components/composed/ranked-card";
 import { formatCurrency, formatNumber } from "@/lib/core/utils";
 import { FragmentType, getFragmentData, graphql } from "@/types/gql";
+// TODO: Replace mock views/occupancyRate with real API data once the backend
+// exposes these fields on the Space type (e.g. `totalViews` and `occupancyRate`).
 import mock from "./mock.json";
 
 export const OverviewTopSpacesSpaceCard_SpaceFragment = graphql(`

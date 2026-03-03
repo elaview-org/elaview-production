@@ -8,6 +8,7 @@ import {
   SidebarMenuItem,
 } from "@/components/primitives/sidebar";
 import { IconInnerShadowTop } from "@tabler/icons-react";
+import Link from "next/link";
 
 export default function Layout(props: LayoutProps<"/">) {
   return (
@@ -16,8 +17,10 @@ export default function Layout(props: LayoutProps<"/">) {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton className="hover:bg-inherit active:bg-inherit data-[slot=sidebar-menu-button]:p-1.5!">
-              <IconInnerShadowTop className="size-5!" />
-              <span className="text-base font-semibold">Elaview</span>
+              <Link href="/" className="flex items-center gap-2">
+                <IconInnerShadowTop className="size-5!" />
+                <span className="text-base font-semibold">Elaview</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

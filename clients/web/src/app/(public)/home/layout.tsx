@@ -1,8 +1,4 @@
-import { authenticatedRedirect } from "@/lib/core/auth";
-
-export default async function Layout(props: LayoutProps<"/">) {
-  await authenticatedRedirect();
-
+export default async function Layout(props: LayoutProps<"/home">) {
   return (
     <main className="bleed-public -mt-14 flex flex-col">
       {props.hero}

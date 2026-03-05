@@ -10,10 +10,12 @@ import {
 } from "@/components/primitives/field";
 import { Input } from "@/components/primitives/input";
 import api from "@/api/client";
+import { Eye, EyeOff, Lock } from "lucide-react";
+import { useState } from "react";
 
 export default function LoginForm() {
   const [state, action, pending] = api.auth.useLogin();
-
+  const [showPassword, setShowPassword] = useState(false);
   return (
     <form className={"flex flex-col gap-6"} action={action}>
       <FieldGroup>
@@ -37,7 +39,6 @@ export default function LoginForm() {
         <Field>
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Password</FieldLabel>
-            {/*todo*/}
             <a
               href="#"
               className="ml-auto text-sm underline-offset-4 hover:underline"
@@ -45,13 +46,30 @@ export default function LoginForm() {
               Forgot your password?
             </a>
           </div>
-          <Input
-            id="password"
-            name={"password"}
-            type="password"
-            defaultValue={state.data.password}
-            required
-          />
+          <div className="relative">
+            <Lock className="text-muted-foreground absolute top-2.5 left-3 h-4 w-4" />
+            <Input
+              id="password"
+              name={"password"}
+              type={showPassword ? "text" : "password"}
+              defaultValue={state.data.password}
+              required
+              className="pr-9 pl-9"
+            />
+            <Button
+              className="absolute top-0 right-0 h-full px-3 hover:bg-transparent"
+              size="icon"
+              type="button"
+              variant="ghost"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? (
+                <EyeOff className="text-muted-foreground h-4 w-4" />
+              ) : (
+                <Eye className="text-muted-foreground h-4 w-4" />
+              )}
+            </Button>
+          </div>
         </Field>
         <Field>
           <p aria-live="polite">{state.message}</p>

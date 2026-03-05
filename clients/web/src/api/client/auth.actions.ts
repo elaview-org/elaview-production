@@ -80,7 +80,7 @@ export async function logout(): Promise<never> {
   } catch {}
 
   (await cookies()).delete(storage.authentication.token);
-  redirect("/login");
+  redirect("/");
 }
 
 export async function switchProfile(targetProfileType: ProfileType) {

@@ -15,18 +15,18 @@ import {
 import { ThemeToggle } from "@/components/composed/theme-toggle";
 import storage from "@/lib/core/storage";
 
-const NAV_LINKS = [
-  { href: "/help", label: "Help" },
-  { href: "/about", label: "About" },
+const navLinks = [
   { href: "/how-it-works", label: "How It Works" },
+  { href: "/careers", label: "Careers" },
+  { href: "/about", label: "About" },
 ] as const;
 
-const COOKIE_KEY = storage.authentication.token + "=";
+const cookieKey = storage.authentication.token + "=";
 const subscribe = () => () => {};
-const getSnapshot = () => document.cookie.includes(COOKIE_KEY);
+const getSnapshot = () => document.cookie.includes(cookieKey);
 const getServerSnapshot = () => false;
 
-export default function Header() {
+export default function Default() {
   const authenticated = useSyncExternalStore(
     subscribe,
     getSnapshot,
@@ -58,7 +58,7 @@ export default function Header() {
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <Button key={link.href} variant="ghost" size="sm" asChild>
               <Link href={link.href}>{link.label}</Link>
             </Button>
@@ -106,7 +106,7 @@ export default function Header() {
                 </SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-1 px-4">
-                {NAV_LINKS.map((link) => (
+                {navLinks.map((link) => (
                   <Button
                     key={link.href}
                     variant="ghost"

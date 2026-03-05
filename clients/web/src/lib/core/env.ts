@@ -1,7 +1,7 @@
 const env = {
   client: {
     apiUrl: process.env.API_URL!,
-    stripePublishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+    stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY!,
   },
 };
 

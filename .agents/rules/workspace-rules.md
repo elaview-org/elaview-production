@@ -42,6 +42,11 @@ Add the following `init_hook` to `devbox.json` to load Doppler secrets whenever 
 **5. Start Environment**
 Run `devbox shell` to enter the environment with all tools and secrets loaded.
 
+**Rule of Thumb: What runs INSIDE vs OUTSIDE `devbox shell`?**
+This rule applies to any project using Devbox:
+- **INSIDE the shell:** Any command that interacts with project source code, starts a dev server, installs project-level dependencies (like `bun install`, `npm install`, etc.), runs a database migration, or requires Doppler secrets.
+- **OUTSIDE the shell:** Global system actions, such as interacting with Git (`git commit`, `git push`) or installing system-wide packages (`apt install`, `brew install`).
+
 ### Topic: GitHub CLI & Git Credential Setup
 To correctly authenticate the local Git environment with GitHub using a personal access token (avoiding password prompts):
 

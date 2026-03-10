@@ -44,8 +44,11 @@ git clone https://github.com/elaview-org/elaview-production.git
 cd elaview-production
 devbox shell
 
-# Install dependencies using Bun
-bun install
+# Install dependencies for web client
+cd clients/web && bun install && cd ../..
+
+# Install dependencies for mobile client
+cd clients/mobile && bun install && cd ../..
 
 # iOS Development Only: Install CocoaPods dependencies
 cd clients/mobile/ios
@@ -55,6 +58,22 @@ cd ../../..
 
 #### 2. Environment Setup
 
+You can choose to use **Doppler** (recommended) or manual local `.env` files.
+
+**Option A: Doppler (Recommended)**
+```bash
+# 1. Login to Doppler
+doppler login
+
+# 2. Setup the project
+doppler setup --project elaview-production --config development
+
+# 3. Reload your devbox shell to automatically fetch secrets
+exit
+devbox shell
+```
+
+**Option B: Manual `.env` Files**
 ```bash
 # Copy environment templates
 cp .env.example .env
@@ -62,7 +81,7 @@ cp clients/web/.env.example clients/web/.env.local
 cp clients/mobile/.env.example clients/mobile/.env.local
 ```
 
-**Minimum required variables:**
+**Minimum required variables for Option B:**
 ```env
 # .env (root)
 GRAPHQL_ENDPOINT=http://localhost:5000/graphql
@@ -812,9 +831,9 @@ stripe login
 stripe listen --forward-to localhost:5000/api/webhooks/stripe
 ```
 
-Copy the webhook signing secret and add to `.env`:
-```env
-STRIPE_WEBHOOK_SECRET=whsec_xxx
+Copy the webhook signing secret and add it to Doppler:
+```bash
+doppler secrets set STRIPE_WEBHOOK_SECRET=whsec_xxx
 ```
 
 See [clients/web/app/api/webhooks/stripe/stripecli.md](./clients/web/app/api/webhooks/stripe/stripecli.md).

@@ -12,7 +12,7 @@ It contains:
 - Quick start guides (< 5 minutes to run locally)
 - Project structure & directory map
 - Complete documentation index
-- Tech stack overview
+- Tech stack overview (Devbox, Bun, Next.js, React Native, .NET 10)
 - Key architectural decisions
 - Common commands
 - Troubleshooting guide

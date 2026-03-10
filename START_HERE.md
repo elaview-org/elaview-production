@@ -24,9 +24,7 @@
 
 ```bash
 # Required
-- Node.js 20+
-- pnpm 9+
-- Git
+- Devbox (https://www.jetify.com/devbox)
 - Docker (for local PostgreSQL)
 
 # Platform-specific for Mobile Development
@@ -35,7 +33,6 @@
   - CocoaPods 1.15.2+ (install: brew install cocoapods)
   - iOS Simulator
 - Android Studio + Android Emulator (for Android)
-- .NET 8 SDK (for backend development)
 ```
 
 ### Get Running in < 5 Minutes
@@ -45,7 +42,10 @@
 ```bash
 git clone https://github.com/elaview-org/elaview-production.git
 cd elaview-production
-pnpm install
+devbox shell
+
+# Install dependencies using Bun
+bun install
 
 # iOS Development Only: Install CocoaPods dependencies
 cd clients/mobile/ios
@@ -77,19 +77,21 @@ EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxx
 
 **Option A: Everything at once**
 ```bash
-pnpm dev
+bun run dev
 ```
 
 **Option B: Individual platforms**
 
 ```bash
 # Web only
-pnpm dev:web
+cd clients/web
+bun run dev
 # → http://localhost:3000
 
 # Mobile only
-pnpm dev:mobile
-# → Scan QR with Expo Go (Expo SDK <54) OR custom dev build (SDK 54+)
+cd clients/mobile
+bun run dev
+# → Scan QR with custom dev build
 
 # Backend only (if working on .NET)
 cd backend
@@ -110,7 +112,7 @@ Why? Because we use:
 
 ```bash
 # Install EAS CLI globally
-pnpm add -g eas-cli
+bun install -g eas-cli
 
 # Login to EAS
 eas login
@@ -136,7 +138,7 @@ eas build --profile development --platform android
 **Start dev server:**
 ```bash
 cd clients/mobile
-npx expo start --dev-client
+bunx expo start --dev-client
 ```
 
 Scan QR with your **custom dev build** (not Expo Go).
@@ -335,11 +337,11 @@ elaview/
 
 | Layer | Mobile | Web |
 |-------|--------|-----|
-| **Framework** | Expo SDK 54, React Native 0.81+ | Next.js 15 (App Router) |
+| **Framework** | Expo SDK 54, React Native 0.81+ | Next.js 16 (App Router) |
 | **Language** | TypeScript (strict mode) | TypeScript (strict mode) |
 | **Routing** | Expo Router v6 (file-based) | App Router (file-based) |
-| **State/API** | Apollo Client 3.9+ | Apollo Client 3.9+ |
-| **Styling** | StyleSheet (React Native) | Tailwind CSS 3.x |
+| **State/API** | Apollo Client 4.1+ | Apollo Client 4.1+ |
+| **Styling** | StyleSheet (React Native) | Tailwind CSS 4.x |
 | **Animations** | Reanimated 4.x | Framer Motion |
 | **Forms** | React Hook Form + Zod | React Hook Form + Zod |
 | **Payments** | Stripe React Native SDK | Stripe.js |
@@ -348,10 +350,10 @@ elaview/
 
 | Layer | Technology | Version |
 |-------|------------|---------|
-| **Runtime** | .NET | 8.0 |
+| **Runtime** | .NET | 10.0 |
 | **Language** | C# | 12 |
-| **GraphQL** | HotChocolate | 14+ |
-| **ORM** | Entity Framework Core | 8.x |
+| **GraphQL** | HotChocolate | 15+ |
+| **ORM** | Entity Framework Core | 10.x |
 | **Database** | PostgreSQL | 16 |
 | **Cache** | Redis | 7.x |
 | **Auth** | .NET Identity + JWT | Built-in |
@@ -360,8 +362,8 @@ elaview/
 
 | Component | Technology | Purpose |
 |-----------|------------|---------|
-| **Monorepo** | Turborepo | Build orchestration |
-| **Package Manager** | pnpm | Fast, disk-efficient |
+| **Package Manager** | bun | Fast JS runtime/manager |
+| **Environment** | devbox | Developer environment isolated via nix |
 | **Payments** | Stripe Connect | Marketplace payments, escrow |
 | **Storage** | Cloudflare R2 | File storage (S3-compatible) |
 | **CDN** | Cloudflare | File delivery |
@@ -511,18 +513,17 @@ const CATEGORIES = ['storefront', 'billboard']; // NEVER DO THIS
 
 ---
 
-### 7. Monorepo with Turborepo + pnpm
+### 7. Monorepo with Devbox + Bun
 
-**Decision**: Use Turborepo for build orchestration and pnpm for package management.
+**Decision**: Use Devbox for environment orchestration and Bun for package management.
 
 **Why**:
-- Fast incremental builds (only rebuild what changed)
-- Shared dependencies reduce disk space
-- Better than Lerna or Yarn workspaces
+- Fast incremental builds
+- Isolated development environments via Nix
+- Insanely fast dependency resolution with Bun
 
 **Impact**:
-- Use `pnpm` instead of `npm` or `yarn`
-- `turbo.json` defines build pipeline
+- Use `bun` instead of `npm`, `yarn`, or `pnpm`
 - Packages must declare dependencies in `package.json`
 
 **See**: [.cursor/rules/01-architecture.mdc](./.cursor/rules/01-architecture.mdc)
@@ -535,62 +536,62 @@ const CATEGORIES = ['storefront', 'billboard']; // NEVER DO THIS
 
 ```bash
 # Start everything
-pnpm dev
+bun run dev
 
 # Start specific app
-pnpm dev:mobile       # Mobile dev server
-pnpm dev:web          # Web dev server
-pnpm dev:backend      # .NET backend (alternative: cd backend && dotnet run)
+cd clients/mobile && bun run dev       # Mobile dev server
+cd clients/web && bun run dev          # Web dev server
+cd backend && dotnet run               # .NET backend
 
 # Mobile: Start with dev client
 cd clients/mobile
-npx expo start --dev-client
+bunx expo start --dev-client
 ```
 
 ### Code Quality
 
 ```bash
 # Lint all packages
-pnpm lint
+bun run lint
 
 # Fix linting issues
-pnpm lint:fix
+bun run lint:fix
 
 # Type check
-pnpm typecheck
+bun run typecheck
 
 # Format code
-pnpm format
+bun run format
 ```
 
 ### Testing
 
 ```bash
 # Run all tests
-pnpm test
+bun run test
 
 # Watch mode
-pnpm test:watch
+bun run test:watch
 
 # Coverage
-pnpm test:coverage
+bun run test:coverage
 
 # Integration tests
-pnpm test:integration
+bun run test:integration
 
 # E2E tests (mobile)
-pnpm test:e2e
+bun run test:e2e
 ```
 
 ### Build
 
 ```bash
 # Build all packages
-pnpm build
+bun run build
 
 # Build specific app
-pnpm --filter @elaview/mobile build
-pnpm --filter @elaview/web build
+cd clients/mobile && bun run build
+cd clients/web && bun run build
 ```
 
 ### Mobile (EAS Build)
@@ -616,10 +617,10 @@ eas submit -p android
 
 ```bash
 # Generate TypeScript types from schema
-pnpm codegen
+bun run codegen
 
 # Watch mode (regenerate on schema changes)
-pnpm codegen:watch
+bun run codegen:watch
 ```
 
 ### Database (Backend)
@@ -782,14 +783,14 @@ const [updateBooking] = useUpdateBookingMutation({
 **Solution**: Run GraphQL codegen before building:
 
 ```bash
-pnpm codegen
-pnpm build
+bun run codegen
+bun run build
 ```
 
 Add to CI pipeline:
 ```yaml
-- run: pnpm codegen
-- run: pnpm build
+- run: bun run codegen
+- run: bun run build
 ```
 
 ---

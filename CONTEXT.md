@@ -1,10 +1,16 @@
 # Agent Context
 
-> Last updated: 2026-03-05
+> Last updated: 2026-03-12
 
 ## Project Overview
 
 B2B advertising marketplace connecting local advertisers with physical ad space owners (storefronts, windows, walls).
+
+### Business Core
+- **Space Owners**: List physical inventory (windows, screens, walls).
+- **Advertisers**: Find spaces, upload creative, and pay via Stripe.
+- **Workflow**: Two-stage payout (install fee + final payout after verification).
+- **Onboarding**: See [ONBOARDING.md](file:///home/md/Desktop/code/elaview-production/ONBOARDING.md) for a beginner-friendly guide.
 
 ## Tech Stack
 
@@ -87,18 +93,12 @@ All commands must be run inside `devbox shell`.
 
 ## Seeding Dashboard Dummy Data
 
-A standalone bun script lives in `scripts/seed-dashboard/`. It populates all dashboard tabs with realistic data.
-
-```bash
-cd scripts/seed-dashboard && bun install && bun run seed   # populate
-cd scripts/seed-dashboard && bun run clean                 # remove dummy data
-```
-
-All dummy data is tagged with `ELAVIEW_DUMMY_SEED` for safe cleanup. Delete the folder to remove the script entirely.
+> **⚠️ REMOVED (as of 2026-03-10):** The `scripts/seed-dashboard/` folder previously contained a standalone bun script for populating dashboard tabs with dummy data. This folder has been deleted from the repo and **no longer exists**. Do NOT attempt to run `cd scripts/seed-dashboard && bun run seed` — it will fail. There is currently no automated seeding script in the project.
 
 ## Architectural Reality (Overrides START_HERE.md & .cursor/rules/)
 
-- **Backend Folder Structure**: Uses Vertical Slice Architecture heavily in `backend/Features/` (Analytics, Auth, Marketplace, etc.). The docs incorrectly mention a layered architecture (`Models/`, `Services/`, `GraphQL/`).
-- **Frontend/Monorepo Status**: `packages/` (shared libraries) does NOT exist yet. `clients/mobile` and `clients/web` operate as standalone folders. There is NO root `package.json` orchestrating a monorepo.
-- **Mobile Structure**: The main Expo Router forms are inside `clients/mobile/src/app/`, not the root directory.
-- **Package Manager Enforcements**: Both frontends strictly enforce `bun` via their `package.json` engines (npm/yarn/pnpm are stubbed to error out).
+- **Backend Folder Structure**: Uses **Vertical Slice Architecture** in `backend/Features/` (Analytics, Auth, Marketplace, etc.). Each feature folder contains its own queries, mutations, and domain logic.
+- **Frontend/Monorepo Status**: `packages/` does NOT exist yet. `clients/mobile` and `clients/web` are standalone.
+- **Web Structure**: Next.js 16 app is located in `clients/web/src/app/`.
+- **Mobile Structure**: Expo Router app is located in `clients/mobile/src/app/`.
+- **Package Manager**: Strictly `bun`. Do not use npm/yarn.

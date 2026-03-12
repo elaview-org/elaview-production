@@ -3,6 +3,7 @@ trigger: always_on
 ---
 
 STRICTLY FOLLOW THESE FIRST BEFORE ANYTHING ELSE:
+- it is a general file which will be applied to any project or tech stack, it is basically for general coding guidelines and not specific to any project or tech stack.so don't put any current project context in here but put in context.md in root of repo only.
 - deep search repo and check environment before doing anything.
 - maintain a CONTEXT.md at the root. Continually update this file whenever you make changes. This file is strictly for YOU (the AI IDE) to maintain your own context, so you always understand the project state, structure, and how work is being done.
 - don't rely on docs alone, always verify against actual code.

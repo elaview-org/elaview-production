@@ -140,11 +140,7 @@ export default function DiscoverMap({ data, bounds, zoom }: Props) {
                 </Link>
               </Button>
               <Button size="sm" className="flex-1" asChild>
-                <Link
-                  href={`/src/app/(protected)/@content/@shared/_spaces/${space.id}#book`}
-                >
-                  Request Booking
-                </Link>
+                <Link href={`spaces/${space.id}#book`}>Request Booking</Link>
               </Button>
             </div>
           </div>

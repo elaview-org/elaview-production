@@ -42,7 +42,7 @@ export function ReachChartSkeleton() {
         </div>
         <Skeleton className="h-9 w-40" />
       </div>
-      <Skeleton className="h-[250px] w-full" />
+      <Skeleton className="h-62.5 w-full" />
     </div>
   );
 }
@@ -133,7 +133,7 @@ export default function ReachChart({ data }: Props) {
         <MaybePlaceholder data={data} placeholder={<Placeholder />}>
           <ChartContainer
             config={REACH_CHART_CONFIG}
-            className="aspect-auto h-[250px] w-full"
+            className="aspect-auto h-62.5 w-full"
           >
             <AreaChart data={filteredData}>
               <defs>

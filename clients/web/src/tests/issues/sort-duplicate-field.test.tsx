@@ -12,6 +12,9 @@ mock.module("@/hooks/use-search-params-updater", () => ({
   }),
 }));
 
+// TODO: These tests use userEvent.setup() which requires a more complete DOM environment
+// than happy-dom provides. Consider using Playwright for these interaction tests instead.
+// For now, we're deferring these tests until we have E2E test infrastructure.
 describe.skip("ToolbarSortPanel - Duplicate field selection", () => {
   const fields = [
     { value: "createdAt", label: "Date" },

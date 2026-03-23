@@ -7,6 +7,7 @@ import {
   IconCookie,
   IconCurrencyDollar,
   IconDashboard,
+  IconDeviceDesktop,
   IconHelp,
 } from "@tabler/icons-react";
 
@@ -42,6 +43,11 @@ const spaceOwnerData = {
       title: "Calendar",
       url: "/calendar",
       icon: IconCalendar,
+    },
+    {
+      title: "Screens",
+      url: "/screens",
+      icon: IconDeviceDesktop,
     },
   ],
   documents: [],

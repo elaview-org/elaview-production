@@ -4,6 +4,20 @@ schema {
   subscription: Subscription
 }
 
+"""The authorize directive."""
+directive @authorize(
+  """
+  Defines when when the authorize directive shall be applied.By default the authorize directives are applied during the validation phase.
+  """
+  apply: ApplyPolicy! = BEFORE_RESOLVER
+  """
+  The name of the authorization policy that determines access to the annotated resource.
+  """
+  policy: String
+  """Roles that are allowed to access the annotated resource."""
+  roles: [String!]
+) repeatable on FIELD_DEFINITION | OBJECT
+
 """
 The purpose of the `cost` directive is to define a `weight` for GraphQL types, fields, and arguments. Static analysis can use these weights when calculating the overall cost of a query or response.
 """
@@ -48,9 +62,9 @@ interface ActivityEvent {
 
 type AdvertiserAnalytics {
   endDate: DateTime!
-  monthlyStats(months: Int!): [AdvertiserMonthlyStats!]!
+  monthlyStats(months: Int!): [AdvertiserMonthlyStats!]! @cost(weight: "10")
   periodComparison: AdvertiserPeriodComparison!
-  spacePerformance(first: Int!): [AdvertiserSpacePerformance!]!
+  spacePerformance(first: Int!): [AdvertiserSpacePerformance!]! @cost(weight: "10")
   startDate: DateTime!
   statusDistribution: [StatusCount!]!
   summary: AdvertiserSummary!
@@ -61,14 +75,14 @@ type AdvertiserAnalytics {
 type AdvertiserAttentionItem {
   id: UUID!
   impressions: Long!
-  roi: Decimal
+  roi: Decimal @cost(weight: "10")
   title: String!
 }
 
 type AdvertiserMonthlyStats {
   impressions: Long!
   month: String!
-  spending: Decimal
+  spending: Decimal @cost(weight: "10")
 }
 
 type AdvertiserPeriodComparison {
@@ -81,8 +95,8 @@ type AdvertiserPeriodData {
   endDate: DateTime!
   impressions: Long!
   period: String!
-  roi: Decimal
-  spending: Decimal
+  roi: Decimal @cost(weight: "10")
+  spending: Decimal @cost(weight: "10")
   startDate: DateTime!
 }
 
@@ -98,9 +112,9 @@ type AdvertiserProfile {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [CampaignSortInput!]
-    where: CampaignFilterInput
-  ): CampaignsConnection
+    order: [CampaignSortInput!] @cost(weight: "10")
+    where: CampaignFilterInput @cost(weight: "10")
+  ): CampaignsConnection @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   companyName: String
   createdAt: DateTime!
   id: UUID!
@@ -113,7 +127,7 @@ type AdvertiserProfile {
   stripeAccountStatus: String
   stripeCustomerId: String
   stripeLastAccountHealthCheck: DateTime
-  totalSpend: Decimal!
+  totalSpend: Decimal! @cost(weight: "10")
   user: User!
   userId: UUID!
   website: String
@@ -141,47 +155,47 @@ input AdvertiserProfileFilterInput {
 }
 
 input AdvertiserProfileSortInput {
-  companyName: SortEnumType
-  createdAt: SortEnumType
-  id: SortEnumType
-  industry: SortEnumType
-  onboardingComplete: SortEnumType
-  stripeAccountDisconnectedAt: SortEnumType
-  stripeAccountDisconnectedNotifiedAt: SortEnumType
-  stripeAccountId: SortEnumType
-  stripeAccountStatus: SortEnumType
-  stripeCustomerId: SortEnumType
-  stripeLastAccountHealthCheck: SortEnumType
-  user: UserSortInput
-  userId: SortEnumType
-  website: SortEnumType
+  companyName: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  industry: SortEnumType @cost(weight: "10")
+  onboardingComplete: SortEnumType @cost(weight: "10")
+  stripeAccountDisconnectedAt: SortEnumType @cost(weight: "10")
+  stripeAccountDisconnectedNotifiedAt: SortEnumType @cost(weight: "10")
+  stripeAccountId: SortEnumType @cost(weight: "10")
+  stripeAccountStatus: SortEnumType @cost(weight: "10")
+  stripeCustomerId: SortEnumType @cost(weight: "10")
+  stripeLastAccountHealthCheck: SortEnumType @cost(weight: "10")
+  user: UserSortInput @cost(weight: "10")
+  userId: SortEnumType @cost(weight: "10")
+  website: SortEnumType @cost(weight: "10")
 }
 
 type AdvertiserSpacePerformance {
   id: UUID!
   image: String
   impressions: Long!
-  roi: Decimal
+  roi: Decimal @cost(weight: "10")
   title: String!
   totalBookings: Int!
-  totalSpend: Decimal
+  totalSpend: Decimal @cost(weight: "10")
 }
 
 type AdvertiserSummary {
-  avgCostPerImpression: Decimal
-  completionRate: Decimal
-  previousAvgCostPerImpression: Decimal
-  previousCompletionRate: Decimal
+  avgCostPerImpression: Decimal @cost(weight: "10")
+  completionRate: Decimal @cost(weight: "10")
+  previousAvgCostPerImpression: Decimal @cost(weight: "10")
+  previousCompletionRate: Decimal @cost(weight: "10")
   previousReach: Int!
-  previousRoi: Decimal
+  previousRoi: Decimal @cost(weight: "10")
   previousTotalBookings: Int!
   previousTotalImpressions: Long!
-  previousTotalSpend: Decimal
+  previousTotalSpend: Decimal @cost(weight: "10")
   reach: Int!
-  roi: Decimal
+  roi: Decimal @cost(weight: "10")
   totalBookings: Int!
   totalImpressions: Long!
-  totalSpend: Decimal
+  totalSpend: Decimal @cost(weight: "10")
 }
 
 type AdvertiserTopPerformers {
@@ -228,7 +242,7 @@ type ApproveProofPayload {
 type AttentionItem {
   bookings: Int!
   id: UUID!
-  occupancy: Decimal
+  occupancy: Decimal @cost(weight: "10")
   title: String!
 }
 
@@ -266,12 +280,12 @@ input BlockedDateFilterInput {
 }
 
 input BlockedDateSortInput {
-  createdAt: SortEnumType
-  date: SortEnumType
-  id: SortEnumType
-  reason: SortEnumType
-  space: SpaceSortInput
-  spaceId: SortEnumType
+  createdAt: SortEnumType @cost(weight: "10")
+  date: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  reason: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  spaceId: SortEnumType @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -283,7 +297,7 @@ type BlockedDatesBySpaceConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
   """Identifies the total count of items in the connection."""
-  totalCount: Int!
+  totalCount: Int! @cost(weight: "10")
 }
 
 """An edge in a connection."""
@@ -296,7 +310,7 @@ type BlockedDatesBySpaceEdge {
 
 type Booking {
   advertiserNotes: String
-  campaign: Campaign
+  campaign: Campaign @authorize @cost(weight: "10")
   campaignId: UUID!
   cancellationReason: String
   cancelledAt: DateTime
@@ -310,16 +324,16 @@ type Booking {
   installationFee: Decimal!
   ownerNotes: String
   ownerPayoutAmount: Decimal!
-  payments(order: [PaymentSortInput!], where: PaymentFilterInput): [Payment!]!
-  payouts(order: [PayoutSortInput!], where: PayoutFilterInput): [Payout!]!
+  payments(order: [PaymentSortInput!] @cost(weight: "10"), where: PaymentFilterInput @cost(weight: "10")): [Payment!]! @authorize @cost(weight: "10")
+  payouts(order: [PayoutSortInput!] @cost(weight: "10"), where: PayoutFilterInput @cost(weight: "10")): [Payout!]! @authorize @cost(weight: "10")
   platformFeeAmount: Decimal!
   platformFeePercent: Decimal!
   pricePerDay: Decimal!
   proof: BookingProof
   rejectedAt: DateTime
   rejectionReason: String
-  reviews(order: [ReviewSortInput!], where: ReviewFilterInput): [Review!]!
-  space: Space
+  reviews(order: [ReviewSortInput!] @cost(weight: "10"), where: ReviewFilterInput @cost(weight: "10")): [Review!]! @authorize @cost(weight: "10")
+  space: Space @authorize @cost(weight: "10")
   spaceId: UUID!
   startDate: DateTime!
   status: BookingStatus!
@@ -375,20 +389,20 @@ input BookingDisputeFilterInput {
 }
 
 input BookingDisputeSortInput {
-  booking: BookingSortInput
-  bookingId: SortEnumType
-  createdAt: SortEnumType
-  disputedAt: SortEnumType
-  disputedByUser: UserSortInput
-  disputedByUserId: SortEnumType
-  id: SortEnumType
-  issueType: SortEnumType
-  reason: SortEnumType
-  resolutionAction: SortEnumType
-  resolutionNotes: SortEnumType
-  resolvedAt: SortEnumType
-  resolvedByUser: UserSortInput
-  resolvedByUserId: SortEnumType
+  booking: BookingSortInput @cost(weight: "10")
+  bookingId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  disputedAt: SortEnumType @cost(weight: "10")
+  disputedByUser: UserSortInput @cost(weight: "10")
+  disputedByUserId: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  issueType: SortEnumType @cost(weight: "10")
+  reason: SortEnumType @cost(weight: "10")
+  resolutionAction: SortEnumType @cost(weight: "10")
+  resolutionNotes: SortEnumType @cost(weight: "10")
+  resolvedAt: SortEnumType @cost(weight: "10")
+  resolvedByUser: UserSortInput @cost(weight: "10")
+  resolvedByUserId: SortEnumType @cost(weight: "10")
 }
 
 input BookingFilterInput {
@@ -461,49 +475,49 @@ input BookingProofFilterInput {
 }
 
 input BookingProofSortInput {
-  autoApproveAt: SortEnumType
-  booking: BookingSortInput
-  bookingId: SortEnumType
-  createdAt: SortEnumType
-  id: SortEnumType
-  rejectionReason: SortEnumType
-  reviewedAt: SortEnumType
-  reviewedByUser: UserSortInput
-  reviewedByUserId: SortEnumType
-  status: SortEnumType
-  submittedAt: SortEnumType
+  autoApproveAt: SortEnumType @cost(weight: "10")
+  booking: BookingSortInput @cost(weight: "10")
+  bookingId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  rejectionReason: SortEnumType @cost(weight: "10")
+  reviewedAt: SortEnumType @cost(weight: "10")
+  reviewedByUser: UserSortInput @cost(weight: "10")
+  reviewedByUserId: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  submittedAt: SortEnumType @cost(weight: "10")
 }
 
 input BookingSortInput {
-  advertiserNotes: SortEnumType
-  campaign: CampaignSortInput
-  campaignId: SortEnumType
-  cancellationReason: SortEnumType
-  cancelledAt: SortEnumType
-  cancelledByUser: UserSortInput
-  cancelledByUserId: SortEnumType
-  createdAt: SortEnumType
-  dispute: BookingDisputeSortInput
-  endDate: SortEnumType
-  fileDownloadedAt: SortEnumType
-  id: SortEnumType
-  installationFee: SortEnumType
-  ownerNotes: SortEnumType
-  ownerPayoutAmount: SortEnumType
-  platformFeeAmount: SortEnumType
-  platformFeePercent: SortEnumType
-  pricePerDay: SortEnumType
-  proof: BookingProofSortInput
-  rejectedAt: SortEnumType
-  rejectionReason: SortEnumType
-  space: SpaceSortInput
-  spaceId: SortEnumType
-  startDate: SortEnumType
-  status: SortEnumType
-  subtotalAmount: SortEnumType
-  totalAmount: SortEnumType
-  totalDays: SortEnumType
-  updatedAt: SortEnumType
+  advertiserNotes: SortEnumType @cost(weight: "10")
+  campaign: CampaignSortInput @cost(weight: "10")
+  campaignId: SortEnumType @cost(weight: "10")
+  cancellationReason: SortEnumType @cost(weight: "10")
+  cancelledAt: SortEnumType @cost(weight: "10")
+  cancelledByUser: UserSortInput @cost(weight: "10")
+  cancelledByUserId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  dispute: BookingDisputeSortInput @cost(weight: "10")
+  endDate: SortEnumType @cost(weight: "10")
+  fileDownloadedAt: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  installationFee: SortEnumType @cost(weight: "10")
+  ownerNotes: SortEnumType @cost(weight: "10")
+  ownerPayoutAmount: SortEnumType @cost(weight: "10")
+  platformFeeAmount: SortEnumType @cost(weight: "10")
+  platformFeePercent: SortEnumType @cost(weight: "10")
+  pricePerDay: SortEnumType @cost(weight: "10")
+  proof: BookingProofSortInput @cost(weight: "10")
+  rejectedAt: SortEnumType @cost(weight: "10")
+  rejectionReason: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  spaceId: SortEnumType @cost(weight: "10")
+  startDate: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  subtotalAmount: SortEnumType @cost(weight: "10")
+  totalAmount: SortEnumType @cost(weight: "10")
+  totalDays: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
 }
 
 enum BookingStatus {
@@ -520,10 +534,10 @@ enum BookingStatus {
 }
 
 input BookingStatusOperationFilterInput {
-  eq: BookingStatus
-  in: [BookingStatus!]
-  neq: BookingStatus
-  nin: [BookingStatus!]
+  eq: BookingStatus @cost(weight: "10")
+  in: [BookingStatus!] @cost(weight: "10")
+  neq: BookingStatus @cost(weight: "10")
+  nin: [BookingStatus!] @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -563,12 +577,12 @@ type BookingsRequiringActionEdge {
 }
 
 input BooleanOperationFilterInput {
-  eq: Boolean
-  neq: Boolean
+  eq: Boolean @cost(weight: "10")
+  neq: Boolean @cost(weight: "10")
 }
 
 type Campaign {
-  advertiser: AdvertiserProfile
+  advertiser: AdvertiserProfile @authorize @cost(weight: "10")
   advertiserProfile: AdvertiserProfile!
   advertiserProfileId: UUID!
   bookings(
@@ -582,9 +596,9 @@ type Campaign {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [BookingSortInput!]
-    where: BookingFilterInput
-  ): BookingsConnection
+    order: [BookingSortInput!] @cost(weight: "10")
+    where: BookingFilterInput @cost(weight: "10")
+  ): BookingsConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   createdAt: DateTime!
   description: String
   endDate: DateTime
@@ -592,12 +606,12 @@ type Campaign {
   id: UUID!
   imageUrl: String!
   name: String!
-  spacesCount: Int!
+  spacesCount: Int! @authorize @cost(weight: "10")
   startDate: DateTime
   status: CampaignStatus!
   targetAudience: String
   totalBudget: Decimal
-  totalSpend: Decimal!
+  totalSpend: Decimal! @authorize @cost(weight: "10")
 }
 
 input CampaignFilterInput {
@@ -620,19 +634,19 @@ input CampaignFilterInput {
 }
 
 input CampaignSortInput {
-  advertiserProfile: AdvertiserProfileSortInput
-  advertiserProfileId: SortEnumType
-  createdAt: SortEnumType
-  description: SortEnumType
-  endDate: SortEnumType
-  goals: SortEnumType
-  id: SortEnumType
-  imageUrl: SortEnumType
-  name: SortEnumType
-  startDate: SortEnumType
-  status: SortEnumType
-  targetAudience: SortEnumType
-  totalBudget: SortEnumType
+  advertiserProfile: AdvertiserProfileSortInput @cost(weight: "10")
+  advertiserProfileId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  description: SortEnumType @cost(weight: "10")
+  endDate: SortEnumType @cost(weight: "10")
+  goals: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  imageUrl: SortEnumType @cost(weight: "10")
+  name: SortEnumType @cost(weight: "10")
+  startDate: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  targetAudience: SortEnumType @cost(weight: "10")
+  totalBudget: SortEnumType @cost(weight: "10")
 }
 
 enum CampaignStatus {
@@ -644,10 +658,10 @@ enum CampaignStatus {
 }
 
 input CampaignStatusOperationFilterInput {
-  eq: CampaignStatus
-  in: [CampaignStatus!]
-  neq: CampaignStatus
-  nin: [CampaignStatus!]
+  eq: CampaignStatus @cost(weight: "10")
+  in: [CampaignStatus!] @cost(weight: "10")
+  neq: CampaignStatus @cost(weight: "10")
+  nin: [CampaignStatus!] @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -689,6 +703,97 @@ input CancelCampaignInput {
 type CancelCampaignPayload {
   campaign: Campaign
   errors: [CancelCampaignError!]
+}
+
+type Career {
+  createdAt: DateTime!
+  department: CareerDepartment!
+  description: String!
+  expiresAt: DateTime
+  id: UUID!
+  isActive: Boolean!
+  location: String!
+  requirements: String!
+  title: String!
+  type: CareerType!
+}
+
+enum CareerDepartment {
+  CUSTOMER_SUCCESS
+  DESIGN
+  ENGINEERING
+  MARKETING
+  OPERATIONS
+  SALES
+}
+
+input CareerDepartmentOperationFilterInput {
+  eq: CareerDepartment @cost(weight: "10")
+  in: [CareerDepartment!] @cost(weight: "10")
+  neq: CareerDepartment @cost(weight: "10")
+  nin: [CareerDepartment!] @cost(weight: "10")
+}
+
+input CareerFilterInput {
+  and: [CareerFilterInput!]
+  createdAt: DateTimeOperationFilterInput
+  department: CareerDepartmentOperationFilterInput
+  description: StringOperationFilterInput
+  expiresAt: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
+  isActive: BooleanOperationFilterInput
+  location: StringOperationFilterInput
+  or: [CareerFilterInput!]
+  requirements: StringOperationFilterInput
+  title: StringOperationFilterInput
+  type: CareerTypeOperationFilterInput
+}
+
+input CareerSortInput {
+  createdAt: SortEnumType @cost(weight: "10")
+  department: SortEnumType @cost(weight: "10")
+  description: SortEnumType @cost(weight: "10")
+  expiresAt: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  isActive: SortEnumType @cost(weight: "10")
+  location: SortEnumType @cost(weight: "10")
+  requirements: SortEnumType @cost(weight: "10")
+  title: SortEnumType @cost(weight: "10")
+  type: SortEnumType @cost(weight: "10")
+}
+
+enum CareerType {
+  CONTRACT
+  FULL_TIME
+  INTERNSHIP
+  PART_TIME
+}
+
+input CareerTypeOperationFilterInput {
+  eq: CareerType @cost(weight: "10")
+  in: [CareerType!] @cost(weight: "10")
+  neq: CareerType @cost(weight: "10")
+  nin: [CareerType!] @cost(weight: "10")
+}
+
+"""A connection to a list of items."""
+type CareersConnection {
+  """A list of edges."""
+  edges: [CareersEdge!]
+  """A flattened list of the nodes."""
+  nodes: [Career!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int! @cost(weight: "10")
+}
+
+"""An edge in a connection."""
+type CareersEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: Career!
 }
 
 union ChangePasswordError = NotFoundError | ValidationError
@@ -756,10 +861,10 @@ type Conversation {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [MessageSortInput!]
-    where: MessageFilterInput
-  ): MessagesConnection
-  participants: [ConversationParticipant!]!
+    order: [MessageSortInput!] @cost(weight: "10")
+    where: MessageFilterInput @cost(weight: "10")
+  ): MessagesConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  participants: [ConversationParticipant!]! @authorize @cost(weight: "10")
   updatedAt: DateTime!
 }
 
@@ -800,11 +905,11 @@ input ConversationParticipantFilterInput {
 }
 
 input ConversationSortInput {
-  booking: BookingSortInput
-  bookingId: SortEnumType
-  createdAt: SortEnumType
-  id: SortEnumType
-  updatedAt: SortEnumType
+  booking: BookingSortInput @cost(weight: "10")
+  bookingId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
 }
 
 union CreateBookingConversationError = NotFoundError
@@ -848,6 +953,52 @@ input CreateCampaignInput {
 type CreateCampaignPayload {
   campaign: Campaign
   errors: [CreateCampaignError!]
+}
+
+union CreateCareerError = ValidationError
+
+input CreateCareerInput {
+  department: CareerDepartment!
+  description: String!
+  expiresAt: DateTime
+  isActive: Boolean!
+  location: String!
+  requirements: String!
+  title: String!
+  type: CareerType!
+}
+
+type CreateCareerPayload {
+  career: Career
+  errors: [CreateCareerError!]
+}
+
+union CreateDigitalSignageScheduleError = NotFoundError | ValidationError
+
+input CreateDigitalSignageScheduleInput {
+  bookingId: ID!
+  campaignId: ID!
+  creativeAssetUrl: String!
+  creativeType: DigitalSignageCreativeType!
+  endDate: DateTime!
+  rotationIntervalSeconds: Int!
+  screenId: ID!
+  startDate: DateTime!
+}
+
+type CreateDigitalSignageSchedulePayload {
+  errors: [CreateDigitalSignageScheduleError!]
+  schedule: DigitalSignageSchedule
+}
+
+input CreateDigitalSignageScreenInput {
+  name: String!
+  resolution: String
+  spaceId: ID!
+}
+
+type CreateDigitalSignageScreenPayload {
+  screen: DigitalSignageScreen!
 }
 
 union CreatePaymentIntentError = ConflictError | ForbiddenError | InvalidStatusTransitionError | NotFoundError
@@ -932,6 +1083,11 @@ type CreateSpacePayload {
   space: Space
 }
 
+type DailySignups {
+  count: Int!
+  date: DateTime!
+}
+
 type DailyStats {
   bookings: Int!
   date: DateTime!
@@ -947,21 +1103,21 @@ type DatePrice {
 }
 
 """The `DateTime` scalar represents an ISO-8601 compliant date time type."""
-scalar DateTime
+scalar DateTime @specifiedBy(url: "https://www.graphql-scalars.com/date-time")
 
 input DateTimeOperationFilterInput {
-  eq: DateTime
-  gt: DateTime
-  gte: DateTime
-  in: [DateTime]
-  lt: DateTime
-  lte: DateTime
-  neq: DateTime
-  ngt: DateTime
-  ngte: DateTime
-  nin: [DateTime]
-  nlt: DateTime
-  nlte: DateTime
+  eq: DateTime @cost(weight: "10")
+  gt: DateTime @cost(weight: "10")
+  gte: DateTime @cost(weight: "10")
+  in: [DateTime] @cost(weight: "10")
+  lt: DateTime @cost(weight: "10")
+  lte: DateTime @cost(weight: "10")
+  neq: DateTime @cost(weight: "10")
+  ngt: DateTime @cost(weight: "10")
+  ngte: DateTime @cost(weight: "10")
+  nin: [DateTime] @cost(weight: "10")
+  nlt: DateTime @cost(weight: "10")
+  nlte: DateTime @cost(weight: "10")
 }
 
 union DeactivateSpaceError = ConflictError | ForbiddenError | NotFoundError
@@ -979,18 +1135,18 @@ type DeactivateSpacePayload {
 scalar Decimal
 
 input DecimalOperationFilterInput {
-  eq: Decimal
-  gt: Decimal
-  gte: Decimal
-  in: [Decimal]
-  lt: Decimal
-  lte: Decimal
-  neq: Decimal
-  ngt: Decimal
-  ngte: Decimal
-  nin: [Decimal]
-  nlt: Decimal
-  nlte: Decimal
+  eq: Decimal @cost(weight: "10")
+  gt: Decimal @cost(weight: "10")
+  gte: Decimal @cost(weight: "10")
+  in: [Decimal] @cost(weight: "10")
+  lt: Decimal @cost(weight: "10")
+  lte: Decimal @cost(weight: "10")
+  neq: Decimal @cost(weight: "10")
+  ngt: Decimal @cost(weight: "10")
+  ngte: Decimal @cost(weight: "10")
+  nin: [Decimal] @cost(weight: "10")
+  nlt: Decimal @cost(weight: "10")
+  nlte: Decimal @cost(weight: "10")
 }
 
 union DeleteCampaignError = ConflictError | ForbiddenError | NotFoundError
@@ -1001,6 +1157,17 @@ input DeleteCampaignInput {
 
 type DeleteCampaignPayload {
   errors: [DeleteCampaignError!]
+  success: Boolean
+}
+
+union DeleteCareerError = NotFoundError
+
+input DeleteCareerInput {
+  id: ID!
+}
+
+type DeleteCareerPayload {
+  errors: [DeleteCareerError!]
   success: Boolean
 }
 
@@ -1075,6 +1242,327 @@ type DeleteUserPayload {
   success: Boolean
 }
 
+enum DigitalSignageCreativeType {
+  IMAGE
+  VIDEO
+}
+
+input DigitalSignageCreativeTypeOperationFilterInput {
+  eq: DigitalSignageCreativeType @cost(weight: "10")
+  in: [DigitalSignageCreativeType!] @cost(weight: "10")
+  neq: DigitalSignageCreativeType @cost(weight: "10")
+  nin: [DigitalSignageCreativeType!] @cost(weight: "10")
+}
+
+type DigitalSignageDevice {
+  createdAt: DateTime!
+  deviceName: String!
+  deviceToken: String!
+  id: UUID!
+  lastSeenAt: DateTime
+  pairingCode: String
+  pairingCodeExpiresAt: DateTime
+  proofEvents: [DigitalSignageProofEvent!]!
+  screen: DigitalSignageScreen!
+  screenId: UUID!
+  status: DigitalSignageDeviceStatus!
+  type: DigitalSignageDeviceType!
+  updatedAt: DateTime!
+}
+
+input DigitalSignageDeviceFilterInput {
+  and: [DigitalSignageDeviceFilterInput!]
+  createdAt: DateTimeOperationFilterInput
+  deviceName: StringOperationFilterInput
+  deviceToken: StringOperationFilterInput
+  id: UuidOperationFilterInput
+  lastSeenAt: DateTimeOperationFilterInput
+  or: [DigitalSignageDeviceFilterInput!]
+  pairingCode: StringOperationFilterInput
+  pairingCodeExpiresAt: DateTimeOperationFilterInput
+  proofEvents: ListFilterInputTypeOfDigitalSignageProofEventFilterInput
+  screen: DigitalSignageScreenFilterInput
+  screenId: UuidOperationFilterInput
+  status: DigitalSignageDeviceStatusOperationFilterInput
+  type: DigitalSignageDeviceTypeOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+input DigitalSignageDeviceSortInput {
+  createdAt: SortEnumType @cost(weight: "10")
+  deviceName: SortEnumType @cost(weight: "10")
+  deviceToken: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  lastSeenAt: SortEnumType @cost(weight: "10")
+  pairingCode: SortEnumType @cost(weight: "10")
+  pairingCodeExpiresAt: SortEnumType @cost(weight: "10")
+  screen: DigitalSignageScreenSortInput @cost(weight: "10")
+  screenId: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  type: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+}
+
+enum DigitalSignageDeviceStatus {
+  DISABLED
+  ERROR
+  OFFLINE
+  ONLINE
+  PAIRING
+  UNPAIRED
+}
+
+input DigitalSignageDeviceStatusOperationFilterInput {
+  eq: DigitalSignageDeviceStatus @cost(weight: "10")
+  in: [DigitalSignageDeviceStatus!] @cost(weight: "10")
+  neq: DigitalSignageDeviceStatus @cost(weight: "10")
+  nin: [DigitalSignageDeviceStatus!] @cost(weight: "10")
+}
+
+enum DigitalSignageDeviceType {
+  ANDROID_TV
+  FIRE_TV
+  OTHER
+  RASPBERRY_PI
+  SMART_TV
+}
+
+input DigitalSignageDeviceTypeOperationFilterInput {
+  eq: DigitalSignageDeviceType @cost(weight: "10")
+  in: [DigitalSignageDeviceType!] @cost(weight: "10")
+  neq: DigitalSignageDeviceType @cost(weight: "10")
+  nin: [DigitalSignageDeviceType!] @cost(weight: "10")
+}
+
+type DigitalSignageProofEvent {
+  booking: Booking!
+  bookingId: UUID!
+  createdAt: DateTime!
+  device: DigitalSignageDevice!
+  deviceId: UUID!
+  displayedAt: DateTime!
+  displayedDurationSeconds: Int!
+  id: UUID!
+  metadata: String
+  schedule: DigitalSignageSchedule!
+  scheduleId: UUID!
+  screen: DigitalSignageScreen!
+  screenId: UUID!
+}
+
+input DigitalSignageProofEventFilterInput {
+  and: [DigitalSignageProofEventFilterInput!]
+  booking: BookingFilterInput
+  bookingId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  device: DigitalSignageDeviceFilterInput
+  deviceId: UuidOperationFilterInput
+  displayedAt: DateTimeOperationFilterInput
+  displayedDurationSeconds: IntOperationFilterInput
+  id: UuidOperationFilterInput
+  metadata: StringOperationFilterInput
+  or: [DigitalSignageProofEventFilterInput!]
+  schedule: DigitalSignageScheduleFilterInput
+  scheduleId: UuidOperationFilterInput
+  screen: DigitalSignageScreenFilterInput
+  screenId: UuidOperationFilterInput
+}
+
+input DigitalSignageProofEventSortInput {
+  booking: BookingSortInput @cost(weight: "10")
+  bookingId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  device: DigitalSignageDeviceSortInput @cost(weight: "10")
+  deviceId: SortEnumType @cost(weight: "10")
+  displayedAt: SortEnumType @cost(weight: "10")
+  displayedDurationSeconds: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  metadata: SortEnumType @cost(weight: "10")
+  schedule: DigitalSignageScheduleSortInput @cost(weight: "10")
+  scheduleId: SortEnumType @cost(weight: "10")
+  screen: DigitalSignageScreenSortInput @cost(weight: "10")
+  screenId: SortEnumType @cost(weight: "10")
+}
+
+"""A connection to a list of items."""
+type DigitalSignageProofEventsForBookingConnection {
+  """A list of edges."""
+  edges: [DigitalSignageProofEventsForBookingEdge!]
+  """A flattened list of the nodes."""
+  nodes: [DigitalSignageProofEvent!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int! @cost(weight: "10")
+}
+
+"""An edge in a connection."""
+type DigitalSignageProofEventsForBookingEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: DigitalSignageProofEvent!
+}
+
+type DigitalSignageSchedule {
+  booking: Booking!
+  bookingId: UUID!
+  campaign: Campaign!
+  campaignId: UUID!
+  createdAt: DateTime!
+  creativeAssetUrl: String!
+  creativeType: DigitalSignageCreativeType!
+  endDate: DateTime!
+  id: UUID!
+  proofEvents: [DigitalSignageProofEvent!]!
+  pushedToDevicesAt: DateTime
+  rotationIntervalSeconds: Int!
+  screen: DigitalSignageScreen!
+  screenId: UUID!
+  startDate: DateTime!
+  status: DigitalSignageScheduleStatus!
+  updatedAt: DateTime!
+}
+
+input DigitalSignageScheduleFilterInput {
+  and: [DigitalSignageScheduleFilterInput!]
+  booking: BookingFilterInput
+  bookingId: UuidOperationFilterInput
+  campaign: CampaignFilterInput
+  campaignId: UuidOperationFilterInput
+  createdAt: DateTimeOperationFilterInput
+  creativeAssetUrl: StringOperationFilterInput
+  creativeType: DigitalSignageCreativeTypeOperationFilterInput
+  endDate: DateTimeOperationFilterInput
+  id: UuidOperationFilterInput
+  or: [DigitalSignageScheduleFilterInput!]
+  proofEvents: ListFilterInputTypeOfDigitalSignageProofEventFilterInput
+  pushedToDevicesAt: DateTimeOperationFilterInput
+  rotationIntervalSeconds: IntOperationFilterInput
+  screen: DigitalSignageScreenFilterInput
+  screenId: UuidOperationFilterInput
+  startDate: DateTimeOperationFilterInput
+  status: DigitalSignageScheduleStatusOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+input DigitalSignageScheduleSortInput {
+  booking: BookingSortInput @cost(weight: "10")
+  bookingId: SortEnumType @cost(weight: "10")
+  campaign: CampaignSortInput @cost(weight: "10")
+  campaignId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  creativeAssetUrl: SortEnumType @cost(weight: "10")
+  creativeType: SortEnumType @cost(weight: "10")
+  endDate: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  pushedToDevicesAt: SortEnumType @cost(weight: "10")
+  rotationIntervalSeconds: SortEnumType @cost(weight: "10")
+  screen: DigitalSignageScreenSortInput @cost(weight: "10")
+  screenId: SortEnumType @cost(weight: "10")
+  startDate: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+}
+
+enum DigitalSignageScheduleStatus {
+  ACTIVE
+  CANCELLED
+  COMPLETED
+  PENDING
+}
+
+input DigitalSignageScheduleStatusOperationFilterInput {
+  eq: DigitalSignageScheduleStatus @cost(weight: "10")
+  in: [DigitalSignageScheduleStatus!] @cost(weight: "10")
+  neq: DigitalSignageScheduleStatus @cost(weight: "10")
+  nin: [DigitalSignageScheduleStatus!] @cost(weight: "10")
+}
+
+"""A connection to a list of items."""
+type DigitalSignageSchedulesForScreenConnection {
+  """A list of edges."""
+  edges: [DigitalSignageSchedulesForScreenEdge!]
+  """A flattened list of the nodes."""
+  nodes: [DigitalSignageSchedule!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int! @cost(weight: "10")
+}
+
+"""An edge in a connection."""
+type DigitalSignageSchedulesForScreenEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: DigitalSignageSchedule!
+}
+
+type DigitalSignageScreen {
+  createdAt: DateTime!
+  devices: [DigitalSignageDevice!]!
+  id: UUID!
+  lastHeartbeatAt: DateTime
+  name: String!
+  proofEvents: [DigitalSignageProofEvent!]!
+  resolution: String
+  schedules: [DigitalSignageSchedule!]!
+  space: Space!
+  spaceId: UUID!
+  spaceOwnerProfile: SpaceOwnerProfile!
+  spaceOwnerProfileId: UUID!
+  status: DigitalSignageScreenStatus!
+  updatedAt: DateTime!
+}
+
+input DigitalSignageScreenFilterInput {
+  and: [DigitalSignageScreenFilterInput!]
+  createdAt: DateTimeOperationFilterInput
+  devices: ListFilterInputTypeOfDigitalSignageDeviceFilterInput
+  id: UuidOperationFilterInput
+  lastHeartbeatAt: DateTimeOperationFilterInput
+  name: StringOperationFilterInput
+  or: [DigitalSignageScreenFilterInput!]
+  proofEvents: ListFilterInputTypeOfDigitalSignageProofEventFilterInput
+  resolution: StringOperationFilterInput
+  schedules: ListFilterInputTypeOfDigitalSignageScheduleFilterInput
+  space: SpaceFilterInput
+  spaceId: UuidOperationFilterInput
+  spaceOwnerProfile: SpaceOwnerProfileFilterInput
+  spaceOwnerProfileId: UuidOperationFilterInput
+  status: DigitalSignageScreenStatusOperationFilterInput
+  updatedAt: DateTimeOperationFilterInput
+}
+
+input DigitalSignageScreenSortInput {
+  createdAt: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  lastHeartbeatAt: SortEnumType @cost(weight: "10")
+  name: SortEnumType @cost(weight: "10")
+  resolution: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  spaceId: SortEnumType @cost(weight: "10")
+  spaceOwnerProfile: SpaceOwnerProfileSortInput @cost(weight: "10")
+  spaceOwnerProfileId: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  updatedAt: SortEnumType @cost(weight: "10")
+}
+
+enum DigitalSignageScreenStatus {
+  ERROR
+  MAINTENANCE
+  OFFLINE
+  ONLINE
+}
+
+input DigitalSignageScreenStatusOperationFilterInput {
+  eq: DigitalSignageScreenStatus @cost(weight: "10")
+  in: [DigitalSignageScreenStatus!] @cost(weight: "10")
+  neq: DigitalSignageScreenStatus @cost(weight: "10")
+  nin: [DigitalSignageScreenStatus!] @cost(weight: "10")
+}
+
 union DisconnectStripeAccountError = NotFoundError | PaymentError | ValidationError
 
 type DisconnectStripeAccountPayload {
@@ -1092,10 +1580,10 @@ enum DisputeIssueType {
 }
 
 input DisputeIssueTypeOperationFilterInput {
-  eq: DisputeIssueType
-  in: [DisputeIssueType!]
-  neq: DisputeIssueType
-  nin: [DisputeIssueType!]
+  eq: DisputeIssueType @cost(weight: "10")
+  in: [DisputeIssueType!] @cost(weight: "10")
+  neq: DisputeIssueType @cost(weight: "10")
+  nin: [DisputeIssueType!] @cost(weight: "10")
 }
 
 union DisputeProofError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
@@ -1118,11 +1606,11 @@ type EarningsDataPoint {
 }
 
 type EarningsSummary {
-  availableBalance: Decimal
-  lastMonthEarnings: Decimal
-  pendingPayouts: Decimal
-  thisMonthEarnings: Decimal
-  totalEarnings: Decimal
+  availableBalance: Decimal @cost(weight: "10")
+  lastMonthEarnings: Decimal @cost(weight: "10")
+  pendingPayouts: Decimal @cost(weight: "10")
+  thisMonthEarnings: Decimal @cost(weight: "10")
+  totalEarnings: Decimal @cost(weight: "10")
 }
 
 type EffectivePricePayload {
@@ -1149,24 +1637,44 @@ type ExportBookingsPayload {
 }
 
 input FloatOperationFilterInput {
-  eq: Float
-  gt: Float
-  gte: Float
-  in: [Float]
-  lt: Float
-  lte: Float
-  neq: Float
-  ngt: Float
-  ngte: Float
-  nin: [Float]
-  nlt: Float
-  nlte: Float
+  eq: Float @cost(weight: "10")
+  gt: Float @cost(weight: "10")
+  gte: Float @cost(weight: "10")
+  in: [Float] @cost(weight: "10")
+  lt: Float @cost(weight: "10")
+  lte: Float @cost(weight: "10")
+  neq: Float @cost(weight: "10")
+  ngt: Float @cost(weight: "10")
+  ngte: Float @cost(weight: "10")
+  nin: [Float] @cost(weight: "10")
+  nlt: Float @cost(weight: "10")
+  nlte: Float @cost(weight: "10")
 }
 
 type ForbiddenError implements Error {
   action: String!
   code: String!
   message: String!
+}
+
+union GenerateDevicePairingCodeError = NotFoundError
+
+input GenerateDevicePairingCodeInput {
+  input: GeneratePairingCodeInput!
+}
+
+type GenerateDevicePairingCodePayload {
+  errors: [GenerateDevicePairingCodeError!]
+  generatePairingCodePayload: GeneratePairingCodePayload
+}
+
+input GeneratePairingCodeInput {
+  screenId: ID!
+}
+
+type GeneratePairingCodePayload {
+  expiresAt: DateTime!
+  pairingCode: String!
 }
 
 type GeocodingError implements Error {
@@ -1201,18 +1709,18 @@ type IncomingBookingRequestsEdge {
 }
 
 input IntOperationFilterInput {
-  eq: Int
-  gt: Int
-  gte: Int
-  in: [Int]
-  lt: Int
-  lte: Int
-  neq: Int
-  ngt: Int
-  ngte: Int
-  nin: [Int]
-  nlt: Int
-  nlte: Int
+  eq: Int @cost(weight: "10")
+  gt: Int @cost(weight: "10")
+  gte: Int @cost(weight: "10")
+  in: [Int] @cost(weight: "10")
+  lt: Int @cost(weight: "10")
+  lte: Int @cost(weight: "10")
+  neq: Int @cost(weight: "10")
+  ngt: Int @cost(weight: "10")
+  ngte: Int @cost(weight: "10")
+  nin: [Int] @cost(weight: "10")
+  nlt: Int @cost(weight: "10")
+  nlte: Int @cost(weight: "10")
 }
 
 type InvalidStatusTransitionError implements Error {
@@ -1228,108 +1736,129 @@ type KeyValuePairOfStringAndString__ {
 }
 
 input ListFilterInputTypeOfBlockedDateFilterInput {
-  all: BlockedDateFilterInput
-  any: Boolean
-  none: BlockedDateFilterInput
-  some: BlockedDateFilterInput
+  all: BlockedDateFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: BlockedDateFilterInput @cost(weight: "10")
+  some: BlockedDateFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfBookingFilterInput {
-  all: BookingFilterInput
-  any: Boolean
-  none: BookingFilterInput
-  some: BookingFilterInput
+  all: BookingFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: BookingFilterInput @cost(weight: "10")
+  some: BookingFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfCampaignFilterInput {
-  all: CampaignFilterInput
-  any: Boolean
-  none: CampaignFilterInput
-  some: CampaignFilterInput
+  all: CampaignFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: CampaignFilterInput @cost(weight: "10")
+  some: CampaignFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfConversationParticipantFilterInput {
-  all: ConversationParticipantFilterInput
-  any: Boolean
-  none: ConversationParticipantFilterInput
-  some: ConversationParticipantFilterInput
+  all: ConversationParticipantFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: ConversationParticipantFilterInput @cost(weight: "10")
+  some: ConversationParticipantFilterInput @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfDigitalSignageDeviceFilterInput {
+  all: DigitalSignageDeviceFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: DigitalSignageDeviceFilterInput @cost(weight: "10")
+  some: DigitalSignageDeviceFilterInput @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfDigitalSignageProofEventFilterInput {
+  all: DigitalSignageProofEventFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: DigitalSignageProofEventFilterInput @cost(weight: "10")
+  some: DigitalSignageProofEventFilterInput @cost(weight: "10")
+}
+
+input ListFilterInputTypeOfDigitalSignageScheduleFilterInput {
+  all: DigitalSignageScheduleFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: DigitalSignageScheduleFilterInput @cost(weight: "10")
+  some: DigitalSignageScheduleFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfManualPayoutFilterInput {
-  all: ManualPayoutFilterInput
-  any: Boolean
-  none: ManualPayoutFilterInput
-  some: ManualPayoutFilterInput
+  all: ManualPayoutFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: ManualPayoutFilterInput @cost(weight: "10")
+  some: ManualPayoutFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfMessageFilterInput {
-  all: MessageFilterInput
-  any: Boolean
-  none: MessageFilterInput
-  some: MessageFilterInput
+  all: MessageFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: MessageFilterInput @cost(weight: "10")
+  some: MessageFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfPaymentFilterInput {
-  all: PaymentFilterInput
-  any: Boolean
-  none: PaymentFilterInput
-  some: PaymentFilterInput
+  all: PaymentFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: PaymentFilterInput @cost(weight: "10")
+  some: PaymentFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfPayoutFilterInput {
-  all: PayoutFilterInput
-  any: Boolean
-  none: PayoutFilterInput
-  some: PayoutFilterInput
+  all: PayoutFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: PayoutFilterInput @cost(weight: "10")
+  some: PayoutFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfPricingRuleFilterInput {
-  all: PricingRuleFilterInput
-  any: Boolean
-  none: PricingRuleFilterInput
-  some: PricingRuleFilterInput
+  all: PricingRuleFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: PricingRuleFilterInput @cost(weight: "10")
+  some: PricingRuleFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfRefundFilterInput {
-  all: RefundFilterInput
-  any: Boolean
-  none: RefundFilterInput
-  some: RefundFilterInput
+  all: RefundFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: RefundFilterInput @cost(weight: "10")
+  some: RefundFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfReviewFilterInput {
-  all: ReviewFilterInput
-  any: Boolean
-  none: ReviewFilterInput
-  some: ReviewFilterInput
+  all: ReviewFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: ReviewFilterInput @cost(weight: "10")
+  some: ReviewFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfSavedPaymentMethodFilterInput {
-  all: SavedPaymentMethodFilterInput
-  any: Boolean
-  none: SavedPaymentMethodFilterInput
-  some: SavedPaymentMethodFilterInput
+  all: SavedPaymentMethodFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: SavedPaymentMethodFilterInput @cost(weight: "10")
+  some: SavedPaymentMethodFilterInput @cost(weight: "10")
 }
 
 input ListFilterInputTypeOfSpaceFilterInput {
-  all: SpaceFilterInput
-  any: Boolean
-  none: SpaceFilterInput
-  some: SpaceFilterInput
+  all: SpaceFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: SpaceFilterInput @cost(weight: "10")
+  some: SpaceFilterInput @cost(weight: "10")
 }
 
 input ListIntOperationFilterInput {
-  all: IntOperationFilterInput
-  any: Boolean
-  none: IntOperationFilterInput
-  some: IntOperationFilterInput
+  all: IntOperationFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: IntOperationFilterInput @cost(weight: "10")
+  some: IntOperationFilterInput @cost(weight: "10")
 }
 
 input ListStringOperationFilterInput {
-  all: StringOperationFilterInput
-  any: Boolean
-  none: StringOperationFilterInput
-  some: StringOperationFilterInput
+  all: StringOperationFilterInput @cost(weight: "10")
+  any: Boolean @cost(weight: "10")
+  none: StringOperationFilterInput @cost(weight: "10")
+  some: StringOperationFilterInput @cost(weight: "10")
 }
 
 """
@@ -1338,18 +1867,18 @@ The `LocalDate` scalar type represents a ISO date string, represented as UTF-8 c
 scalar LocalDate
 
 input LocalDateOperationFilterInput {
-  eq: LocalDate
-  gt: LocalDate
-  gte: LocalDate
-  in: [LocalDate]
-  lt: LocalDate
-  lte: LocalDate
-  neq: LocalDate
-  ngt: LocalDate
-  ngte: LocalDate
-  nin: [LocalDate]
-  nlt: LocalDate
-  nlte: LocalDate
+  eq: LocalDate @cost(weight: "10")
+  gt: LocalDate @cost(weight: "10")
+  gte: LocalDate @cost(weight: "10")
+  in: [LocalDate] @cost(weight: "10")
+  lt: LocalDate @cost(weight: "10")
+  lte: LocalDate @cost(weight: "10")
+  neq: LocalDate @cost(weight: "10")
+  ngt: LocalDate @cost(weight: "10")
+  ngte: LocalDate @cost(weight: "10")
+  nin: [LocalDate] @cost(weight: "10")
+  nlt: LocalDate @cost(weight: "10")
+  nlte: LocalDate @cost(weight: "10")
 }
 
 """
@@ -1390,10 +1919,10 @@ enum ManualPayoutStatus {
 }
 
 input ManualPayoutStatusOperationFilterInput {
-  eq: ManualPayoutStatus
-  in: [ManualPayoutStatus!]
-  neq: ManualPayoutStatus
-  nin: [ManualPayoutStatus!]
+  eq: ManualPayoutStatus @cost(weight: "10")
+  in: [ManualPayoutStatus!] @cost(weight: "10")
+  neq: ManualPayoutStatus @cost(weight: "10")
+  nin: [ManualPayoutStatus!] @cost(weight: "10")
 }
 
 type MarkAllNotificationsReadPayload {
@@ -1444,6 +1973,15 @@ type MarkNotificationReadPayload {
   notification: Notification
 }
 
+type MarketingStats {
+  activeCampaigns: Int!
+  conversionRate: Decimal!
+  newSignups30d: Int!
+  signupTrend: [DailySignups!]!
+  totalAdSpend30d: Decimal!
+  totalCompletedBookings30d: Int!
+}
+
 type Message {
   attachments: [String!]
   content: String!
@@ -1471,14 +2009,14 @@ input MessageFilterInput {
 }
 
 input MessageSortInput {
-  content: SortEnumType
-  conversation: ConversationSortInput
-  conversationId: SortEnumType
-  createdAt: SortEnumType
-  id: SortEnumType
-  senderUser: UserSortInput
-  senderUserId: SortEnumType
-  type: SortEnumType
+  content: SortEnumType @cost(weight: "10")
+  conversation: ConversationSortInput @cost(weight: "10")
+  conversationId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  senderUser: UserSortInput @cost(weight: "10")
+  senderUserId: SortEnumType @cost(weight: "10")
+  type: SortEnumType @cost(weight: "10")
 }
 
 enum MessageType {
@@ -1493,10 +2031,10 @@ enum MessageType {
 }
 
 input MessageTypeOperationFilterInput {
-  eq: MessageType
-  in: [MessageType!]
-  neq: MessageType
-  nin: [MessageType!]
+  eq: MessageType @cost(weight: "10")
+  in: [MessageType!] @cost(weight: "10")
+  neq: MessageType @cost(weight: "10")
+  nin: [MessageType!] @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -1538,64 +2076,72 @@ type MessagesEdge {
 type MonthlyStats {
   bookings: Int!
   month: String!
-  revenue: Decimal
+  revenue: Decimal @cost(weight: "10")
 }
 
 type Mutation {
-  approveBooking(input: ApproveBookingInput!): ApproveBookingPayload!
-  approveProof(input: ApproveProofInput!): ApproveProofPayload!
-  blockDates(input: BlockDatesInput!): BlockDatesPayload!
-  cancelBooking(input: CancelBookingInput!): CancelBookingPayload!
-  cancelCampaign(input: CancelCampaignInput!): CancelCampaignPayload!
-  changePassword(input: ChangePasswordInput!): ChangePasswordPayload!
-  confirmPayment(input: ConfirmPaymentInput!): ConfirmPaymentPayload!
-  confirmSetupIntent(input: ConfirmSetupIntentInput!): ConfirmSetupIntentPayload!
-  connectStripeAccount: ConnectStripeAccountPayload!
-  createBooking(campaignId: ID!, input: CreateBookingInput!): CreateBookingPayload!
-  createBookingConversation(input: CreateBookingConversationInput!): CreateBookingConversationPayload!
-  createCampaign(input: CreateCampaignInput!): CreateCampaignPayload!
-  createPaymentIntent(input: CreatePaymentIntentInput!): CreatePaymentIntentPayload!
-  createPricingRule(input: CreatePricingRuleInput!): CreatePricingRulePayload!
-  createReview(bookingId: ID!, input: CreateReviewInput!): CreateReviewPayload!
-  createSetupIntent: CreateSetupIntentPayload!
-  createSpace(input: CreateSpaceInput!): CreateSpacePayload!
-  deactivateSpace(input: DeactivateSpaceInput!): DeactivateSpacePayload!
-  deleteCampaign(input: DeleteCampaignInput!): DeleteCampaignPayload!
-  deleteMyAccount(input: DeleteMyAccountInput!): DeleteMyAccountPayload!
-  deleteNotification(input: DeleteNotificationInput!): DeleteNotificationPayload!
-  deletePaymentMethod(input: DeletePaymentMethodInput!): DeletePaymentMethodPayload!
-  deletePricingRule(input: DeletePricingRuleInput!): DeletePricingRulePayload!
-  deleteReview(input: DeleteReviewInput!): DeleteReviewPayload!
-  deleteSpace(input: DeleteSpaceInput!): DeleteSpacePayload!
-  deleteUser(input: DeleteUserInput!): DeleteUserPayload!
-  disconnectStripeAccount: DisconnectStripeAccountPayload!
-  disputeProof(input: DisputeProofInput!): DisputeProofPayload!
-  markAllNotificationsRead: MarkAllNotificationsReadPayload!
-  markConversationRead(input: MarkConversationReadInput!): MarkConversationReadPayload!
-  markFileDownloaded(input: MarkFileDownloadedInput!): MarkFileDownloadedPayload!
-  markInstalled(input: MarkInstalledInput!): MarkInstalledPayload!
-  markNotificationRead(input: MarkNotificationReadInput!): MarkNotificationReadPayload!
-  notifyTyping(input: NotifyTypingInput!): NotifyTypingPayload!
-  processPayout(input: ProcessPayoutInput!): ProcessPayoutPayload!
-  reactivateSpace(input: ReactivateSpaceInput!): ReactivateSpacePayload!
-  refreshStripeAccountStatus: RefreshStripeAccountStatusPayload!
-  rejectBooking(input: RejectBookingInput!): RejectBookingPayload!
-  requestManualPayout(input: RequestManualPayoutInput!): RequestManualPayoutPayload!
-  requestRefund(input: RequestRefundInput!): RequestRefundPayload!
-  retryPayout(input: RetryPayoutInput!): RetryPayoutPayload!
-  sendMessage(input: SendMessageInput!): SendMessagePayload!
-  setDefaultPaymentMethod(input: SetDefaultPaymentMethodInput!): SetDefaultPaymentMethodPayload!
-  submitCampaign(input: SubmitCampaignInput!): SubmitCampaignPayload!
-  submitProof(input: SubmitProofInput!): SubmitProofPayload!
-  unblockDates(input: UnblockDatesInput!): UnblockDatesPayload!
-  updateAdvertiserProfile(input: UpdateAdvertiserProfileInput!): UpdateAdvertiserProfilePayload!
-  updateCampaign(id: ID!, input: UpdateCampaignInput!): UpdateCampaignPayload!
-  updateCurrentUser(input: UpdateCurrentUserInput!): UpdateCurrentUserPayload!
-  updateNotificationPreference(input: UpdateNotificationPreferenceInput!): UpdateNotificationPreferencePayload!
-  updatePricingRule(id: ID!, input: UpdatePricingRuleInput!): UpdatePricingRulePayload!
-  updateReview(id: ID!, input: UpdateReviewInput!): UpdateReviewPayload!
-  updateSpace(id: ID!, input: UpdateSpaceInput!): UpdateSpacePayload!
-  updateSpaceOwnerProfile(input: UpdateSpaceOwnerProfileInput!): UpdateSpaceOwnerProfilePayload!
+  approveBooking(input: ApproveBookingInput!): ApproveBookingPayload! @authorize @cost(weight: "10")
+  approveProof(input: ApproveProofInput!): ApproveProofPayload! @authorize @cost(weight: "10")
+  blockDates(input: BlockDatesInput!): BlockDatesPayload! @authorize @cost(weight: "10")
+  cancelBooking(input: CancelBookingInput!): CancelBookingPayload! @authorize @cost(weight: "10")
+  cancelCampaign(input: CancelCampaignInput!): CancelCampaignPayload! @authorize @cost(weight: "10")
+  changePassword(input: ChangePasswordInput!): ChangePasswordPayload! @authorize @cost(weight: "10")
+  confirmPayment(input: ConfirmPaymentInput!): ConfirmPaymentPayload! @authorize @cost(weight: "10")
+  confirmSetupIntent(input: ConfirmSetupIntentInput!): ConfirmSetupIntentPayload! @authorize @cost(weight: "10")
+  connectStripeAccount: ConnectStripeAccountPayload! @authorize @cost(weight: "10")
+  createBooking(campaignId: ID!, input: CreateBookingInput!): CreateBookingPayload! @authorize @cost(weight: "10")
+  createBookingConversation(input: CreateBookingConversationInput!): CreateBookingConversationPayload! @authorize @cost(weight: "10")
+  createCampaign(input: CreateCampaignInput!): CreateCampaignPayload! @authorize @cost(weight: "10")
+  createCareer(input: CreateCareerInput!): CreateCareerPayload! @authorize(roles: ["Admin"]) @cost(weight: "10")
+  createDigitalSignageSchedule(input: CreateDigitalSignageScheduleInput!): CreateDigitalSignageSchedulePayload! @authorize @cost(weight: "10")
+  createPaymentIntent(input: CreatePaymentIntentInput!): CreatePaymentIntentPayload! @authorize @cost(weight: "10")
+  createPricingRule(input: CreatePricingRuleInput!): CreatePricingRulePayload! @authorize @cost(weight: "10")
+  createReview(bookingId: ID!, input: CreateReviewInput!): CreateReviewPayload! @authorize @cost(weight: "10")
+  createSetupIntent: CreateSetupIntentPayload! @authorize @cost(weight: "10")
+  createSpace(input: CreateSpaceInput!): CreateSpacePayload! @authorize @cost(weight: "10")
+  deactivateSpace(input: DeactivateSpaceInput!): DeactivateSpacePayload! @authorize @cost(weight: "10")
+  deleteCampaign(input: DeleteCampaignInput!): DeleteCampaignPayload! @authorize @cost(weight: "10")
+  deleteCareer(input: DeleteCareerInput!): DeleteCareerPayload! @authorize(roles: ["Admin"]) @cost(weight: "10")
+  deleteMyAccount(input: DeleteMyAccountInput!): DeleteMyAccountPayload! @authorize @cost(weight: "10")
+  deleteNotification(input: DeleteNotificationInput!): DeleteNotificationPayload! @authorize @cost(weight: "10")
+  deletePaymentMethod(input: DeletePaymentMethodInput!): DeletePaymentMethodPayload! @authorize @cost(weight: "10")
+  deletePricingRule(input: DeletePricingRuleInput!): DeletePricingRulePayload! @authorize @cost(weight: "10")
+  deleteReview(input: DeleteReviewInput!): DeleteReviewPayload! @authorize(roles: ["Admin"]) @cost(weight: "10")
+  deleteSpace(input: DeleteSpaceInput!): DeleteSpacePayload! @authorize @cost(weight: "10")
+  deleteUser(input: DeleteUserInput!): DeleteUserPayload! @authorize(roles: ["Admin"]) @cost(weight: "10")
+  disconnectStripeAccount: DisconnectStripeAccountPayload! @authorize @cost(weight: "10")
+  disputeProof(input: DisputeProofInput!): DisputeProofPayload! @authorize @cost(weight: "10")
+  generateDevicePairingCode(input: GenerateDevicePairingCodeInput!): GenerateDevicePairingCodePayload! @authorize @cost(weight: "10")
+  markAllNotificationsRead: MarkAllNotificationsReadPayload! @authorize @cost(weight: "10")
+  markConversationRead(input: MarkConversationReadInput!): MarkConversationReadPayload! @authorize @cost(weight: "10")
+  markFileDownloaded(input: MarkFileDownloadedInput!): MarkFileDownloadedPayload! @authorize @cost(weight: "10")
+  markInstalled(input: MarkInstalledInput!): MarkInstalledPayload! @authorize @cost(weight: "10")
+  markNotificationRead(input: MarkNotificationReadInput!): MarkNotificationReadPayload! @authorize @cost(weight: "10")
+  notifyTyping(input: NotifyTypingInput!): NotifyTypingPayload! @authorize @cost(weight: "10")
+  pairDigitalSignageDevice(input: PairDigitalSignageDeviceInput!): PairDigitalSignageDevicePayload! @cost(weight: "10")
+  processPayout(input: ProcessPayoutInput!): ProcessPayoutPayload! @authorize(roles: ["Admin"]) @cost(weight: "10")
+  reactivateSpace(input: ReactivateSpaceInput!): ReactivateSpacePayload! @authorize @cost(weight: "10")
+  recordDigitalSignageProofEvent(input: RecordDigitalSignageProofEventInput!): RecordDigitalSignageProofEventPayload! @cost(weight: "10")
+  refreshStripeAccountStatus: RefreshStripeAccountStatusPayload! @authorize @cost(weight: "10")
+  registerDigitalSignageScreen(input: RegisterDigitalSignageScreenInput!): RegisterDigitalSignageScreenPayload! @authorize @cost(weight: "10")
+  rejectBooking(input: RejectBookingInput!): RejectBookingPayload! @authorize @cost(weight: "10")
+  requestManualPayout(input: RequestManualPayoutInput!): RequestManualPayoutPayload! @authorize @cost(weight: "10")
+  requestRefund(input: RequestRefundInput!): RequestRefundPayload! @authorize(roles: ["Admin"]) @cost(weight: "10")
+  retryPayout(input: RetryPayoutInput!): RetryPayoutPayload! @authorize(roles: ["Admin"]) @cost(weight: "10")
+  sendMessage(input: SendMessageInput!): SendMessagePayload! @authorize @cost(weight: "10")
+  setDefaultPaymentMethod(input: SetDefaultPaymentMethodInput!): SetDefaultPaymentMethodPayload! @authorize @cost(weight: "10")
+  submitCampaign(input: SubmitCampaignInput!): SubmitCampaignPayload! @authorize @cost(weight: "10")
+  submitProof(input: SubmitProofInput!): SubmitProofPayload! @authorize @cost(weight: "10")
+  unblockDates(input: UnblockDatesInput!): UnblockDatesPayload! @authorize @cost(weight: "10")
+  updateAdvertiserProfile(input: UpdateAdvertiserProfileInput!): UpdateAdvertiserProfilePayload! @authorize @cost(weight: "10")
+  updateCampaign(id: ID!, input: UpdateCampaignInput!): UpdateCampaignPayload! @authorize @cost(weight: "10")
+  updateCareer(id: ID!, input: UpdateCareerInput!): UpdateCareerPayload! @authorize(roles: ["Admin"]) @cost(weight: "10")
+  updateCurrentUser(input: UpdateCurrentUserInput!): UpdateCurrentUserPayload! @authorize @cost(weight: "10")
+  updateNotificationPreference(input: UpdateNotificationPreferenceInput!): UpdateNotificationPreferencePayload! @authorize @cost(weight: "10")
+  updatePricingRule(id: ID!, input: UpdatePricingRuleInput!): UpdatePricingRulePayload! @authorize @cost(weight: "10")
+  updateReview(id: ID!, input: UpdateReviewInput!): UpdateReviewPayload! @authorize @cost(weight: "10")
+  updateSpace(id: ID!, input: UpdateSpaceInput!): UpdateSpacePayload! @authorize @cost(weight: "10")
+  updateSpaceOwnerProfile(input: UpdateSpaceOwnerProfileInput!): UpdateSpaceOwnerProfilePayload! @authorize @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -1607,7 +2153,7 @@ type MyBookingsAsAdvertiserConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
   """Identifies the total count of items in the connection."""
-  totalCount: Int!
+  totalCount: Int! @cost(weight: "10")
 }
 
 """An edge in a connection."""
@@ -1627,7 +2173,7 @@ type MyBookingsAsOwnerConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
   """Identifies the total count of items in the connection."""
-  totalCount: Int!
+  totalCount: Int! @cost(weight: "10")
 }
 
 """An edge in a connection."""
@@ -1672,6 +2218,26 @@ type MyConversationsEdge {
   cursor: String!
   """The item at the end of the edge."""
   node: Conversation!
+}
+
+"""A connection to a list of items."""
+type MyDigitalSignageScreensConnection {
+  """A list of edges."""
+  edges: [MyDigitalSignageScreensEdge!]
+  """A flattened list of the nodes."""
+  nodes: [DigitalSignageScreen!]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int! @cost(weight: "10")
+}
+
+"""An edge in a connection."""
+type MyDigitalSignageScreensEdge {
+  """A cursor for use in pagination."""
+  cursor: String!
+  """The item at the end of the edge."""
+  node: DigitalSignageScreen!
 }
 
 """A connection to a list of items."""
@@ -1755,7 +2321,7 @@ type MySpacesConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
   """Identifies the total count of items in the connection."""
-  totalCount: Int!
+  totalCount: Int! @cost(weight: "10")
 }
 
 """An edge in a connection."""
@@ -1815,17 +2381,17 @@ type NotificationPreference {
 }
 
 input NotificationSortInput {
-  body: SortEnumType
-  createdAt: SortEnumType
-  entityId: SortEnumType
-  entityType: SortEnumType
-  id: SortEnumType
-  isRead: SortEnumType
-  readAt: SortEnumType
-  title: SortEnumType
-  type: SortEnumType
-  user: UserSortInput
-  userId: SortEnumType
+  body: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  entityId: SortEnumType @cost(weight: "10")
+  entityType: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  isRead: SortEnumType @cost(weight: "10")
+  readAt: SortEnumType @cost(weight: "10")
+  title: SortEnumType @cost(weight: "10")
+  type: SortEnumType @cost(weight: "10")
+  user: UserSortInput @cost(weight: "10")
+  userId: SortEnumType @cost(weight: "10")
 }
 
 enum NotificationType {
@@ -1854,10 +2420,10 @@ enum NotificationType {
 }
 
 input NotificationTypeOperationFilterInput {
-  eq: NotificationType
-  in: [NotificationType!]
-  neq: NotificationType
-  nin: [NotificationType!]
+  eq: NotificationType @cost(weight: "10")
+  in: [NotificationType!] @cost(weight: "10")
+  neq: NotificationType @cost(weight: "10")
+  nin: [NotificationType!] @cost(weight: "10")
 }
 
 union NotifyTypingError = ForbiddenError
@@ -1888,6 +2454,20 @@ type PageInfo {
   startCursor: String
 }
 
+union PairDigitalSignageDeviceError = ConflictError | ValidationError
+
+input PairDigitalSignageDeviceInput {
+  deviceName: String!
+  deviceToken: String!
+  pairingCode: String!
+  type: DigitalSignageDeviceType!
+}
+
+type PairDigitalSignageDevicePayload {
+  device: DigitalSignageDevice
+  errors: [PairDigitalSignageDeviceError!]
+}
+
 type Payment {
   amount: Decimal!
   booking: Booking!
@@ -1908,9 +2488,9 @@ type Payment {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [RefundSortInput!]
-    where: RefundFilterInput
-  ): RefundsConnection
+    order: [RefundSortInput!] @cost(weight: "10")
+    where: RefundFilterInput @cost(weight: "10")
+  ): RefundsConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   status: PaymentStatus!
   stripeChargeId: String
   stripeFee: Decimal
@@ -1952,19 +2532,19 @@ input PaymentFilterInput {
 }
 
 input PaymentSortInput {
-  amount: SortEnumType
-  booking: BookingSortInput
-  bookingId: SortEnumType
-  createdAt: SortEnumType
-  failureReason: SortEnumType
-  id: SortEnumType
-  paidAt: SortEnumType
-  receiptUrl: SortEnumType
-  status: SortEnumType
-  stripeChargeId: SortEnumType
-  stripeFee: SortEnumType
-  stripePaymentIntentId: SortEnumType
-  type: SortEnumType
+  amount: SortEnumType @cost(weight: "10")
+  booking: BookingSortInput @cost(weight: "10")
+  bookingId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  failureReason: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  paidAt: SortEnumType @cost(weight: "10")
+  receiptUrl: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  stripeChargeId: SortEnumType @cost(weight: "10")
+  stripeFee: SortEnumType @cost(weight: "10")
+  stripePaymentIntentId: SortEnumType @cost(weight: "10")
+  type: SortEnumType @cost(weight: "10")
 }
 
 enum PaymentStatus {
@@ -1976,10 +2556,10 @@ enum PaymentStatus {
 }
 
 input PaymentStatusOperationFilterInput {
-  eq: PaymentStatus
-  in: [PaymentStatus!]
-  neq: PaymentStatus
-  nin: [PaymentStatus!]
+  eq: PaymentStatus @cost(weight: "10")
+  in: [PaymentStatus!] @cost(weight: "10")
+  neq: PaymentStatus @cost(weight: "10")
+  nin: [PaymentStatus!] @cost(weight: "10")
 }
 
 enum PaymentType {
@@ -1989,10 +2569,10 @@ enum PaymentType {
 }
 
 input PaymentTypeOperationFilterInput {
-  eq: PaymentType
-  in: [PaymentType!]
-  neq: PaymentType
-  nin: [PaymentType!]
+  eq: PaymentType @cost(weight: "10")
+  in: [PaymentType!] @cost(weight: "10")
+  neq: PaymentType @cost(weight: "10")
+  nin: [PaymentType!] @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -2056,27 +2636,27 @@ enum PayoutSchedule {
 }
 
 input PayoutScheduleOperationFilterInput {
-  eq: PayoutSchedule
-  in: [PayoutSchedule!]
-  neq: PayoutSchedule
-  nin: [PayoutSchedule!]
+  eq: PayoutSchedule @cost(weight: "10")
+  in: [PayoutSchedule!] @cost(weight: "10")
+  neq: PayoutSchedule @cost(weight: "10")
+  nin: [PayoutSchedule!] @cost(weight: "10")
 }
 
 input PayoutSortInput {
-  amount: SortEnumType
-  attemptCount: SortEnumType
-  booking: BookingSortInput
-  bookingId: SortEnumType
-  createdAt: SortEnumType
-  failureReason: SortEnumType
-  id: SortEnumType
-  lastAttemptAt: SortEnumType
-  processedAt: SortEnumType
-  spaceOwnerProfile: SpaceOwnerProfileSortInput
-  spaceOwnerProfileId: SortEnumType
-  stage: SortEnumType
-  status: SortEnumType
-  stripeTransferId: SortEnumType
+  amount: SortEnumType @cost(weight: "10")
+  attemptCount: SortEnumType @cost(weight: "10")
+  booking: BookingSortInput @cost(weight: "10")
+  bookingId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  failureReason: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  lastAttemptAt: SortEnumType @cost(weight: "10")
+  processedAt: SortEnumType @cost(weight: "10")
+  spaceOwnerProfile: SpaceOwnerProfileSortInput @cost(weight: "10")
+  spaceOwnerProfileId: SortEnumType @cost(weight: "10")
+  stage: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  stripeTransferId: SortEnumType @cost(weight: "10")
 }
 
 enum PayoutStage {
@@ -2085,10 +2665,10 @@ enum PayoutStage {
 }
 
 input PayoutStageOperationFilterInput {
-  eq: PayoutStage
-  in: [PayoutStage!]
-  neq: PayoutStage
-  nin: [PayoutStage!]
+  eq: PayoutStage @cost(weight: "10")
+  in: [PayoutStage!] @cost(weight: "10")
+  neq: PayoutStage @cost(weight: "10")
+  nin: [PayoutStage!] @cost(weight: "10")
 }
 
 enum PayoutStatus {
@@ -2100,17 +2680,17 @@ enum PayoutStatus {
 }
 
 input PayoutStatusOperationFilterInput {
-  eq: PayoutStatus
-  in: [PayoutStatus!]
-  neq: PayoutStatus
-  nin: [PayoutStatus!]
+  eq: PayoutStatus @cost(weight: "10")
+  in: [PayoutStatus!] @cost(weight: "10")
+  neq: PayoutStatus @cost(weight: "10")
+  nin: [PayoutStatus!] @cost(weight: "10")
 }
 
 type PerformerItem {
-  change: Decimal
+  change: Decimal @cost(weight: "10")
   id: UUID!
   title: String!
-  value: Decimal
+  value: Decimal @cost(weight: "10")
 }
 
 type PeriodComparison {
@@ -2121,11 +2701,22 @@ type PeriodComparison {
 type PeriodData {
   avgRating: Float
   bookings: Int!
-  completionRate: Decimal
+  completionRate: Decimal @cost(weight: "10")
   endDate: DateTime!
   period: String!
-  revenue: Decimal
+  revenue: Decimal @cost(weight: "10")
   startDate: DateTime!
+}
+
+type PlatformStats {
+  newUsersLast30Days: Int!
+  totalActiveSpaces: Int!
+  totalAdvertisers: Int!
+  totalBookings: Int!
+  totalCampaigns: Int!
+  totalRevenue: Decimal!
+  totalSpaceOwners: Int!
+  totalUsers: Int!
 }
 
 type PricingRule {
@@ -2159,16 +2750,16 @@ input PricingRuleFilterInput {
 }
 
 input PricingRuleSortInput {
-  createdAt: SortEnumType
-  endDate: SortEnumType
-  id: SortEnumType
-  label: SortEnumType
-  priority: SortEnumType
-  space: SpaceSortInput
-  spaceId: SortEnumType
-  startDate: SortEnumType
-  type: SortEnumType
-  value: SortEnumType
+  createdAt: SortEnumType @cost(weight: "10")
+  endDate: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  label: SortEnumType @cost(weight: "10")
+  priority: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  spaceId: SortEnumType @cost(weight: "10")
+  startDate: SortEnumType @cost(weight: "10")
+  type: SortEnumType @cost(weight: "10")
+  value: SortEnumType @cost(weight: "10")
 }
 
 enum PricingRuleType {
@@ -2177,10 +2768,10 @@ enum PricingRuleType {
 }
 
 input PricingRuleTypeOperationFilterInput {
-  eq: PricingRuleType
-  in: [PricingRuleType!]
-  neq: PricingRuleType
-  nin: [PricingRuleType!]
+  eq: PricingRuleType @cost(weight: "10")
+  in: [PricingRuleType!] @cost(weight: "10")
+  neq: PricingRuleType @cost(weight: "10")
+  nin: [PricingRuleType!] @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -2192,7 +2783,7 @@ type PricingRulesBySpaceConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
   """Identifies the total count of items in the connection."""
-  totalCount: Int!
+  totalCount: Int! @cost(weight: "10")
 }
 
 """An edge in a connection."""
@@ -2221,10 +2812,10 @@ enum ProfileType {
 }
 
 input ProfileTypeOperationFilterInput {
-  eq: ProfileType
-  in: [ProfileType!]
-  neq: ProfileType
-  nin: [ProfileType!]
+  eq: ProfileType @cost(weight: "10")
+  in: [ProfileType!] @cost(weight: "10")
+  neq: ProfileType @cost(weight: "10")
+  nin: [ProfileType!] @cost(weight: "10")
 }
 
 type ProofActivity implements ActivityEvent {
@@ -2244,16 +2835,17 @@ enum ProofStatus {
 }
 
 input ProofStatusOperationFilterInput {
-  eq: ProofStatus
-  in: [ProofStatus!]
-  neq: ProofStatus
-  nin: [ProofStatus!]
+  eq: ProofStatus @cost(weight: "10")
+  in: [ProofStatus!] @cost(weight: "10")
+  neq: ProofStatus @cost(weight: "10")
+  nin: [ProofStatus!] @cost(weight: "10")
 }
 
 type Query {
-  advertiserAnalytics(endDate: DateTime!, startDate: DateTime!): AdvertiserAnalytics!
-  advertiserDailyStats(endDate: DateTime!, startDate: DateTime!): [DailyStats!]!
-  advertiserSpendingSummary: SpendingSummary!
+  advertiserAnalytics(endDate: DateTime!, startDate: DateTime!): AdvertiserAnalytics! @authorize @cost(weight: "10")
+  advertiserDailyStats(endDate: DateTime!, startDate: DateTime!): [DailyStats!]! @authorize @cost(weight: "10")
+  advertiserReachTrend(endDate: DateTime!, startDate: DateTime!): [ReachTrendPoint!]! @authorize @cost(weight: "10")
+  advertiserSpendingSummary: SpendingSummary! @authorize @cost(weight: "10")
   blockedDatesBySpace(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2266,12 +2858,12 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [BlockedDateSortInput!]
+    order: [BlockedDateSortInput!] @cost(weight: "10")
     spaceId: ID!
     startDate: LocalDate
-    where: BlockedDateFilterInput
-  ): BlockedDatesBySpaceConnection
-  bookingById(id: ID!): Booking
+    where: BlockedDateFilterInput @cost(weight: "10")
+  ): BlockedDatesBySpaceConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  bookingById(id: ID!): Booking @authorize @cost(weight: "10")
   bookingsRequiringAction(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2283,12 +2875,58 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-  ): BookingsRequiringActionConnection
-  campaignById(id: ID!): Campaign
-  earningsByDateRange(end: DateTime!, granularity: Granularity!, start: DateTime!): [EarningsDataPoint!]!
-  earningsSummary: EarningsSummary!
-  effectivePriceByDate(date: LocalDate!, spaceId: ID!): EffectivePricePayload!
-  exportBookingsAsCsv(input: ExportBookingsInput): ExportBookingsPayload!
+  ): BookingsRequiringActionConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  campaignById(id: ID!): Campaign @authorize @cost(weight: "10")
+  careerById(id: ID!): Career @cost(weight: "10")
+  careers(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [CareerSortInput!] @cost(weight: "10")
+    where: CareerFilterInput @cost(weight: "10")
+  ): CareersConnection @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  digitalSignageProofEventsForBooking(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    bookingId: ID!
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [DigitalSignageProofEventSortInput!] @cost(weight: "10")
+    where: DigitalSignageProofEventFilterInput @cost(weight: "10")
+  ): DigitalSignageProofEventsForBookingConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  digitalSignageSchedulesForScreen(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [DigitalSignageScheduleSortInput!] @cost(weight: "10")
+    screenId: ID!
+    where: DigitalSignageScheduleFilterInput @cost(weight: "10")
+  ): DigitalSignageSchedulesForScreenConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  digitalSignageScreenById(id: ID!): DigitalSignageScreen @authorize @cost(weight: "10")
+  earningsByDateRange(end: DateTime!, granularity: Granularity!, start: DateTime!): [EarningsDataPoint!]! @authorize @cost(weight: "10")
+  earningsSummary: EarningsSummary! @authorize @cost(weight: "10")
+  effectivePriceByDate(date: LocalDate!, spaceId: ID!): EffectivePricePayload! @cost(weight: "10")
+  exportBookingsAsCsv(input: ExportBookingsInput): ExportBookingsPayload! @authorize @cost(weight: "10")
   incomingBookingRequests(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2300,9 +2938,10 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [BookingSortInput!]
-  ): IncomingBookingRequestsConnection
-  me: User
+    order: [BookingSortInput!] @cost(weight: "10")
+  ): IncomingBookingRequestsConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  marketingStats: MarketingStats! @authorize(roles: ["Admin", "Marketing"]) @cost(weight: "10")
+  me: User @authorize @cost(weight: "10")
   messagesByConversation(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2315,10 +2954,10 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [MessageSortInput!]
-    where: MessageFilterInput
-  ): MessagesByConversationConnection
-  myActivityFeed(first: Int!): [ActivityEvent!]!
+    order: [MessageSortInput!] @cost(weight: "10")
+    where: MessageFilterInput @cost(weight: "10")
+  ): MessagesByConversationConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  myActivityFeed(first: Int!): [ActivityEvent!]! @authorize @cost(weight: "10")
   myBookingsAsAdvertiser(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2330,10 +2969,10 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [BookingSortInput!]
+    order: [BookingSortInput!] @cost(weight: "10")
     searchText: String
-    where: BookingFilterInput
-  ): MyBookingsAsAdvertiserConnection
+    where: BookingFilterInput @cost(weight: "10")
+  ): MyBookingsAsAdvertiserConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   myBookingsAsOwner(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2345,10 +2984,10 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [BookingSortInput!]
+    order: [BookingSortInput!] @cost(weight: "10")
     searchText: String
-    where: BookingFilterInput
-  ): MyBookingsAsOwnerConnection
+    where: BookingFilterInput @cost(weight: "10")
+  ): MyBookingsAsOwnerConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   myCampaigns(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2360,9 +2999,9 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [CampaignSortInput!]
-    where: CampaignFilterInput
-  ): MyCampaignsConnection
+    order: [CampaignSortInput!] @cost(weight: "10")
+    where: CampaignFilterInput @cost(weight: "10")
+  ): MyCampaignsConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   myConversations(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2374,10 +3013,24 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [ConversationSortInput!]
-    where: ConversationFilterInput
-  ): MyConversationsConnection
-  myNotificationPreferences: [NotificationPreference!]!
+    order: [ConversationSortInput!] @cost(weight: "10")
+    where: ConversationFilterInput @cost(weight: "10")
+  ): MyConversationsConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  myDigitalSignageScreens(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: String
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+    """Returns the first _n_ elements from the list."""
+    first: Int
+    """Returns the last _n_ elements from the list."""
+    last: Int
+    order: [DigitalSignageScreenSortInput!] @cost(weight: "10")
+    where: DigitalSignageScreenFilterInput @cost(weight: "10")
+  ): MyDigitalSignageScreensConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  myNotificationPreferences: [NotificationPreference!]! @authorize @cost(weight: "10")
   myNotifications(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2389,9 +3042,9 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [NotificationSortInput!]
-    where: NotificationFilterInput
-  ): MyNotificationsConnection
+    order: [NotificationSortInput!] @cost(weight: "10")
+    where: NotificationFilterInput @cost(weight: "10")
+  ): MyNotificationsConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   myPayments(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2403,9 +3056,9 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [PaymentSortInput!]
-    where: PaymentFilterInput
-  ): MyPaymentsConnection
+    order: [PaymentSortInput!] @cost(weight: "10")
+    where: PaymentFilterInput @cost(weight: "10")
+  ): MyPaymentsConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   myPayouts(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2417,9 +3070,9 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [PayoutSortInput!]
-    where: PayoutFilterInput
-  ): MyPayoutsConnection
+    order: [PayoutSortInput!] @cost(weight: "10")
+    where: PayoutFilterInput @cost(weight: "10")
+  ): MyPayoutsConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   myReviews(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2431,9 +3084,9 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [ReviewSortInput!]
-  ): MyReviewsConnection
-  mySavedPaymentMethods(order: [SavedPaymentMethodSortInput!], where: SavedPaymentMethodFilterInput): [SavedPaymentMethod!]!
+    order: [ReviewSortInput!] @cost(weight: "10")
+  ): MyReviewsConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  mySavedPaymentMethods(order: [SavedPaymentMethodSortInput!] @cost(weight: "10"), where: SavedPaymentMethodFilterInput @cost(weight: "10")): [SavedPaymentMethod!]! @authorize @cost(weight: "10")
   mySpaces(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2445,10 +3098,10 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [SpaceSortInput!]
-    where: SpaceFilterInput
-  ): MySpacesConnection
-  paymentById(id: ID!): Payment
+    order: [SpaceSortInput!] @cost(weight: "10")
+    where: SpaceFilterInput @cost(weight: "10")
+  ): MySpacesConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  paymentById(id: ID!): Payment @authorize @cost(weight: "10")
   paymentsByBooking(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2461,10 +3114,11 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [PaymentSortInput!]
-    where: PaymentFilterInput
-  ): PaymentsByBookingConnection
-  payoutById(id: ID!): Payout
+    order: [PaymentSortInput!] @cost(weight: "10")
+    where: PaymentFilterInput @cost(weight: "10")
+  ): PaymentsByBookingConnection @authorize @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  payoutById(id: ID!): Payout @authorize @cost(weight: "10")
+  platformStats: PlatformStats! @authorize(roles: ["Admin"]) @cost(weight: "10")
   pricingRulesBySpace(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2476,11 +3130,11 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [PricingRuleSortInput!]
+    order: [PricingRuleSortInput!] @cost(weight: "10")
     spaceId: ID!
-    where: PricingRuleFilterInput
-  ): PricingRulesBySpaceConnection
-  reviewByBooking(bookingId: ID!, reviewerType: ReviewerType!): Review
+    where: PricingRuleFilterInput @cost(weight: "10")
+  ): PricingRulesBySpaceConnection @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  reviewByBooking(bookingId: ID!, reviewerType: ReviewerType!): Review @authorize @cost(weight: "10")
   reviewsBySpace(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2492,12 +3146,12 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [ReviewSortInput!]
+    order: [ReviewSortInput!] @cost(weight: "10")
     spaceId: ID!
-  ): ReviewsBySpaceConnection
-  spaceById(id: ID!): Space
-  spaceOwnerAnalytics(endDate: DateTime!, startDate: DateTime!): SpaceOwnerAnalytics!
-  spaceOwnerDailyStats(endDate: DateTime!, startDate: DateTime!): [DailyStats!]!
+  ): ReviewsBySpaceConnection @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  spaceById(id: ID!): Space @authorize @cost(weight: "10")
+  spaceOwnerAnalytics(endDate: DateTime!, startDate: DateTime!): SpaceOwnerAnalytics! @authorize @cost(weight: "10")
+  spaceOwnerDailyStats(endDate: DateTime!, startDate: DateTime!): [DailyStats!]! @authorize @cost(weight: "10")
   spaces(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2509,9 +3163,9 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [SpaceSortInput!]
-    where: SpaceFilterInput
-  ): SpacesConnection
+    order: [SpaceSortInput!] @cost(weight: "10")
+    where: SpaceFilterInput @cost(weight: "10")
+  ): SpacesConnection @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   transactionsByBooking(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2524,11 +3178,11 @@ type Query {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [TransactionSortInput!]
-    where: TransactionFilterInput
-  ): TransactionsByBookingConnection
-  unreadConversationsCount: Int!
-  unreadNotificationsCount: Int!
+    order: [TransactionSortInput!] @cost(weight: "10")
+    where: TransactionFilterInput @cost(weight: "10")
+  ): TransactionsByBookingConnection @authorize(roles: ["Admin"]) @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
+  unreadConversationsCount: Int! @authorize @cost(weight: "10")
+  unreadNotificationsCount: Int! @authorize @cost(weight: "10")
 }
 
 type RatingPerformerItem {
@@ -2544,6 +3198,12 @@ type RatingTrendPoint {
   reviews: Int!
 }
 
+type ReachTrendPoint {
+  date: DateTime!
+  impressions: Long!
+  reach: Long!
+}
+
 union ReactivateSpaceError = ForbiddenError | NotFoundError
 
 input ReactivateSpaceInput {
@@ -2553,6 +3213,22 @@ input ReactivateSpaceInput {
 type ReactivateSpacePayload {
   errors: [ReactivateSpaceError!]
   space: Space
+}
+
+union RecordDigitalSignageProofEventError = ConflictError | NotFoundError | ValidationError
+
+input RecordDigitalSignageProofEventInput {
+  bookingId: ID!
+  deviceToken: String!
+  displayedAt: DateTime!
+  displayedDurationSeconds: Int!
+  metadata: String
+  scheduleId: ID!
+}
+
+type RecordDigitalSignageProofEventPayload {
+  errors: [RecordDigitalSignageProofEventError!]
+  proofEvent: DigitalSignageProofEvent
 }
 
 union RefreshStripeAccountStatusError = NotFoundError | PaymentError | ValidationError
@@ -2593,17 +3269,17 @@ input RefundFilterInput {
 }
 
 input RefundSortInput {
-  amount: SortEnumType
-  booking: BookingSortInput
-  bookingId: SortEnumType
-  createdAt: SortEnumType
-  id: SortEnumType
-  payment: PaymentSortInput
-  paymentId: SortEnumType
-  processedAt: SortEnumType
-  reason: SortEnumType
-  status: SortEnumType
-  stripeRefundId: SortEnumType
+  amount: SortEnumType @cost(weight: "10")
+  booking: BookingSortInput @cost(weight: "10")
+  bookingId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  payment: PaymentSortInput @cost(weight: "10")
+  paymentId: SortEnumType @cost(weight: "10")
+  processedAt: SortEnumType @cost(weight: "10")
+  reason: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  stripeRefundId: SortEnumType @cost(weight: "10")
 }
 
 enum RefundStatus {
@@ -2613,10 +3289,10 @@ enum RefundStatus {
 }
 
 input RefundStatusOperationFilterInput {
-  eq: RefundStatus
-  in: [RefundStatus!]
-  neq: RefundStatus
-  nin: [RefundStatus!]
+  eq: RefundStatus @cost(weight: "10")
+  in: [RefundStatus!] @cost(weight: "10")
+  neq: RefundStatus @cost(weight: "10")
+  nin: [RefundStatus!] @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -2635,6 +3311,17 @@ type RefundsEdge {
   cursor: String!
   """The item at the end of the edge."""
   node: Refund!
+}
+
+union RegisterDigitalSignageScreenError = NotFoundError | ValidationError
+
+input RegisterDigitalSignageScreenInput {
+  input: CreateDigitalSignageScreenInput!
+}
+
+type RegisterDigitalSignageScreenPayload {
+  createDigitalSignageScreenPayload: CreateDigitalSignageScreenPayload
+  errors: [RegisterDigitalSignageScreenError!]
 }
 
 union RejectBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
@@ -2691,7 +3378,7 @@ type Review {
   createdAt: DateTime!
   id: UUID!
   rating: Int!
-  reviewer: ReviewerInfo
+  reviewer: ReviewerInfo @cost(weight: "10")
   reviewerProfileId: UUID!
   reviewerType: ReviewerType!
   space: Space!
@@ -2714,16 +3401,16 @@ input ReviewFilterInput {
 }
 
 input ReviewSortInput {
-  booking: BookingSortInput
-  bookingId: SortEnumType
-  comment: SortEnumType
-  createdAt: SortEnumType
-  id: SortEnumType
-  rating: SortEnumType
-  reviewerProfileId: SortEnumType
-  reviewerType: SortEnumType
-  space: SpaceSortInput
-  spaceId: SortEnumType
+  booking: BookingSortInput @cost(weight: "10")
+  bookingId: SortEnumType @cost(weight: "10")
+  comment: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  rating: SortEnumType @cost(weight: "10")
+  reviewerProfileId: SortEnumType @cost(weight: "10")
+  reviewerType: SortEnumType @cost(weight: "10")
+  space: SpaceSortInput @cost(weight: "10")
+  spaceId: SortEnumType @cost(weight: "10")
 }
 
 type ReviewerInfo {
@@ -2738,10 +3425,10 @@ enum ReviewerType {
 }
 
 input ReviewerTypeOperationFilterInput {
-  eq: ReviewerType
-  in: [ReviewerType!]
-  neq: ReviewerType
-  nin: [ReviewerType!]
+  eq: ReviewerType @cost(weight: "10")
+  in: [ReviewerType!] @cost(weight: "10")
+  neq: ReviewerType @cost(weight: "10")
+  nin: [ReviewerType!] @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -2809,16 +3496,16 @@ input SavedPaymentMethodFilterInput {
 }
 
 input SavedPaymentMethodSortInput {
-  advertiserProfile: AdvertiserProfileSortInput
-  advertiserProfileId: SortEnumType
-  brand: SortEnumType
-  createdAt: SortEnumType
-  expMonth: SortEnumType
-  expYear: SortEnumType
-  id: SortEnumType
-  isDefault: SortEnumType
-  last4: SortEnumType
-  stripePaymentMethodId: SortEnumType
+  advertiserProfile: AdvertiserProfileSortInput @cost(weight: "10")
+  advertiserProfileId: SortEnumType @cost(weight: "10")
+  brand: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  expMonth: SortEnumType @cost(weight: "10")
+  expYear: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  isDefault: SortEnumType @cost(weight: "10")
+  last4: SortEnumType @cost(weight: "10")
+  stripePaymentMethodId: SortEnumType @cost(weight: "10")
 }
 
 union SendMessageError = ForbiddenError
@@ -2868,15 +3555,15 @@ type Space {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [BookingSortInput!]
-    where: BookingFilterInput
-  ): BookingsConnection
+    order: [BookingSortInput!] @cost(weight: "10")
+    where: BookingFilterInput @cost(weight: "10")
+  ): BookingsConnection @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   city: String!
   createdAt: DateTime!
   description: String
   dimensions: String
   dimensionsText: String
-  effectivePrices(endDate: LocalDate!, startDate: LocalDate!): [DatePrice!]!
+  effectivePrices(endDate: LocalDate!, startDate: LocalDate!): [DatePrice!]! @cost(weight: "10")
   height: Float
   id: UUID!
   images: [String!]!
@@ -2885,7 +3572,7 @@ type Space {
   longitude: Float!
   maxDuration: Int
   minDuration: Int!
-  owner: SpaceOwnerProfile
+  owner: SpaceOwnerProfile @authorize @cost(weight: "10")
   pricePerDay: Decimal!
   pricingRules: [PricingRule!]!
   rejectionReason: String
@@ -2900,9 +3587,9 @@ type Space {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [ReviewSortInput!]
-    where: ReviewFilterInput
-  ): ReviewsConnection
+    order: [ReviewSortInput!] @cost(weight: "10")
+    where: ReviewFilterInput @cost(weight: "10")
+  ): ReviewsConnection @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   spaceOwnerProfile: SpaceOwnerProfile!
   spaceOwnerProfileId: UUID!
   state: String!
@@ -2956,12 +3643,12 @@ input SpaceFilterInput {
 }
 
 type SpaceOwnerAnalytics {
-  bookingHeatmap: [[Int!]!]!
+  bookingHeatmap: [[Int!]!]! @cost(weight: "10")
   endDate: DateTime!
-  monthlyStats(months: Int!): [MonthlyStats!]!
+  monthlyStats(months: Int!): [MonthlyStats!]! @cost(weight: "10")
   periodComparison: PeriodComparison!
-  ratingTrends(months: Int!): [RatingTrendPoint!]!
-  spacePerformance(first: Int!): [SpacePerformanceItem!]!
+  ratingTrends(months: Int!): [RatingTrendPoint!]! @cost(weight: "10")
+  spacePerformance(first: Int!): [SpacePerformanceItem!]! @cost(weight: "10")
   startDate: DateTime!
   statusDistribution: [StatusCount!]!
   summary: SpaceOwnerSummary!
@@ -2970,7 +3657,7 @@ type SpaceOwnerAnalytics {
 }
 
 type SpaceOwnerProfile {
-  averageResponseTime: Int!
+  averageResponseTime: Int! @cost(weight: "10")
   businessName: String
   businessType: String
   createdAt: DateTime!
@@ -2979,7 +3666,7 @@ type SpaceOwnerProfile {
   onboardingComplete: Boolean!
   payoutSchedule: PayoutSchedule!
   payouts: [Payout!]!
-  responseRate: Float!
+  responseRate: Float! @cost(weight: "10")
   reviews(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -2991,9 +3678,9 @@ type SpaceOwnerProfile {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [ReviewSortInput!]
-    where: ReviewFilterInput
-  ): ReviewsConnection
+    order: [ReviewSortInput!] @cost(weight: "10")
+    where: ReviewFilterInput @cost(weight: "10")
+  ): ReviewsConnection @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   spaces(
     """Returns the elements in the list that come after the specified cursor."""
     after: String
@@ -3005,9 +3692,9 @@ type SpaceOwnerProfile {
     first: Int
     """Returns the last _n_ elements from the list."""
     last: Int
-    order: [SpaceSortInput!]
-    where: SpaceFilterInput
-  ): SpacesConnection
+    order: [SpaceSortInput!] @cost(weight: "10")
+    where: SpaceFilterInput @cost(weight: "10")
+  ): SpacesConnection @listSize(assumedSize: 50, slicingArguments: ["first", "last"], slicingArgumentDefaultValue: 10, sizedFields: ["edges", "nodes"], requireOneSlicingArgument: false) @cost(weight: "10")
   stripeAccountDisconnectedAt: DateTime
   stripeAccountDisconnectedNotifiedAt: DateTime
   stripeAccountId: String
@@ -3039,35 +3726,35 @@ input SpaceOwnerProfileFilterInput {
 }
 
 input SpaceOwnerProfileSortInput {
-  businessName: SortEnumType
-  businessType: SortEnumType
-  createdAt: SortEnumType
-  id: SortEnumType
-  onboardingComplete: SortEnumType
-  payoutSchedule: SortEnumType
-  stripeAccountDisconnectedAt: SortEnumType
-  stripeAccountDisconnectedNotifiedAt: SortEnumType
-  stripeAccountId: SortEnumType
-  stripeAccountStatus: SortEnumType
-  stripeLastAccountHealthCheck: SortEnumType
-  user: UserSortInput
-  userId: SortEnumType
+  businessName: SortEnumType @cost(weight: "10")
+  businessType: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  onboardingComplete: SortEnumType @cost(weight: "10")
+  payoutSchedule: SortEnumType @cost(weight: "10")
+  stripeAccountDisconnectedAt: SortEnumType @cost(weight: "10")
+  stripeAccountDisconnectedNotifiedAt: SortEnumType @cost(weight: "10")
+  stripeAccountId: SortEnumType @cost(weight: "10")
+  stripeAccountStatus: SortEnumType @cost(weight: "10")
+  stripeLastAccountHealthCheck: SortEnumType @cost(weight: "10")
+  user: UserSortInput @cost(weight: "10")
+  userId: SortEnumType @cost(weight: "10")
 }
 
 type SpaceOwnerSummary {
   averageRating: Float
-  avgBookingDuration: Decimal
-  completionRate: Decimal
-  forecastedRevenue: Decimal
-  occupancyRate: Decimal
-  previousAvgBookingDuration: Decimal
-  previousOccupancyRate: Decimal
-  previousRepeatAdvertiserRate: Decimal
+  avgBookingDuration: Decimal @cost(weight: "10")
+  completionRate: Decimal @cost(weight: "10")
+  forecastedRevenue: Decimal @cost(weight: "10")
+  occupancyRate: Decimal @cost(weight: "10")
+  previousAvgBookingDuration: Decimal @cost(weight: "10")
+  previousOccupancyRate: Decimal @cost(weight: "10")
+  previousRepeatAdvertiserRate: Decimal @cost(weight: "10")
   previousTotalBookings: Int!
-  previousTotalRevenue: Decimal
-  repeatAdvertiserRate: Decimal
+  previousTotalRevenue: Decimal @cost(weight: "10")
+  repeatAdvertiserRate: Decimal @cost(weight: "10")
   totalBookings: Int!
-  totalRevenue: Decimal
+  totalRevenue: Decimal @cost(weight: "10")
 }
 
 type SpaceOwnerTopPerformers {
@@ -3082,42 +3769,42 @@ type SpacePerformanceItem {
   averageRating: Float
   id: UUID!
   image: String
-  occupancyRate: Decimal
+  occupancyRate: Decimal @cost(weight: "10")
   title: String!
   totalBookings: Int!
-  totalRevenue: Decimal
+  totalRevenue: Decimal @cost(weight: "10")
 }
 
 input SpaceSortInput {
-  address: SortEnumType
-  availableFrom: SortEnumType
-  availableTo: SortEnumType
-  averageRating: SortEnumType
-  city: SortEnumType
-  createdAt: SortEnumType
-  description: SortEnumType
-  dimensions: SortEnumType
-  dimensionsText: SortEnumType
-  height: SortEnumType
-  id: SortEnumType
-  installationFee: SortEnumType
-  latitude: SortEnumType
-  longitude: SortEnumType
-  maxDuration: SortEnumType
-  minDuration: SortEnumType
-  pricePerDay: SortEnumType
-  rejectionReason: SortEnumType
-  spaceOwnerProfile: SpaceOwnerProfileSortInput
-  spaceOwnerProfileId: SortEnumType
-  state: SortEnumType
-  status: SortEnumType
-  title: SortEnumType
-  totalBookings: SortEnumType
-  totalRevenue: SortEnumType
-  traffic: SortEnumType
-  type: SortEnumType
-  width: SortEnumType
-  zipCode: SortEnumType
+  address: SortEnumType @cost(weight: "10")
+  availableFrom: SortEnumType @cost(weight: "10")
+  availableTo: SortEnumType @cost(weight: "10")
+  averageRating: SortEnumType @cost(weight: "10")
+  city: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  description: SortEnumType @cost(weight: "10")
+  dimensions: SortEnumType @cost(weight: "10")
+  dimensionsText: SortEnumType @cost(weight: "10")
+  height: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  installationFee: SortEnumType @cost(weight: "10")
+  latitude: SortEnumType @cost(weight: "10")
+  longitude: SortEnumType @cost(weight: "10")
+  maxDuration: SortEnumType @cost(weight: "10")
+  minDuration: SortEnumType @cost(weight: "10")
+  pricePerDay: SortEnumType @cost(weight: "10")
+  rejectionReason: SortEnumType @cost(weight: "10")
+  spaceOwnerProfile: SpaceOwnerProfileSortInput @cost(weight: "10")
+  spaceOwnerProfileId: SortEnumType @cost(weight: "10")
+  state: SortEnumType @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
+  title: SortEnumType @cost(weight: "10")
+  totalBookings: SortEnumType @cost(weight: "10")
+  totalRevenue: SortEnumType @cost(weight: "10")
+  traffic: SortEnumType @cost(weight: "10")
+  type: SortEnumType @cost(weight: "10")
+  width: SortEnumType @cost(weight: "10")
+  zipCode: SortEnumType @cost(weight: "10")
 }
 
 enum SpaceStatus {
@@ -3129,10 +3816,10 @@ enum SpaceStatus {
 }
 
 input SpaceStatusOperationFilterInput {
-  eq: SpaceStatus
-  in: [SpaceStatus!]
-  neq: SpaceStatus
-  nin: [SpaceStatus!]
+  eq: SpaceStatus @cost(weight: "10")
+  in: [SpaceStatus!] @cost(weight: "10")
+  neq: SpaceStatus @cost(weight: "10")
+  nin: [SpaceStatus!] @cost(weight: "10")
 }
 
 enum SpaceType {
@@ -3146,10 +3833,10 @@ enum SpaceType {
 }
 
 input SpaceTypeOperationFilterInput {
-  eq: SpaceType
-  in: [SpaceType!]
-  neq: SpaceType
-  nin: [SpaceType!]
+  eq: SpaceType @cost(weight: "10")
+  in: [SpaceType!] @cost(weight: "10")
+  neq: SpaceType @cost(weight: "10")
+  nin: [SpaceType!] @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -3161,7 +3848,7 @@ type SpacesConnection {
   """Information to aid in pagination."""
   pageInfo: PageInfo!
   """Identifies the total count of items in the connection."""
-  totalCount: Int!
+  totalCount: Int! @cost(weight: "10")
 }
 
 """An edge in a connection."""
@@ -3173,10 +3860,10 @@ type SpacesEdge {
 }
 
 type SpendingSummary {
-  lastMonthSpending: Decimal
-  pendingPayments: Decimal
-  thisMonthSpending: Decimal
-  totalSpent: Decimal
+  lastMonthSpending: Decimal @cost(weight: "10")
+  pendingPayments: Decimal @cost(weight: "10")
+  thisMonthSpending: Decimal @cost(weight: "10")
+  totalSpent: Decimal @cost(weight: "10")
 }
 
 type StatusCount {
@@ -3186,17 +3873,17 @@ type StatusCount {
 
 input StringOperationFilterInput {
   and: [StringOperationFilterInput!]
-  contains: String
-  endsWith: String
-  eq: String
-  in: [String]
-  ncontains: String
-  nendsWith: String
-  neq: String
-  nin: [String]
-  nstartsWith: String
+  contains: String @cost(weight: "20")
+  endsWith: String @cost(weight: "20")
+  eq: String @cost(weight: "10")
+  in: [String] @cost(weight: "10")
+  ncontains: String @cost(weight: "20")
+  nendsWith: String @cost(weight: "20")
+  neq: String @cost(weight: "10")
+  nin: [String] @cost(weight: "10")
+  nstartsWith: String @cost(weight: "20")
   or: [StringOperationFilterInput!]
-  startsWith: String
+  startsWith: String @cost(weight: "20")
 }
 
 union SubmitCampaignError = ForbiddenError | InvalidStatusTransitionError | NotFoundError
@@ -3223,11 +3910,11 @@ type SubmitProofPayload {
 }
 
 type Subscription {
-  onBookingUpdate(bookingId: ID!): Booking!
-  onMessage(conversationId: ID!): Message!
-  onNotification(userId: ID!): Notification!
-  onProofUpdate(bookingId: ID!): BookingProof!
-  onTyping(conversationId: ID!): TypingIndicator!
+  onBookingUpdate(bookingId: ID!): Booking! @authorize
+  onMessage(conversationId: ID!): Message! @authorize
+  onNotification(userId: ID!): Notification! @authorize
+  onProofUpdate(bookingId: ID!): BookingProof! @authorize
+  onTyping(conversationId: ID!): TypingIndicator! @authorize
 }
 
 type Transaction {
@@ -3263,18 +3950,18 @@ input TransactionFilterInput {
 }
 
 input TransactionSortInput {
-  amount: SortEnumType
-  booking: BookingSortInput
-  bookingId: SortEnumType
-  createdAt: SortEnumType
-  currency: SortEnumType
-  description: SortEnumType
-  id: SortEnumType
-  referenceId: SortEnumType
-  referenceType: SortEnumType
-  type: SortEnumType
-  user: UserSortInput
-  userId: SortEnumType
+  amount: SortEnumType @cost(weight: "10")
+  booking: BookingSortInput @cost(weight: "10")
+  bookingId: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  currency: SortEnumType @cost(weight: "10")
+  description: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  referenceId: SortEnumType @cost(weight: "10")
+  referenceType: SortEnumType @cost(weight: "10")
+  type: SortEnumType @cost(weight: "10")
+  user: UserSortInput @cost(weight: "10")
+  userId: SortEnumType @cost(weight: "10")
 }
 
 enum TransactionType {
@@ -3285,10 +3972,10 @@ enum TransactionType {
 }
 
 input TransactionTypeOperationFilterInput {
-  eq: TransactionType
-  in: [TransactionType!]
-  neq: TransactionType
-  nin: [TransactionType!]
+  eq: TransactionType @cost(weight: "10")
+  in: [TransactionType!] @cost(weight: "10")
+  neq: TransactionType @cost(weight: "10")
+  nin: [TransactionType!] @cost(weight: "10")
 }
 
 """A connection to a list of items."""
@@ -3318,7 +4005,7 @@ type TypingIndicator {
   userName: String!
 }
 
-scalar UUID
+scalar UUID @specifiedBy(url: "https://tools.ietf.org/html/rfc4122")
 
 union UnblockDatesError = ForbiddenError | NotFoundError | ValidationError
 
@@ -3361,6 +4048,24 @@ input UpdateCampaignInput {
 type UpdateCampaignPayload {
   campaign: Campaign
   errors: [UpdateCampaignError!]
+}
+
+union UpdateCareerError = NotFoundError | ValidationError
+
+input UpdateCareerInput {
+  department: CareerDepartment
+  description: String
+  expiresAt: DateTime
+  isActive: Boolean
+  location: String
+  requirements: String
+  title: String
+  type: CareerType
+}
+
+type UpdateCareerPayload {
+  career: Career
+  errors: [UpdateCareerError!]
 }
 
 union UpdateCurrentUserError = NotFoundError
@@ -3501,26 +4206,26 @@ enum UserRole {
 }
 
 input UserRoleOperationFilterInput {
-  eq: UserRole
-  in: [UserRole!]
-  neq: UserRole
-  nin: [UserRole!]
+  eq: UserRole @cost(weight: "10")
+  in: [UserRole!] @cost(weight: "10")
+  neq: UserRole @cost(weight: "10")
+  nin: [UserRole!] @cost(weight: "10")
 }
 
 input UserSortInput {
-  activeProfileType: SortEnumType
-  advertiserProfile: AdvertiserProfileSortInput
-  avatar: SortEnumType
-  createdAt: SortEnumType
-  email: SortEnumType
-  id: SortEnumType
-  lastLoginAt: SortEnumType
-  name: SortEnumType
-  password: SortEnumType
-  phone: SortEnumType
-  role: SortEnumType
-  spaceOwnerProfile: SpaceOwnerProfileSortInput
-  status: SortEnumType
+  activeProfileType: SortEnumType @cost(weight: "10")
+  advertiserProfile: AdvertiserProfileSortInput @cost(weight: "10")
+  avatar: SortEnumType @cost(weight: "10")
+  createdAt: SortEnumType @cost(weight: "10")
+  email: SortEnumType @cost(weight: "10")
+  id: SortEnumType @cost(weight: "10")
+  lastLoginAt: SortEnumType @cost(weight: "10")
+  name: SortEnumType @cost(weight: "10")
+  password: SortEnumType @cost(weight: "10")
+  phone: SortEnumType @cost(weight: "10")
+  role: SortEnumType @cost(weight: "10")
+  spaceOwnerProfile: SpaceOwnerProfileSortInput @cost(weight: "10")
+  status: SortEnumType @cost(weight: "10")
 }
 
 enum UserStatus {
@@ -3530,25 +4235,25 @@ enum UserStatus {
 }
 
 input UserStatusOperationFilterInput {
-  eq: UserStatus
-  in: [UserStatus!]
-  neq: UserStatus
-  nin: [UserStatus!]
+  eq: UserStatus @cost(weight: "10")
+  in: [UserStatus!] @cost(weight: "10")
+  neq: UserStatus @cost(weight: "10")
+  nin: [UserStatus!] @cost(weight: "10")
 }
 
 input UuidOperationFilterInput {
-  eq: UUID
-  gt: UUID
-  gte: UUID
-  in: [UUID]
-  lt: UUID
-  lte: UUID
-  neq: UUID
-  ngt: UUID
-  ngte: UUID
-  nin: [UUID]
-  nlt: UUID
-  nlte: UUID
+  eq: UUID @cost(weight: "10")
+  gt: UUID @cost(weight: "10")
+  gte: UUID @cost(weight: "10")
+  in: [UUID] @cost(weight: "10")
+  lt: UUID @cost(weight: "10")
+  lte: UUID @cost(weight: "10")
+  neq: UUID @cost(weight: "10")
+  ngt: UUID @cost(weight: "10")
+  ngte: UUID @cost(weight: "10")
+  nin: [UUID] @cost(weight: "10")
+  nlt: UUID @cost(weight: "10")
+  nlte: UUID @cost(weight: "10")
 }
 
 type ValidationError implements Error {

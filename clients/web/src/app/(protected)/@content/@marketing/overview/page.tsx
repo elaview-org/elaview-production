@@ -15,35 +15,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/primitives/card";
+import api from "@/api/server";
+import { graphql } from "@/types/gql";
 
-// TODO: Replace with real marketing aggregate queries once the backend exposes
-// platform-wide marketing metrics (signups, conversion rate, top campaigns, etc.)
-const MARKETING_STATS = [
-  {
-    label: "New Sign-ups (30d)",
-    value: "—",
-    footer: "Backend integration pending",
-    description: "Requires marketing analytics query",
-  },
-  {
-    label: "Conversion Rate",
-    value: "—",
-    footer: "Backend integration pending",
-    description: "Visitor → registered user",
-  },
-  {
-    label: "Active Campaigns",
-    value: "—",
-    footer: "Backend integration pending",
-    description: "Requires marketing analytics query",
-  },
-  {
-    label: "Total Ad Spend",
-    value: "—",
-    footer: "Backend integration pending",
-    description: "Requires marketing analytics query",
-  },
-];
+const MarketingStatsQuery = graphql(`
+  query MarketingStats {
+    marketingStats {
+      newSignups30d
+      conversionRate
+      activeCampaigns
+      totalAdSpend30d
+      totalCompletedBookings30d
+      signupTrend {
+        date
+        count
+      }
+    }
+  }
+`);
 
 const MARKETING_SECTIONS = [
   {
@@ -66,7 +55,59 @@ const MARKETING_SECTIONS = [
   },
 ];
 
-export default function Page() {
+function formatNumber(n: number): string {
+  return new Intl.NumberFormat("en-US").format(n);
+}
+
+function formatCurrency(n: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(n);
+}
+
+function formatPercent(n: number): string {
+  return `${n.toFixed(1)}%`;
+}
+
+export default async function Page() {
+  const { data } = await api.query({
+    query: MarketingStatsQuery,
+    tags: ["marketing-stats"],
+    revalidate: 60,
+  });
+
+  const stats = data?.marketingStats;
+
+  const MARKETING_STATS = [
+    {
+      label: "New Sign-ups (30d)",
+      value: stats ? formatNumber(stats.newSignups30d) : "—",
+      footer: stats
+        ? `${formatNumber(stats.totalCompletedBookings30d)} completed bookings`
+        : "Loading...",
+      description: "New user registrations in the last 30 days",
+    },
+    {
+      label: "Conversion Rate",
+      value: stats ? formatPercent(stats.conversionRate) : "—",
+      footer: "Visitor → registered user",
+      description: "Percentage of visitors who sign up",
+    },
+    {
+      label: "Active Campaigns",
+      value: stats ? formatNumber(stats.activeCampaigns) : "—",
+      footer: "Currently running campaigns",
+      description: "Bookings in active state across the platform",
+    },
+    {
+      label: "Total Ad Spend (30d)",
+      value: stats ? formatCurrency(stats.totalAdSpend30d) : "—",
+      footer: "Last 30 days",
+      description: "Advertiser spending across platform",
+    },
+  ];
   return (
     <div className="flex flex-col gap-8">
       {/* Header */}

@@ -727,6 +727,100 @@ export type CancelCampaignPayload = {
   errors: Maybe<Array<CancelCampaignError>>;
 };
 
+export type Career = {
+  __typename: 'Career';
+  createdAt: Scalars['DateTime']['output'];
+  department: CareerDepartment;
+  description: Scalars['String']['output'];
+  expiresAt: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['UUID']['output'];
+  isActive: Scalars['Boolean']['output'];
+  location: Scalars['String']['output'];
+  requirements: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  type: CareerType;
+};
+
+export enum CareerDepartment {
+  CustomerSuccess = 'CUSTOMER_SUCCESS',
+  Design = 'DESIGN',
+  Engineering = 'ENGINEERING',
+  Marketing = 'MARKETING',
+  Operations = 'OPERATIONS',
+  Sales = 'SALES'
+}
+
+export type CareerDepartmentOperationFilterInput = {
+  eq?: InputMaybe<CareerDepartment>;
+  in?: InputMaybe<Array<CareerDepartment>>;
+  neq?: InputMaybe<CareerDepartment>;
+  nin?: InputMaybe<Array<CareerDepartment>>;
+};
+
+export type CareerFilterInput = {
+  and?: InputMaybe<Array<CareerFilterInput>>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  department?: InputMaybe<CareerDepartmentOperationFilterInput>;
+  description?: InputMaybe<StringOperationFilterInput>;
+  expiresAt?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  isActive?: InputMaybe<BooleanOperationFilterInput>;
+  location?: InputMaybe<StringOperationFilterInput>;
+  or?: InputMaybe<Array<CareerFilterInput>>;
+  requirements?: InputMaybe<StringOperationFilterInput>;
+  title?: InputMaybe<StringOperationFilterInput>;
+  type?: InputMaybe<CareerTypeOperationFilterInput>;
+};
+
+export type CareerSortInput = {
+  createdAt?: InputMaybe<SortEnumType>;
+  department?: InputMaybe<SortEnumType>;
+  description?: InputMaybe<SortEnumType>;
+  expiresAt?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  isActive?: InputMaybe<SortEnumType>;
+  location?: InputMaybe<SortEnumType>;
+  requirements?: InputMaybe<SortEnumType>;
+  title?: InputMaybe<SortEnumType>;
+  type?: InputMaybe<SortEnumType>;
+};
+
+export enum CareerType {
+  Contract = 'CONTRACT',
+  FullTime = 'FULL_TIME',
+  Internship = 'INTERNSHIP',
+  PartTime = 'PART_TIME'
+}
+
+export type CareerTypeOperationFilterInput = {
+  eq?: InputMaybe<CareerType>;
+  in?: InputMaybe<Array<CareerType>>;
+  neq?: InputMaybe<CareerType>;
+  nin?: InputMaybe<Array<CareerType>>;
+};
+
+/** A connection to a list of items. */
+export type CareersConnection = {
+  __typename: 'CareersConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<CareersEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<Career>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+  /** Identifies the total count of items in the connection. */
+  totalCount: Scalars['Int']['output'];
+};
+
+/** An edge in a connection. */
+export type CareersEdge = {
+  __typename: 'CareersEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: Career;
+};
+
 export type ChangePasswordError = NotFoundError | ValidationError;
 
 export type ChangePasswordInput = {
@@ -893,6 +987,55 @@ export type CreateCampaignPayload = {
   errors: Maybe<Array<CreateCampaignError>>;
 };
 
+export type CreateCareerError = ValidationError;
+
+export type CreateCareerInput = {
+  department: CareerDepartment;
+  description: Scalars['String']['input'];
+  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
+  isActive: Scalars['Boolean']['input'];
+  location: Scalars['String']['input'];
+  requirements: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  type: CareerType;
+};
+
+export type CreateCareerPayload = {
+  __typename: 'CreateCareerPayload';
+  career: Maybe<Career>;
+  errors: Maybe<Array<CreateCareerError>>;
+};
+
+export type CreateDigitalSignageScheduleError = NotFoundError | ValidationError;
+
+export type CreateDigitalSignageScheduleInput = {
+  bookingId: Scalars['ID']['input'];
+  campaignId: Scalars['ID']['input'];
+  creativeAssetUrl: Scalars['String']['input'];
+  creativeType: DigitalSignageCreativeType;
+  endDate: Scalars['DateTime']['input'];
+  rotationIntervalSeconds: Scalars['Int']['input'];
+  screenId: Scalars['ID']['input'];
+  startDate: Scalars['DateTime']['input'];
+};
+
+export type CreateDigitalSignageSchedulePayload = {
+  __typename: 'CreateDigitalSignageSchedulePayload';
+  errors: Maybe<Array<CreateDigitalSignageScheduleError>>;
+  schedule: Maybe<DigitalSignageSchedule>;
+};
+
+export type CreateDigitalSignageScreenInput = {
+  name: Scalars['String']['input'];
+  resolution?: InputMaybe<Scalars['String']['input']>;
+  spaceId: Scalars['ID']['input'];
+};
+
+export type CreateDigitalSignageScreenPayload = {
+  __typename: 'CreateDigitalSignageScreenPayload';
+  screen: DigitalSignageScreen;
+};
+
 export type CreatePaymentIntentError = ConflictError | ForbiddenError | InvalidStatusTransitionError | NotFoundError;
 
 export type CreatePaymentIntentInput = {
@@ -980,6 +1123,12 @@ export type CreateSpacePayload = {
   space: Maybe<Space>;
 };
 
+export type DailySignups = {
+  __typename: 'DailySignups';
+  count: Scalars['Int']['output'];
+  date: Scalars['DateTime']['output'];
+};
+
 export type DailyStats = {
   __typename: 'DailyStats';
   bookings: Scalars['Int']['output'];
@@ -1047,6 +1196,18 @@ export type DeleteCampaignInput = {
 export type DeleteCampaignPayload = {
   __typename: 'DeleteCampaignPayload';
   errors: Maybe<Array<DeleteCampaignError>>;
+  success: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type DeleteCareerError = NotFoundError;
+
+export type DeleteCareerInput = {
+  id: Scalars['ID']['input'];
+};
+
+export type DeleteCareerPayload = {
+  __typename: 'DeleteCareerPayload';
+  errors: Maybe<Array<DeleteCareerError>>;
   success: Maybe<Scalars['Boolean']['output']>;
 };
 
@@ -1126,6 +1287,335 @@ export type DeleteUserPayload = {
   __typename: 'DeleteUserPayload';
   errors: Maybe<Array<DeleteUserError>>;
   success: Maybe<Scalars['Boolean']['output']>;
+};
+
+export enum DigitalSignageCreativeType {
+  Image = 'IMAGE',
+  Video = 'VIDEO'
+}
+
+export type DigitalSignageCreativeTypeOperationFilterInput = {
+  eq?: InputMaybe<DigitalSignageCreativeType>;
+  in?: InputMaybe<Array<DigitalSignageCreativeType>>;
+  neq?: InputMaybe<DigitalSignageCreativeType>;
+  nin?: InputMaybe<Array<DigitalSignageCreativeType>>;
+};
+
+export type DigitalSignageDevice = {
+  __typename: 'DigitalSignageDevice';
+  createdAt: Scalars['DateTime']['output'];
+  deviceName: Scalars['String']['output'];
+  deviceToken: Scalars['String']['output'];
+  id: Scalars['UUID']['output'];
+  lastSeenAt: Maybe<Scalars['DateTime']['output']>;
+  pairingCode: Maybe<Scalars['String']['output']>;
+  pairingCodeExpiresAt: Maybe<Scalars['DateTime']['output']>;
+  proofEvents: Array<DigitalSignageProofEvent>;
+  screen: DigitalSignageScreen;
+  screenId: Scalars['UUID']['output'];
+  status: DigitalSignageDeviceStatus;
+  type: DigitalSignageDeviceType;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type DigitalSignageDeviceFilterInput = {
+  and?: InputMaybe<Array<DigitalSignageDeviceFilterInput>>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  deviceName?: InputMaybe<StringOperationFilterInput>;
+  deviceToken?: InputMaybe<StringOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  lastSeenAt?: InputMaybe<DateTimeOperationFilterInput>;
+  or?: InputMaybe<Array<DigitalSignageDeviceFilterInput>>;
+  pairingCode?: InputMaybe<StringOperationFilterInput>;
+  pairingCodeExpiresAt?: InputMaybe<DateTimeOperationFilterInput>;
+  proofEvents?: InputMaybe<ListFilterInputTypeOfDigitalSignageProofEventFilterInput>;
+  screen?: InputMaybe<DigitalSignageScreenFilterInput>;
+  screenId?: InputMaybe<UuidOperationFilterInput>;
+  status?: InputMaybe<DigitalSignageDeviceStatusOperationFilterInput>;
+  type?: InputMaybe<DigitalSignageDeviceTypeOperationFilterInput>;
+  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type DigitalSignageDeviceSortInput = {
+  createdAt?: InputMaybe<SortEnumType>;
+  deviceName?: InputMaybe<SortEnumType>;
+  deviceToken?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  lastSeenAt?: InputMaybe<SortEnumType>;
+  pairingCode?: InputMaybe<SortEnumType>;
+  pairingCodeExpiresAt?: InputMaybe<SortEnumType>;
+  screen?: InputMaybe<DigitalSignageScreenSortInput>;
+  screenId?: InputMaybe<SortEnumType>;
+  status?: InputMaybe<SortEnumType>;
+  type?: InputMaybe<SortEnumType>;
+  updatedAt?: InputMaybe<SortEnumType>;
+};
+
+export enum DigitalSignageDeviceStatus {
+  Disabled = 'DISABLED',
+  Error = 'ERROR',
+  Offline = 'OFFLINE',
+  Online = 'ONLINE',
+  Pairing = 'PAIRING',
+  Unpaired = 'UNPAIRED'
+}
+
+export type DigitalSignageDeviceStatusOperationFilterInput = {
+  eq?: InputMaybe<DigitalSignageDeviceStatus>;
+  in?: InputMaybe<Array<DigitalSignageDeviceStatus>>;
+  neq?: InputMaybe<DigitalSignageDeviceStatus>;
+  nin?: InputMaybe<Array<DigitalSignageDeviceStatus>>;
+};
+
+export enum DigitalSignageDeviceType {
+  AndroidTv = 'ANDROID_TV',
+  FireTv = 'FIRE_TV',
+  Other = 'OTHER',
+  RaspberryPi = 'RASPBERRY_PI',
+  SmartTv = 'SMART_TV'
+}
+
+export type DigitalSignageDeviceTypeOperationFilterInput = {
+  eq?: InputMaybe<DigitalSignageDeviceType>;
+  in?: InputMaybe<Array<DigitalSignageDeviceType>>;
+  neq?: InputMaybe<DigitalSignageDeviceType>;
+  nin?: InputMaybe<Array<DigitalSignageDeviceType>>;
+};
+
+export type DigitalSignageProofEvent = {
+  __typename: 'DigitalSignageProofEvent';
+  booking: Booking;
+  bookingId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  device: DigitalSignageDevice;
+  deviceId: Scalars['UUID']['output'];
+  displayedAt: Scalars['DateTime']['output'];
+  displayedDurationSeconds: Scalars['Int']['output'];
+  id: Scalars['UUID']['output'];
+  metadata: Maybe<Scalars['String']['output']>;
+  schedule: DigitalSignageSchedule;
+  scheduleId: Scalars['UUID']['output'];
+  screen: DigitalSignageScreen;
+  screenId: Scalars['UUID']['output'];
+};
+
+export type DigitalSignageProofEventFilterInput = {
+  and?: InputMaybe<Array<DigitalSignageProofEventFilterInput>>;
+  booking?: InputMaybe<BookingFilterInput>;
+  bookingId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  device?: InputMaybe<DigitalSignageDeviceFilterInput>;
+  deviceId?: InputMaybe<UuidOperationFilterInput>;
+  displayedAt?: InputMaybe<DateTimeOperationFilterInput>;
+  displayedDurationSeconds?: InputMaybe<IntOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  metadata?: InputMaybe<StringOperationFilterInput>;
+  or?: InputMaybe<Array<DigitalSignageProofEventFilterInput>>;
+  schedule?: InputMaybe<DigitalSignageScheduleFilterInput>;
+  scheduleId?: InputMaybe<UuidOperationFilterInput>;
+  screen?: InputMaybe<DigitalSignageScreenFilterInput>;
+  screenId?: InputMaybe<UuidOperationFilterInput>;
+};
+
+export type DigitalSignageProofEventSortInput = {
+  booking?: InputMaybe<BookingSortInput>;
+  bookingId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  device?: InputMaybe<DigitalSignageDeviceSortInput>;
+  deviceId?: InputMaybe<SortEnumType>;
+  displayedAt?: InputMaybe<SortEnumType>;
+  displayedDurationSeconds?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  metadata?: InputMaybe<SortEnumType>;
+  schedule?: InputMaybe<DigitalSignageScheduleSortInput>;
+  scheduleId?: InputMaybe<SortEnumType>;
+  screen?: InputMaybe<DigitalSignageScreenSortInput>;
+  screenId?: InputMaybe<SortEnumType>;
+};
+
+/** A connection to a list of items. */
+export type DigitalSignageProofEventsForBookingConnection = {
+  __typename: 'DigitalSignageProofEventsForBookingConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<DigitalSignageProofEventsForBookingEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<DigitalSignageProofEvent>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+  /** Identifies the total count of items in the connection. */
+  totalCount: Scalars['Int']['output'];
+};
+
+/** An edge in a connection. */
+export type DigitalSignageProofEventsForBookingEdge = {
+  __typename: 'DigitalSignageProofEventsForBookingEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: DigitalSignageProofEvent;
+};
+
+export type DigitalSignageSchedule = {
+  __typename: 'DigitalSignageSchedule';
+  booking: Booking;
+  bookingId: Scalars['UUID']['output'];
+  campaign: Campaign;
+  campaignId: Scalars['UUID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  creativeAssetUrl: Scalars['String']['output'];
+  creativeType: DigitalSignageCreativeType;
+  endDate: Scalars['DateTime']['output'];
+  id: Scalars['UUID']['output'];
+  proofEvents: Array<DigitalSignageProofEvent>;
+  pushedToDevicesAt: Maybe<Scalars['DateTime']['output']>;
+  rotationIntervalSeconds: Scalars['Int']['output'];
+  screen: DigitalSignageScreen;
+  screenId: Scalars['UUID']['output'];
+  startDate: Scalars['DateTime']['output'];
+  status: DigitalSignageScheduleStatus;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type DigitalSignageScheduleFilterInput = {
+  and?: InputMaybe<Array<DigitalSignageScheduleFilterInput>>;
+  booking?: InputMaybe<BookingFilterInput>;
+  bookingId?: InputMaybe<UuidOperationFilterInput>;
+  campaign?: InputMaybe<CampaignFilterInput>;
+  campaignId?: InputMaybe<UuidOperationFilterInput>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  creativeAssetUrl?: InputMaybe<StringOperationFilterInput>;
+  creativeType?: InputMaybe<DigitalSignageCreativeTypeOperationFilterInput>;
+  endDate?: InputMaybe<DateTimeOperationFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  or?: InputMaybe<Array<DigitalSignageScheduleFilterInput>>;
+  proofEvents?: InputMaybe<ListFilterInputTypeOfDigitalSignageProofEventFilterInput>;
+  pushedToDevicesAt?: InputMaybe<DateTimeOperationFilterInput>;
+  rotationIntervalSeconds?: InputMaybe<IntOperationFilterInput>;
+  screen?: InputMaybe<DigitalSignageScreenFilterInput>;
+  screenId?: InputMaybe<UuidOperationFilterInput>;
+  startDate?: InputMaybe<DateTimeOperationFilterInput>;
+  status?: InputMaybe<DigitalSignageScheduleStatusOperationFilterInput>;
+  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type DigitalSignageScheduleSortInput = {
+  booking?: InputMaybe<BookingSortInput>;
+  bookingId?: InputMaybe<SortEnumType>;
+  campaign?: InputMaybe<CampaignSortInput>;
+  campaignId?: InputMaybe<SortEnumType>;
+  createdAt?: InputMaybe<SortEnumType>;
+  creativeAssetUrl?: InputMaybe<SortEnumType>;
+  creativeType?: InputMaybe<SortEnumType>;
+  endDate?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  pushedToDevicesAt?: InputMaybe<SortEnumType>;
+  rotationIntervalSeconds?: InputMaybe<SortEnumType>;
+  screen?: InputMaybe<DigitalSignageScreenSortInput>;
+  screenId?: InputMaybe<SortEnumType>;
+  startDate?: InputMaybe<SortEnumType>;
+  status?: InputMaybe<SortEnumType>;
+  updatedAt?: InputMaybe<SortEnumType>;
+};
+
+export enum DigitalSignageScheduleStatus {
+  Active = 'ACTIVE',
+  Cancelled = 'CANCELLED',
+  Completed = 'COMPLETED',
+  Pending = 'PENDING'
+}
+
+export type DigitalSignageScheduleStatusOperationFilterInput = {
+  eq?: InputMaybe<DigitalSignageScheduleStatus>;
+  in?: InputMaybe<Array<DigitalSignageScheduleStatus>>;
+  neq?: InputMaybe<DigitalSignageScheduleStatus>;
+  nin?: InputMaybe<Array<DigitalSignageScheduleStatus>>;
+};
+
+/** A connection to a list of items. */
+export type DigitalSignageSchedulesForScreenConnection = {
+  __typename: 'DigitalSignageSchedulesForScreenConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<DigitalSignageSchedulesForScreenEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<DigitalSignageSchedule>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+  /** Identifies the total count of items in the connection. */
+  totalCount: Scalars['Int']['output'];
+};
+
+/** An edge in a connection. */
+export type DigitalSignageSchedulesForScreenEdge = {
+  __typename: 'DigitalSignageSchedulesForScreenEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: DigitalSignageSchedule;
+};
+
+export type DigitalSignageScreen = {
+  __typename: 'DigitalSignageScreen';
+  createdAt: Scalars['DateTime']['output'];
+  devices: Array<DigitalSignageDevice>;
+  id: Scalars['UUID']['output'];
+  lastHeartbeatAt: Maybe<Scalars['DateTime']['output']>;
+  name: Scalars['String']['output'];
+  proofEvents: Array<DigitalSignageProofEvent>;
+  resolution: Maybe<Scalars['String']['output']>;
+  schedules: Array<DigitalSignageSchedule>;
+  space: Space;
+  spaceId: Scalars['UUID']['output'];
+  spaceOwnerProfile: SpaceOwnerProfile;
+  spaceOwnerProfileId: Scalars['UUID']['output'];
+  status: DigitalSignageScreenStatus;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type DigitalSignageScreenFilterInput = {
+  and?: InputMaybe<Array<DigitalSignageScreenFilterInput>>;
+  createdAt?: InputMaybe<DateTimeOperationFilterInput>;
+  devices?: InputMaybe<ListFilterInputTypeOfDigitalSignageDeviceFilterInput>;
+  id?: InputMaybe<UuidOperationFilterInput>;
+  lastHeartbeatAt?: InputMaybe<DateTimeOperationFilterInput>;
+  name?: InputMaybe<StringOperationFilterInput>;
+  or?: InputMaybe<Array<DigitalSignageScreenFilterInput>>;
+  proofEvents?: InputMaybe<ListFilterInputTypeOfDigitalSignageProofEventFilterInput>;
+  resolution?: InputMaybe<StringOperationFilterInput>;
+  schedules?: InputMaybe<ListFilterInputTypeOfDigitalSignageScheduleFilterInput>;
+  space?: InputMaybe<SpaceFilterInput>;
+  spaceId?: InputMaybe<UuidOperationFilterInput>;
+  spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileFilterInput>;
+  spaceOwnerProfileId?: InputMaybe<UuidOperationFilterInput>;
+  status?: InputMaybe<DigitalSignageScreenStatusOperationFilterInput>;
+  updatedAt?: InputMaybe<DateTimeOperationFilterInput>;
+};
+
+export type DigitalSignageScreenSortInput = {
+  createdAt?: InputMaybe<SortEnumType>;
+  id?: InputMaybe<SortEnumType>;
+  lastHeartbeatAt?: InputMaybe<SortEnumType>;
+  name?: InputMaybe<SortEnumType>;
+  resolution?: InputMaybe<SortEnumType>;
+  space?: InputMaybe<SpaceSortInput>;
+  spaceId?: InputMaybe<SortEnumType>;
+  spaceOwnerProfile?: InputMaybe<SpaceOwnerProfileSortInput>;
+  spaceOwnerProfileId?: InputMaybe<SortEnumType>;
+  status?: InputMaybe<SortEnumType>;
+  updatedAt?: InputMaybe<SortEnumType>;
+};
+
+export enum DigitalSignageScreenStatus {
+  Error = 'ERROR',
+  Maintenance = 'MAINTENANCE',
+  Offline = 'OFFLINE',
+  Online = 'ONLINE'
+}
+
+export type DigitalSignageScreenStatusOperationFilterInput = {
+  eq?: InputMaybe<DigitalSignageScreenStatus>;
+  in?: InputMaybe<Array<DigitalSignageScreenStatus>>;
+  neq?: InputMaybe<DigitalSignageScreenStatus>;
+  nin?: InputMaybe<Array<DigitalSignageScreenStatus>>;
 };
 
 export type DisconnectStripeAccountError = NotFoundError | PaymentError | ValidationError;
@@ -1229,6 +1719,28 @@ export type ForbiddenError = Error & {
   message: Scalars['String']['output'];
 };
 
+export type GenerateDevicePairingCodeError = NotFoundError;
+
+export type GenerateDevicePairingCodeInput = {
+  input: GeneratePairingCodeInput;
+};
+
+export type GenerateDevicePairingCodePayload = {
+  __typename: 'GenerateDevicePairingCodePayload';
+  errors: Maybe<Array<GenerateDevicePairingCodeError>>;
+  generatePairingCodePayload: Maybe<GeneratePairingCodePayload>;
+};
+
+export type GeneratePairingCodeInput = {
+  screenId: Scalars['ID']['input'];
+};
+
+export type GeneratePairingCodePayload = {
+  __typename: 'GeneratePairingCodePayload';
+  expiresAt: Scalars['DateTime']['output'];
+  pairingCode: Scalars['String']['output'];
+};
+
 export type GeocodingError = Error & {
   __typename: 'GeocodingError';
   address: Scalars['String']['output'];
@@ -1318,6 +1830,27 @@ export type ListFilterInputTypeOfConversationParticipantFilterInput = {
   any?: InputMaybe<Scalars['Boolean']['input']>;
   none?: InputMaybe<ConversationParticipantFilterInput>;
   some?: InputMaybe<ConversationParticipantFilterInput>;
+};
+
+export type ListFilterInputTypeOfDigitalSignageDeviceFilterInput = {
+  all?: InputMaybe<DigitalSignageDeviceFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<DigitalSignageDeviceFilterInput>;
+  some?: InputMaybe<DigitalSignageDeviceFilterInput>;
+};
+
+export type ListFilterInputTypeOfDigitalSignageProofEventFilterInput = {
+  all?: InputMaybe<DigitalSignageProofEventFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<DigitalSignageProofEventFilterInput>;
+  some?: InputMaybe<DigitalSignageProofEventFilterInput>;
+};
+
+export type ListFilterInputTypeOfDigitalSignageScheduleFilterInput = {
+  all?: InputMaybe<DigitalSignageScheduleFilterInput>;
+  any?: InputMaybe<Scalars['Boolean']['input']>;
+  none?: InputMaybe<DigitalSignageScheduleFilterInput>;
+  some?: InputMaybe<DigitalSignageScheduleFilterInput>;
 };
 
 export type ListFilterInputTypeOfManualPayoutFilterInput = {
@@ -1505,6 +2038,16 @@ export type MarkNotificationReadPayload = {
   notification: Maybe<Notification>;
 };
 
+export type MarketingStats = {
+  __typename: 'MarketingStats';
+  activeCampaigns: Scalars['Int']['output'];
+  conversionRate: Scalars['Decimal']['output'];
+  newSignups30d: Scalars['Int']['output'];
+  signupTrend: Array<DailySignups>;
+  totalAdSpend30d: Scalars['Decimal']['output'];
+  totalCompletedBookings30d: Scalars['Int']['output'];
+};
+
 export type Message = {
   __typename: 'Message';
   attachments: Maybe<Array<Scalars['String']['output']>>;
@@ -1622,6 +2165,8 @@ export type Mutation = {
   createBooking: CreateBookingPayload;
   createBookingConversation: CreateBookingConversationPayload;
   createCampaign: CreateCampaignPayload;
+  createCareer: CreateCareerPayload;
+  createDigitalSignageSchedule: CreateDigitalSignageSchedulePayload;
   createPaymentIntent: CreatePaymentIntentPayload;
   createPricingRule: CreatePricingRulePayload;
   createReview: CreateReviewPayload;
@@ -1629,6 +2174,7 @@ export type Mutation = {
   createSpace: CreateSpacePayload;
   deactivateSpace: DeactivateSpacePayload;
   deleteCampaign: DeleteCampaignPayload;
+  deleteCareer: DeleteCareerPayload;
   deleteMyAccount: DeleteMyAccountPayload;
   deleteNotification: DeleteNotificationPayload;
   deletePaymentMethod: DeletePaymentMethodPayload;
@@ -1638,15 +2184,19 @@ export type Mutation = {
   deleteUser: DeleteUserPayload;
   disconnectStripeAccount: DisconnectStripeAccountPayload;
   disputeProof: DisputeProofPayload;
+  generateDevicePairingCode: GenerateDevicePairingCodePayload;
   markAllNotificationsRead: MarkAllNotificationsReadPayload;
   markConversationRead: MarkConversationReadPayload;
   markFileDownloaded: MarkFileDownloadedPayload;
   markInstalled: MarkInstalledPayload;
   markNotificationRead: MarkNotificationReadPayload;
   notifyTyping: NotifyTypingPayload;
+  pairDigitalSignageDevice: PairDigitalSignageDevicePayload;
   processPayout: ProcessPayoutPayload;
   reactivateSpace: ReactivateSpacePayload;
+  recordDigitalSignageProofEvent: RecordDigitalSignageProofEventPayload;
   refreshStripeAccountStatus: RefreshStripeAccountStatusPayload;
+  registerDigitalSignageScreen: RegisterDigitalSignageScreenPayload;
   rejectBooking: RejectBookingPayload;
   requestManualPayout: RequestManualPayoutPayload;
   requestRefund: RequestRefundPayload;
@@ -1658,6 +2208,7 @@ export type Mutation = {
   unblockDates: UnblockDatesPayload;
   updateAdvertiserProfile: UpdateAdvertiserProfilePayload;
   updateCampaign: UpdateCampaignPayload;
+  updateCareer: UpdateCareerPayload;
   updateCurrentUser: UpdateCurrentUserPayload;
   updateNotificationPreference: UpdateNotificationPreferencePayload;
   updatePricingRule: UpdatePricingRulePayload;
@@ -1723,6 +2274,16 @@ export type MutationCreateCampaignArgs = {
 };
 
 
+export type MutationCreateCareerArgs = {
+  input: CreateCareerInput;
+};
+
+
+export type MutationCreateDigitalSignageScheduleArgs = {
+  input: CreateDigitalSignageScheduleInput;
+};
+
+
 export type MutationCreatePaymentIntentArgs = {
   input: CreatePaymentIntentInput;
 };
@@ -1751,6 +2312,11 @@ export type MutationDeactivateSpaceArgs = {
 
 export type MutationDeleteCampaignArgs = {
   input: DeleteCampaignInput;
+};
+
+
+export type MutationDeleteCareerArgs = {
+  input: DeleteCareerInput;
 };
 
 
@@ -1794,6 +2360,11 @@ export type MutationDisputeProofArgs = {
 };
 
 
+export type MutationGenerateDevicePairingCodeArgs = {
+  input: GenerateDevicePairingCodeInput;
+};
+
+
 export type MutationMarkConversationReadArgs = {
   input: MarkConversationReadInput;
 };
@@ -1819,6 +2390,11 @@ export type MutationNotifyTypingArgs = {
 };
 
 
+export type MutationPairDigitalSignageDeviceArgs = {
+  input: PairDigitalSignageDeviceInput;
+};
+
+
 export type MutationProcessPayoutArgs = {
   input: ProcessPayoutInput;
 };
@@ -1826,6 +2402,16 @@ export type MutationProcessPayoutArgs = {
 
 export type MutationReactivateSpaceArgs = {
   input: ReactivateSpaceInput;
+};
+
+
+export type MutationRecordDigitalSignageProofEventArgs = {
+  input: RecordDigitalSignageProofEventInput;
+};
+
+
+export type MutationRegisterDigitalSignageScreenArgs = {
+  input: RegisterDigitalSignageScreenInput;
 };
 
 
@@ -1882,6 +2468,12 @@ export type MutationUpdateAdvertiserProfileArgs = {
 export type MutationUpdateCampaignArgs = {
   id: Scalars['ID']['input'];
   input: UpdateCampaignInput;
+};
+
+
+export type MutationUpdateCareerArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateCareerInput;
 };
 
 
@@ -1999,6 +2591,28 @@ export type MyConversationsEdge = {
   cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Conversation;
+};
+
+/** A connection to a list of items. */
+export type MyDigitalSignageScreensConnection = {
+  __typename: 'MyDigitalSignageScreensConnection';
+  /** A list of edges. */
+  edges: Maybe<Array<MyDigitalSignageScreensEdge>>;
+  /** A flattened list of the nodes. */
+  nodes: Maybe<Array<DigitalSignageScreen>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+  /** Identifies the total count of items in the connection. */
+  totalCount: Scalars['Int']['output'];
+};
+
+/** An edge in a connection. */
+export type MyDigitalSignageScreensEdge = {
+  __typename: 'MyDigitalSignageScreensEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['String']['output'];
+  /** The item at the end of the edge. */
+  node: DigitalSignageScreen;
 };
 
 /** A connection to a list of items. */
@@ -2224,6 +2838,21 @@ export type PageInfo = {
   hasPreviousPage: Scalars['Boolean']['output'];
   /** When paginating backwards, the cursor to continue. */
   startCursor: Maybe<Scalars['String']['output']>;
+};
+
+export type PairDigitalSignageDeviceError = ConflictError | ValidationError;
+
+export type PairDigitalSignageDeviceInput = {
+  deviceName: Scalars['String']['input'];
+  deviceToken: Scalars['String']['input'];
+  pairingCode: Scalars['String']['input'];
+  type: DigitalSignageDeviceType;
+};
+
+export type PairDigitalSignageDevicePayload = {
+  __typename: 'PairDigitalSignageDevicePayload';
+  device: Maybe<DigitalSignageDevice>;
+  errors: Maybe<Array<PairDigitalSignageDeviceError>>;
 };
 
 export type Payment = {
@@ -2472,6 +3101,18 @@ export type PeriodData = {
   startDate: Scalars['DateTime']['output'];
 };
 
+export type PlatformStats = {
+  __typename: 'PlatformStats';
+  newUsersLast30Days: Scalars['Int']['output'];
+  totalActiveSpaces: Scalars['Int']['output'];
+  totalAdvertisers: Scalars['Int']['output'];
+  totalBookings: Scalars['Int']['output'];
+  totalCampaigns: Scalars['Int']['output'];
+  totalRevenue: Scalars['Decimal']['output'];
+  totalSpaceOwners: Scalars['Int']['output'];
+  totalUsers: Scalars['Int']['output'];
+};
+
 export type PricingRule = {
   __typename: 'PricingRule';
   createdAt: Scalars['DateTime']['output'];
@@ -2603,16 +3244,23 @@ export type Query = {
   __typename: 'Query';
   advertiserAnalytics: AdvertiserAnalytics;
   advertiserDailyStats: Array<DailyStats>;
+  advertiserReachTrend: Array<ReachTrendPoint>;
   advertiserSpendingSummary: SpendingSummary;
   blockedDatesBySpace: Maybe<BlockedDatesBySpaceConnection>;
   bookingById: Maybe<Booking>;
   bookingsRequiringAction: Maybe<BookingsRequiringActionConnection>;
   campaignById: Maybe<Campaign>;
+  careerById: Maybe<Career>;
+  careers: Maybe<CareersConnection>;
+  digitalSignageProofEventsForBooking: Maybe<DigitalSignageProofEventsForBookingConnection>;
+  digitalSignageSchedulesForScreen: Maybe<DigitalSignageSchedulesForScreenConnection>;
+  digitalSignageScreenById: Maybe<DigitalSignageScreen>;
   earningsByDateRange: Array<EarningsDataPoint>;
   earningsSummary: EarningsSummary;
   effectivePriceByDate: EffectivePricePayload;
   exportBookingsAsCsv: ExportBookingsPayload;
   incomingBookingRequests: Maybe<IncomingBookingRequestsConnection>;
+  marketingStats: MarketingStats;
   me: Maybe<User>;
   messagesByConversation: Maybe<MessagesByConversationConnection>;
   myActivityFeed: Array<ActivityEvent>;
@@ -2620,6 +3268,7 @@ export type Query = {
   myBookingsAsOwner: Maybe<MyBookingsAsOwnerConnection>;
   myCampaigns: Maybe<MyCampaignsConnection>;
   myConversations: Maybe<MyConversationsConnection>;
+  myDigitalSignageScreens: Maybe<MyDigitalSignageScreensConnection>;
   myNotificationPreferences: Array<NotificationPreference>;
   myNotifications: Maybe<MyNotificationsConnection>;
   myPayments: Maybe<MyPaymentsConnection>;
@@ -2630,6 +3279,7 @@ export type Query = {
   paymentById: Maybe<Payment>;
   paymentsByBooking: Maybe<PaymentsByBookingConnection>;
   payoutById: Maybe<Payout>;
+  platformStats: PlatformStats;
   pricingRulesBySpace: Maybe<PricingRulesBySpaceConnection>;
   reviewByBooking: Maybe<Review>;
   reviewsBySpace: Maybe<ReviewsBySpaceConnection>;
@@ -2650,6 +3300,12 @@ export type QueryAdvertiserAnalyticsArgs = {
 
 
 export type QueryAdvertiserDailyStatsArgs = {
+  endDate: Scalars['DateTime']['input'];
+  startDate: Scalars['DateTime']['input'];
+};
+
+
+export type QueryAdvertiserReachTrendArgs = {
   endDate: Scalars['DateTime']['input'];
   startDate: Scalars['DateTime']['input'];
 };
@@ -2682,6 +3338,48 @@ export type QueryBookingsRequiringActionArgs = {
 
 
 export type QueryCampaignByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryCareerByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryCareersArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<CareerSortInput>>;
+  where?: InputMaybe<CareerFilterInput>;
+};
+
+
+export type QueryDigitalSignageProofEventsForBookingArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  bookingId: Scalars['ID']['input'];
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<DigitalSignageProofEventSortInput>>;
+  where?: InputMaybe<DigitalSignageProofEventFilterInput>;
+};
+
+
+export type QueryDigitalSignageSchedulesForScreenArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<DigitalSignageScheduleSortInput>>;
+  screenId: Scalars['ID']['input'];
+  where?: InputMaybe<DigitalSignageScheduleFilterInput>;
+};
+
+
+export type QueryDigitalSignageScreenByIdArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -2768,6 +3466,16 @@ export type QueryMyConversationsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   order?: InputMaybe<Array<ConversationSortInput>>;
   where?: InputMaybe<ConversationFilterInput>;
+};
+
+
+export type QueryMyDigitalSignageScreensArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  before?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Array<DigitalSignageScreenSortInput>>;
+  where?: InputMaybe<DigitalSignageScreenFilterInput>;
 };
 
 
@@ -2926,6 +3634,13 @@ export type RatingTrendPoint = {
   reviews: Scalars['Int']['output'];
 };
 
+export type ReachTrendPoint = {
+  __typename: 'ReachTrendPoint';
+  date: Scalars['DateTime']['output'];
+  impressions: Scalars['Long']['output'];
+  reach: Scalars['Long']['output'];
+};
+
 export type ReactivateSpaceError = ForbiddenError | NotFoundError;
 
 export type ReactivateSpaceInput = {
@@ -2936,6 +3651,23 @@ export type ReactivateSpacePayload = {
   __typename: 'ReactivateSpacePayload';
   errors: Maybe<Array<ReactivateSpaceError>>;
   space: Maybe<Space>;
+};
+
+export type RecordDigitalSignageProofEventError = ConflictError | NotFoundError | ValidationError;
+
+export type RecordDigitalSignageProofEventInput = {
+  bookingId: Scalars['ID']['input'];
+  deviceToken: Scalars['String']['input'];
+  displayedAt: Scalars['DateTime']['input'];
+  displayedDurationSeconds: Scalars['Int']['input'];
+  metadata?: InputMaybe<Scalars['String']['input']>;
+  scheduleId: Scalars['ID']['input'];
+};
+
+export type RecordDigitalSignageProofEventPayload = {
+  __typename: 'RecordDigitalSignageProofEventPayload';
+  errors: Maybe<Array<RecordDigitalSignageProofEventError>>;
+  proofEvent: Maybe<DigitalSignageProofEvent>;
 };
 
 export type RefreshStripeAccountStatusError = NotFoundError | PaymentError | ValidationError;
@@ -3022,6 +3754,18 @@ export type RefundsEdge = {
   cursor: Scalars['String']['output'];
   /** The item at the end of the edge. */
   node: Refund;
+};
+
+export type RegisterDigitalSignageScreenError = NotFoundError | ValidationError;
+
+export type RegisterDigitalSignageScreenInput = {
+  input: CreateDigitalSignageScreenInput;
+};
+
+export type RegisterDigitalSignageScreenPayload = {
+  __typename: 'RegisterDigitalSignageScreenPayload';
+  createDigitalSignageScreenPayload: Maybe<CreateDigitalSignageScreenPayload>;
+  errors: Maybe<Array<RegisterDigitalSignageScreenError>>;
 };
 
 export type RejectBookingError = ForbiddenError | InvalidStatusTransitionError | NotFoundError;
@@ -3815,6 +4559,25 @@ export type UpdateCampaignPayload = {
   errors: Maybe<Array<UpdateCampaignError>>;
 };
 
+export type UpdateCareerError = NotFoundError | ValidationError;
+
+export type UpdateCareerInput = {
+  department?: InputMaybe<CareerDepartment>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
+  requirements?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<CareerType>;
+};
+
+export type UpdateCareerPayload = {
+  __typename: 'UpdateCareerPayload';
+  career: Maybe<Career>;
+  errors: Maybe<Array<UpdateCareerError>>;
+};
+
 export type UpdateCurrentUserError = NotFoundError;
 
 export type UpdateCurrentUserInput = {
@@ -4138,6 +4901,47 @@ export type UnblockDatesMutation = { unblockDates: { __typename: 'UnblockDatesPa
       | { __typename: 'ValidationError', message: string }
     > | null } };
 
+export type GetCareersQueryVariables = Exact<{
+  where?: InputMaybe<CareerFilterInput>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  after?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetCareersQuery = { careers: { __typename: 'CareersConnection', nodes: Array<{ __typename: 'Career', id: string, title: string, department: CareerDepartment, location: string, type: CareerType, description: string, requirements: string, isActive: boolean, createdAt: string, expiresAt: string | null }> | null } | null };
+
+export type GetCareerByIdQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetCareerByIdQuery = { careerById: { __typename: 'Career', id: string, title: string, department: CareerDepartment, location: string, type: CareerType, description: string, requirements: string, isActive: boolean, createdAt: string, expiresAt: string | null } | null };
+
+export type CreateCareerMutationVariables = Exact<{
+  input: CreateCareerInput;
+}>;
+
+
+export type CreateCareerMutation = { createCareer: { __typename: 'CreateCareerPayload', career: { __typename: 'Career', id: string } | null, errors: Array<{ __typename: 'ValidationError', message: string }> | null } };
+
+export type UpdateCareerMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateCareerInput;
+}>;
+
+
+export type UpdateCareerMutation = { updateCareer: { __typename: 'UpdateCareerPayload', career: { __typename: 'Career', id: string } | null, errors: Array<
+      | { __typename: 'NotFoundError', message: string }
+      | { __typename: 'ValidationError', message: string }
+    > | null } };
+
+export type DeleteCareerMutationVariables = Exact<{
+  input: DeleteCareerInput;
+}>;
+
+
+export type DeleteCareerMutation = { deleteCareer: { __typename: 'DeleteCareerPayload', errors: Array<{ __typename: 'NotFoundError', message: string }> | null } };
+
 export type SpaceOwnerListingsQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   last?: InputMaybe<Scalars['Int']['input']>;
@@ -4198,11 +5002,24 @@ export type DashboardUserQuery = { me: (
     & { ' $fragmentRefs'?: { 'UserProvider_UserFragmentFragment': UserProvider_UserFragmentFragment } }
   ) | null };
 
+export type PlatformStatsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PlatformStatsQuery = { platformStats: { __typename: 'PlatformStats', totalUsers: number, totalActiveSpaces: number, totalBookings: number, totalRevenue: number, totalCampaigns: number, totalSpaceOwners: number, totalAdvertisers: number, newUsersLast30Days: number } };
+
 export type AnalyticsAdvertiserComparison_QueryFragmentFragment = { advertiserAnalytics: { __typename: 'AdvertiserAnalytics', periodComparison: { __typename: 'AdvertiserPeriodComparison', current: { __typename: 'AdvertiserPeriodData', period: string, startDate: string, endDate: string, bookings: number, spending: number | null, impressions: number, roi: number | null }, previous: { __typename: 'AdvertiserPeriodData', period: string, startDate: string, endDate: string, bookings: number, spending: number | null, impressions: number, roi: number | null } } } } & { ' $fragmentName'?: 'AnalyticsAdvertiserComparison_QueryFragmentFragment' };
 
 export type AnalyticsAdvertiserMonthlyChart_QueryFragmentFragment = { advertiserAnalytics: { __typename: 'AdvertiserAnalytics', monthlyStats: Array<{ __typename: 'AdvertiserMonthlyStats', month: string, spending: number | null, impressions: number }> } } & { ' $fragmentName'?: 'AnalyticsAdvertiserMonthlyChart_QueryFragmentFragment' };
 
 export type AnalyticsAdvertiserPerformanceTable_QueryFragmentFragment = { advertiserAnalytics: { __typename: 'AdvertiserAnalytics', spacePerformance: Array<{ __typename: 'AdvertiserSpacePerformance', id: string, title: string, image: string | null, totalBookings: number, totalSpend: number | null, impressions: number, roi: number | null }> } } & { ' $fragmentName'?: 'AnalyticsAdvertiserPerformanceTable_QueryFragmentFragment' };
+
+export type AdvertiserReachTrendQueryVariables = Exact<{
+  startDate: Scalars['DateTime']['input'];
+  endDate: Scalars['DateTime']['input'];
+}>;
+
+
+export type AdvertiserReachTrendQuery = { advertiserReachTrend: Array<{ __typename: 'ReachTrendPoint', date: string, reach: number, impressions: number }> };
 
 export type AnalyticsAdvertiserSpendingChart_QueryFragmentFragment = { advertiserDailyStats: Array<{ __typename: 'DailyStats', date: string, spending: number }> } & { ' $fragmentName'?: 'AnalyticsAdvertiserSpendingChart_QueryFragmentFragment' };
 
@@ -4503,6 +5320,11 @@ export type RequestRefundMutation = { requestRefund: { __typename: 'RequestRefun
       | { __typename: 'PaymentError', message: string }
       | { __typename: 'ValidationError', message: string }
     > | null } };
+
+export type MarketingStatsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MarketingStatsQuery = { marketingStats: { __typename: 'MarketingStats', newSignups30d: number, conversionRate: number, activeCampaigns: number, totalAdSpend30d: number, totalCompletedBookings30d: number, signupTrend: Array<{ __typename: 'DailySignups', date: string, count: number }> } };
 
 export type Gallery_SharedSpaceFragmentFragment = { __typename: 'Space', title: string, images: Array<string> } & { ' $fragmentName'?: 'Gallery_SharedSpaceFragmentFragment' };
 
@@ -5075,6 +5897,40 @@ export type OverviewDataQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type OverviewDataQuery = { ' $fragmentRefs'?: { 'OverviewStatCards_QueryFragmentFragment': OverviewStatCards_QueryFragmentFragment;'OverviewDeadlineWarnings_QueryFragmentFragment': OverviewDeadlineWarnings_QueryFragmentFragment;'OverviewPendingRequests_QueryFragmentFragment': OverviewPendingRequests_QueryFragmentFragment;'OverviewActiveBookings_QueryFragmentFragment': OverviewActiveBookings_QueryFragmentFragment;'OverviewTopSpaces_QueryFragmentFragment': OverviewTopSpaces_QueryFragmentFragment;'OverviewUpcomingPayouts_QueryFragmentFragment': OverviewUpcomingPayouts_QueryFragmentFragment;'OverviewActivityChart_QueryFragmentFragment': OverviewActivityChart_QueryFragmentFragment;'OverviewRecentActivity_QueryFragmentFragment': OverviewRecentActivity_QueryFragmentFragment } };
 
+export type DigitalSignageScreenDetailQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DigitalSignageScreenDetailQuery = { digitalSignageScreenById: { __typename: 'DigitalSignageScreen', id: string, name: string, status: DigitalSignageScreenStatus, resolution: string | null, lastHeartbeatAt: string | null, createdAt: string, updatedAt: string, devices: Array<{ __typename: 'DigitalSignageDevice', id: string, deviceName: string, type: DigitalSignageDeviceType, status: DigitalSignageDeviceStatus, lastSeenAt: string | null, createdAt: string }>, schedules: Array<{ __typename: 'DigitalSignageSchedule', id: string, creativeAssetUrl: string, creativeType: DigitalSignageCreativeType, rotationIntervalSeconds: number, startDate: string, endDate: string, status: DigitalSignageScheduleStatus, pushedToDevicesAt: string | null }> } | null };
+
+export type MyDigitalSignageScreensQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MyDigitalSignageScreensQuery = { myDigitalSignageScreens: { __typename: 'MyDigitalSignageScreensConnection', nodes: Array<{ __typename: 'DigitalSignageScreen', id: string, name: string, status: DigitalSignageScreenStatus, resolution: string | null, lastHeartbeatAt: string | null, updatedAt: string, devices: Array<{ __typename: 'DigitalSignageDevice', id: string, deviceName: string, status: DigitalSignageDeviceStatus, lastSeenAt: string | null }>, schedules: Array<{ __typename: 'DigitalSignageSchedule', id: string, status: DigitalSignageScheduleStatus, startDate: string, endDate: string, creativeType: DigitalSignageCreativeType }> }> | null } | null };
+
+export type MySpacesForScreenRegistrationQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MySpacesForScreenRegistrationQuery = { mySpaces: { __typename: 'MySpacesConnection', nodes: Array<{ __typename: 'Space', id: string, title: string }> | null } | null };
+
+export type RegisterDigitalSignageScreenMutationVariables = Exact<{
+  input: RegisterDigitalSignageScreenInput;
+}>;
+
+
+export type RegisterDigitalSignageScreenMutation = { registerDigitalSignageScreen: { __typename: 'RegisterDigitalSignageScreenPayload', createDigitalSignageScreenPayload: { __typename: 'CreateDigitalSignageScreenPayload', screen: { __typename: 'DigitalSignageScreen', id: string, name: string } } | null, errors: Array<
+      | { __typename: 'NotFoundError', message: string }
+      | { __typename: 'ValidationError', message: string }
+    > | null } };
+
+export type GenerateDevicePairingCodeMutationVariables = Exact<{
+  input: GenerateDevicePairingCodeInput;
+}>;
+
+
+export type GenerateDevicePairingCodeMutation = { generateDevicePairingCode: { __typename: 'GenerateDevicePairingCodePayload', generatePairingCodePayload: { __typename: 'GeneratePairingCodePayload', pairingCode: string, expiresAt: string } | null, errors: Array<{ __typename: 'NotFoundError', message: string }> | null } };
+
 export type FeaturedSpaceCard_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, description: string | null, city: string, state: string, images: Array<string>, type: SpaceType, pricePerDay: number, averageRating: number | null } & { ' $fragmentName'?: 'FeaturedSpaceCard_SpaceFragmentFragment' };
 
 export type FeaturedSpacesQueryVariables = Exact<{ [key: string]: never; }>;
@@ -5108,6 +5964,11 @@ export type PublicBrowseSpacesQuery = { spaces: { __typename: 'SpacesConnection'
     )> | null, pageInfo: { __typename: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor: string | null, endCursor: string | null } } | null };
 
 export type PublicSpacesSpaceCard_SpaceFragmentFragment = { __typename: 'Space', id: string, title: string, description: string | null, city: string, state: string, images: Array<string>, type: SpaceType, pricePerDay: number, averageRating: number | null } & { ' $fragmentName'?: 'PublicSpacesSpaceCard_SpaceFragmentFragment' };
+
+export type MeRoleQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MeRoleQuery = { me: { __typename: 'User', id: string, role: UserRole } | null };
 
 export type UserProvider_UserFragmentFragment = { __typename: 'User', id: string, role: UserRole, activeProfileType: ProfileType, email: string, name: string, avatar: string | null } & { ' $fragmentName'?: 'UserProvider_UserFragmentFragment' };
 
@@ -5213,12 +6074,19 @@ export const BulkDeactivateSpaceDocument = {"kind":"Document","definitions":[{"k
 export const BulkDeleteSpaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"BulkDeleteSpace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteSpaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteSpace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<BulkDeleteSpaceMutation, BulkDeleteSpaceMutationVariables>;
 export const BlockDatesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"BlockDates"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BlockDatesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"blockDates"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"blockedDates"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"date"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<BlockDatesMutation, BlockDatesMutationVariables>;
 export const UnblockDatesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UnblockDates"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UnblockDatesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unblockDates"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unblockedCount"}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UnblockDatesMutation, UnblockDatesMutationVariables>;
+export const GetCareersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCareers"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"CareerFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"careers"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"department"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"requirements"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}}]}}]}}]}}]} as unknown as DocumentNode<GetCareersQuery, GetCareersQueryVariables>;
+export const GetCareerByIdDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCareerById"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"careerById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"department"}},{"kind":"Field","name":{"kind":"Name","value":"location"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"requirements"}},{"kind":"Field","name":{"kind":"Name","value":"isActive"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}}]}}]}}]} as unknown as DocumentNode<GetCareerByIdQuery, GetCareerByIdQueryVariables>;
+export const CreateCareerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCareer"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCareerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCareer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"career"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CreateCareerMutation, CreateCareerMutationVariables>;
+export const UpdateCareerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCareer"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCareerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCareer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"career"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UpdateCareerMutation, UpdateCareerMutationVariables>;
+export const DeleteCareerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteCareer"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DeleteCareerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteCareer"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<DeleteCareerMutation, DeleteCareerMutationVariables>;
 export const SpaceOwnerListingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SpaceOwnerListings"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"last"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"before"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SpaceSortInput"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"SpaceFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gridView"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"tableView"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mapView"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mySpaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"last"},"value":{"kind":"Variable","name":{"kind":"Name","value":"last"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}},{"kind":"Argument","name":{"kind":"Name","value":"before"},"value":{"kind":"Variable","name":{"kind":"Name","value":"before"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SpaceCard_SpaceFragment"},"directives":[{"kind":"Directive","name":{"kind":"Name","value":"include"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"if"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gridView"}}}]}]},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ListingsTable_SpaceFragment"},"directives":[{"kind":"Directive","name":{"kind":"Name","value":"include"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"if"},"value":{"kind":"Variable","name":{"kind":"Name","value":"tableView"}}}]}]},{"kind":"FragmentSpread","name":{"kind":"Name","value":"ListingsMap_SpaceFragment"},"directives":[{"kind":"Directive","name":{"kind":"Name","value":"include"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"if"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mapView"}}}]}]}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ListingsTable_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ListingsMap_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"latitude"}},{"kind":"Field","name":{"kind":"Name","value":"longitude"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}}]}}]} as unknown as DocumentNode<SpaceOwnerListingsQuery, SpaceOwnerListingsQueryVariables>;
 export const SpaceDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SpaceDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Header_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Gallery_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Details_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Performance_SpaceFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Header_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Gallery_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Details_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"zipCode"}},{"kind":"Field","name":{"kind":"Name","value":"traffic"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"installationFee"}},{"kind":"Field","name":{"kind":"Name","value":"minDuration"}},{"kind":"Field","name":{"kind":"Name","value":"maxDuration"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"dimensionsText"}},{"kind":"Field","name":{"kind":"Name","value":"availableFrom"}},{"kind":"Field","name":{"kind":"Name","value":"availableTo"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Performance_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"totalRevenue"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}}]}}]} as unknown as DocumentNode<SpaceDetailQuery, SpaceDetailQueryVariables>;
 export const SpaceBookingsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SpaceBookings"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"spaceId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UUID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myBookingsAsOwner"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"spaceId"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"Variable","name":{"kind":"Name","value":"spaceId"}}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"startDate"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"advertiserProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"companyName"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<SpaceBookingsQuery, SpaceBookingsQueryVariables>;
 export const SpaceReviewsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SpaceReviews"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"spaceId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reviewsBySpace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"spaceId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"spaceId"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"rating"}},{"kind":"Field","name":{"kind":"Name","value":"comment"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"reviewer"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SpaceReviewsQuery, SpaceReviewsQueryVariables>;
 export const SpaceBlockedDatesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SpaceBlockedDates"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"spaceId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"blockedDatesBySpace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"spaceId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"spaceId"}}},{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"date"}}]}}]}}]}}]} as unknown as DocumentNode<SpaceBlockedDatesQuery, SpaceBlockedDatesQueryVariables>;
 export const DashboardUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DashboardUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"UserProvider_UserFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"UserProvider_UserFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"activeProfileType"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]} as unknown as DocumentNode<DashboardUserQuery, DashboardUserQueryVariables>;
+export const PlatformStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PlatformStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"platformStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalUsers"}},{"kind":"Field","name":{"kind":"Name","value":"totalActiveSpaces"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"totalRevenue"}},{"kind":"Field","name":{"kind":"Name","value":"totalCampaigns"}},{"kind":"Field","name":{"kind":"Name","value":"totalSpaceOwners"}},{"kind":"Field","name":{"kind":"Name","value":"totalAdvertisers"}},{"kind":"Field","name":{"kind":"Name","value":"newUsersLast30Days"}}]}}]}}]} as unknown as DocumentNode<PlatformStatsQuery, PlatformStatsQueryVariables>;
+export const AdvertiserReachTrendDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdvertiserReachTrend"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiserReachTrend"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"startDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"endDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"reach"}},{"kind":"Field","name":{"kind":"Name","value":"impressions"}}]}}]}}]} as unknown as DocumentNode<AdvertiserReachTrendQuery, AdvertiserReachTrendQueryVariables>;
 export const AdvertiserAnalyticsDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdvertiserAnalyticsData"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"AnalyticsAdvertiserSummary_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"AnalyticsAdvertiserSpendingChart_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"AnalyticsAdvertiserStatusChart_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"AnalyticsAdvertiserMonthlyChart_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"AnalyticsAdvertiserComparison_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"AnalyticsAdvertiserTopPerformers_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"AnalyticsAdvertiserPerformanceTable_QueryFragment"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AnalyticsAdvertiserSummary_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiserAnalytics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"startDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"endDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"summary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalSpend"}},{"kind":"Field","name":{"kind":"Name","value":"previousTotalSpend"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"previousTotalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"totalImpressions"}},{"kind":"Field","name":{"kind":"Name","value":"previousTotalImpressions"}},{"kind":"Field","name":{"kind":"Name","value":"reach"}},{"kind":"Field","name":{"kind":"Name","value":"previousReach"}},{"kind":"Field","name":{"kind":"Name","value":"avgCostPerImpression"}},{"kind":"Field","name":{"kind":"Name","value":"previousAvgCostPerImpression"}},{"kind":"Field","name":{"kind":"Name","value":"roi"}},{"kind":"Field","name":{"kind":"Name","value":"previousRoi"}},{"kind":"Field","name":{"kind":"Name","value":"completionRate"}},{"kind":"Field","name":{"kind":"Name","value":"previousCompletionRate"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AnalyticsAdvertiserSpendingChart_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiserDailyStats"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"startDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"endDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"spending"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AnalyticsAdvertiserStatusChart_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiserAnalytics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"startDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"endDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"statusDistribution"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AnalyticsAdvertiserMonthlyChart_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiserAnalytics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"startDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"endDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"monthlyStats"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"months"},"value":{"kind":"IntValue","value":"12"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"month"}},{"kind":"Field","name":{"kind":"Name","value":"spending"}},{"kind":"Field","name":{"kind":"Name","value":"impressions"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AnalyticsAdvertiserComparison_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiserAnalytics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"startDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"endDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"periodComparison"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"current"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"period"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"bookings"}},{"kind":"Field","name":{"kind":"Name","value":"spending"}},{"kind":"Field","name":{"kind":"Name","value":"impressions"}},{"kind":"Field","name":{"kind":"Name","value":"roi"}}]}},{"kind":"Field","name":{"kind":"Name","value":"previous"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"period"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"bookings"}},{"kind":"Field","name":{"kind":"Name","value":"spending"}},{"kind":"Field","name":{"kind":"Name","value":"impressions"}},{"kind":"Field","name":{"kind":"Name","value":"roi"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AnalyticsAdvertiserTopPerformers_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiserAnalytics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"startDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"endDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"topPerformers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bestRoi"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"change"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mostImpressions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"change"}}]}},{"kind":"Field","name":{"kind":"Name","value":"bestValue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"change"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mostBookings"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"value"}},{"kind":"Field","name":{"kind":"Name","value":"change"}}]}},{"kind":"Field","name":{"kind":"Name","value":"needsReview"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"roi"}},{"kind":"Field","name":{"kind":"Name","value":"impressions"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"AnalyticsAdvertiserPerformanceTable_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiserAnalytics"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"startDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"endDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spacePerformance"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"image"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"totalSpend"}},{"kind":"Field","name":{"kind":"Name","value":"impressions"}},{"kind":"Field","name":{"kind":"Name","value":"roi"}}]}}]}}]}}]} as unknown as DocumentNode<AdvertiserAnalyticsDataQuery, AdvertiserAnalyticsDataQueryVariables>;
 export const AdvertiserBookingDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdvertiserBookingDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"bookingById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"totalDays"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"subtotalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"installationFee"}},{"kind":"Field","name":{"kind":"Name","value":"platformFeeAmount"}},{"kind":"Field","name":{"kind":"Name","value":"platformFeePercent"}},{"kind":"Field","name":{"kind":"Name","value":"totalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"advertiserNotes"}},{"kind":"Field","name":{"kind":"Name","value":"rejectionReason"}},{"kind":"Field","name":{"kind":"Name","value":"rejectedAt"}},{"kind":"Field","name":{"kind":"Name","value":"cancellationReason"}},{"kind":"Field","name":{"kind":"Name","value":"cancelledAt"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"zipCode"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"imageUrl"}}]}},{"kind":"Field","name":{"kind":"Name","value":"proof"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"photos"}},{"kind":"Field","name":{"kind":"Name","value":"submittedAt"}},{"kind":"Field","name":{"kind":"Name","value":"autoApproveAt"}},{"kind":"Field","name":{"kind":"Name","value":"rejectionReason"}}]}},{"kind":"Field","name":{"kind":"Name","value":"dispute"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"issueType"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"photos"}},{"kind":"Field","name":{"kind":"Name","value":"disputedAt"}},{"kind":"Field","name":{"kind":"Name","value":"resolutionAction"}},{"kind":"Field","name":{"kind":"Name","value":"resolutionNotes"}},{"kind":"Field","name":{"kind":"Name","value":"resolvedAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"payments"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<AdvertiserBookingDetailQuery, AdvertiserBookingDetailQueryVariables>;
 export const AdvertiserCancelBookingDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AdvertiserCancelBooking"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CancelBookingInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cancelBooking"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"booking"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AdvertiserCancelBookingMutation, AdvertiserCancelBookingMutationVariables>;
@@ -5240,6 +6108,7 @@ export const AdvertiserOverviewDataDocument = {"kind":"Document","definitions":[
 export const AdvertiserSpendingDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdvertiserSpending"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"DateTime"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"paymentWhere"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PaymentFilterInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiserSpendingSummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"SpendingCards_SpendingSummaryFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"advertiserDailyStats"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"startDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"startDate"}}},{"kind":"Argument","name":{"kind":"Name","value":"endDate"},"value":{"kind":"Variable","name":{"kind":"Name","value":"endDate"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"spending"}}]}},{"kind":"Field","alias":{"kind":"Name","value":"activeCampaigns"},"name":{"kind":"Name","value":"myCampaigns"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"in"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"ACTIVE"},{"kind":"EnumValue","value":"SUBMITTED"}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"myPayments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"paymentWhere"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PaymentsTable_PaymentFragment"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"mySavedPaymentMethods"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"brand"}},{"kind":"Field","name":{"kind":"Name","value":"last4"}},{"kind":"Field","name":{"kind":"Name","value":"expMonth"}},{"kind":"Field","name":{"kind":"Name","value":"expYear"}},{"kind":"Field","name":{"kind":"Name","value":"isDefault"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SpendingCards_SpendingSummaryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"SpendingSummary"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalSpent"}},{"kind":"Field","name":{"kind":"Name","value":"pendingPayments"}},{"kind":"Field","name":{"kind":"Name","value":"thisMonthSpending"}},{"kind":"Field","name":{"kind":"Name","value":"lastMonthSpending"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PaymentsTable_PaymentFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Payment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"paidAt"}},{"kind":"Field","name":{"kind":"Name","value":"receiptUrl"}},{"kind":"Field","name":{"kind":"Name","value":"booking"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<AdvertiserSpendingQuery, AdvertiserSpendingQueryVariables>;
 export const AdvertiserPaymentsHistoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"AdvertiserPaymentsHistory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PaymentFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PaymentSortInput"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myPayments"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PaymentsHistoryTable_PaymentFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}},{"kind":"Field","alias":{"kind":"Name","value":"allCampaigns"},"name":{"kind":"Name","value":"myCampaigns"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"in"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"ACTIVE"},{"kind":"EnumValue","value":"SUBMITTED"},{"kind":"EnumValue","value":"COMPLETED"}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PaymentsHistoryTable_PaymentFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Payment"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"paidAt"}},{"kind":"Field","name":{"kind":"Name","value":"failureReason"}},{"kind":"Field","name":{"kind":"Name","value":"receiptUrl"}},{"kind":"Field","name":{"kind":"Name","value":"booking"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<AdvertiserPaymentsHistoryQuery, AdvertiserPaymentsHistoryQueryVariables>;
 export const RequestRefundDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RequestRefund"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RequestRefundInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"requestRefund"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"refund"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RequestRefundMutation, RequestRefundMutationVariables>;
+export const MarketingStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MarketingStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"marketingStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"newSignups30d"}},{"kind":"Field","name":{"kind":"Name","value":"conversionRate"}},{"kind":"Field","name":{"kind":"Name","value":"activeCampaigns"}},{"kind":"Field","name":{"kind":"Name","value":"totalAdSpend30d"}},{"kind":"Field","name":{"kind":"Name","value":"totalCompletedBookings30d"}},{"kind":"Field","name":{"kind":"Name","value":"signupTrend"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"count"}}]}}]}}]}}]} as unknown as DocumentNode<MarketingStatsQuery, MarketingStatsQueryVariables>;
 export const SharedSpaceDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SharedSpaceDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Header_SharedSpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"Gallery_SharedSpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"SpaceInfo_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PricingCard_SpaceFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OwnerCard_SpaceFragment"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Header_SharedSpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"Gallery_SharedSpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"SpaceInfo_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"zipCode"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"dimensionsText"}},{"kind":"Field","name":{"kind":"Name","value":"traffic"}},{"kind":"Field","name":{"kind":"Name","value":"availableFrom"}},{"kind":"Field","name":{"kind":"Name","value":"availableTo"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PricingCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"installationFee"}},{"kind":"Field","name":{"kind":"Name","value":"minDuration"}},{"kind":"Field","name":{"kind":"Name","value":"maxDuration"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OwnerCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"averageRating"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]} as unknown as DocumentNode<SharedSpaceDetailQuery, SharedSpaceDetailQueryVariables>;
 export const SendMessageDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SendMessage"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SendMessageInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"sendMessage"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"content"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"attachments"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"senderUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ForbiddenError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<SendMessageMutation, SendMessageMutationVariables>;
 export const MarkConversationReadDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"MarkConversationRead"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"MarkConversationReadInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"markConversationRead"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"participant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"lastReadAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ForbiddenError"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MarkConversationReadMutation, MarkConversationReadMutationVariables>;
@@ -5292,6 +6161,12 @@ export const SpaceOwnerEarningsDocument = {"kind":"Document","definitions":[{"ki
 export const SpaceOwnerPayoutsHistoryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SpaceOwnerPayoutsHistory"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"PayoutFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PayoutSortInput"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myPayouts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PayoutsHistoryTable_PayoutFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PayoutsHistoryTable_PayoutFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Payout"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"stage"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"processedAt"}},{"kind":"Field","name":{"kind":"Name","value":"failureReason"}},{"kind":"Field","name":{"kind":"Name","value":"attemptCount"}},{"kind":"Field","name":{"kind":"Name","value":"booking"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]} as unknown as DocumentNode<SpaceOwnerPayoutsHistoryQuery, SpaceOwnerPayoutsHistoryQueryVariables>;
 export const RetryPayoutDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RetryPayout"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RetryPayoutInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"retryPayout"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"payout"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RetryPayoutMutation, RetryPayoutMutationVariables>;
 export const OverviewDataDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OverviewData"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewStatCards_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewDeadlineWarnings_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewPendingRequests_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewActiveBookings_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewTopSpaces_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewUpcomingPayouts_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewActivityChart_QueryFragment"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewRecentActivity_QueryFragment"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewDeadlineWarningsDeadlineCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"advertiser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewPendingRequestsRequestCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"totalAmount"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewActiveBookingsBookingCard_BookingFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Booking"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"campaign"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"advertiser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewTopSpacesSpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"totalRevenue"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewUpcomingPayoutsPayoutCard_PayoutFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Payout"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"stage"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"booking"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"space"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewStatCards_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"stripeAccountStatus"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"earningsSummary"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"availableBalance"}},{"kind":"Field","name":{"kind":"Name","value":"pendingPayouts"}},{"kind":"Field","name":{"kind":"Name","value":"thisMonthEarnings"}},{"kind":"Field","name":{"kind":"Name","value":"lastMonthEarnings"}}]}},{"kind":"Field","alias":{"kind":"Name","value":"activeBookings"},"name":{"kind":"Name","value":"myBookingsAsOwner"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"in"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"PAID"},{"kind":"EnumValue","value":"FILE_DOWNLOADED"},{"kind":"EnumValue","value":"INSTALLED"},{"kind":"EnumValue","value":"VERIFIED"}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mySpaces"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewDeadlineWarnings_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"deadlineBookings"},"name":{"kind":"Name","value":"myBookingsAsOwner"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"in"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"FILE_DOWNLOADED"},{"kind":"EnumValue","value":"INSTALLED"}]}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"endDate"},"value":{"kind":"EnumValue","value":"ASC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewDeadlineWarningsDeadlineCard_BookingFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewPendingRequests_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"incomingBookingRequests"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewPendingRequestsRequestCard_BookingFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewActiveBookings_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myBookingsAsOwner"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"in"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"PAID"},{"kind":"EnumValue","value":"FILE_DOWNLOADED"},{"kind":"EnumValue","value":"INSTALLED"}]}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewActiveBookingsBookingCard_BookingFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewTopSpaces_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"totalRevenue"},"value":{"kind":"EnumValue","value":"DESC"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewTopSpacesSpaceCard_SpaceFragment"}}]}}]}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewUpcomingPayouts_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","alias":{"kind":"Name","value":"upcomingPayouts"},"name":{"kind":"Name","value":"myPayouts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"5"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"in"},"value":{"kind":"ListValue","values":[{"kind":"EnumValue","value":"PENDING"},{"kind":"EnumValue","value":"PROCESSING"}]}}]}}]}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"ASC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"OverviewUpcomingPayoutsPayoutCard_PayoutFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewActivityChart_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myPayouts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"20"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"processedAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"processedAt"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"OverviewRecentActivity_QueryFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Query"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myNotifications"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"10"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ListValue","values":[{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"body"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"isRead"}}]}}]}}]}}]} as unknown as DocumentNode<OverviewDataQuery, OverviewDataQueryVariables>;
+export const DigitalSignageScreenDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"DigitalSignageScreenDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"digitalSignageScreenById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"resolution"}},{"kind":"Field","name":{"kind":"Name","value":"lastHeartbeatAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"devices"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"deviceName"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"lastSeenAt"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"schedules"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"creativeAssetUrl"}},{"kind":"Field","name":{"kind":"Name","value":"creativeType"}},{"kind":"Field","name":{"kind":"Name","value":"rotationIntervalSeconds"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"pushedToDevicesAt"}}]}}]}}]}}]} as unknown as DocumentNode<DigitalSignageScreenDetailQuery, DigitalSignageScreenDetailQueryVariables>;
+export const MyDigitalSignageScreensDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyDigitalSignageScreens"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myDigitalSignageScreens"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"50"}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"createdAt"},"value":{"kind":"EnumValue","value":"DESC"}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"resolution"}},{"kind":"Field","name":{"kind":"Name","value":"lastHeartbeatAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"devices"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"deviceName"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"lastSeenAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"schedules"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"startDate"}},{"kind":"Field","name":{"kind":"Name","value":"endDate"}},{"kind":"Field","name":{"kind":"Name","value":"creativeType"}}]}}]}}]}}]}}]} as unknown as DocumentNode<MyDigitalSignageScreensQuery, MyDigitalSignageScreensQueryVariables>;
+export const MySpacesForScreenRegistrationDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MySpacesForScreenRegistration"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mySpaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"100"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}}]}}]}}]}}]} as unknown as DocumentNode<MySpacesForScreenRegistrationQuery, MySpacesForScreenRegistrationQueryVariables>;
+export const RegisterDigitalSignageScreenDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RegisterDigitalSignageScreen"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterDigitalSignageScreenInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"registerDigitalSignageScreen"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createDigitalSignageScreenPayload"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"screen"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<RegisterDigitalSignageScreenMutation, RegisterDigitalSignageScreenMutationVariables>;
+export const GenerateDevicePairingCodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"GenerateDevicePairingCode"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GenerateDevicePairingCodeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"generateDevicePairingCode"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"generatePairingCodePayload"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pairingCode"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}}]}},{"kind":"Field","name":{"kind":"Name","value":"errors"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Error"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GenerateDevicePairingCodeMutation, GenerateDevicePairingCodeMutationVariables>;
 export const FeaturedSpacesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"FeaturedSpaces"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"IntValue","value":"8"}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"status"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"eq"},"value":{"kind":"EnumValue","value":"ACTIVE"}}]}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"FeaturedSpaceCard_SpaceFragment"}}]}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"FeaturedSpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}}]}}]} as unknown as DocumentNode<FeaturedSpacesQuery, FeaturedSpacesQueryVariables>;
 export const PublicSpaceDetailDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PublicSpaceDetail"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaceById"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"address"}},{"kind":"Field","name":{"kind":"Name","value":"zipCode"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"installationFee"}},{"kind":"Field","name":{"kind":"Name","value":"minDuration"}},{"kind":"Field","name":{"kind":"Name","value":"maxDuration"}},{"kind":"Field","name":{"kind":"Name","value":"dimensions"}},{"kind":"Field","name":{"kind":"Name","value":"dimensionsText"}},{"kind":"Field","name":{"kind":"Name","value":"width"}},{"kind":"Field","name":{"kind":"Name","value":"height"}},{"kind":"Field","name":{"kind":"Name","value":"traffic"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}},{"kind":"Field","name":{"kind":"Name","value":"totalBookings"}},{"kind":"Field","name":{"kind":"Name","value":"spaceOwnerProfile"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"businessName"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"avatar"}}]}}]}}]}}]}}]} as unknown as DocumentNode<PublicSpaceDetailQuery, PublicSpaceDetailQueryVariables>;
 export const PublicBrowseSpacesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PublicBrowseSpaces"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"last"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"after"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"before"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"SpaceFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"order"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SpaceSortInput"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"spaces"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"last"},"value":{"kind":"Variable","name":{"kind":"Name","value":"last"}}},{"kind":"Argument","name":{"kind":"Name","value":"after"},"value":{"kind":"Variable","name":{"kind":"Name","value":"after"}}},{"kind":"Argument","name":{"kind":"Name","value":"before"},"value":{"kind":"Variable","name":{"kind":"Name","value":"before"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}},{"kind":"Argument","name":{"kind":"Name","value":"order"},"value":{"kind":"Variable","name":{"kind":"Name","value":"order"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"FragmentSpread","name":{"kind":"Name","value":"PublicSpacesSpaceCard_SpaceFragment"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"totalCount"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"PublicSpacesSpaceCard_SpaceFragment"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Space"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"city"}},{"kind":"Field","name":{"kind":"Name","value":"state"}},{"kind":"Field","name":{"kind":"Name","value":"images"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"pricePerDay"}},{"kind":"Field","name":{"kind":"Name","value":"averageRating"}}]}}]} as unknown as DocumentNode<PublicBrowseSpacesQuery, PublicBrowseSpacesQueryVariables>;
+export const MeRoleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MeRole"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]} as unknown as DocumentNode<MeRoleQuery, MeRoleQueryVariables>;

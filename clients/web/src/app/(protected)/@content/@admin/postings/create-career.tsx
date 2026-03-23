@@ -180,7 +180,7 @@ export default function CreateCareer({ triggerLabel = "New career" }: Props) {
               rows={5}
               placeholder="Describe the role, responsibilities, and what a typical day looks like..."
               required
-              className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:outline-none"
+              className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-20 w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:outline-none"
             />
             {state.fieldErrors.description && (
               <p className="text-destructive text-xs">
@@ -200,7 +200,7 @@ export default function CreateCareer({ triggerLabel = "New career" }: Props) {
               rows={5}
               placeholder="List the skills, experience, and qualifications you are looking for..."
               required
-              className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[80px] w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:outline-none"
+              className="border-input bg-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-20 w-full rounded-md border px-3 py-2 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:outline-none"
             />
             {state.fieldErrors.requirements && (
               <p className="text-destructive text-xs">

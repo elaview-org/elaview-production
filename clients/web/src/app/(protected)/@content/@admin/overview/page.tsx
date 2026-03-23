@@ -16,35 +16,23 @@ import {
 } from "@/components/primitives/card";
 import { SummaryCardGrid } from "@/components/composed/summary-card";
 import { CardAction, CardFooter } from "@/components/primitives/card";
+import api from "@/api/server";
+import { graphql } from "@/types/gql";
 
-// TODO: Replace with real admin aggregate queries once the backend exposes
-// platform-wide stats (totalUsers, totalActiveSpaces, totalBookings, totalRevenue).
-const PLATFORM_STATS = [
-  {
-    label: "Total Users",
-    value: "—",
-    footer: "Backend integration pending",
-    description: "Requires admin stats query",
-  },
-  {
-    label: "Active Spaces",
-    value: "—",
-    footer: "Backend integration pending",
-    description: "Requires admin stats query",
-  },
-  {
-    label: "Total Bookings",
-    value: "—",
-    footer: "Backend integration pending",
-    description: "Requires admin stats query",
-  },
-  {
-    label: "Platform Revenue",
-    value: "—",
-    footer: "Backend integration pending",
-    description: "Requires admin stats query",
-  },
-];
+const PlatformStatsQuery = graphql(`
+  query PlatformStats {
+    platformStats {
+      totalUsers
+      totalActiveSpaces
+      totalBookings
+      totalRevenue
+      totalCampaigns
+      totalSpaceOwners
+      totalAdvertisers
+      newUsersLast30Days
+    }
+  }
+`);
 
 const ADMIN_SECTIONS = [
   {
@@ -77,7 +65,56 @@ const ADMIN_SECTIONS = [
   },
 ];
 
-export default function Page() {
+function formatNumber(n: number): string {
+  return new Intl.NumberFormat("en-US").format(n);
+}
+
+function formatCurrency(n: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(n);
+}
+
+export default async function Page() {
+  const { data } = await api.query({
+    query: PlatformStatsQuery,
+    tags: ["admin-stats"],
+    revalidate: 60,
+  });
+
+  const stats = data?.platformStats;
+
+  const PLATFORM_STATS = [
+    {
+      label: "Total Users",
+      value: stats ? formatNumber(stats.totalUsers) : "—",
+      footer: stats
+        ? `+${formatNumber(stats.newUsersLast30Days)} last 30 days`
+        : "Loading...",
+      description: `${formatNumber(stats?.totalSpaceOwners ?? 0)} owners · ${formatNumber(stats?.totalAdvertisers ?? 0)} advertisers`,
+    },
+    {
+      label: "Active Spaces",
+      value: stats ? formatNumber(stats.totalActiveSpaces) : "—",
+      footer: "Currently listed and active",
+      description: "Spaces available for booking",
+    },
+    {
+      label: "Total Bookings",
+      value: stats ? formatNumber(stats.totalBookings) : "—",
+      footer: `${formatNumber(stats?.totalCampaigns ?? 0)} campaigns`,
+      description: "All-time bookings across platform",
+    },
+    {
+      label: "Platform Revenue",
+      value: stats ? formatCurrency(stats.totalRevenue) : "—",
+      footer: "Total successful payments",
+      description: "All-time revenue from payments",
+    },
+  ];
+
   return (
     <div className="flex flex-col gap-8">
       {/* Header */}

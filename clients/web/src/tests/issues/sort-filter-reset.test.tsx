@@ -13,6 +13,9 @@ mock.module("@/hooks/use-search-params-updater", () => ({
   }),
 }));
 
+// TODO: These tests use userEvent.setup() which requires a more complete DOM environment
+// than happy-dom provides. Consider using Playwright for these interaction tests instead.
+// For now, we're deferring these tests until we have E2E test infrastructure.
 describe.skip("ToolbarSortPanel - Reset to default", () => {
   const sortProps = {
     sort: { fields: [{ value: "createdAt", label: "Date" }] },

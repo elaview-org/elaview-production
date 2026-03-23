@@ -1,9 +1,6 @@
 "use server";
 
-// TODO: Implement real GraphQL mutations once the backend implements the Career entity.
-// See api/server/careers.ts for the full backend contract.
-// For now these actions return stub errors so the UI can be fully built and wired up.
-
+import api from "@/api/server";
 import { revalidatePath } from "next/cache";
 import { careerSchema } from "./schemas";
 
@@ -48,30 +45,29 @@ export async function createCareerAction(
     };
   }
 
-  // TODO: Replace with real GraphQL mutation:
-  // const result = await api.mutate({
-  //   mutation: graphql(`
-  //     mutation CreateCareer($input: CreateCareerInput!) {
-  //       createCareer(input: $input) {
-  //         career { id }
-  //         errors { ... on Error { message } }
-  //       }
-  //     }
-  //   `),
-  //   variables: { input: parsed.data },
-  // });
-  // const payload = result.data?.createCareer;
-  // if (payload?.errors?.length) return { success: false, message: payload.errors[0].message, fieldErrors: {} };
-  // if (!payload?.career?.id) return { success: false, message: "Failed to create career", fieldErrors: {} };
-  // revalidatePath("/careers");
-  // redirect(`/careers/${payload.career.id}`);
+  try {
+    const input = {
+      ...parsed.data,
+      expiresAt: parsed.data.expiresAt || undefined,
+    };
 
-  return {
-    success: false,
-    message:
-      "Backend not yet implemented. See api/server/careers.ts for the GraphQL contract.",
-    fieldErrors: {},
-  };
+    await api.careers.create(input);
+
+    revalidatePath("/postings");
+    revalidatePath("/careers");
+
+    return {
+      success: true,
+      message: "Career created successfully.",
+      fieldErrors: {},
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to create career",
+      fieldErrors: {},
+    };
+  }
 }
 
 export async function updateCareerAction(
@@ -102,43 +98,72 @@ export async function updateCareerAction(
     };
   }
 
-  // TODO: Replace with real GraphQL mutation once backend is implemented.
-  void id;
+  try {
+    const input = {
+      ...parsed.data,
+      expiresAt: parsed.data.expiresAt || undefined,
+    };
 
-  return {
-    success: false,
-    message:
-      "Backend not yet implemented. See api/server/careers.ts for the GraphQL contract.",
-    fieldErrors: {},
-  };
+    await api.careers.update(id, input);
+
+    revalidatePath("/postings");
+    revalidatePath("/careers");
+    revalidatePath(`/careers/${id}`);
+
+    return {
+      success: true,
+      message: "Career updated successfully.",
+      fieldErrors: {},
+    };
+  } catch (error) {
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to update career",
+      fieldErrors: {},
+    };
+  }
 }
 
 export async function deleteCareerAction(
   id: string
 ): Promise<{ success: boolean; error: string | null }> {
-  // TODO: Replace with real GraphQL mutation once backend is implemented.
-  void id;
+  try {
+    await api.careers.delete(id);
 
-  return {
-    success: false,
-    error:
-      "Backend not yet implemented. See api/server/careers.ts for the GraphQL contract.",
-  };
+    revalidatePath("/postings");
+    revalidatePath("/careers");
+
+    return {
+      success: true,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to delete career",
+    };
+  }
 }
 
 export async function toggleCareerActiveAction(
   id: string,
   isActive: boolean
 ): Promise<{ success: boolean; error: string | null }> {
-  // TODO: Replace with real GraphQL mutation once backend is implemented.
-  void id;
-  void isActive;
+  try {
+    await api.careers.update(id, { isActive });
 
-  revalidatePath("/postings");
+    revalidatePath("/postings");
+    revalidatePath("/careers");
+    revalidatePath(`/careers/${id}`);
 
-  return {
-    success: false,
-    error:
-      "Backend not yet implemented. See api/server/careers.ts for the GraphQL contract.",
-  };
+    return {
+      success: true,
+      error: null,
+    };
+  } catch (error) {
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to update status",
+    };
+  }
 }

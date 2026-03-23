@@ -12,6 +12,18 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     public DbSet<BlockedDate> BlockedDates { get; set; } = null!;
     public DbSet<PricingRule> PricingRules { get; set; } = null!;
     public DbSet<Campaign> Campaigns { get; set; } = null!;
+    public DbSet<Career> Careers { get; set; } = null!;
+    public DbSet<DigitalSignageScreen> DigitalSignageScreens { get; set; } =
+        null!;
+    public DbSet<DigitalSignageDevice> DigitalSignageDevices { get; set; } =
+        null!;
+    public DbSet<DigitalSignageSchedule> DigitalSignageSchedules { get; set; } =
+        null!;
+
+    public DbSet<DigitalSignageProofEvent> DigitalSignageProofEvents {
+        get;
+        set;
+    } = null!;
 
     public DbSet<Booking> Bookings { get; set; } = null!;
     public DbSet<BookingProof> BookingProofs { get; set; } = null!;
@@ -50,6 +62,15 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
         new BlockedDateConfig().Configure(modelBuilder.Entity<BlockedDate>());
         new PricingRuleConfig().Configure(modelBuilder.Entity<PricingRule>());
         new CampaignConfig().Configure(modelBuilder.Entity<Campaign>());
+        new CareerConfig().Configure(modelBuilder.Entity<Career>());
+        new DigitalSignageScreenConfig().Configure(modelBuilder
+            .Entity<DigitalSignageScreen>());
+        new DigitalSignageDeviceConfig().Configure(modelBuilder
+            .Entity<DigitalSignageDevice>());
+        new DigitalSignageScheduleConfig().Configure(modelBuilder
+            .Entity<DigitalSignageSchedule>());
+        new DigitalSignageProofEventConfig().Configure(modelBuilder
+            .Entity<DigitalSignageProofEvent>());
 
         new BookingConfig().Configure(modelBuilder.Entity<Booking>());
         new BookingProofConfig().Configure(modelBuilder.Entity<BookingProof>());

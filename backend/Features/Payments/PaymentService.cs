@@ -1,4 +1,5 @@
 using ElaviewBackend.Data.Entities;
+using ElaviewBackend.Features.DigitalSignage;
 using ElaviewBackend.Features.Shared.Errors;
 using Stripe;
 
@@ -16,7 +17,8 @@ public interface IPaymentService {
 
 public sealed class PaymentService(
     IPaymentRepository repository,
-    ITransactionRepository transactionRepository
+    ITransactionRepository transactionRepository,
+    IDigitalSignageService digitalSignageService
 ) : IPaymentService {
     public IQueryable<Payment> GetById(Guid id)
         => repository.GetById(id);
@@ -138,6 +140,9 @@ public sealed class PaymentService(
             Description = $"Payment for booking {payment.BookingId}",
             CreatedAt = DateTime.UtcNow
         }, ct);
+
+        // Auto-create digital signage schedule for DigitalDisplay spaces
+        await digitalSignageService.TryAutoScheduleForBookingAsync(payment.BookingId, ct);
 
         return payment;
     }

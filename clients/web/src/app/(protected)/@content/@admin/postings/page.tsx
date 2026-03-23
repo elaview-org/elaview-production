@@ -35,21 +35,6 @@ export default async function Page() {
         <CreateCareer />
       </div>
 
-      {/* Backend pending notice */}
-      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-900 dark:bg-amber-950/30">
-        <p className="font-medium text-amber-800 dark:text-amber-400">
-          Backend integration pending
-        </p>
-        <p className="mt-1 text-amber-700 dark:text-amber-500">
-          The Career entity has not yet been implemented in the .NET GraphQL
-          API. All CRUD operations are stubbed. See{" "}
-          <code className="rounded bg-amber-100 px-1 text-xs dark:bg-amber-900">
-            src/api/server/careers.ts
-          </code>{" "}
-          for the full backend contract to implement.
-        </p>
-      </div>
-
       {/* Table */}
       {careers.length === 0 ? (
         <div className="flex flex-col items-center gap-4 rounded-xl border py-16 text-center">

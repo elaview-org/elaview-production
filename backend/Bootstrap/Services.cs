@@ -5,6 +5,8 @@ using ElaviewBackend.Features.Marketplace;
 using ElaviewBackend.Features.Notifications;
 using ElaviewBackend.Features.Payments;
 using ElaviewBackend.Features.Analytics;
+using ElaviewBackend.Features.Careers;
+using ElaviewBackend.Features.DigitalSignage;
 using ElaviewBackend.Features.Shared.Errors;
 using ElaviewBackend.Features.Users;
 using ElaviewBackend.Settings;
@@ -70,6 +72,10 @@ public static class Services {
             .AddScoped<IMessageRepository, MessageRepository>()
             .AddScoped<IAnalyticsRepository, AnalyticsRepository>()
             .AddScoped<IAnalyticsService, AnalyticsService>()
+            .AddScoped<ICareerService, CareerService>()
+            .AddScoped<ICareerRepository, CareerRepository>()
+            .AddScoped<IDigitalSignageService, DigitalSignageService>()
+            .AddScoped<IDigitalSignageRepository, DigitalSignageRepository>()
             .AddSingleton(sp => {
                 var settings = sp
                     .GetRequiredService<IOptions<GlobalSettings>>()

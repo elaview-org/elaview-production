@@ -4,7 +4,7 @@ import storage from "@/lib/core/storage";
 
 const authCookieKey = storage.authentication.token;
 
-export function proxy(request: NextRequest) {
+export function middleware(request: NextRequest) {
   if (!request.cookies.has(authCookieKey)) {
     return NextResponse.rewrite(new URL("/not-found", request.url));
   }

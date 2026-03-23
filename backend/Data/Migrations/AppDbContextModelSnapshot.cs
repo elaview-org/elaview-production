@@ -390,6 +390,59 @@ namespace ElaviewBackend.Data.Migrations
                     b.ToTable("campaigns");
                 });
 
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.Career", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<int>("Department")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Requirements")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("character varying(4000)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Department");
+
+                    b.HasIndex("IsActive");
+
+                    b.ToTable("careers");
+                });
+
             modelBuilder.Entity("ElaviewBackend.Data.Entities.Conversation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -453,6 +506,229 @@ namespace ElaviewBackend.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("conversation_participants");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageDevice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("DeviceName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("DeviceToken")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("LastSeenAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("PairingCode")
+                        .HasMaxLength(6)
+                        .HasColumnType("character varying(6)");
+
+                    b.Property<DateTime?>("PairingCodeExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ScreenId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceToken")
+                        .IsUnique();
+
+                    b.HasIndex("PairingCode");
+
+                    b.HasIndex("ScreenId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("digital_signage_devices");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageProofEvent", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<Guid>("DeviceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("DisplayedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DisplayedDurationSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Metadata")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
+                    b.Property<Guid>("ScheduleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ScreenId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("DeviceId");
+
+                    b.HasIndex("DisplayedAt");
+
+                    b.HasIndex("ScheduleId");
+
+                    b.HasIndex("ScreenId");
+
+                    b.ToTable("digital_signage_proof_events");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CampaignId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("CreativeAssetUrl")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<int>("CreativeType")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("PushedToDevicesAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("RotationIntervalSeconds")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ScreenId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
+
+                    b.HasIndex("CampaignId");
+
+                    b.HasIndex("ScreenId");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("StartDate", "EndDate");
+
+                    b.ToTable("digital_signage_schedules");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageScreen", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime?>("LastHeartbeatAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Resolution")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("SpaceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SpaceOwnerProfileId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SpaceId")
+                        .IsUnique();
+
+                    b.HasIndex("SpaceOwnerProfileId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("digital_signage_screens");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Data.Entities.ManualPayout", b =>
@@ -1395,6 +1671,98 @@ namespace ElaviewBackend.Data.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageDevice", b =>
+                {
+                    b.HasOne("ElaviewBackend.Data.Entities.DigitalSignageScreen", "Screen")
+                        .WithMany("Devices")
+                        .HasForeignKey("ScreenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Screen");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageProofEvent", b =>
+                {
+                    b.HasOne("ElaviewBackend.Data.Entities.Booking", "Booking")
+                        .WithMany()
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ElaviewBackend.Data.Entities.DigitalSignageDevice", "Device")
+                        .WithMany("ProofEvents")
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ElaviewBackend.Data.Entities.DigitalSignageSchedule", "Schedule")
+                        .WithMany("ProofEvents")
+                        .HasForeignKey("ScheduleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ElaviewBackend.Data.Entities.DigitalSignageScreen", "Screen")
+                        .WithMany("ProofEvents")
+                        .HasForeignKey("ScreenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("Device");
+
+                    b.Navigation("Schedule");
+
+                    b.Navigation("Screen");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageSchedule", b =>
+                {
+                    b.HasOne("ElaviewBackend.Data.Entities.Booking", "Booking")
+                        .WithMany()
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ElaviewBackend.Data.Entities.Campaign", "Campaign")
+                        .WithMany()
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("ElaviewBackend.Data.Entities.DigitalSignageScreen", "Screen")
+                        .WithMany("Schedules")
+                        .HasForeignKey("ScreenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+
+                    b.Navigation("Campaign");
+
+                    b.Navigation("Screen");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageScreen", b =>
+                {
+                    b.HasOne("ElaviewBackend.Data.Entities.Space", "Space")
+                        .WithOne()
+                        .HasForeignKey("ElaviewBackend.Data.Entities.DigitalSignageScreen", "SpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ElaviewBackend.Data.Entities.SpaceOwnerProfile", "SpaceOwnerProfile")
+                        .WithMany()
+                        .HasForeignKey("SpaceOwnerProfileId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Space");
+
+                    b.Navigation("SpaceOwnerProfile");
+                });
+
             modelBuilder.Entity("ElaviewBackend.Data.Entities.ManualPayout", b =>
                 {
                     b.HasOne("ElaviewBackend.Data.Entities.SpaceOwnerProfile", "SpaceOwnerProfile")
@@ -1606,6 +1974,25 @@ namespace ElaviewBackend.Data.Migrations
                     b.Navigation("Messages");
 
                     b.Navigation("Participants");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageDevice", b =>
+                {
+                    b.Navigation("ProofEvents");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageSchedule", b =>
+                {
+                    b.Navigation("ProofEvents");
+                });
+
+            modelBuilder.Entity("ElaviewBackend.Data.Entities.DigitalSignageScreen", b =>
+                {
+                    b.Navigation("Devices");
+
+                    b.Navigation("ProofEvents");
+
+                    b.Navigation("Schedules");
                 });
 
             modelBuilder.Entity("ElaviewBackend.Data.Entities.Payment", b =>

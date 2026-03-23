@@ -53,4 +53,26 @@ public static class AnalyticsQueries {
         CancellationToken ct
     ) => await analyticsService.GetAdvertiserAnalyticsAsync(
         userService.GetPrincipalId(), startDate, endDate, ct);
+
+    [Authorize(Roles = ["Admin"])]
+    public static async Task<PlatformStats> PlatformStats(
+        IAnalyticsService analyticsService,
+        CancellationToken ct
+    ) => await analyticsService.GetPlatformStatsAsync(ct);
+
+    [Authorize(Roles = ["Admin", "Marketing"])]
+    public static async Task<MarketingStats> MarketingStats(
+        IAnalyticsService analyticsService,
+        CancellationToken ct
+    ) => await analyticsService.GetMarketingStatsAsync(ct);
+
+    [Authorize]
+    public static async Task<List<ReachTrendPoint>> AdvertiserReachTrend(
+        DateTime startDate,
+        DateTime endDate,
+        IUserService userService,
+        IAnalyticsService analyticsService,
+        CancellationToken ct
+    ) => await analyticsService.GetAdvertiserReachTrendAsync(
+        userService.GetPrincipalId(), startDate, endDate, ct);
 }

@@ -6,8 +6,38 @@ GlobalRegistrator.register();
 
 expect.extend(matchers);
 
+// Ensure document is fully initialized with body before any tests run
+if (!document.body) {
+  const html = document.createElement("html");
+  const body = document.createElement("body");
+  html.appendChild(body);
+  document.appendChild(html);
+}
+
+// Initialize pointer capture methods if missing (userEvent requirement)
+if (!Element.prototype.setPointerCapture) {
+  Element.prototype.setPointerCapture = function() {
+    return undefined;
+  };
+}
+
+if (!Element.prototype.releasePointerCapture) {
+  Element.prototype.releasePointerCapture = function() {
+    return undefined;
+  };
+}
+
+if (!Element.prototype.hasPointerCapture) {
+  Element.prototype.hasPointerCapture = function() {
+    return false;
+  };
+}
+
 afterEach(() => {
-  document.body.innerHTML = "";
+  // Clear body content without recreating body element
+  while (document.body.firstChild) {
+    document.body.removeChild(document.body.firstChild);
+  }
 });
 
 mock.module("next/navigation", () => import("./mocks/next-navigation"));
@@ -71,7 +101,10 @@ class ResizeObserverStub {
 window.ResizeObserver = ResizeObserverStub as unknown as typeof ResizeObserver;
 
 Element.prototype.scrollIntoView = mock();
-Element.prototype.hasPointerCapture =
-  mock() as unknown as typeof Element.prototype.hasPointerCapture;
-Element.prototype.setPointerCapture = mock();
-Element.prototype.releasePointerCapture = mock();
+
+// Set up keyboard and pointer event support for happy-dom
+Object.defineProperty(KeyboardEvent.prototype, "shiftKey", { get: () => false });
+Object.defineProperty(KeyboardEvent.prototype, "ctrlKey", { get: () => false });
+Object.defineProperty(KeyboardEvent.prototype, "altKey", { get: () => false });
+Object.defineProperty(KeyboardEvent.prototype, "metaKey", { get: () => false });
+

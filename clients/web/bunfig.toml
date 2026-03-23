@@ -1,2 +1,4 @@
 [test]
-preload = ["./src/tests/utils/setup.ts"]
+preload = ["./src/tests/utils/setup.ts"]# Exclude Playwright E2E tests from Bun test runner
+root = "src/tests"
+# Run only .test.ts and .test.tsx files, skip .spec.ts files (Playwright)

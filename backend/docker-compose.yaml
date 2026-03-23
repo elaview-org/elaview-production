@@ -39,6 +39,8 @@ services:
       ELAVIEW_BACKEND_ADMIN_PASSWORD: ${ELAVIEW_BACKEND_ADMIN_PASSWORD}
       ELAVIEW_BACKEND_STRIPE_CONNECT_RETURN_URL: ${ELAVIEW_BACKEND_STRIPE_CONNECT_RETURN_URL}
       ELAVIEW_BACKEND_STRIPE_CONNECT_REFRESH_URL: ${ELAVIEW_BACKEND_STRIPE_CONNECT_REFRESH_URL}
+      ELAVIEW_BACKEND_SIGNALING_URL: http://elaview-signaling:8001
+      ELAVIEW_BACKEND_SIGNALING_WEBHOOK_SECRET: ${ELAVIEW_BACKEND_SIGNALING_WEBHOOK_SECRET:-dev-secret}
     networks: [ elaview-backend ]
     ports:
       - "${ELAVIEW_BACKEND_SERVER_PORT}:${ELAVIEW_BACKEND_SERVER_PORT}/tcp"
@@ -53,6 +55,21 @@ services:
         target: /root/.aspnet/DataProtection-Keys
     depends_on:
       - database
+
+  signaling:
+    container_name: elaview-signaling
+    build:
+      context: ../services/signaling
+      dockerfile: Dockerfile
+    environment:
+      ELAVIEW_SIGNALING_PORT: "8001"
+      ELAVIEW_SIGNALING_WEBHOOK_SECRET: ${ELAVIEW_BACKEND_SIGNALING_WEBHOOK_SECRET:-dev-secret}
+      ELAVIEW_BACKEND_URL: http://elaview-backend-server:${ELAVIEW_BACKEND_SERVER_PORT}
+    networks: [ elaview-backend ]
+    ports:
+      - "8001:8001"
+    depends_on:
+      - server
 
 networks:
   elaview-backend:

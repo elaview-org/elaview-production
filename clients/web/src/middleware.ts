@@ -2,13 +2,12 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import storage from "@/lib/core/storage";
 
-const AUTH_COOKIE = storage.authentication.token;
+const authCookieKey = storage.authentication.token;
 
 export function middleware(request: NextRequest) {
-  if (!request.cookies.has(AUTH_COOKIE)) {
+  if (!request.cookies.has(authCookieKey)) {
     return NextResponse.rewrite(new URL("/not-found", request.url));
   }
-
   return NextResponse.next();
 }
 

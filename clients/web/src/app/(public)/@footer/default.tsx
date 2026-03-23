@@ -2,7 +2,7 @@ import Link from "next/link";
 import { IconInnerShadowTop } from "@tabler/icons-react";
 import { Separator } from "@/components/primitives/separator";
 
-const FOOTER_LINKS = [
+const footerLinks = [
   { href: "/about", label: "About" },
   { href: "/careers", label: "Careers" },
   { href: "/how-it-works", label: "How It Works" },
@@ -12,7 +12,7 @@ const FOOTER_LINKS = [
   { href: "/privacy-policy", label: "Privacy" },
 ] as const;
 
-export default function Footer() {
+export default function Default() {
   return (
     <footer className="mt-auto">
       <Separator />
@@ -23,7 +23,7 @@ export default function Footer() {
         </div>
 
         <nav className="flex flex-wrap gap-x-6 gap-y-2">
-          {FOOTER_LINKS.map((link) => (
+          {footerLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}

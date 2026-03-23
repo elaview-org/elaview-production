@@ -1,6 +1,6 @@
 import { authenticatedRedirect } from "@/lib/core/auth";
 
-export default async function Layout(props: LayoutProps<"/">) {
+export default async function Layout(props: LayoutProps<"/home">) {
   await authenticatedRedirect();
 
   return (

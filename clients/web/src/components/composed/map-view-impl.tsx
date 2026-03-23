@@ -2,9 +2,12 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { MapContainer, Marker, Popup, useMap } from "react-leaflet";
+import MarkerClusterGroup from "react-leaflet-cluster";
 import ThemedTileLayer from "./themed-tile-layer";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.css";
+import "react-leaflet-cluster/dist/assets/MarkerCluster.Default.css";
 import { cn } from "@/lib/core/utils";
 import { Button } from "@/components/primitives/button";
 import { IconCurrentLocation } from "@tabler/icons-react";
@@ -158,28 +161,32 @@ export default function MapViewImpl<TData>({
         <ThemedTileLayer />
         {enableGeolocation && <GeolocationButton />}
         {onViewChange && <ViewWatcher onViewChange={onViewChange} />}
-        {data.map((item) => {
-          const id = getValue(item, getId);
-          const position: [number, number] = [
-            getValue(item, latitude),
-            getValue(item, longitude),
-          ];
-          const label = markerLabel ? getValue(item, markerLabel) : undefined;
-          const icon = label ? createLabelIcon(label) : undefined;
+        <MarkerClusterGroup zoomToBoundsOnClick>
+          {data.map((item) => {
+            const id = getValue(item, getId);
+            const position: [number, number] = [
+              getValue(item, latitude),
+              getValue(item, longitude),
+            ];
+            const label = markerLabel ? getValue(item, markerLabel) : undefined;
+            const icon = label ? createLabelIcon(label) : undefined;
 
-          return (
-            <Marker
-              key={id}
-              position={position}
-              icon={icon}
-              eventHandlers={
-                onMarkerClick ? { click: () => onMarkerClick(item) } : undefined
-              }
-            >
-              {renderPopup && <Popup>{renderPopup(item)}</Popup>}
-            </Marker>
-          );
-        })}
+            return (
+              <Marker
+                key={id}
+                position={position}
+                icon={icon}
+                eventHandlers={
+                  onMarkerClick
+                    ? { click: () => onMarkerClick(item) }
+                    : undefined
+                }
+              >
+                {renderPopup && <Popup>{renderPopup(item)}</Popup>}
+              </Marker>
+            );
+          })}
+        </MarkerClusterGroup>
       </MapContainer>
     </div>
   );

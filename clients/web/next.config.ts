@@ -6,8 +6,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   env: {
     API_URL: process.env.ELAVIEW_WEB_API_URL,
-    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
-      process.env.ELAVIEW_BACKEND_STRIPE_PUBLISHABLE_KEY,
+    STRIPE_PUBLISHABLE_KEY: process.env.ELAVIEW_BACKEND_STRIPE_PUBLISHABLE_KEY,
   },
   reactStrictMode: true,
   poweredByHeader: false,
@@ -35,6 +34,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  redirects: () => [
+    {
+      source: "/home",
+      destination: "/",
+      permanent: true,
+    },
+  ],
+  rewrites: () => [
+    {
+      source: "/",
+      destination: "/home",
+    },
+  ],
 };
 
 export default nextConfig;

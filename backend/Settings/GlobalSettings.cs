@@ -6,6 +6,8 @@ public class GlobalSettings {
     public CloudinarySettings Cloudinary { get; set; } = new();
 
     public NominatimSettings Nominatim { get; set; } = new();
+
+    public SignalingSettings Signaling { get; set; } = new();
 }
 
 public class DatabaseSettings {
@@ -44,4 +46,10 @@ public class NominatimSettings {
     public int TimeoutSeconds { get; set; } = 10;
 
     public int RateLimitDelayMs { get; set; } = 1000;
+}
+
+public class SignalingSettings {
+    public string BaseUrl { get; set; } = "http://localhost:8001";
+
+    public string WebhookSecret { get; set; } = "dev-secret";
 }

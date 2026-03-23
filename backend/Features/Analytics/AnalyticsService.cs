@@ -37,6 +37,13 @@ public interface IAnalyticsService {
 
     Task<List<AdvertiserMonthlyStats>> GetAdvertiserMonthlyStatsAsync(
         Guid userId, int months, CancellationToken ct);
+
+    Task<PlatformStats> GetPlatformStatsAsync(CancellationToken ct);
+
+    Task<MarketingStats> GetMarketingStatsAsync(CancellationToken ct);
+
+    Task<List<ReachTrendPoint>> GetAdvertiserReachTrendAsync(
+        Guid userId, DateTime startDate, DateTime endDate, CancellationToken ct);
 }
 
 public sealed class AnalyticsService(
@@ -172,4 +179,14 @@ public sealed class AnalyticsService(
     public async Task<List<AdvertiserMonthlyStats>> GetAdvertiserMonthlyStatsAsync(
         Guid userId, int months, CancellationToken ct
     ) => await repository.GetAdvertiserMonthlyStatsAsync(userId, months, ct);
+
+    public async Task<PlatformStats> GetPlatformStatsAsync(CancellationToken ct)
+        => await repository.GetPlatformStatsAsync(ct);
+
+    public async Task<MarketingStats> GetMarketingStatsAsync(CancellationToken ct)
+        => await repository.GetMarketingStatsAsync(ct);
+
+    public async Task<List<ReachTrendPoint>> GetAdvertiserReachTrendAsync(
+        Guid userId, DateTime startDate, DateTime endDate, CancellationToken ct
+    ) => await repository.GetAdvertiserReachTrendAsync(userId, startDate, endDate, ct);
 }

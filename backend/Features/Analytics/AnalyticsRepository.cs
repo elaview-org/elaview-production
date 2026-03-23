@@ -53,6 +53,13 @@ public interface IAnalyticsRepository {
 
     Task<AdvertiserTopPerformers> GetAdvertiserTopPerformersAsync(
         Guid userId, DateTime start, DateTime end, CancellationToken ct);
+
+    Task<PlatformStats> GetPlatformStatsAsync(CancellationToken ct);
+
+    Task<MarketingStats> GetMarketingStatsAsync(CancellationToken ct);
+
+    Task<List<ReachTrendPoint>> GetAdvertiserReachTrendAsync(
+        Guid userId, DateTime startDate, DateTime endDate, CancellationToken ct);
 }
 
 public sealed partial class AnalyticsRepository(AppDbContext context) : IAnalyticsRepository {
@@ -839,4 +846,130 @@ public sealed partial class AnalyticsRepository(AppDbContext context) : IAnalyti
 
     [GeneratedRegex(@"(\d+)")]
     private static partial Regex TrafficPattern();
+
+    // ── Platform Stats (Admin) ───────────────────────────
+
+    public async Task<PlatformStats> GetPlatformStatsAsync(CancellationToken ct) {
+        var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+
+        var totalUsers = await context.Users.CountAsync(ct);
+        var totalActiveSpaces = await context.Spaces
+            .Where(s => s.Status == SpaceStatus.Active)
+            .CountAsync(ct);
+        var totalBookings = await context.Bookings.CountAsync(ct);
+        var totalRevenue = await context.Payments
+            .Where(p => p.Status == PaymentStatus.Succeeded)
+            .SumAsync(p => p.Amount, ct);
+        var totalCampaigns = await context.Campaigns.CountAsync(ct);
+        var totalSpaceOwners = await context.SpaceOwnerProfiles.CountAsync(ct);
+        var totalAdvertisers = await context.AdvertiserProfiles.CountAsync(ct);
+        var newUsersLast30Days = await context.Users
+            .Where(u => u.CreatedAt >= thirtyDaysAgo)
+            .CountAsync(ct);
+
+        return new PlatformStats(
+            totalUsers, totalActiveSpaces, totalBookings, totalRevenue,
+            totalCampaigns, totalSpaceOwners, totalAdvertisers, newUsersLast30Days
+        );
+    }
+
+    // ── Marketing Stats ──────────────────────────────────
+
+    public async Task<MarketingStats> GetMarketingStatsAsync(CancellationToken ct) {
+        var thirtyDaysAgo = DateTime.UtcNow.AddDays(-30);
+
+        var newSignups = await context.Users
+            .Where(u => u.CreatedAt >= thirtyDaysAgo)
+            .CountAsync(ct);
+
+        var totalVisitors = await context.Users.CountAsync(ct);
+        var conversionRate = totalVisitors > 0
+            ? Math.Round((decimal)newSignups / totalVisitors * 100, 2)
+            : 0m;
+
+        var activeCampaigns = await context.Campaigns
+            .Where(c => c.Bookings.Any(b =>
+                ExcludedStatuses.All(s => s != b.Status)))
+            .CountAsync(ct);
+
+        var totalAdSpend = await context.Payments
+            .Where(p => p.Status == PaymentStatus.Succeeded)
+            .Where(p => p.PaidAt != null && p.PaidAt >= thirtyDaysAgo)
+            .SumAsync(p => p.Amount, ct);
+
+        var completedBookings = await context.Bookings
+            .Where(b => CompletedStatuses.Contains(b.Status))
+            .Where(b => b.UpdatedAt >= thirtyDaysAgo)
+            .CountAsync(ct);
+
+        var signupTrend = await context.Users
+            .Where(u => u.CreatedAt >= thirtyDaysAgo)
+            .GroupBy(u => u.CreatedAt.Date)
+            .Select(g => new DailySignups(g.Key, g.Count()))
+            .OrderBy(d => d.Date)
+            .ToListAsync(ct);
+
+        return new MarketingStats(
+            newSignups, conversionRate, activeCampaigns,
+            totalAdSpend, completedBookings, signupTrend
+        );
+    }
+
+    // ── Advertiser Reach Trend ───────────────────────────
+
+    public async Task<List<ReachTrendPoint>> GetAdvertiserReachTrendAsync(
+        Guid userId, DateTime startDate, DateTime endDate, CancellationToken ct
+    ) {
+        // Compute weekly reach/impressions from booking data and digital signage proof events.
+        // For bookings without digital signage proof, estimate from space traffic data.
+        var bookings = await context.Bookings
+            .Where(b => b.Campaign.AdvertiserProfile.UserId == userId)
+            .Where(b => CompletedStatuses.Contains(b.Status) ||
+                        b.Status == BookingStatus.Installed ||
+                        b.Status == BookingStatus.FileDownloaded)
+            .Where(b => b.StartDate < endDate && b.EndDate > startDate)
+            .Include(b => b.Space)
+            .ToListAsync(ct);
+
+        // Check for digital signage proof events
+        var proofEvents = await context.DigitalSignageProofEvents
+            .Where(e => e.Booking.Campaign.AdvertiserProfile.UserId == userId)
+            .Where(e => e.DisplayedAt >= startDate && e.DisplayedAt < endDate)
+            .GroupBy(e => e.DisplayedAt.Date)
+            .Select(g => new {
+                Date = g.Key,
+                Impressions = (long)g.Count(),
+                Duration = g.Sum(e => e.DisplayedDurationSeconds)
+            })
+            .ToListAsync(ct);
+
+        // Generate weekly data points
+        var result = new List<ReachTrendPoint>();
+        var current = startDate;
+        while (current < endDate) {
+            var weekEnd = current.AddDays(7) > endDate ? endDate : current.AddDays(7);
+
+            // Digital signage impressions for this week
+            var digitalImpressions = proofEvents
+                .Where(e => e.Date >= current && e.Date < weekEnd)
+                .Sum(e => e.Impressions);
+
+            // Physical space estimated impressions from traffic data
+            var activeBookingsThisWeek = bookings
+                .Where(b => b.StartDate < weekEnd && b.EndDate > current)
+                .ToList();
+
+            var physicalImpressions = activeBookingsThisWeek
+                .Sum(b => ParseTrafficToDaily(b.Space.Traffic) * 7);
+
+            var totalImpressions = digitalImpressions + physicalImpressions;
+            // Reach is estimated as ~60% of impressions (unique viewers)
+            var reach = (long)(totalImpressions * 0.6);
+
+            result.Add(new ReachTrendPoint(current, reach, totalImpressions));
+            current = weekEnd;
+        }
+
+        return result;
+    }
 }

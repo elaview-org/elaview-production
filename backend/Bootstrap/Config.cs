@@ -30,7 +30,11 @@ public static class Config {
             ["Cloudinary:ApiKey"] =
                 envVars["ELAVIEW_BACKEND_CLOUDINARY_API_KEY"]?.ToString(),
             ["Cloudinary:ApiSecret"] =
-                envVars["ELAVIEW_BACKEND_CLOUDINARY_API_SECRET"]?.ToString()
+                envVars["ELAVIEW_BACKEND_CLOUDINARY_API_SECRET"]?.ToString(),
+            ["Signaling:BaseUrl"] =
+                envVars["ELAVIEW_BACKEND_SIGNALING_URL"]?.ToString(),
+            ["Signaling:WebhookSecret"] =
+                envVars["ELAVIEW_BACKEND_SIGNALING_WEBHOOK_SECRET"]?.ToString()
         };
 
         builder.Configuration.AddInMemoryCollection(configData);

@@ -27,6 +27,22 @@ public enum SpaceType {
     Other
 }
 
+public enum CareerDepartment {
+    Engineering,
+    Design,
+    Marketing,
+    Sales,
+    Operations,
+    CustomerSuccess
+}
+
+public enum CareerType {
+    FullTime,
+    PartTime,
+    Contract,
+    Internship
+}
+
 public enum SpaceStatus {
     Active,
     Inactive,
@@ -243,6 +259,42 @@ public enum OutreachMessageType {
     FollowUp3,
     DemoInvite,
     CheckIn
+}
+
+public enum DigitalSignageScreenStatus {
+    Offline,
+    Online,
+    Error,
+    Maintenance
+}
+
+public enum DigitalSignageDeviceType {
+    RaspberryPi,
+    FireTv,
+    AndroidTv,
+    SmartTv,
+    Other
+}
+
+public enum DigitalSignageDeviceStatus {
+    Unpaired,
+    Pairing,
+    Online,
+    Offline,
+    Error,
+    Disabled
+}
+
+public enum DigitalSignageCreativeType {
+    Image,
+    Video
+}
+
+public enum DigitalSignageScheduleStatus {
+    Pending,
+    Active,
+    Completed,
+    Cancelled
 }
 
 public enum Scale {
